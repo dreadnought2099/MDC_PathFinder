@@ -13,7 +13,7 @@
 
                 <!-- Overlay Button -->
                 <button onclick="openModal()"
-                    class="absolute inset-0 bg-black bg-opacity-50 text-white text-xs rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
+                    class="absolute inset-0 bg-primary bg-opacity-50 text-white text-xs rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 cursor-pointer">
                     Change Profile Image
                 </button>
             </div>
