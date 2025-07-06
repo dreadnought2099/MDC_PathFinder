@@ -3,35 +3,139 @@
 @section('content')
     <div class="container mx-auto p-6">
         <div class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg border border-primary">
-            <h2 class="text-2xl font-bold text-center mb-4">
-                Profil<span class="text-primary">e</span>
-            </h2>
+            <h2 class="text-2xl font-bold text-center mb-4">Profile</h2>
 
-            {{-- Profile image preview --}}
             <div class="flex justify-center mb-4">
                 <img src="{{ $user->profile_photo_url ?? asset('images/profile.jpeg') }}" alt="Profile"
-                     class="h-32 w-32 rounded-full object-cover">
+                    class="h-32 w-32 rounded-full object-cover border">
             </div>
 
-            {{-- Upload form --}}
-            <form method="POST" action="{{ route('admin.profile.updateImage') }}" enctype="multipart/form-data" class="space-y-4">
-                @csrf
+            <button class="bg-primary text-white w-full py-2 rounded hover:bg-primary-dark cursor-pointer" onclick="openModal()">
+                Change Profile Image
+            </button>
 
-                <div>
-                    <label for="profile_image" class="block text-sm font-medium text-gray-700">Change Profile Image</label>
-                    <input type="file" name="profile_image" id="profile_image"
-                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" accept="image/*" required>
-                </div>
-
-                <button type="submit" class="bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark w-full">
-                    Upload
-                </button>
-            </form>
-            
+            {{-- User Info --}}
             <div class="space-y-3 mt-6">
-                <p>Name:{{ $user->name }}</p>
-                <p>Email:{{ $user->email }}</p>
+                <p>Name: {{ $user->name }}</p>
+                <p>Email: {{ $user->email }}</p>
             </div>
         </div>
     </div>
+
+    <style>
+        .modal {
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+    </style>
+
+    {{-- Modal --}}
+    <div id="cropperModal" class="modal fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex justify-center items-center"
+        onclick="handleOutsideClick(event)">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative">
+
+            <button type="button" onclick="closeModal()"
+                class="absolute top-2 right-3 text-6xl text-gray-500 font-bold hover:text-red-600 focus:outline-none cursor-pointer"
+                aria-label="Close">
+                &times;
+            </button>
+
+
+            <h3 class="text-lg font-semibold mb-4">Crop Image</h3>
+
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                    <img id="image-to-crop" class="max-w-full max-h-[400px] mx-auto">
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 mb-2">Preview</p>
+                    <div class="w-32 h-32 border overflow-hidden">
+                        <img id="preview" class="w-full h-full object-cover">
+                    </div>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ route('admin.profile.updateImage') }}" enctype="multipart/form-data"
+                id="upload-form" class="mt-4">
+                @csrf
+                <input type="hidden" name="cropped_image" id="cropped_image">
+                <input type="file" id="profile_image" accept="image/*" class="hidden">
+                <div class="flex justify-end">
+                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded cursor-pointer">Crop Image</button>
+                </div>
+            </form>
+        </div>
+    </div>
+@endsection
+
+@section('scripts')
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+    <script>
+        let cropper;
+        const input = document.getElementById('profile_image');
+        const image = document.getElementById('image-to-crop');
+        const preview = document.getElementById('preview');
+        const modal = document.getElementById('cropperModal');
+
+        window.openModal = function() {
+            input.click();
+        };
+
+        window.handleOutsideClick = function(event) {
+            const modal = document.getElementById('cropperModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+
+        window.closeModal = function() {
+            modal.classList.add('hidden');
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+            image.src = '';
+            preview.src = '';
+            input.value = '';
+        };
+
+        input.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                image.src = reader.result;
+                preview.src = reader.result;
+                modal.classList.remove('hidden');
+
+                if (cropper) cropper.destroy();
+                cropper = new Cropper(image, {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    preview: '#preview',
+                });
+            };
+            reader.readAsDataURL(file);
+        });
+
+        document.getElementById('upload-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if (!cropper) return;
+
+            cropper.getCroppedCanvas({
+                width: 300,
+                height: 300,
+            }).toBlob((blob) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    document.getElementById('cropped_image').value = reader.result;
+                    e.target.submit();
+                };
+                reader.readAsDataURL(blob);
+            });
+        });
+    </script>
 @endsection

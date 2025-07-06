@@ -18,5 +18,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/profile', [ProfileController::class, 'index'])->name('admin.profile');
-    Route::post('/admin/profile/image', [ProfileController::class, 'updateImage'])->name('admin.profile.updateImage')->middleware('auth');
+    Route::post('/admin/profile/update-image', [ProfileController::class, 'updateImage'])->name('admin.profile.updateImage');
+
 });

@@ -7,7 +7,6 @@
 
     <title>{{ config('app.name') }}</title>
     @vite('resources/css/app.css')
-    <script src="//unpkg.com/alpinejs" defer></script>
 </head>
 <body>
     @include('components.navbar')
@@ -15,6 +14,10 @@
      {{-- Main Content --}}
     <main class="flex-grow container mx-auto px-4 py-6">
         @yield('content')
-    </main>    
+    </main>  
+    
+    <script src="//unpkg.com/alpinejs" defer></script>
+
+     @yield('scripts')
 </body>
 </html>

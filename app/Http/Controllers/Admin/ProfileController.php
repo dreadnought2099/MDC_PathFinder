@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ProfileController extends Controller
 {
@@ -19,30 +20,20 @@ class ProfileController extends Controller
     public function updateImage(Request $request)
     {
         $request->validate([
-            'profile_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:51200',
+            'cropped_image' => 'required|string',
         ]);
 
-        $user = Auth::user(); // adjust guard if needed
+        $imageData = $request->input('cropped_image');
+        $image = str_replace('data:image/png;base64,', '', $imageData);
+        $image = str_replace(' ', '+', $image);
+        $imageName = Str::random(10) . '.png';
 
-        if (!$user) {
-            abort(403, 'Unauthorized');
-        }
+        Storage::disk('public')->put("profile_images/{$imageName}", base64_decode($image));
 
-        // Delete old image if needed
-        if ($user->profile_photo_path && Storage::exists($user->profile_photo_path)) {
-            Storage::delete($user->profile_photo_path);
-        }
-
-        // Use original filename
-        $file = $request->file('profile_image');
-        $filename = $file->getClientOriginalName();
-
-        // Store using the original filename in a user-specific folder
-        $path = $file->storeAs("public/profile-images/{$user->id}", $filename);
-
-        $user->profile_photo_path = $path;
+        $user = auth()->user(); // or Auth::guard('admin')->user();
+        $user->profile_photo_path = "profile_images/{$imageName}";
         $user->save();
 
-        return back()->with('success', 'Profile image updated.');
+        return back()->with('success', 'Profile image updated!');
     }
 }
