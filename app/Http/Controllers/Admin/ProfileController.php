@@ -23,17 +23,29 @@ class ProfileController extends Controller
             'cropped_image' => 'required|string',
         ]);
 
-        $imageData = $request->input('cropped_image');
-        $image = str_replace('data:image/png;base64,', '', $imageData);
-        $image = str_replace(' ', '+', $image);
-        $imageName = Str::random(10) . '.png';
+        $user = Auth::user();
 
-        Storage::disk('public')->put("profile_images/{$imageName}", base64_decode($image));
+        // Delete old image if exists
+        if ($user->profile_photo_path && Storage::disk('public')->exists($user->profile_photo_path)) {
+            Storage::disk('public')->delete($user->profile_photo_path);
+        }
 
-        $user = auth()->user(); // or Auth::guard('admin')->user();
-        $user->profile_photo_path = "profile_images/{$imageName}";
+        // Decode base64 image
+        $base64Image = $request->input('cropped_image');
+        preg_match("/^data:image\/(\w+);base64,/", $base64Image, $type);
+        $image = substr($base64Image, strpos($base64Image, ',') + 1);
+        $image = base64_decode($image);
+        $extension = $type[1]; // jpg, png, etc.
+
+        $cleanName = Str::slug($user->name);
+        $filename = $cleanName . '-' . time() . '.' . $extension;
+        $path = 'profile_images/' . $filename;
+
+        Storage::disk('public')->put($path, $image);
+
+        $user->profile_photo_path = $path;
         $user->save();
 
-        return back()->with('success', 'Profile image updated!');
+        return back()->with('success', 'Profile image updated successfully.');
     }
 }

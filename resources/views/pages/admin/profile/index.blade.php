@@ -3,21 +3,25 @@
 @section('content')
     <div class="container mx-auto p-6">
         <div class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg border border-primary">
-            <h2 class="text-2xl font-bold text-center mb-4">Profile</h2>
+            <h2 class="text-2xl font-bold text-center mb-6">Profile</h2>
 
-            <div class="flex justify-center mb-4">
-                <img src="{{ $user->profile_photo_url ?? asset('images/profile.jpeg') }}" alt="Profile"
-                    class="h-32 w-32 rounded-full object-cover border">
+            <!-- Profile Image Wrapper -->
+            <div class="relative w-40 h-40 mx-auto mb-4">
+                <img src="{{ $user->profile_photo_path ? asset('storage/' . $user->profile_photo_path) . '?v=' . time() : asset('images/profile.jpeg') }}"
+                    alt="Profile"
+                    class="w-full h-full rounded-full object-cover border">
+
+                <!-- Overlay Button -->
+                <button onclick="openModal()"
+                    class="absolute inset-0 bg-black bg-opacity-50 text-white text-xs rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
+                    Change Profile Image
+                </button>
             </div>
 
-            <button class="bg-primary text-white w-full py-2 rounded hover:bg-primary-dark cursor-pointer" onclick="openModal()">
-                Change Profile Image
-            </button>
-
-            {{-- User Info --}}
-            <div class="space-y-3 mt-6">
-                <p>Name: {{ $user->name }}</p>
-                <p>Email: {{ $user->email }}</p>
+            <!-- User Info -->
+            <div class="space-y-2 text-center">
+                <p><strong>Name:</strong> {{ $user->name }}</p>
+                <p><strong>Email:</strong> {{ $user->email }}</p>
             </div>
         </div>
     </div>
@@ -28,27 +32,27 @@
         }
     </style>
 
-    {{-- Modal --}}
-    <div id="cropperModal" class="modal fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex justify-center items-center"
+    <!-- Modal -->
+    <div id="cropperModal"
+        class="modal fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex justify-center items-center cursor-pointer"
         onclick="handleOutsideClick(event)">
         <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative">
 
             <button type="button" onclick="closeModal()"
-                class="absolute top-2 right-3 text-6xl text-gray-500 font-bold hover:text-red-600 focus:outline-none cursor-pointer"
+                class="absolute top-2 right-4 text-6xl text-gray-500 hover:text-red-600 focus:outline-none cursor-pointer"
                 aria-label="Close">
                 &times;
             </button>
 
-
-            <h3 class="text-lg font-semibold mb-4">Crop Image</h3>
+            <h3 class="text-xl font-semibold mb-4">Crop Image</h3>
 
             <div class="flex flex-col md:flex-row gap-4">
                 <div class="flex-1">
-                    <img id="image-to-crop" class="max-w-full max-h-[400px] mx-auto">
+                    <img id="image-to-crop" class="max-w-full max-h-[400px] mx-auto rounded">
                 </div>
                 <div>
                     <p class="text-sm text-gray-500 mb-2">Preview</p>
-                    <div class="w-32 h-32 border overflow-hidden">
+                    <div class="w-32 h-32 border overflow-hidden rounded-full">
                         <img id="preview" class="w-full h-full object-cover">
                     </div>
                 </div>
@@ -59,8 +63,11 @@
                 @csrf
                 <input type="hidden" name="cropped_image" id="cropped_image">
                 <input type="file" id="profile_image" accept="image/*" class="hidden">
-                <div class="flex justify-end">
-                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded cursor-pointer">Crop Image</button>
+                <div class="flex justify-end mt-4">
+                    <button type="submit"
+                        class="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded cursor-pointer">
+                        Crop & Upload
+                    </button>
                 </div>
             </form>
         </div>
@@ -78,18 +85,15 @@
         const preview = document.getElementById('preview');
         const modal = document.getElementById('cropperModal');
 
-        window.openModal = function() {
+        window.openModal = function () {
             input.click();
         };
 
-        window.handleOutsideClick = function(event) {
-            const modal = document.getElementById('cropperModal');
-            if (event.target === modal) {
-                closeModal();
-            }
+        window.handleOutsideClick = function (event) {
+            if (event.target === modal) closeModal();
         };
 
-        window.closeModal = function() {
+        window.closeModal = function () {
             modal.classList.add('hidden');
             if (cropper) {
                 cropper.destroy();
@@ -120,15 +124,11 @@
             reader.readAsDataURL(file);
         });
 
-        document.getElementById('upload-form').addEventListener('submit', function(e) {
+        document.getElementById('upload-form').addEventListener('submit', function (e) {
             e.preventDefault();
-
             if (!cropper) return;
 
-            cropper.getCroppedCanvas({
-                width: 300,
-                height: 300,
-            }).toBlob((blob) => {
+            cropper.getCroppedCanvas({ width: 300, height: 300 }).toBlob((blob) => {
                 const reader = new FileReader();
                 reader.onloadend = () => {
                     document.getElementById('cropped_image').value = reader.result;
