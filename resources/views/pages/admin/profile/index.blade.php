@@ -20,8 +20,8 @@
 
             <!-- User Info -->
             <div class="space-y-2 text-center">
-                <p><strong>Name:</strong> {{ $user->name }}</p>
-                <p><strong>Email:</strong> {{ $user->email }}</p>
+                <p><span class="text-primary">Name:</span> {{ $user->name }}</p>
+                <p><span class="text-primary">Email:</span> {{ $user->email }}</p>
             </div>
         </div>
     </div>
