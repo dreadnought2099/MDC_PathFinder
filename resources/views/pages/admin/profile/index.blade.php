@@ -8,8 +8,7 @@
             <!-- Profile Image Wrapper -->
             <div class="relative w-40 h-40 mx-auto mb-4">
                 <img src="{{ $user->profile_photo_path ? asset('storage/' . $user->profile_photo_path) . '?v=' . time() : asset('images/profile.jpeg') }}"
-                    alt="Profile"
-                    class="w-full h-full rounded-full object-cover border">
+                    alt="Profile" class="w-full h-full rounded-full object-cover border">
 
                 <!-- Overlay Button -->
                 <button onclick="openModal()"
@@ -83,15 +82,15 @@
         const preview = document.getElementById('preview');
         const modal = document.getElementById('cropperModal');
 
-        window.openModal = function () {
+        window.openModal = function() {
             input.click();
         };
 
-        window.handleOutsideClick = function (event) {
+        window.handleOutsideClick = function(event) {
             if (event.target === modal) closeModal();
         };
 
-        window.closeModal = function () {
+        window.closeModal = function() {
             modal.classList.add('hidden');
             if (cropper) {
                 cropper.destroy();
@@ -121,17 +120,36 @@
             reader.readAsDataURL(file);
         });
 
-        document.getElementById('upload-form').addEventListener('submit', function (e) {
+        document.getElementById('upload-form').addEventListener('submit', function(e) {
             e.preventDefault();
             if (!cropper) return;
 
-            cropper.getCroppedCanvas({ width: 300, height: 300 }).toBlob((blob) => {
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    document.getElementById('cropped_image').value = reader.result;
-                    e.target.submit();
-                };
-                reader.readAsDataURL(blob);
+            cropper.getCroppedCanvas({
+                width: 300,
+                height: 300
+            }).toBlob((blob) => {
+                const formData = new FormData();
+                formData.append('cropped_image', blob);
+                formData.append('_token', '{{ csrf_token() }}');
+
+                fetch('{{ route('admin.profile.updateImage') }}', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.imageUrl) {
+                            // ✅ This is where you paste it
+                            document.querySelector('[x-ref="navbarProfile"]').src = data.imageUrl +
+                                '?v=' + new Date().getTime();
+                        }
+
+                        closeModal();
+                    })
+                    .catch(error => {
+                        console.error('Upload failed:', error);
+                        closeModal();
+                    });
             });
         });
     </script>
