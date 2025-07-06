@@ -52,9 +52,7 @@
                 </div>
                 <div>
                     <p class="text-sm text-gray-500 mb-2">Preview</p>
-                    <div class="w-32 h-32 border overflow-hidden rounded-full">
-                        <img id="preview" class="w-full h-full object-cover">
-                    </div>
+                    <div id="preview" class="w-32 h-32 border overflow-hidden rounded-full"></div>
                 </div>
             </div>
 
@@ -111,7 +109,6 @@
             const reader = new FileReader();
             reader.onload = () => {
                 image.src = reader.result;
-                preview.src = reader.result;
                 modal.classList.remove('hidden');
 
                 if (cropper) cropper.destroy();
