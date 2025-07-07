@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 
 
-Route::get('/ar-view', [NavigationController::class, 'index'])->name('ar.view');
+Route::get('/scanMarker', [NavigationController::class, 'index'])->name('ar.view');
 // Home page
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
