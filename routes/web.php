@@ -6,6 +6,10 @@ use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/ar-view', function () {
+    return view('pages.client.ar');
+});
+
 // Home page
 Route::get('/', [HomeController::class, 'index'])->name('home');
 

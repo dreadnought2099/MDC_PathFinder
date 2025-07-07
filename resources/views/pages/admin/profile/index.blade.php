@@ -2,8 +2,9 @@
 
 @section('content')
     <div class="container mx-auto p-6">
-        <div class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg border border-primary">
-            <h2 class="text-2xl font-bold text-center mb-6">Profile</h2>
+        
+        <div class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg border-2 border-primary">
+            <h2 class="text-2xl text-center mb-6">Profile</h2>
 
             <!-- Profile Image Wrapper -->
             <div class="relative w-40 h-40 mx-auto mb-4">

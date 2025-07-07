@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1>Admin Dashboard</h1>
+    <div class="text-center text-5xl">
+        <h1>Admin Dashboard</h1>
+    </div>
 @endsection
