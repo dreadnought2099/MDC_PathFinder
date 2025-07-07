@@ -8,10 +8,13 @@ use App\Http\Controllers\NavigationController;
 use Illuminate\Support\Facades\Route;
 
 
-
-Route::get('/scanMarker', [NavigationController::class, 'index'])->name('ar.view');
 // Home page
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+
+Route::get('/navigate/from/{markerId}', [NavigationController::class, 'showAvailableRooms']);
+Route::get('/scanMarker', [NavigationController::class, 'index'])->name('ar.view');
+
 
 // Admin login (GET and POST)
 Route::get('/admin', [LogInController::class, 'showLoginForm'])->name('login');

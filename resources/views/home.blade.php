@@ -1,7 +1,7 @@
 @extends('layouts.guest')
 
 @section('content')
-    <div class="min-h-screen flex flex-col justify-between items-center px-4 py-10 bg-gray-100">
+    <div class="min-h-screen flex flex-col justify-between items-center px-4 py-10">
         <!-- Centered text -->
         <div class="text-center mt-20">
             <h3 class="text-3xl font-semibold">Welcome to</h3>
