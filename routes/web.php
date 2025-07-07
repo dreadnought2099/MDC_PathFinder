@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/ar-view', function () {
     return view('pages.client.ar');
-});
+})->name('ar.view');
 
 // Home page
 Route::get('/', [HomeController::class, 'index'])->name('home');

@@ -19,8 +19,8 @@
 
 <body>
     <a-scene embedded arjs>
-        <a-marker type="pattern" url="/markers/pattern1.patt">
-            <a-box position="0 0.5 0" material="color: red;"></a-box>
+        <a-marker type="pattern" url="/marker-patterns/pattern-1.patt">
+            <a-box position="0 0.5 0" material="color: blue;"></a-box>
         </a-marker>
 
         <a-entity camera></a-entity>
