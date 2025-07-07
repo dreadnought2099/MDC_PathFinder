@@ -4,12 +4,12 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NavigationController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/ar-view', function () {
-    return view('pages.client.ar');
-})->name('ar.view');
 
+
+Route::get('/ar-view', [NavigationController::class, 'index'])->name('ar.view');
 // Home page
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
