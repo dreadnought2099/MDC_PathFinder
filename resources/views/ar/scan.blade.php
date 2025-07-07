@@ -13,17 +13,29 @@
     <script>
         // REGISTER BEFORE scene renders
         AFRAME.registerComponent('redirect-on-scan', {
-            init: function () {
+            init: function() {
                 this.el.addEventListener('markerFound', () => {
                     const markerId = this.el.getAttribute('id');
                     window.location.href = `/navigate/from/${markerId}`;
                 });
             }
         });
+
+        AFRAME.registerComponent('scan-animation', {
+            tick: function(time, timeDelta) {
+                const y = Math.sin(time / 500) * 0.4;
+                this.el.setAttribute('position', `0 0.101 ${y}`);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('#scan-line').setAttribute('scan-animation', '');
+        });
     </script>
 
     <style>
-        html, body {
+        html,
+        body {
             margin: 0;
             overflow: hidden;
             height: 100%;
@@ -35,7 +47,9 @@
 <body>
     <a-scene embedded arjs="sourceType: webcam; detectionMode: mono;">
         <a-marker id="marker1" type="pattern" url="/marker-patterns/pattern-1.patt" redirect-on-scan>
-            <a-box position="0 0.5 0" material="color: blue;"></a-box>
+            <a-plane id="scan-line" position="0 0.101 0" width="1" height="0.02" rotation="-90 0 0" color="green">
+            </a-plane>
+
         </a-marker>
 
         <a-entity camera></a-entity>
