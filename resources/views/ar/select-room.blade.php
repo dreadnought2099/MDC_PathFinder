@@ -7,15 +7,17 @@
 
             <ul class="space-y-4">
                 @foreach ($rooms as $room)
-                    <li class="border border-primary rounded px-4 py-3 hover:bg-gray-50 transition">
-                        <div class="flex items-center justify-between">
-                            <span>{{ $room->name }}</span>
-                            <a href="{{ url("/navigate/to/{$markerId}/{$room->id}") }}"
-                               class="text-blue-600 hover:underline">
-                                Navigate →
-                            </a>
-                        </div>
-                    </li>
+                    @if ($room->marker_id !== $markerId)
+                        <li class="border border-primary rounded px-4 py-3 hover:bg-gray-50 transition">
+                            <div class="flex items-center justify-between">
+                                <span>{{ $room->name }}</span>
+                                <a href="{{ url("/navigate/to/{$markerIdentifier}/{$room->id}") }}"
+                                    class="text-blue-600 hover:underline">
+                                    Navigate →
+                                </a>
+                            </div>
+                        </li>
+                    @endif
                 @endforeach
             </ul>
 

@@ -6,16 +6,22 @@ use Illuminate\Http\Request;
 
 class NavigationController extends Controller
 {
-    public function index() {
-         return view('ar.scan');
+    public function index()
+    {
+        return view('ar.scan');
     }
 
-    public function showAvailableRooms($markerId)
-{
-    // You can optionally filter rooms by marker proximity or logic here
-    $rooms = \App\Models\Room::with('marker')->get();
+    public function showAvailableRooms($markerIdentifier)
+    {
+        // Find marker record by unique marker ID string
+        $marker = \App\Models\Marker::where('marker_id', $markerIdentifier)->firstOrFail();
 
-    return view('ar.select-room', compact('rooms', 'markerId'));
-}
+        $rooms = \App\Models\Room::with('marker')->get();
 
+        return view('ar.select-room', [
+            'rooms' => $rooms,
+            'markerId' => $marker->id, // Use numeric ID for comparison
+            'markerIdentifier' => $marker->marker_id // optional, for UI
+        ]);
+    }
 }

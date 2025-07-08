@@ -49,9 +49,11 @@
         <a-marker id="marker1" type="pattern" url="/marker-patterns/pattern-1.patt" redirect-on-scan>
             <a-plane id="scan-line" position="0 0.101 0" width="1" height="0.02" rotation="-90 0 0" color="green">
             </a-plane>
-
         </a-marker>
-
+         <a-marker id="marker2" type="pattern" url="/marker-patterns/pattern-2.patt" redirect-on-scan>
+            <a-plane id="scan-line" position="0 0.101 0" width="1" height="0.02" rotation="-90 0 0" color="green">
+            </a-plane>
+        </a-marker>
         <a-entity camera></a-entity>
     </a-scene>
 </body>
