@@ -11,7 +11,7 @@
                         <li class="border border-primary rounded px-4 py-3 hover:bg-gray-50 transition">
                             <div class="flex items-center justify-between">
                                 <span>{{ $room->name }}</span>
-                                <a href="{{ url("/navigate/to/{$markerIdentifier}/{$room->id}") }}"
+                                <a href="{{ route('ar.navigate', ['sourceMarkerId' => $markerIdentifier, 'roomId' => $room->id]) }}"
                                     class="text-blue-600 hover:underline">
                                     Navigate →
                                 </a>

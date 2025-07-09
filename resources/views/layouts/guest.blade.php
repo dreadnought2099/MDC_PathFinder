@@ -7,6 +7,8 @@
 
     <title>{{ config('app.name') }}</title>
     @vite('resources/css/app.css')
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/ar.js/1.7.2/aframe/build/aframe-ar.min.js"></script>
 
 </head>
 <body>
@@ -14,5 +16,7 @@
     <main class="flex-grow container mx-auto px-4 py-6">
         @yield('content')
     </main>    
+
+    @stack('scripts')
 </body>
 </html>

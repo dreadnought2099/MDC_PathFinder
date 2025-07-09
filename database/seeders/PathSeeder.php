@@ -3,11 +3,11 @@
 namespace Database\Seeders;
 
 use App\Models\Marker;
-use App\Models\Room;
+use App\Models\Path;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class RoomSeeder extends Seeder
+class PathSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -17,14 +17,10 @@ class RoomSeeder extends Seeder
         $marker1 = Marker::where('marker_id', 'marker-1')->first();
         $marker2 = Marker::where('marker_id', 'marker-2')->first();
 
-        Room::create([
-            'name' => 'Library',
-            'marker_id' => $marker1->id,
-        ]);
-
-        Room::create([
-            'name' => 'Computer Lab',
-            'marker_id' => $marker2->id,
+        Path::create([
+            'from_marker_id' => $marker1->id,
+            'to_marker_id' => $marker2->id,
+            'angle' => 90, // example: facing east
         ]);
     }
 }

@@ -11,12 +11,17 @@
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
 
     <script>
+        const routeBase = @json(route('ar.select-room', ['markerIdentifier' => 'MARKER_ID']));
+    </script>
+    
+    <script>
         // REGISTER BEFORE scene renders
         AFRAME.registerComponent('redirect-on-scan', {
             init: function() {
                 this.el.addEventListener('markerFound', () => {
                     const markerId = this.el.getAttribute('id');
-                    window.location.href = `/navigate/from/${markerId}`;
+                    const finalUrl = routeBase.replace('MARKER_ID', markerId);
+                    window.location.href = finalUrl;
                 });
             }
         });
@@ -46,12 +51,13 @@
 
 <body>
     <a-scene embedded arjs="sourceType: webcam; detectionMode: mono;">
-        <a-marker id="marker1" type="pattern" url="/marker-patterns/pattern-1.patt" redirect-on-scan>
+        <a-marker id="marker-1" type="pattern" url="/marker-patterns/pattern-1.patt" redirect-on-scan>
             <a-plane id="scan-line" position="0 0.101 0" width="1" height="0.02" rotation="-90 0 0" color="green">
             </a-plane>
         </a-marker>
-         <a-marker id="marker2" type="pattern" url="/marker-patterns/pattern-2.patt" redirect-on-scan>
-            <a-plane id="scan-line" position="0 0.101 0" width="1" height="0.02" rotation="-90 0 0" color="green">
+        <a-marker id="marker-2" type="pattern" url="/marker-patterns/pattern-2.patt" redirect-on-scan>
+            <a-plane id="scan-line" position="0 0.101 0" width="1" height="0.02" rotation="-90 0 0"
+                color="green">
             </a-plane>
         </a-marker>
         <a-entity camera></a-entity>

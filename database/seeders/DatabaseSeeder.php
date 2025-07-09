@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
             MarkerSeeder::class,
             RoomSeeder::class,
+            PathSeeder::class,
         ]);
     }
 }

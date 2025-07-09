@@ -15,4 +15,14 @@ class Marker extends Model
     {
         return $this->hasMany(Room::class);
     }
+
+    public function pathsFrom()
+    {
+        return $this->hasMany(Path::class, 'from_marker_id');
+    }
+
+    public function pathsTo()
+    {
+        return $this->hasMany(Path::class, 'to_marker_id');
+    }
 }

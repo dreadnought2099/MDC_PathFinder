@@ -14,12 +14,12 @@ class MarkerSeeder extends Seeder
     public function run(): void
     {
         Marker::create([
-            'marker_id' => 'marker1',
+            'marker_id' => 'marker-1',
             'pattern_url' => 'marker-patterns/pattern-1.patt',
         ]);
 
         Marker::create([
-            'marker_id' => 'marker2',
+            'marker_id' => 'marker-2',
             'pattern_url' => 'marker-patterns/pattern-2.patt',
         ]);
     }
