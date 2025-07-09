@@ -44,7 +44,7 @@
                 &times;
             </button>
 
-            <h3 class="text-xl font-semibold mb-4">Crop Image</h3>
+            <h3 class="text-xl mb-4">Crop Image</h3>
 
             <div class="flex flex-col md:flex-row gap-4">
                 <div class="flex-1">
@@ -63,7 +63,7 @@
                 <input type="file" id="profile_image" accept="image/*" class="hidden">
                 <div class="flex justify-end mt-4">
                     <button type="submit"
-                        class="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded cursor-pointer">
+                        class="px-4 py-2 bg-primary hover:bg-white hover:text-primary border border-primary duration-300 ease-in-out text-white rounded cursor-pointer">
                         Crop & Upload
                     </button>
                 </div>
