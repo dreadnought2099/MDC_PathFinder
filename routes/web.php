@@ -3,8 +3,15 @@
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\LogInController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\TourController;
 use Illuminate\Support\Facades\Route;
 
+
+Route::get('/', [HomeController::class, 'index'])->name('index');
+
+
+Route::get('/scan-marker', [TourController::class, 'index'])->name('ar.view');
 
 // Admin login (GET and POST)
 Route::get('/admin', [LogInController::class, 'showLoginForm'])->name('login');
