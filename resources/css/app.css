@@ -1,0 +1,175 @@
+@import 'tailwindcss';
+@source "../views";
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+@font-face {
+    font-family: "Anton";
+    src: url("/fonts/Anton-Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+@layer base {
+    :root {
+        --color-primary: #157ee1;
+        --color-secondary: #a31621;
+        --color-dark: #212121;
+        --color-note: #f7374f;
+    }
+
+    ::selection {
+        background-color: var(--color-primary);
+        color: white;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        font-family: "Anton", sans-serif;
+    }
+}
+
+@layer utilities {
+    .bg-primary {
+        background-color: var(--color-primary);
+    }
+
+    .bg-dark {
+        background-color: var(--color-dark);
+    }
+
+    .bg-secondary {
+        background-color: var(--color-secondary);
+    }
+
+    .bg-note {
+        background-color: var(--color-note);
+    }
+
+    .text-primary {
+        color: var(--color-primary);
+    }
+
+    .text-secondary {
+        color: var(--color-secondary);
+    }
+
+    .text-dark {
+        color: var(--color-dark);
+    }
+
+    .text-note {
+        color: var(--color-note);
+    }
+
+    .border-primary {
+        border-color: var(--color-primary);
+    }
+
+    .border-secondary {
+        border-color: var(--color-secondary);
+    }
+
+    .border-dark {
+        border-color: var(--color-dark);
+    }
+
+    /* For Hovering */
+    .hover\:bg-primary:hover {
+        background-color: var(--color-primary);
+    }
+
+    .hover\:bg-secondary:hover {
+        background-color: var(--color-secondary);
+    }
+
+    .hover\:border-primary:hover {
+        border-color: var(--color-primary);
+    }
+
+    .hover\:border-secondary:hover {
+        border-color: var(--color-secondary);
+    }
+
+    .hover\:text-primary:hover {
+        color: var(--color-primary);
+    }
+
+    .hover\:text-secondary:hover {
+        color: var(--color-secondary);
+    }
+
+    .hover\:text-dark:hover {
+        color: var(--color-dark);
+    }
+
+    .focus\:ring-primary:focus {
+        --tw-ring-color: var(--color-primary);
+        box-shadow: 0 0 0 1px var(--tw-ring-color);
+    }
+
+    .focus\:border-primary:focus {
+        border-color: var(--color-primary);
+    }
+
+    .peer:focus ~ label {
+        color: var(--color-primary);
+    }
+}
+
+@layer components {
+    .hover-underline {
+        @apply relative inline-block;
+    }
+
+    .hover-underline::after {
+        content: "";
+        @apply absolute left-1/2 bottom-0 w-0 h-0.5 bg-white transition-all duration-500 ease-in-out;
+    }
+
+    .hover-underline:hover::after {
+        @apply left-0 w-full;
+    }
+
+    /* For Hyperlinks */
+    .hover-underline-hyperlink {
+        @apply relative inline-block;
+    }
+
+    .hover-underline-hyperlink::after {
+        content: "";
+        @apply absolute left-1/2 bottom-0 w-0 h-0.5 transition-all duration-500 ease-in-out;
+        background-color: var(--color-primary);
+    }
+
+    .hover-underline-hyperlink:hover::after {
+        @apply left-0 w-full;
+    }
+
+    /* Delete hyperlink */
+    .hover-underline-hyperlink-secondary {
+        @apply relative inline-block;
+    }
+
+    .hover-underline-hyperlink-secondary::after {
+        content: "";
+        @apply absolute left-1/2 bottom-0 w-0 h-0.5 transition-all duration-500 ease-in-out;
+        background-color: var(--color-secondary);
+    }
+
+    .hover-underline-hyperlink-secondary:hover::after {
+        @apply left-0 w-full;
+    }
+}
