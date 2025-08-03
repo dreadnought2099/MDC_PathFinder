@@ -7,6 +7,6 @@ use Illuminate\Http\Request;
 class TourController extends Controller
 {
     public function index() {
-        return view('pages.client.index');
+        return view('pages.client.scan');
     }
 }
