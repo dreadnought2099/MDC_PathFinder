@@ -11,15 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('staff', function (Blueprint $table) {
+        Schema::create('room_images', function (Blueprint $table) {
             $table->id();
             $table->foreignId('room_id')->constrained()->onDelete('cascade');
-            $table->string('name');
-            $table->string('position')->nullable();
-            $table->text('bio')->nullable();
-            $table->string('email')->nullable();
-            $table->string('phone_num')->nullable();
-            $table->string('photo_path')->nullable();
+            $table->string('image_path');
             $table->timestamps();
         });
     }
@@ -29,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('staff');
+        Schema::dropIfExists('room_images');
     }
 };
