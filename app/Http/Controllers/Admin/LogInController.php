@@ -24,7 +24,7 @@ class LogInController extends Controller
             'password' => 'required'
         ]);
 
-        // Error message
+        // Error message & validates using Auth::attempt() to avoid SQL injection
         if (!Auth::attempt($validated)) {
            return back()->with('error', 'Invalid email or password');           
         }

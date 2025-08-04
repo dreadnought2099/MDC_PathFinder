@@ -29,6 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('admin')->name('room.')->group(function () {
         Route::get('/room', [RoomController::class, 'index'])->name('index');
         Route::get('/room/create', [RoomController::class, 'create'])->name('create');
+        Route::post('/room', [RoomController::class, 'store'])->name('store');
     });
 
 

@@ -16,13 +16,13 @@ class RoomController extends Controller
     public function index()
     {
         $rooms = Room::all();
-        return view('rooms.index', compact('rooms'));
+        return view('pages.admin.rooms.index', compact('rooms'));
     }
 
     public function create()
     {
         $staffs = Staff::all();
-        return view('rooms.create', compact('staffs'));
+        return view('pages.admin.rooms.create', compact('staffs'));
     }
 
     public function store(Request $request)
