@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="max-w-xl mx-auto mt-10">
-    <h2 class="text-2xl font-bold mb-6">Add Staff Member</h2>
+    <h2 class="text-2xl text-center mb-6">Add Staff Member</h2>
 
     <form action="{{ route('staff.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
@@ -38,7 +38,7 @@
         </div>
 
         <div>
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            <button type="submit" class="bg-primary text-white px-4 py-2 bg-primary rounded hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer">
                 Save Staff
             </button>
         </div>

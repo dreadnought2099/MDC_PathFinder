@@ -4,7 +4,8 @@
     <div class="text-center text-5xl">
         <h1>Admin Dashboard</h1>
 
-        <div x-data="{ open: false }" @click.away="open = false" class="fixed bottom-6 right-6 flex flex-col items-end space-y-2">
+        <div x-data="{ open: false }" @click.away="open = false"
+            class="fixed bottom-6 right-6 flex flex-col items-end space-y-2">
             <!-- Buttons -->
             <template x-if="open">
                 <div class="flex flex-col space-y-2 mb-2">
@@ -41,5 +42,10 @@
             </button>
         </div>
 
+        <div class="mb-4">
+            <a href="{{ route('staff.index') }}" class="text-primary">
+                Manage Staff
+            </a>
+        </div>
     </div>
 @endsection

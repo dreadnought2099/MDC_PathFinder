@@ -25,6 +25,22 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/profile', [ProfileController::class, 'index'])->name('admin.profile');
     Route::post('/admin/profile/update-image', [ProfileController::class, 'updateImage'])->name('admin.profile.updateImage');
 
-    Route::resource('room', RoomController::class)->only(['create', 'store']);
-    Route::resource('staff', StaffController::class)->only(['create', 'store']);
+
+    Route::prefix('admin')->name('room.')->group(function () {
+        Route::get('/room', [RoomController::class, 'index'])->name('index');
+        Route::get('/room/create', [RoomController::class, 'create'])->name('create');
+    });
+
+
+    Route::prefix('admin')->name('staff.')->group(function () {
+        Route::get('/staff', [StaffController::class, 'index'])->name('index');
+        Route::get('/staff/create', [StaffController::class, 'create'])->name('create');
+        Route::post('/staff', [StaffController::class, 'store'])->name('store');
+        Route::get('/staff/{staff}', [StaffController::class, 'show'])->name('show');
+        Route::get('/staff/{staff}/edit', [StaffController::class, 'edit'])->name('edit');
+        Route::put('/staff/{staff}', [StaffController::class, 'update'])->name('update');
+        Route::delete('/staff/{staff}', [StaffController::class, 'destroy'])->name('destroy');
+    });
+
+
 });
