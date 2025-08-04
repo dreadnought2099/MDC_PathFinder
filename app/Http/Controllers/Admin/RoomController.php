@@ -80,4 +80,84 @@ class RoomController extends Controller
 
         return redirect()->route('room.show', $room->id);
     }
+
+    public function show(Room $room)
+    {
+        $images = $room->images;
+        return view('pages.admin.rooms.show', compact('room', 'images'));
+    }
+
+
+    public function edit(Room $room)
+    {
+        $staffs = Staff::all();
+        return view('pages.admin.rooms.edit', compact('room', 'staffs'));
+    }
+
+    public function update(Request $request, Room $room)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'image_path' => 'nullable|image|max:5120',
+            'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200',
+            'office_hours' => 'nullable|string',
+        ]);
+
+        // Update fields
+        $room->fill($validated);
+
+        // Replace cover image if uploaded
+        if ($request->hasFile('image_path')) {
+            if ($room->image_path) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $room->image_path));
+            }
+            $path = $request->file('image_path')->store('room_images', 'public');
+            $room->image_path = 'storage/' . $path;
+        }
+
+        // Replace video if uploaded
+        if ($request->hasFile('video_path')) {
+            if ($room->video_path) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $room->video_path));
+            }
+            $path = $request->file('video_path')->store('room_videos', 'public');
+            $room->video_path = 'storage/' . $path;
+        }
+
+        $room->save();
+
+        return redirect()->route('room.show', $room->id)->with('success', 'Room updated successfully.');
+    }
+
+
+    public function destroy(Room $room)
+    {
+        // Delete cover image
+        if ($room->image_path && Storage::disk('public')->exists(str_replace('storage/', '', $room->image_path))) {
+            Storage::disk('public')->delete(str_replace('storage/', '', $room->image_path));
+        }
+
+        // Delete video
+        if ($room->video_path && Storage::disk('public')->exists(str_replace('storage/', '', $room->video_path))) {
+            Storage::disk('public')->delete(str_replace('storage/', '', $room->video_path));
+        }
+
+        // Delete QR code
+        if ($room->qr_code_path && Storage::disk('public')->exists(str_replace('storage/', '', $room->qr_code_path))) {
+            Storage::disk('public')->delete(str_replace('storage/', '', $room->qr_code_path));
+        }
+
+        // Delete carousel images
+        foreach ($room->images as $image) {
+            if ($image->image_path && Storage::disk('public')->exists(str_replace('storage/', '', $image->image_path))) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $image->image_path));
+            }
+            $image->delete();
+        }
+
+        $room->delete();
+
+        return redirect()->route('room.index')->with('success', 'Room deleted successfully.');
+    }
 }

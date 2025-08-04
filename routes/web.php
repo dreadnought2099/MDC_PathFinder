@@ -30,6 +30,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/room', [RoomController::class, 'index'])->name('index');
         Route::get('/room/create', [RoomController::class, 'create'])->name('create');
         Route::post('/room', [RoomController::class, 'store'])->name('store');
+        Route::get('/room/{room}', [RoomController::class, 'show'])->name('show');
+        Route::get('/room/{room}/edit', [RoomController::class, 'edit'])->name('edit');
+        Route::put('/room/{room}', [RoomController::class, 'update'])->name('update');
+        Route::delete('/room/{room}', [RoomController::class, 'destroy'])->name('destroy');
     });
 
 
@@ -42,6 +46,4 @@ Route::middleware('auth')->group(function () {
         Route::put('/staff/{staff}', [StaffController::class, 'update'])->name('update');
         Route::delete('/staff/{staff}', [StaffController::class, 'destroy'])->name('destroy');
     });
-
-
 });
