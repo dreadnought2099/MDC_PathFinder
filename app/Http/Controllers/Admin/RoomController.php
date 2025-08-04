@@ -30,35 +30,53 @@ class RoomController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'marker_id' => 'required|string|max:255',
-            'image_path' => 'nullable|string',
-            'video_path' => 'nullable|string',
+            'image_path' => 'nullable|image|max:5120',
+            'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200',
             'office_hours' => 'nullable|string',
         ]);
 
         $room = new Room($validated);
-        $room->save();
+
+        // Save cover image
+        if ($request->hasFile('image_path')) {
+            $imagePath = $request->file('image_path')->store('room_images', 'public');
+            $room->image_path = 'storage/' . $imagePath;
+        }
+
+        // Save short video
+        if ($request->hasFile('video_path')) {
+            $videoPath = $request->file('video_path')->store('room_videos', 'public');
+            $room->video_path = 'storage/' . $videoPath;
+        }
+
+        $room->save(); // Save to generate ID
+
+        $marker_id = 'room_' . $room->id;
+
+        $qrImage = QrCode::format('png')
+            ->size(300)
+            ->generate($marker_id);
+
+        $qrPath = 'qrcodes/' . $marker_id . '.png';
+
+        Storage::disk('public')->put($qrPath, $qrImage);
+
+        $room->update([
+            'marker_id' => $marker_id,
+            'qr_code_path' => 'storage/' . $qrPath,
+        ]);
+
 
         if ($request->hasFile('carousel_images')) {
-            foreach ($request->file('carousel_images') as $image) {
-                $path = $image->store('room_carousel', 'public');
+            foreach ($request->file('carousel_images') as $carouselImage) {
+                $path = $carouselImage->store('carousel_images/' . $room->id, 'public');
 
                 RoomImage::create([
                     'room_id' => $room->id,
-                    'image_path' => $path,
+                    'image_path' => 'storage/' . $path
                 ]);
             }
         }
-
-
-        // Generate QR code based on the room's ID or marker_id
-        $qrImage = QrCode::format('png')->size(300)->generate($room->marker_id);
-        $filePath = 'qrcodes/room_' . $room->id . '.png';
-
-        // Save to public storage
-        Storage::disk('public')->put($filePath, $qrImage);
-        $room->qr_code_path = 'storage/' . $filePath;
-        $room->save();
 
         return redirect()->route('room.show', $room->id);
     }

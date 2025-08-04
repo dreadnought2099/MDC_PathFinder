@@ -8,16 +8,16 @@
             @csrf
 
             <div class="mb-4">
-                <label class="block">Room/Office Name</label>
+                <label class="block text-gray-600">Room/Office Name</label>
                 <input type="text" name="name" class="w-full border p-2 rounded" required>
             </div>
 
             <div class="mb-4">
-                <label class="block">Description</label>
+                <label class="block text-gray-600">Description</label>
                 <textarea name="description" class="w-full border p-2 rounded"></textarea>
             </div>
 
-            <div class="mb-4">
+            {{-- <div class="mb-4">
                 <label for="staff_id">Assign Staff</label>
                 <select name="staff_id" class="w-full border p-2 rounded" required>
                     <option value="">Select a Staff</option>
@@ -25,31 +25,30 @@
                         <option value="{{ $staff->id }}">{{ $staff->name }}</option>
                     @endforeach
                 </select>
+            </div> --}}
 
-            </div>
-
-            <div class="mb-4">
-                <label class="block">Cover Image Path (optional)</label>
+            <div class="mb-4 text-gray-600">
+                <label class="block">Cover Image (optional)</label>
                 <input type="file" name="image_path" class="w-full border p-2 rounded">
             </div>
 
-            <div class="mb-4">
-                <label class="block">Carousel Images</label>
-                <input type="file" name="carousel_images[]" class="w-full border p-2 rounded" multiple>
+            <div class="mb-4 text-gray-600">
+                <input type="file" class="filepond" name="carousel_images[]" multiple data-max-files="5" />
             </div>
 
-            <div class="mb-4">
+            <div class="mb-4 text-gray-600">
                 <label class="block">Short Video Path (optional)</label>
                 <input type="file" name="video_path" class="w-full border p-2 rounded">
             </div>
 
-            <div class="mb-4">
+            <div class="mb-4 text-gray-600">
                 <label class="block">Office Hours</label>
                 <input type="text" name="office_hours" class="w-full border p-2 rounded">
             </div>
 
             <div>
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                <button type="submit"
+                    class="bg-primary text-white px-4 py-2 bg-primary rounded hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer">
                     Save Room
                 </button>
             </div>

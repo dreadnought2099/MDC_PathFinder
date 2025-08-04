@@ -10,15 +10,15 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
+    {   
         Schema::create('rooms', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('staff_id')->nullable()->constrained('staffs')->onDelete('cascade');
+            $table->foreignId('staff_id')->nullable()->constrained('staff')->onDelete('cascade');
             $table->string('name');
             $table->text('description')->nullable();
             $table->string('qr_code_path')->nullable();
-            $table->string('marker_id')->unique();
-            $table->string('image_path')->nullable();
+            $table->string('marker_id')->unique()->nullable();
+            $table->string('image_path')->nullable();   
             $table->string('video_path')->nullable();
             $table->string('office_hours')->nullable();
             $table->timestamps();
