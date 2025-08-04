@@ -23,7 +23,7 @@
     :root {
         --color-primary: #157ee1;
         --color-secondary: #a31621;
-        --color-dark: #212121;
+        --color-edit: #e1a224;
         --color-note: #f7374f;
     }
 
@@ -46,8 +46,8 @@
         background-color: var(--color-primary);
     }
 
-    .bg-dark {
-        background-color: var(--color-dark);
+    .bg-edit {
+        background-color: var(--color-edit);
     }
 
     .bg-secondary {
@@ -66,8 +66,8 @@
         color: var(--color-secondary);
     }
 
-    .text-dark {
-        color: var(--color-dark);
+    .text-edit {
+        color: var(--color-edit);
     }
 
     .text-note {
@@ -82,8 +82,8 @@
         border-color: var(--color-secondary);
     }
 
-    .border-dark {
-        border-color: var(--color-dark);
+    .border-edit {
+        border-color: var(--color-edit);
     }
 
     /* For Hovering */
@@ -136,40 +136,41 @@
 
     .hover-underline::after {
         content: "";
-        @apply absolute left-1/2 bottom-0 w-0 h-0.5 bg-white transition-all duration-500 ease-in-out;
+        @apply absolute left-1/2 bottom-0 w-0 h-0.5 transition-all duration-500 ease-in-out;
+        background-color: var(--color-primary);
     }
 
     .hover-underline:hover::after {
         @apply left-0 w-full;
     }
 
-    /* For Hyperlinks */
-    .hover-underline-hyperlink {
+    .hover-underline-edit {
         @apply relative inline-block;
     }
 
-    .hover-underline-hyperlink::after {
+    .hover-underline-edit::after {
         content: "";
-        @apply absolute left-1/2 bottom-0 w-0 h-0.5 transition-all duration-500 ease-in-out;
-        background-color: var(--color-primary);
+        @apply absolute left-1/2 bottom-0 w-0 h-0.5  transition-all duration-500 ease-in-out;
+        background-color: var(--color-edit);
     }
 
-    .hover-underline-hyperlink:hover::after {
+    .hover-underline-edit:hover::after {
         @apply left-0 w-full;
     }
 
+
     /* Delete hyperlink */
-    .hover-underline-hyperlink-secondary {
+    .hover-underline-delete {
         @apply relative inline-block;
     }
 
-    .hover-underline-hyperlink-secondary::after {
+    .hover-underline-delete::after {
         content: "";
         @apply absolute left-1/2 bottom-0 w-0 h-0.5 transition-all duration-500 ease-in-out;
         background-color: var(--color-secondary);
     }
 
-    .hover-underline-hyperlink-secondary:hover::after {
+    .hover-underline-delete:hover::after {
         @apply left-0 w-full;
     }
 }

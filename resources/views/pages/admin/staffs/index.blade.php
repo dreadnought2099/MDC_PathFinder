@@ -27,17 +27,20 @@
                         <tr class="border-t">
                             <td class="px-4 py-2">{{ $staff->name }}</td>
                             <td class="px-4 py-2 flex space-x-4">
-                                <a href="{{ route('staff.show', $staff->id) }}" class="text-blue-600 hover:underline">
+                                <a href="{{ route('staff.show', $staff->id) }}"
+                                    class="text-primary hover-underline hover:scale-105 transform transition duration-200">
                                     View
                                 </a>
-                                <a href="{{ route('staff.edit', $staff->id) }}" class="text-yellow-600 hover:underline">
+                                <a href="{{ route('staff.edit', $staff->id) }}"
+                                    class="text-edit hover-underline-edit hover:scale-105 transform transition duration-200">
                                     Edit
                                 </a>
                                 <form action="{{ route('staff.destroy', $staff->id) }}" method="POST"
                                     onsubmit="return confirm('Are you sure?')" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:underline">Delete</button>
+                                    <button type="submit"
+                                        class="text-secondary hover-underline-delete hover:scale-105 transform transition duration-200 cursor-pointer">Delete</button>
                                 </form>
                             </td>
                         </tr>

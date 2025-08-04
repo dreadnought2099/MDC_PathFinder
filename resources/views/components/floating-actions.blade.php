@@ -15,7 +15,7 @@
                                     d="M3 21h18M5 21V5a1 1 0 011-1h12a1 1 0 011 1v16M9 21v-4h6v4M9 9h.01M9 13h.01M12 9h.01M12 13h.01M15 9h.01M15 13h.01" />
                             </svg>
                         </div>
-                        <span class="text-sm text-gray-700">Create Room/Offices</span>
+                        <span class="text-sm text-gray-700 hover-underline-hyperlink">Create Room/Offices</span>
                     </a>
                     <a href="{{ route('staff.create') }}" class="group flex items-center space-x-2">
                         <div
@@ -26,7 +26,7 @@
                                     d="M5.121 17.804A8 8 0 0112 15a8 8 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
                         </div>
-                        <span class="text-sm text-gray-700">Add Staff Member</span>
+                        <span class="text-sm text-gray-700 hover-underline-hyperlink">Add Staff Member</span>
                     </a>
                 </div>
             </template>
