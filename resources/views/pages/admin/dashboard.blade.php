@@ -4,7 +4,7 @@
     <div class="text-center text-5xl">
         <h1>Admin Dashboard</h1>
 
-        <div x-data="{ open: false }" class="fixed bottom-6 right-6 flex flex-col items-end space-y-2">
+        <div x-data="{ open: false }" @click.away="open = false" class="fixed bottom-6 right-6 flex flex-col items-end space-y-2">
             <!-- Buttons -->
             <template x-if="open">
                 <div class="flex flex-col space-y-2 mb-2">
@@ -23,7 +23,6 @@
                     <a href="{{ route('staff.create') }}" class="group flex items-center space-x-2">
                         <div
                             class="flex items-center justify-center w-10 h-10 bg-primary text-white rounded-full hover:bg-white hover:text-primary border-2 border-primary transition">
-                            <!-- User Add Icon -->
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
