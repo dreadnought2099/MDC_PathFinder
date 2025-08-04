@@ -3,6 +3,8 @@
 @section('content')
     <div class="container mx-auto p-6">
         
+        <x-floating-actions />
+
         <div class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg border-2 border-primary">
             <h2 class="text-2xl text-center mb-6">Profile</h2>
 
