@@ -36,7 +36,7 @@
                                     Edit
                                 </a>
 
-                                <div x-data="{ showModal: false }" class="inline">
+                                <div x-data="() => ({ showModal: false })" class="inline">
                                     <button @click="showModal = true"
                                         class="text-secondary hover-underline-delete hover:scale-105 transform transition duration-200 cursor-pointer">
                                         Delete
@@ -53,7 +53,8 @@
                                             class="bg-white rounded-lg p-6 w-full max-w-sm shadow-lg">
                                             <h2 class="text-xl mb-4">Confirm Deletion</h2>
                                             <p class="mb-4">Are you sure you want to delete
-                                                <span class="text-primary">{{ $staff->name }}</span>?</p>
+                                                <span class="text-primary">{{ $staff->name }}</span>?
+                                            </p>
 
                                             <form method="POST" action="{{ route('staff.destroy', $staff->id) }}">
                                                 @csrf
