@@ -4,6 +4,8 @@
     <div class="p-6">
         <h1 class="text-2xl text-center mb-4">Staff List</h1>
 
+        <x-floating-actions />
+        
         {{-- Success Message --}}
         @if (session('success'))
             <div class="bg-green-100 text-green-800 p-3 rounded mb-4">
