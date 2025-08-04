@@ -39,7 +39,7 @@ class StaffController extends Controller
         }
 
         Staff::create($validated);
-
+        
         return redirect()->route('staff.index')->with('success', 'Staff created successfully.');
     }
 }

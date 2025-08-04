@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Room;
 use App\Models\RoomImage;
+use App\Models\Staff;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -20,7 +21,8 @@ class RoomController extends Controller
 
     public function create()
     {
-        return view('pages.admin.rooms.create');
+        $staffs = Staff::all();
+        return view('rooms.create', compact('staffs'));
     }
 
     public function store(Request $request)
@@ -40,14 +42,14 @@ class RoomController extends Controller
         if ($request->hasFile('carousel_images')) {
             foreach ($request->file('carousel_images') as $image) {
                 $path = $image->store('room_carousel', 'public');
-        
+
                 RoomImage::create([
                     'room_id' => $room->id,
                     'image_path' => $path,
                 ]);
             }
         }
-        
+
 
         // Generate QR code based on the room's ID or marker_id
         $qrImage = QrCode::format('png')->size(300)->generate($room->marker_id);
@@ -58,6 +60,6 @@ class RoomController extends Controller
         $room->qr_code_path = 'storage/' . $filePath;
         $room->save();
 
-        return redirect()->route('rooms.show', $room->id);
+        return redirect()->route('room.show', $room->id);
     }
 }
