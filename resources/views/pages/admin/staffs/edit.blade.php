@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="p-6">
-        <h1 class="text-2xl font-bold mb-6">Edit Staff</h1>
+        <h1 class="text-2xl text-center font-bold mb-6">Edit Staff</h1>
 
         <x-floating-actions />
 
@@ -56,7 +56,7 @@
             </div>
 
             <div>
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Update</button>
+                <button type="submit" class="bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary transition-all duration-300 cursor-pointer px-4 py-2 rounded">Update</button>
             </div>
         </form>
     </div>
