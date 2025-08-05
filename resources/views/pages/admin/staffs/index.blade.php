@@ -6,14 +6,12 @@
 
         <x-floating-actions />
 
-        {{-- Success Message --}}
         @if (session('success'))
             <div class="bg-green-100 text-green-800 p-3 rounded mb-4">
                 {{ session('success') }}
             </div>
         @endif
 
-        {{-- Staff Table --}}
         <div class="overflow-x-auto">
             <table class="min-w-full bg-white border border-gray-200 rounded">
                 <thead class="bg-gray-100">
@@ -26,7 +24,7 @@
                     @forelse($staffs as $staff)
                         <tr class="border-t">
                             <td class="px-4 py-2">{{ $staff->name }}</td>
-                            <td class="px-4 py-2 flex space-x-4">
+                            <td class="px-4 py-2 flex space-x-4 items-center">
                                 <a href="{{ route('staff.show', $staff->id) }}"
                                     class="text-primary hover-underline hover:scale-105 transform transition duration-200">
                                     View
@@ -35,45 +33,10 @@
                                     class="text-edit hover-underline-edit hover:scale-105 transform transition duration-200">
                                     Edit
                                 </a>
-
-                                <div x-data="() => ({ showModal: false })" class="inline">
-                                    <button @click="showModal = true"
-                                        class="text-secondary hover-underline-delete hover:scale-105 transform transition duration-200 cursor-pointer">
-                                        Delete
-                                    </button>
-
-                                    {{-- Modal --}}
-                                    <div x-show="showModal"
-                                        class="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
-                                        x-transition:enter="transition ease-out duration-300"
-                                        x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                                        x-transition:leave="transition ease-in duration-200"
-                                        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
-                                        <div @click.away="showModal = false"
-                                            class="bg-white rounded-lg p-6 w-full max-w-sm shadow-lg">
-                                            <h2 class="text-xl mb-4">Confirm Deletion</h2>
-                                            <p class="mb-4">Are you sure you want to delete
-                                                <span class="text-primary">{{ $staff->name }}</span>?
-                                            </p>
-
-                                            <form method="POST" action="{{ route('staff.destroy', $staff->id) }}">
-                                                @csrf
-                                                @method('DELETE')
-
-                                                <div class="flex justify-end space-x-2">
-                                                    <button type="button" @click="showModal = false"
-                                                        class="px-4 py-2 bg-gray-300 hover:text-white hover:bg-gray-400 rounded transition-all duration-300 cursor-pointer">
-                                                        Cancel
-                                                    </button>
-                                                    <button type="submit"
-                                                        class="px-4 py-2 bg-secondary text-white rounded hover:bg-white hover:text-secondary border-2 border-secondary transition-all duration-300 cursor-pointer">
-                                                        Confirm
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
+                                <button class="text-secondary hover-underline-delete hover:scale-105 transition duration-200 cursor-pointer"
+                                        onclick="openModal('{{ $staff->id }}', '{{ $staff->name }}')">
+                                    Delete
+                                </button>
                             </td>
                         </tr>
                     @empty
@@ -85,4 +48,51 @@
             </table>
         </div>
     </div>
+
+    <!-- Modal -->
+    <div id="deleteModal" class="fixed inset-0 z-50 bg-black/50 hidden items-center justify-center">
+        <div class="bg-white rounded-lg p-6 w-full max-w-sm shadow-lg">
+            <h2 class="text-xl mb-4">Confirm Deletion</h2>
+            <p class="mb-4">Are you sure you want to delete <span id="modalStaffName" class="text-primary       "></span>?</p>
+
+            <form id="deleteForm" method="POST">
+                @csrf
+                @method('DELETE')
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeModal()"
+                            class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded cursor-pointer">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                            class="px-4 py-2 bg-secondary text-white rounded hover:bg-white hover:text-secondary border border-secondary cursor-pointer">
+                        Confirm
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id, name) {
+            const modal = document.getElementById('deleteModal');
+            const nameSpan = document.getElementById('modalStaffName');
+            const form = document.getElementById('deleteForm');
+
+            nameSpan.textContent = name;
+            form.action = `/staff/${id}`; // Adjust if your route prefix differs
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('deleteModal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        // Optional: Close modal on Escape key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
 @endsection
