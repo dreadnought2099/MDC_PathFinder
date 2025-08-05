@@ -12,7 +12,7 @@
                 <div class="flex flex-col items-center w-full space-y-4">
                     <div id="qr-code-container">
                         @if (Str::endsWith($room->qr_code_path, '.svg'))
-                            <div class="w-48 h-48 flex items-center justify-center">
+                            <div class="w-60 h-60 flex items-center justify-center">
                                 {!! file_get_contents(public_path($room->qr_code_path)) !!}
                             </div>
                         @else
@@ -76,7 +76,7 @@
     </style>
 
     <!-- Print Section (Hidden by default) -->
-    <div id="print-section" class="hidden" style="display:none">
+    <div id="print-section" style="position: absolute; left: -9999px; top: -9999px; visibility: hidden; display: none;">
         <div class="p-8 text-center">
             <h1 class="text-3xl font-bold mb-4">{{ $room->name }}</h1>
             <p class="text-lg mb-6">{{ $room->description }}</p>
@@ -103,15 +103,21 @@
     <script>
         function printQRCode() {
             const printSection = document.getElementById('print-section');
-            printSection.classList.remove('hidden');
+            
+            // Keep the print section hidden but make it available for print media query
+            printSection.style.position = 'absolute';
+            printSection.style.left = '-9999px';
+            printSection.style.top = '-9999px';
+            printSection.style.visibility = 'hidden';
             printSection.style.display = 'block';
+            
+            // Trigger print - the CSS @media print will handle showing the content
+            window.print();
+            
+            // Hide the print section after printing
             setTimeout(() => {
-                window.print();
-                setTimeout(() => {
-                    printSection.classList.add('hidden');
-                    printSection.style.display = 'none';
-                }, 100);
-            }, 50);
+                printSection.style.display = 'none';
+            }, 100);
         }
     </script>
 @endsection

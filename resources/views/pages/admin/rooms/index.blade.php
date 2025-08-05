@@ -19,13 +19,16 @@
                     <tr>
                         <td class="border p-2">{{ $room->name }}</td>
                         <td class="border p-2">
-                            <a href="{{ route('room.show', $room->id) }}" class="text-primary hover-underline hover:scale-105 transform transition duration-200">
+                            <a href="{{ route('room.show', $room->id) }}"
+                                class="text-primary hover-underline hover:scale-105 transform transition duration-200">
                                 View
                             </a>
                             <a href="{{ route('room.edit', $room->id) }}"
-                                class="text-edit hover-underline-edit hover:scale-105 transform transition duration-200">Edit</a>
-
-                            <button onclick="openRoomModal('{{ $room->id }}', '{{ addslashes($room->name) }}')" class="text-secondary hover-underline-delete hover:scale-105 transform transition duration-200 cursor-pointer">
+                                class="text-edit hover-underline-edit hover:scale-105 transform transition duration-200">
+                                Edit
+                            </a>
+                            <button onclick="openRoomModal('{{ $room->id }}', '{{ addslashes($room->name) }}')"
+                                class="text-secondary hover-underline-delete hover:scale-105 transform transition duration-200 cursor-pointer">
                                 Delete
                             </button>
                         </td>
@@ -66,7 +69,7 @@
             const form = document.getElementById('roomDeleteForm');
 
             nameSpan.textContent = name;
-            form.action = `/room/${id}`; // Adjust if your route prefix differs
+            form.action = `/admin/room/${id}`; // Fixed route path
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
@@ -77,7 +80,7 @@
             modal.classList.add('hidden');
         }
 
-        document.addEventListener('keydown', function (e) {
+        document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeRoomModal();
         });
     </script>

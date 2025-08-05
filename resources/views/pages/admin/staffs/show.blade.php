@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="max-w-xl mx-auto bg-white p-6 rounded shadow">
+    <div class="max-w-xl mx-auto bg-white p-6 rounded shadow border-2 border-primary">
         <x-floating-actions />
 
         <h2 class="text-2xl font-bold mb-4">{{ $staff->name }}</h2>
