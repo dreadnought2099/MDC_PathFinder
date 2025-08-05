@@ -113,22 +113,27 @@
                   html5QrcodeScanner = null;
               }
               
-              let roomId = null;
-              
-              // Try to extract room ID from URL format first
-              try {
-                  const url = new URL(decodedText);
-                  roomId = url.searchParams.get('room');
-                  console.log('Room ID from URL:', roomId);
-              } catch (error) {
-                  console.log('Not a URL format, trying direct room ID...');
-                  
-                  // Try to extract room ID from old format (room_13)
-                  if (decodedText.startsWith('room_')) {
-                      roomId = decodedText.replace('room_', '');
-                      console.log('Room ID from old format:', roomId);
-                  }
-              }
+                             let roomId = null;
+               
+               // Handle different QR code formats
+               if (decodedText.startsWith('room_')) {
+                   // Old format: room_13
+                   roomId = decodedText.replace('room_', '');
+                   console.log('Room ID from old format:', roomId);
+               } else if (decodedText.match(/^\d+$/)) {
+                   // New format: just the number (13)
+                   roomId = decodedText;
+                   console.log('Room ID from new format:', roomId);
+               } else {
+                   // Try URL format as fallback
+                   try {
+                       const url = new URL(decodedText);
+                       roomId = url.searchParams.get('room');
+                       console.log('Room ID from URL:', roomId);
+                   } catch (error) {
+                       console.log('Invalid QR code format:', decodedText);
+                   }
+               }
               
               if (roomId) {
                   // Show success message

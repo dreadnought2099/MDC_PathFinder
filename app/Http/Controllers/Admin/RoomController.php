@@ -90,11 +90,11 @@ class RoomController extends Controller
         // Regenerate QR code if it doesn't exist or is in old format
         if (!$room->qr_code_path || !Storage::disk('public')->exists(str_replace('storage/', '', $room->qr_code_path))) {
             $marker_id = 'room_' . $room->id;
-            $roomUrl = url('/scan-marker?room=' . $room->id);
+            $roomId = $room->id;
             
             $qrImage = QrCode::format('svg')
                 ->size(300)
-                ->generate($roomUrl);
+                ->generate($roomId);
             
             $qrPath = 'qrcodes/' . $marker_id . '.svg';
             Storage::disk('public')->put($qrPath, $qrImage);
