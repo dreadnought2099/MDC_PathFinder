@@ -52,10 +52,13 @@ class RoomController extends Controller
         $room->save(); // Save to generate ID
 
         $marker_id = 'room_' . $room->id;
+        
+        // Generate QR code with the room's public URL
+        $roomUrl = url('/scan-marker?room=' . $room->id);
 
         $qrImage = QrCode::format('svg')
             ->size(300)
-            ->generate($marker_id);
+            ->generate($roomUrl);
 
         $qrPath = 'qrcodes/' . $marker_id . '.svg';
         Storage::disk('public')->put($qrPath, $qrImage);
