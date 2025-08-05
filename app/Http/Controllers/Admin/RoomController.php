@@ -53,11 +53,11 @@ class RoomController extends Controller
 
         $marker_id = 'room_' . $room->id;
 
-        $qrImage = QrCode::format('png')
+        $qrImage = QrCode::format('svg')
             ->size(300)
             ->generate($marker_id);
 
-        $qrPath = 'qrcodes/' . $marker_id . '.png';
+        $qrPath = 'qrcodes/' . $marker_id . '.svg';
         Storage::disk('public')->put($qrPath, $qrImage);
 
         $room->update([

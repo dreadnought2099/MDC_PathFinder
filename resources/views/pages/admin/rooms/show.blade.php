@@ -7,8 +7,14 @@
         @if ($room->qr_code_path)
             <div class="mt-6">
                 <h2 class="text-xl font-semibold">Room QR Code:</h2>
-                <img src="{{ asset('storage/' . $room->qr_code_path) }}" alt="QR Code for {{ $room->name }}"
-                    class="mt-2 w-48 h-48">
+                @if (Str::endsWith($room->qr_code_path, '.svg'))
+                    <div class="mt-2 w-48 h-48">
+                        {!! file_get_contents(public_path($room->qr_code_path)) !!}
+                    </div>
+                @else
+                    <img src="{{ asset('storage/' . $room->qr_code_path) }}" alt="QR Code for {{ $room->name }}"
+                        class="mt-2 w-48 h-48">
+                @endif
             </div>
         @endif
 
