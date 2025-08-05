@@ -1,31 +1,33 @@
 @extends('layouts.app')
 
 @section('content')
+    <x-floating-actions />
+    
     <div class="max-w-4xl mx-auto p-4">
-        <h1 class="text-2xl font-bold">{{ $room->name }}</h1>
+        <h1 class="text-2xl font-bold">{{ $room->name }} QR Code</h1>
         <p class="mt-2 text-gray-700">{{ $room->description }}</p>
         @if ($room->qr_code_path)
             <div class="mt-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-semibold">Room QR Code:</h2>
+                
+                <div class="flex flex-col items-center w-full space-y-4">
+                    <div id="qr-code-container">
+                        @if (Str::endsWith($room->qr_code_path, '.svg'))
+                            <div class="w-48 h-48 flex items-center justify-center">
+                                {!! file_get_contents(public_path($room->qr_code_path)) !!}
+                            </div>
+                        @else
+                            <img src="{{ asset('storage/' . $room->qr_code_path) }}" alt="QR Code for {{ $room->name }}"
+                                class="w-48 h-48 mx-auto">
+                        @endif
+                    </div>
+                    
                     <button onclick="printQRCode()" 
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center space-x-2">
+                            class="bg-primary text-white hover:bg-white hover:text-primary px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2 cursor-pointer border-1 border-primary mt-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
                         </svg>
                         <span>Print QR Code</span>
                     </button>
-                </div>
-                
-                <div id="qr-code-container" class="mt-2">
-                    @if (Str::endsWith($room->qr_code_path, '.svg'))
-                        <div class="w-48 h-48">
-                            {!! file_get_contents(public_path($room->qr_code_path)) !!}
-                        </div>
-                    @else
-                        <img src="{{ asset('storage/' . $room->qr_code_path) }}" alt="QR Code for {{ $room->name }}"
-                            class="w-48 h-48">
-                    @endif
                 </div>
             </div>
         @endif
@@ -74,7 +76,7 @@
     </style>
 
     <!-- Print Section (Hidden by default) -->
-    <div id="print-section" class="hidden">
+    <div id="print-section" class="hidden" style="display:none">
         <div class="p-8 text-center">
             <h1 class="text-3xl font-bold mb-4">{{ $room->name }}</h1>
             <p class="text-lg mb-6">{{ $room->description }}</p>
@@ -100,16 +102,16 @@
 
     <script>
         function printQRCode() {
-            // Show print section
-            document.getElementById('print-section').classList.remove('hidden');
-            
-            // Print
-            window.print();
-            
-            // Hide print section after printing
+            const printSection = document.getElementById('print-section');
+            printSection.classList.remove('hidden');
+            printSection.style.display = 'block';
             setTimeout(() => {
-                document.getElementById('print-section').classList.add('hidden');
-            }, 1000);
+                window.print();
+                setTimeout(() => {
+                    printSection.classList.add('hidden');
+                    printSection.style.display = 'none';
+                }, 100);
+            }, 50);
         }
     </script>
 @endsection
