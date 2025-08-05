@@ -36,7 +36,7 @@ class RoomController extends Controller
         ]);
 
         $room = new Room($validated);
-
+        
         // Save cover image
         if ($request->hasFile('image_path')) {
             $imagePath = $request->file('image_path')->store('room_images', 'public');
@@ -58,7 +58,6 @@ class RoomController extends Controller
             ->generate($marker_id);
 
         $qrPath = 'qrcodes/' . $marker_id . '.png';
-
         Storage::disk('public')->put($qrPath, $qrImage);
 
         $room->update([

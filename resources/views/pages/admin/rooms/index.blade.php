@@ -19,8 +19,11 @@
                     <tr>
                         <td class="border p-2">{{ $room->name }}</td>
                         <td class="border p-2">
+                            <a href="{{ route('room.show', $room->id) }}" class="text-primary hover-underline hover:scale-105 transform transition duration-200">
+                                View
+                            </a>
                             <a href="{{ route('room.edit', $room->id) }}"
-                                class="text-primary hover-underline hover:scale-105 transform transition duration-200">Edit</a>
+                                class="text-edit hover-underline-edit hover:scale-105 transform transition duration-200">Edit</a>
 
                             <button onclick="openRoomModal('{{ $room->id }}', '{{ addslashes($room->name) }}')" class="text-secondary hover-underline-delete hover:scale-105 transform transition duration-200 cursor-pointer">
                                 Delete
