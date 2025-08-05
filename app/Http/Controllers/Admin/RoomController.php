@@ -53,12 +53,12 @@ class RoomController extends Controller
 
         $marker_id = 'room_' . $room->id;
         
-        // Generate QR code with the room's public URL
-        $roomUrl = url('/scan-marker?room=' . $room->id);
+        // Generate QR code with just the room ID (better for scanning)
+        $roomId = $room->id;
 
         $qrImage = QrCode::format('svg')
             ->size(300)
-            ->generate($roomUrl);
+            ->generate($roomId);
 
         $qrPath = 'qrcodes/' . $marker_id . '.svg';
         Storage::disk('public')->put($qrPath, $qrImage);
@@ -86,6 +86,24 @@ class RoomController extends Controller
     public function show(Room $room)
     {
         $images = $room->images;
+        
+        // Regenerate QR code if it doesn't exist or is in old format
+        if (!$room->qr_code_path || !Storage::disk('public')->exists(str_replace('storage/', '', $room->qr_code_path))) {
+            $marker_id = 'room_' . $room->id;
+            $roomUrl = url('/scan-marker?room=' . $room->id);
+            
+            $qrImage = QrCode::format('svg')
+                ->size(300)
+                ->generate($roomUrl);
+            
+            $qrPath = 'qrcodes/' . $marker_id . '.svg';
+            Storage::disk('public')->put($qrPath, $qrImage);
+            
+            $room->update([
+                'qr_code_path' => 'storage/' . $qrPath,
+            ]);
+        }
+        
         return view('pages.admin.rooms.show', compact('room', 'images'));
     }
 

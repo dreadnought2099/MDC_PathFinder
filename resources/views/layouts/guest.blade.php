@@ -16,5 +16,6 @@
     </main>    
 
     @stack('scripts')
+    <script src="https://unpkg.com/html5-qrcode"></script>
 </body>
 </html>

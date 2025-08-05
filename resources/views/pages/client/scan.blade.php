@@ -72,74 +72,158 @@
                 <p class="text-gray-600 mb-6">Point your camera at a QR code to start exploring campus rooms.</p>
                 
                 <!-- Camera scanner -->
-                <div class="max-w-md mx-auto">
-                    <div id="qr-reader" class="w-full h-64 bg-gray-100 rounded-lg overflow-hidden mb-4"></div>
+                 <div class="max-w-lg mx-auto">
+                     <div id="qr-reader" class="w-full h-96 bg-gray-100 rounded-lg overflow-hidden mb-4"></div>
                     <div id="qr-reader-results" class="text-sm text-gray-600"></div>
                     
-                    <!-- Manual input fallback -->
-                    <div class="mt-4">
-                        <p class="text-sm text-gray-500 mb-2">Or enter room ID manually:</p>
-                        <input type="number" id="manual-room-id" placeholder="Enter room ID" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
-                        <button onclick="goToRoom()" 
-                                class="mt-2 w-full bg-primary hover:bg-white hover:text-primary text-white py-2 px-4 rounded-lg border border-primary transition-all duration-300">
-                            View Room
-                        </button>
-                    </div>
+                                         <!-- Manual input fallback -->
+                     <div class="mt-4">
+                         <p class="text-sm text-gray-500 mb-2">Or enter room ID manually:</p>
+                         <input type="number" id="manual-room-id" placeholder="Enter room ID" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                         <button onclick="goToRoom()" 
+                                 class="mt-2 w-full bg-primary hover:bg-white hover:text-primary text-white py-2 px-4 rounded-lg border border-primary transition-all duration-300">
+                             View Room
+                         </button>
+                         
+                         <!-- Manual restart button -->
+                         <button onclick="restartScanner()" 
+                                 class="mt-2 w-full bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-all duration-300">
+                             Restart Camera
+                         </button>
+                     </div>
                 </div>
             </div>
         @endif
-    </div>
+         </div>
 
-    <!-- QR Scanner Script -->
-    <script src="https://unpkg.com/html5-qrcode"></script>
-    <script>
-        let html5QrcodeScanner = null;
-
-        function onScanSuccess(decodedText, decodedResult) {
-            // Stop scanning
-            if (html5QrcodeScanner) {
-                html5QrcodeScanner.clear();
-            }
-            
-            // Extract room ID from URL
-            const url = new URL(decodedText);
-            const roomId = url.searchParams.get('room');
-            
-            if (roomId) {
-                // Redirect to room page
-                window.location.href = `{{ route('ar.view') }}?room=${roomId}`;
-            } else {
-                document.getElementById('qr-reader-results').innerHTML = 'Invalid QR code format';
-            }
-        }
-
-        function onScanFailure(error) {
-            // Handle scan failure silently
-        }
-
-        // Initialize scanner when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            if (!document.querySelector('#qr-reader').hasAttribute('data-initialized')) {
-                html5QrcodeScanner = new Html5QrcodeScanner(
-                    "qr-reader",
-                    { 
-                        fps: 10, 
-                        qrbox: { width: 250, height: 250 },
-                        aspectRatio: 1.0
-                    },
-                    false
-                );
-                html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-                document.querySelector('#qr-reader').setAttribute('data-initialized', 'true');
-            }
-        });
-
-        function goToRoom() {
-            const roomId = document.getElementById('manual-room-id').value;
-            if (roomId) {
-                window.location.href = `{{ route('ar.view') }}?room=${roomId}`;
-            }
-        }
-    </script>
+     <!-- QR Scanner Script -->
+     <script src="https://unpkg.com/html5-qrcode"></script>
+     <script>
+         let html5QrcodeScanner = null;
+         let scanAttempts = 0;
+         const maxScanAttempts = 3;
+ 
+                   function onScanSuccess(decodedText, decodedResult) {
+              console.log('QR Code scanned:', decodedText);
+              
+              // Stop scanning immediately to prevent multiple scans
+              if (html5QrcodeScanner) {
+                  html5QrcodeScanner.clear();
+                  html5QrcodeScanner = null;
+              }
+              
+              let roomId = null;
+              
+              // Try to extract room ID from URL format first
+              try {
+                  const url = new URL(decodedText);
+                  roomId = url.searchParams.get('room');
+                  console.log('Room ID from URL:', roomId);
+              } catch (error) {
+                  console.log('Not a URL format, trying direct room ID...');
+                  
+                  // Try to extract room ID from old format (room_13)
+                  if (decodedText.startsWith('room_')) {
+                      roomId = decodedText.replace('room_', '');
+                      console.log('Room ID from old format:', roomId);
+                  }
+              }
+              
+              if (roomId) {
+                  // Show success message
+                  document.getElementById('qr-reader-results').innerHTML = 
+                      '<span class="text-green-600">✓ QR Code detected! Redirecting to room ' + roomId + '...</span>';
+                  
+                  // Redirect to room page after a short delay
+                  setTimeout(() => {
+                      window.location.href = `{{ route('ar.view') }}?room=${roomId}`;
+                  }, 1500);
+              } else {
+                  // Invalid QR code format
+                  document.getElementById('qr-reader-results').innerHTML = 
+                      '<span class="text-red-600">✗ Invalid QR code format: ' + decodedText + '</span>';
+                  
+                  // Reinitialize scanner after delay
+                  setTimeout(() => {
+                      const qrReader = document.querySelector('#qr-reader');
+                      if (qrReader) {
+                          qrReader.removeAttribute('data-initialized');
+                          initializeScanner();
+                      }
+                  }, 3000);
+              }
+          }
+ 
+                   function onScanFailure(error) {
+              // Don't count every failure, only log for debugging
+              console.log('Scan attempt failed:', error);
+          }
+ 
+                   function restartScanner() {
+              // Clear existing scanner
+              if (html5QrcodeScanner) {
+                  html5QrcodeScanner.clear();
+                  html5QrcodeScanner = null;
+              }
+              
+              // Reset initialization flag
+              const qrReader = document.querySelector('#qr-reader');
+              if (qrReader) {
+                  qrReader.removeAttribute('data-initialized');
+              }
+              
+              // Clear results
+              document.getElementById('qr-reader-results').innerHTML = 
+                  '<span class="text-blue-600">🔄 Restarting camera...</span>';
+              
+              // Restart after a short delay
+              setTimeout(() => {
+                  initializeScanner();
+              }, 1000);
+          }
+ 
+                   function initializeScanner() {
+              const qrReader = document.querySelector('#qr-reader');
+              if (qrReader && !qrReader.hasAttribute('data-initialized')) {
+                  try {
+                      // Clear any previous results
+                      document.getElementById('qr-reader-results').innerHTML = 
+                          '<span class="text-blue-600">📷 Camera ready. Point at QR code...</span>';
+                      
+                                             html5QrcodeScanner = new Html5QrcodeScanner(
+                           "qr-reader",
+                           { 
+                               fps: 5, 
+                               qrbox: { width: 300, height: 300 },
+                               aspectRatio: 1.0,
+                               rememberLastUsedCamera: true,
+                               showTorchButtonIfSupported: true,
+                               disableFlip: false,
+                               verbose: false
+                           },
+                           false
+                       );
+                      html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+                      qrReader.setAttribute('data-initialized', 'true');
+                  } catch (error) {
+                      console.error('Scanner initialization error:', error);
+                      document.getElementById('qr-reader-results').innerHTML = 
+                          '<span class="text-red-600">❌ Camera initialization failed. Please refresh the page.</span>';
+                  }
+              }
+          }
+ 
+         // Initialize scanner when page loads
+         document.addEventListener('DOMContentLoaded', function() {
+             initializeScanner();
+         });
+ 
+         function goToRoom() {
+             const roomId = document.getElementById('manual-room-id').value;
+             if (roomId) {
+                 window.location.href = `{{ route('ar.view') }}?room=${roomId}`;
+             }
+         }
+     </script>
 @endsection
