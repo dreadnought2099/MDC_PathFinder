@@ -6,15 +6,27 @@
         <p class="mt-2 text-gray-700">{{ $room->description }}</p>
         @if ($room->qr_code_path)
             <div class="mt-6">
-                <h2 class="text-xl font-semibold">Room QR Code:</h2>
-                @if (Str::endsWith($room->qr_code_path, '.svg'))
-                    <div class="mt-2 w-48 h-48">
-                        {!! file_get_contents(public_path($room->qr_code_path)) !!}
-                    </div>
-                @else
-                    <img src="{{ asset('storage/' . $room->qr_code_path) }}" alt="QR Code for {{ $room->name }}"
-                        class="mt-2 w-48 h-48">
-                @endif
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold">Room QR Code:</h2>
+                    <button onclick="printQRCode()" 
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                        </svg>
+                        <span>Print QR Code</span>
+                    </button>
+                </div>
+                
+                <div id="qr-code-container" class="mt-2">
+                    @if (Str::endsWith($room->qr_code_path, '.svg'))
+                        <div class="w-48 h-48">
+                            {!! file_get_contents(public_path($room->qr_code_path)) !!}
+                        </div>
+                    @else
+                        <img src="{{ asset('storage/' . $room->qr_code_path) }}" alt="QR Code for {{ $room->name }}"
+                            class="w-48 h-48">
+                    @endif
+                </div>
             </div>
         @endif
 
@@ -38,4 +50,66 @@
             </div>
         </div>
     </div>
+
+    <!-- Print Styles -->
+    <style>
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #print-section, #print-section * {
+                visibility: visible;
+            }
+            #print-section {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                text-align: center;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+
+    <!-- Print Section (Hidden by default) -->
+    <div id="print-section" class="hidden">
+        <div class="p-8 text-center">
+            <h1 class="text-3xl font-bold mb-4">{{ $room->name }}</h1>
+            <p class="text-lg mb-6">{{ $room->description }}</p>
+            
+            <div class="flex justify-center mb-6">
+                @if (Str::endsWith($room->qr_code_path, '.svg'))
+                    <div class="w-64 h-64">
+                        {!! file_get_contents(public_path($room->qr_code_path)) !!}
+                    </div>
+                @else
+                    <img src="{{ asset('storage/' . $room->qr_code_path) }}" alt="QR Code for {{ $room->name }}"
+                        class="w-64 h-64">
+                @endif
+            </div>
+            
+            <div class="text-sm text-gray-600">
+                <p>Scan this QR code to view room information</p>
+                <p class="mt-2">Room ID: {{ $room->id }}</p>
+                <p class="mt-4">Generated on: {{ now()->format('M d, Y H:i') }}</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function printQRCode() {
+            // Show print section
+            document.getElementById('print-section').classList.remove('hidden');
+            
+            // Print
+            window.print();
+            
+            // Hide print section after printing
+            setTimeout(() => {
+                document.getElementById('print-section').classList.add('hidden');
+            }, 1000);
+        }
+    </script>
 @endsection
