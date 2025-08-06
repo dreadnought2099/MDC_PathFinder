@@ -53,14 +53,14 @@
     <div id="deleteModal" class="fixed inset-0 z-50 bg-black/50 hidden items-center justify-center">
         <div class="bg-white rounded-lg p-6 w-full max-w-sm shadow-lg">
             <h2 class="text-xl mb-4">Confirm Deletion</h2>
-            <p class="mb-4">Are you sure you want to delete <span id="modalStaffName" class="text-primary       "></span>?</p>
+            <p class="mb-4">Are you sure you want to delete <span id="modalStaffName" class="text-primary   "></span>?</p>
 
             <form id="deleteForm" method="POST">
                 @csrf
                 @method('DELETE')
                 <div class="flex justify-end gap-2">
                     <button type="button" onclick="closeModal()"
-                            class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded cursor-pointer">
+                            class="px-4 py-2 bg-gray-300 hover:text-white hover:bg-gray-400 rounded transition-all duration-300 cursor-pointer">
                         Cancel
                     </button>
                     <button type="submit"
@@ -79,7 +79,7 @@
             const form = document.getElementById('deleteForm');
 
             nameSpan.textContent = name;
-            form.action = `/staff/${id}`; // Adjust if your route prefix differs
+            form.action = '{{ route('staff.destroy', '__ID__') }}'.replace('__ID__', id);
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }

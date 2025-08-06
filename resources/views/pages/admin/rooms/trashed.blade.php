@@ -60,7 +60,9 @@
                                                         Cancel
                                                     </button>
                                                     <button type="submit"
-                                                        class="px-4 py-2 bg-secondary text-white rounded hover:bg-white hover:text-secondary border-2 border-secondary transition-all duration-300 cursor-pointer">Restore</button>
+                                                        class="px-4 py-2 bg-primary text-white rounded hover:bg-white hover:text-primary border hover:border-primary transition-all duration-300 cursor-pointer">
+                                                        Restore
+                                                    </button>
                                                 </div>
                                             </form>
                                         </div>

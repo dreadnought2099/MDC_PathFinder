@@ -31,7 +31,7 @@ class StaffController extends Controller
             'bio' => 'nullable|string',
             'email' => 'nullable|email|max:255|unique:staff,email',
             'phone_num' => ['nullable', 'regex:/^09\d{9}$/'],
-            'photo_path' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'photo_path' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:20480'],    
         ]);
 
         // Handle image upload if present
