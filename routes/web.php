@@ -34,6 +34,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/room/{room}/edit', [RoomController::class, 'edit'])->name('edit');
         Route::put('/room/{room}', [RoomController::class, 'update'])->name('update');
         Route::delete('/room/{room}', [RoomController::class, 'destroy'])->name('destroy');
+        Route::get('/rooms/trashed', [RoomController::class, 'trashed'])->name('trashed');
     });
 
 

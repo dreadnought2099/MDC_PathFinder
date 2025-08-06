@@ -7,24 +7,15 @@
                 <div class="flex flex-col space-y-2 mb-2">
 
                     <a href="{{ route('room.create') }}" class="group flex items-center space-x-2">
-                        <div
-                            class="flex items-center justify-center w-10 h-10 bg-primary text-white rounded-full hover:bg-white hover:text-primary border-2 border-primary transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 21h18M5 21V5a1 1 0 011-1h12a1 1 0 011 1v16M9 21v-4h6v4M9 9h.01M9 13h.01M12 9h.01M12 13h.01M15 9h.01M15 13h.01" />
-                            </svg>
+                        <div class="flex items-center justify-center w-12 h-12 hover:scale-120 transition-all duration-300">
+                            <img src="{{ asset('icons/offices.png')}}" alt="Add Room/Office" />
                         </div>
-                        <span class="text-sm text-gray-700 hover-underline">Create Room/Offices</span>
+                        <span class="text-sm text-gray-700 hover-underline">Add Room/Office</span>
                     </a>
                     <a href="{{ route('staff.create') }}" class="group flex items-center space-x-2">
                         <div
-                            class="flex items-center justify-center w-10 h-10 bg-primary text-white rounded-full hover:bg-white hover:text-primary border-2 border-primary transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M5.121 17.804A8 8 0 0112 15a8 8 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
+                            class="flex items-center justify-center w-12 h-12 hover:scale-120 transition-all duration-300">
+                            <img src="{{ asset('icons/user.png')}}" alt="Add Staff Member" />
                         </div>
                         <span class="text-sm text-gray-700 hover-underline">Add Staff Member</span>
                     </a>

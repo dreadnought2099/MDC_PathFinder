@@ -180,4 +180,10 @@ class RoomController extends Controller
 
         return redirect()->route('room.index')->with('success', 'Room deleted successfully.');
     }
+
+    public function trashed() {
+        
+        $rooms = Room::onlyTrashed()->get();
+        return view('pages.admin.rooms.trashed', compact('rooms'));
+    }
 }

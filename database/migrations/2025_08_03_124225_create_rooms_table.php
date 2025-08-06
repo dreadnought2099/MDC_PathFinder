@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('image_path')->nullable();   
             $table->string('video_path')->nullable();
             $table->string('office_hours')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
