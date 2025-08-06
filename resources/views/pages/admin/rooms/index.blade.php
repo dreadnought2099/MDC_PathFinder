@@ -5,7 +5,7 @@
 
         <x-floating-actions />
 
-        <h2 class="text-xl text-center font-bold mb-4">Room List</h2>
+        <h2 class="text-2xl text-center font-bold mb-4"><span class="text-primary">Room</span> List</h2>
 
         <table class="w-full border-collapse border">
             <thead>

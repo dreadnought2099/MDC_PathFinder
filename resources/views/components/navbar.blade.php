@@ -1,17 +1,18 @@
 <nav class="bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 items-center">
+
             <!-- Back Button -->
             @if (!Route::is('admin.dashboard'))
-                <div>
-                    <button onclick="goBack()" class="flex items-center text-black hover:text-[#157ee1] focus:outline-none cursor-pointer">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                        </svg>
-                        <span class="ml-1">Back</span>
-                    </button>
-                </div>
+                <a href="{{ route('admin.dashboard') }}"
+                    class="flex items-center text-black hover:text-[#157ee1] focus:outline-none cursor-pointer">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
+                    <span class="ml-1">Back</span>
+                </a>
             @endif
+
             <!-- Profile Dropdown -->
             <div x-data="{ open: false }" class="relative ml-auto" x-cloak>
                 <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none cursor-pointer">
@@ -41,15 +42,3 @@
         </div>
     </div>
 </nav>
-
-<script>
-    function goBack() {
-        // If there is a referrer and it's not the current page, go back
-        if (document.referrer && document.referrer !== window.location.href) {
-            history.back();
-        } else {
-            // Fallback: redirect to a default route like dashboard
-            window.location.href = "{{ route('admin.dashboard') }}";
-        }
-    }
-</script>

@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="p-6">
-        <h1 class="text-2xl text-center mb-4">Staff List</h1>
+        <h1 class="text-2xl text-center mb-4"><span class="text-primary">Staff</span> List</h1>
 
         <x-floating-actions />
 
