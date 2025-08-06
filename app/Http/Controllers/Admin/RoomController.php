@@ -36,7 +36,7 @@ class RoomController extends Controller
         ]);
 
         $room = new Room($validated);
-        
+
         // Save cover image
         if ($request->hasFile('image_path')) {
             $imagePath = $request->file('image_path')->store('room_images', 'public');
@@ -52,7 +52,7 @@ class RoomController extends Controller
         $room->save(); // Save to generate ID
 
         $marker_id = 'room_' . $room->id;
-        
+
         // Generate QR code with just the room ID (better for scanning)
         $roomId = $room->id;
 
@@ -86,24 +86,24 @@ class RoomController extends Controller
     public function show(Room $room)
     {
         $images = $room->images;
-        
+
         // Regenerate QR code if it doesn't exist or is in old format
         if (!$room->qr_code_path || !Storage::disk('public')->exists(str_replace('storage/', '', $room->qr_code_path))) {
             $marker_id = 'room_' . $room->id;
             $roomId = $room->id;
-            
+
             $qrImage = QrCode::format('svg')
                 ->size(300)
                 ->generate($roomId);
-            
+
             $qrPath = 'qrcodes/' . $marker_id . '.svg';
             Storage::disk('public')->put($qrPath, $qrImage);
-            
+
             $room->update([
                 'qr_code_path' => 'storage/' . $qrPath,
             ]);
         }
-        
+
         return view('pages.admin.rooms.show', compact('room', 'images'));
     }
 
@@ -181,9 +181,55 @@ class RoomController extends Controller
         return redirect()->route('room.index')->with('success', 'Room deleted successfully.');
     }
 
-    public function trashed() {
-        
+    public function trashed()
+    {
+
         $rooms = Room::onlyTrashed()->get();
         return view('pages.admin.rooms.trashed', compact('rooms'));
+    }
+
+    public function restore($id)
+    {
+
+        $room = Room::onlyTrashed()->findOrFail($id);
+        $room->restore();
+
+        return redirect()->route('room.trashed')->with('success', 'Room restored successfully.');
+    }
+
+    public function forceDelete($id)
+    {
+
+        $room = Room::onlyTrashed()->findOrFail($id);
+
+        //Delete Cover Image
+        if($room->image_path) {
+            Storage::disk('public')->delete(str_replace('storage/', '', $room->image_path));    
+        }
+
+        //Delete Video
+        if($room->video_path) {
+            Storage::disk('public')->delete(str_replace('storage/', '', $room->video_path));    
+        }
+
+        //Delete Cover Image
+        if($room->image_path) {
+            Storage::disk('public')->delete(str_replace('storage/', '', $room->image_path));    
+        }
+
+        //Delete QR Code
+        if($room->qr_code_path) {
+            Storage::disk('public')->delete(str_replace('storage/', '', $room->qr_code_path));    
+        }
+
+        //Delete Carousel images
+        foreach($room->images as $image) {
+            Storage::disk('public')->delete(str_replace('storage/', '', $room->image_path));    
+            $image->delete();
+        }
+
+        $room->forceDelete();
+
+        return redirect()->route('room.trashed')->with('success','Room permanently deleted.');     
     }
 }

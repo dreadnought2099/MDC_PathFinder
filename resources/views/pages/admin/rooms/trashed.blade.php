@@ -5,7 +5,7 @@
     <h2 class="text-2xl font-semibold text-center mb-6">Trashed <span class="text-primary">Rooms</span></h2>
 
     <x-floating-actions />
-    
+
     {{-- <div class="mb-4">
         <a href="{{ route('room.index') }}"
            class="bg-primary text-white px-4 py-2 rounded hover:bg-white hover:text-primary border border-primary transition-all">
@@ -32,21 +32,21 @@
                             <td class="px-4 py-2 text-sm text-gray-500">{{ $room->deleted_at->format('Y-m-d H:i') }}</td>
                             <td class="px-4 py-2 space-x-2">
                                 <!-- Restore -->
-                                <form action="{{ route('rooms.restore', $room->id) }}" method="POST" class="inline">
+                                <form action="{{ route('room.restore', $room->id) }}" method="POST" class="inline">
                                     @csrf
                                     <button type="submit"
-                                            class="text-green-600 hover:underline">
+                                            class="text-primary hover-underline cursor-pointer">
                                         Restore
                                     </button>
                                 </form>
 
                                 <!-- Permanently Delete -->
-                                <form action="{{ route('rooms.forceDelete', $room->id) }}" method="POST" class="inline"
+                                <form action="{{ route('room.forceDelete', $room->id) }}" method="POST" class="inline"
                                       onsubmit="return confirm('Permanently delete this room? This cannot be undone.')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit"
-                                            class="text-red-600 hover:underline">
+                                            class="text-secondary hover-underline-delete cursor-pointer">
                                         Delete Permanently
                                     </button>
                                 </form>

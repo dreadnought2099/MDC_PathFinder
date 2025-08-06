@@ -5,7 +5,7 @@
         <!-- Centered text -->
         <div class="text-center mt-20">
             <h3 class="text-3xl font-semibold">Welcome to</h3>
-            <h1 class="text-5xl font-bold mt-2">{{ config('app.name') }}</h1>
+            <h1 class="text-5xl font-bold mt-2"><span class="text-primary">{{ config('app.name') }}</span></h1>
         </div>
 
         <!-- Button at the bottom -->

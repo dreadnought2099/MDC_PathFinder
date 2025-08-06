@@ -35,6 +35,8 @@ Route::middleware('auth')->group(function () {
         Route::put('/room/{room}', [RoomController::class, 'update'])->name('update');
         Route::delete('/room/{room}', [RoomController::class, 'destroy'])->name('destroy');
         Route::get('/rooms/trashed', [RoomController::class, 'trashed'])->name('trashed');
+        Route::post('/rooms/{id}/restore', [RoomController::class, 'restore'])->name('restore');
+        Route::delete('/rooms/{id}/force-delete', [RoomController::class, 'forceDelete'])->name('forceDelete');
     });
 
 

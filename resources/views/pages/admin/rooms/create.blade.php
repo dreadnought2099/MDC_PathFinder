@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="max-w-xl mx-auto mt-10">
-        <h2 class="text-2xl font-bold mb-6">Add New Room/Office</h2>
+        <h2 class="text-2xl text-center font-bold mb-6">Add New <span class="text-primary">Room/Office</span></h2>
 
         <form action="{{ route('room.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
@@ -33,7 +33,7 @@
             </div>
 
             <div class="mb-4 text-gray-600">
-                <input type="file" class="filepond" name="carousel_images[]" multiple data-max-files="5" />
+                <input type="file" class="filepond" name="carousel_images[]" multiple data-max-files="10" />
             </div>
 
             <div class="mb-4 text-gray-600">
