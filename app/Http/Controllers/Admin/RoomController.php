@@ -80,7 +80,7 @@ class RoomController extends Controller
             }
         }
 
-        return redirect()->route('room.show', $room->id);
+        return redirect()->route('room.show', $room->id)->with('success', "{$room->name} was added successfully.");
     }
 
     public function show(Room $room)

@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container mx-auto p-4">
-        <h2 class="text-2xl font-semibold text-center mb-6">Trashed <span class="text-primary">Rooms</span></h2>
+        <h2 class="text-2xl font-semibold text-center mb-6"><span class="text-primary">Trashed</span> Rooms</h2>
 
         <x-floating-actions />
 
@@ -47,9 +47,9 @@
                                         onclick="closeModal(event, this)">
                                         <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full"
                                             onclick="event.stopPropagation()">
-                                            <h2 class="text-lg font-semibold mb-4">Restore Room</h2>
+                                            <h2 class="text-lg mb-4"><span class="text-primary">Restore</span> Room</h2>
                                             <p class="mb-4 text-gray-700">Are you sure you want to restore
-                                                <strong>{{ $room->name }}</strong>?
+                                                <span class="text-primary">{{ $room->name }}</span>?
                                             </p>
                                             <form action="{{ route('room.restore', $room->id) }}" method="POST">
                                                 @csrf
@@ -80,7 +80,7 @@
                                         onclick="closeModal(event, this)">
                                         <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full"
                                             onclick="event.stopPropagation()">
-                                            <h2 class="text-lg mb-4 text-secondary">Confirm Permanent Deletion
+                                            <h2 class="text-lg mb-4">Confirm<span class="text-secondary"> Permanent Deletion</span> 
                                             </h2>
                                             <p class="mb-4 text-gray-700">Are you sure you want to permanently delete
                                                 <span class="text-secondary">{{ $room->name }}</span>? This action cannot be undone.</p>
