@@ -2,7 +2,7 @@
 
 @section('content')
      <div class="max-w-xl mx-auto mt-10">
-        <h2 class="text-2xl font-bold mb-6">Edit Room/Office</h2>
+        <h2 class="text-2xl text-center font-bold mb-6">Edit Room/Office</h2>
 
         <form action="{{ route('room.update', $room->id) }}" method="POST" enctype="multipart/form-data">
             @csrf

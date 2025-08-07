@@ -15,6 +15,7 @@ class RoomController extends Controller
 
     public function index()
     {
+        
         $rooms = Room::all();
         return view('pages.admin.rooms.index', compact('rooms'));
     }
@@ -147,7 +148,7 @@ class RoomController extends Controller
 
         $room->save();
 
-        return redirect()->route('room.show', $room->id)->with('success', 'Room updated successfully.');
+        return redirect()->route('room.index', $room->id)->with('success', "{$room->name} updated successfully.");
     }
 
 
@@ -203,33 +204,33 @@ class RoomController extends Controller
         $room = Room::onlyTrashed()->findOrFail($id);
 
         //Delete Cover Image
-        if($room->image_path) {
-            Storage::disk('public')->delete(str_replace('storage/', '', $room->image_path));    
+        if ($room->image_path) {
+            Storage::disk('public')->delete(str_replace('storage/', '', $room->image_path));
         }
 
         //Delete Video
-        if($room->video_path) {
-            Storage::disk('public')->delete(str_replace('storage/', '', $room->video_path));    
+        if ($room->video_path) {
+            Storage::disk('public')->delete(str_replace('storage/', '', $room->video_path));
         }
 
         //Delete Cover Image
-        if($room->image_path) {
-            Storage::disk('public')->delete(str_replace('storage/', '', $room->image_path));    
+        if ($room->image_path) {
+            Storage::disk('public')->delete(str_replace('storage/', '', $room->image_path));
         }
 
         //Delete QR Code
-        if($room->qr_code_path) {
-            Storage::disk('public')->delete(str_replace('storage/', '', $room->qr_code_path));    
+        if ($room->qr_code_path) {
+            Storage::disk('public')->delete(str_replace('storage/', '', $room->qr_code_path));
         }
 
         //Delete Carousel images
-        foreach($room->images as $image) {
-            Storage::disk('public')->delete(str_replace('storage/', '', $room->image_path));    
+        foreach ($room->images as $image) {
+            Storage::disk('public')->delete(str_replace('storage/', '', $room->image_path));
             $image->delete();
         }
 
         $room->forceDelete();
 
-        return redirect()->route('room.trashed')->with('success','Room permanently deleted.');     
+        return redirect()->route('room.trashed')->with('success', 'Room permanently deleted.');
     }
 }

@@ -6,12 +6,6 @@
 
         <x-floating-actions />
 
-        {{-- @if (session('success'))
-            <div class="bg-green-100 text-green-800 p-3 rounded mb-4">
-                {{ session('success') }}
-            </div>
-        @endif --}}
-
         <div class="overflow-x-auto">
             <table class="min-w-full bg-white border border-gray-200 rounded">
                 <thead class="bg-gray-100">
