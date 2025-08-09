@@ -55,19 +55,32 @@
 
             {{-- Add New Carousel Images --}}
             <div class="mb-4">
-                <label for="carousel_images" class="font-bold">Add Carousel Images</label>
+                <label for="carousel_images" class="block">Add Carousel Images</label>
                 <input type="file" name="carousel_images[]" multiple class="w-full border p-2 rounded">
             </div>
 
-            <div class="mb-4 text-gray-600">
-                <label class="block">Short Video Path (optional)</label>
+            <div class="mb-8 text-gray-800 max-w-lg mx-auto">
+                <label class="block mb-3 font-semibold text-gray-900">Upload Short Video (optional)</label>
+
                 @if ($room->video_path)
-                    <div class="mb-2">
-                        <video src="{{ asset('storage/' . $room->video_path) }}" controls class="h-24 rounded"></video>
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-5 border border-gray-200">
+                        <video src="{{ asset('storage/' . $room->video_path) }}" controls preload="metadata"
+                            class="block mx-auto max-w-full h-auto"></video>
+                        <div class="p-3 text-center text-sm text-gray-600 truncate"
+                            title="{{ basename($room->video_path) }}">
+                            {{ basename($room->video_path) }}
+                        </div>
                     </div>
                 @endif
-                <input type="file" name="video_path" class="w-full border p-2 rounded">
+
+                <label for="video_path"
+                    class="block text-center cursor-pointer bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-indigo-700 hover:to-blue-700 text-white rounded-md px-6 py-2 transition duration-300">
+                    Select
+                </label>
+                <input type="file" name="video_path" id="video_path" class="hidden"
+                    accept="video/mp4,video/avi,video/mpeg" />
             </div>
+
 
 
             <div class="mb-4 text-gray-600">

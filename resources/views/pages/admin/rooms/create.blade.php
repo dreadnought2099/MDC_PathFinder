@@ -28,22 +28,88 @@
             </div> --}}
 
             <div class="mb-4 text-gray-600">
-                <label class="block">Cover Image (optional)</label>
-                <input type="file" name="image_path" class="w-full border p-2 rounded">
+                <label class="block mb-2 font-semibold text-gray-700">Cover Image (optional)</label>
+
+                <label for="image_path" id="uploadBox"
+                    class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors overflow-hidden relative">
+                    <svg id="uploadIcon" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-400 mb-2"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span id="uploadText" class="text-gray-500">Click to upload image</span>
+                    <input type="file" name="image_path" id="image_path" class="hidden" accept="image/*" />
+                    <img id="previewImage" class="absolute inset-0 object-cover w-full h-full hidden" alt="Image preview" />
+                </label>
             </div>
 
-            <div class="mb-4 text-gray-600">
-                <input type="file" class="filepond" name="carousel_images[]" multiple data-max-files="10" />
+            <div class="mb-4 text-gray-600 max-w-xl mx-auto">
+                <label class="block mb-2 font-semibold text-gray-700">Carousel Images (optional)</label>
+
+                <label for="carousel_images" id="carouselUploadBox"
+                    class="flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors p-4 overflow-auto relative">
+
+                    <svg id="carouselUploadIcon" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-400 mb-2"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span id="carouselUploadText" class="text-gray-500 mb-4">Click to upload images (max 10)</span>
+
+                    <input type="file" name="carousel_images[]" id="carousel_images" class="hidden" accept="image/*"
+                        multiple />
+
+                    <div id="carouselPreviewContainer" class="flex flex-wrap gap-3 w-full justify-start"></div>
+                </label>
             </div>
 
-            <div class="mb-4 text-gray-600">
-                <label class="block">Short Video Path (optional)</label>
-                <input type="file" name="video_path" class="w-full border p-2 rounded">
+            <div class="mb-4 text-gray-600 max-w-xl mx-auto">
+                <label class="block mb-2 font-semibold text-gray-700">Short Video (optional)</label>
+
+                <div id="videoDropZone"
+                    class="relative w-full min-h-[150px] border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center text-gray-500 cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors p-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mb-2" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14m-6 6v-6m0 0l-4.553 2.276A1 1 0 014 13.382V6.618a1 1 0 011.447-.894L9 8" />
+                    </svg>
+                    <p class="mb-2">Drag & drop a video file here or click to select</p>
+                    <p class="text-xs text-gray-400">(mp4, avi, mpeg | max 50MB)</p>
+
+                    <input type="file" id="video_path" name="video_path" accept="video/mp4,video/avi,video/mpeg"
+                        class="hidden" />
+                </div>
+
+                <div id="videoPreviewContainer" class="mt-4 hidden relative rounded border border-gray-300 overflow-hidden">
+                    <video id="videoPreview" controls class="w-full h-auto bg-black"></video>
+                    <button type="button" id="removeVideoBtn"
+                        class="absolute top-2 right-2 bg-secondary text-white rounded-full p-1 hover:bg-red-700 transition-colors"
+                        title="Remove video">&times;</button>
+                </div>
             </div>
 
-            <div class="mb-4 text-gray-600">
-                <label class="block">Office Hours</label>
-                <input type="text" name="office_hours" class="w-full border p-2 rounded">
+            <div class="mb-4 text-gray-600 max-w-sm">
+                <label class="block mb-1 font-semibold">Office Hours</label>
+
+                {{-- Days of the week checkboxes --}}
+                <div class="flex flex-wrap gap-2 mb-2">
+                    @php
+                        $days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                    @endphp
+                    @foreach ($days as $day)
+                        <label class="inline-flex items-center gap-1 cursor-pointer">
+                            <input type="checkbox" name="office_days[]" value="{{ $day }}" class="form-checkbox" />
+                            <span>{{ $day }}</span>
+                        </label>
+                    @endforeach
+                </div>
+
+                {{-- Time inputs --}}
+                <div class="flex gap-2 items-center">
+                    <input type="time" name="office_hours_start" class="flex-1 border p-2 rounded"
+                        placeholder="Start time" />
+                    <span class="self-center">to</span>
+                    <input type="time" name="office_hours_end" class="flex-1 border p-2 rounded"
+                        placeholder="End time" />
+                </div>
             </div>
 
             <div>
@@ -54,4 +120,119 @@
             </div>
         </form>
     </div>
+@endsection
+
+@section('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cover image upload preview
+            const coverInput = document.getElementById('image_path');
+            const coverPreview = document.getElementById('previewImage');
+            const coverUploadIcon = document.getElementById('uploadIcon');
+            const coverUploadText = document.getElementById('uploadText');
+
+            coverInput.addEventListener('change', () => {
+                if (coverInput.files && coverInput.files[0]) {
+                    const reader = new FileReader();
+
+                    reader.onload = e => {
+                        coverPreview.src = e.target.result;
+                        coverPreview.classList.remove('hidden');
+                        coverUploadIcon.style.display = 'none';
+                        coverUploadText.style.display = 'none';
+                    };
+
+                    reader.readAsDataURL(coverInput.files[0]);
+                }
+                // No else — keep existing preview if no file selected
+            });
+
+            // Carousel images upload preview
+            const carouselInput = document.getElementById('carousel_images');
+            const carouselPreviewContainer = document.getElementById('carouselPreviewContainer');
+            const carouselUploadIcon = document.getElementById('carouselUploadIcon');
+            const carouselUploadText = document.getElementById('carouselUploadText');
+
+            carouselInput.addEventListener('change', () => {
+                carouselPreviewContainer.innerHTML = ''; // Clear previous previews
+
+                if (carouselInput.files && carouselInput.files.length > 0) {
+                    carouselUploadIcon.style.display = 'none';
+                    carouselUploadText.style.display = 'none';
+
+                    Array.from(carouselInput.files).forEach(file => {
+                        const reader = new FileReader();
+
+                        reader.onload = e => {
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+                            img.className = 'w-24 h-24 object-cover rounded shadow';
+                            carouselPreviewContainer.appendChild(img);
+                        };
+
+                        reader.readAsDataURL(file);
+                    });
+                } else {
+                    carouselUploadIcon.style.display = '';
+                    carouselUploadText.style.display = '';
+                }
+            });
+
+            const dropZone = document.getElementById('videoDropZone');
+            const videoInput = document.getElementById('video_path');
+            const videoPreviewContainer = document.getElementById('videoPreviewContainer');
+            const videoPreview = document.getElementById('videoPreview');
+            const removeVideoBtn = document.getElementById('removeVideoBtn');
+
+            // Click drop zone triggers file input
+            dropZone.addEventListener('click', () => {
+                videoInput.click();
+            });
+
+            // Handle file selection
+            videoInput.addEventListener('change', () => {
+                if (videoInput.files && videoInput.files[0]) {
+                    showVideoPreview(videoInput.files[0]);
+                }
+            });
+
+            // Handle drag and drop
+            dropZone.addEventListener('dragover', e => {
+                e.preventDefault();
+                dropZone.classList.add('border-primary', 'bg-gray-50');
+            });
+
+            dropZone.addEventListener('dragleave', e => {
+                e.preventDefault();
+                dropZone.classList.remove('border-primary', 'bg-gray-50');
+            });
+
+            dropZone.addEventListener('drop', e => {
+                e.preventDefault();
+                dropZone.classList.remove('border-primary', 'bg-gray-50');
+
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    videoInput.files = e.dataTransfer.files;
+                    showVideoPreview(e.dataTransfer.files[0]);
+                }
+            });
+
+            // Remove video
+            removeVideoBtn.addEventListener('click', () => {
+                clearVideo();
+                videoInput.value = '';
+            });
+
+            function showVideoPreview(file) {
+                const url = URL.createObjectURL(file);
+                videoPreview.src = url;
+                videoPreviewContainer.classList.remove('hidden');
+            }
+
+            function clearVideo() {
+                videoPreview.src = '';
+                videoPreviewContainer.classList.add('hidden');
+            }
+        });
+    </script>
 @endsection

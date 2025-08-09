@@ -1,105 +1,112 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-floating-actions />
-    
-    <div class="max-w-4xl mx-auto p-4">
-        <h1 class="text-2xl font-bold">{{ $room->name }} QR Code</h1>
-        <p class="mt-2 text-gray-700">{{ $room->description }}</p>
-        @if ($room->qr_code_path)
-            <div class="mt-6">
-                <div class="flex flex-col items-center w-full space-y-4">
-                    <div id="qr-code-container">
-                        @if (Str::endsWith($room->qr_code_path, '.svg'))
-                            <div class="w-60 h-60 flex items-center justify-center">
-                                {!! file_get_contents(storage_path('app/public/' . $room->qr_code_path)) !!}
-                            </div>
-                        @else
-                            <img src="{{ asset('storage/' . $room->qr_code_path) }}" alt="QR Code for {{ $room->name }}"
-                                class="w-48 h-48 mx-auto">
-                        @endif
-                    </div>
-                    
-                    <button onclick="printQRCode()" 
-                            class="bg-primary text-white hover:bg-white hover:text-primary px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2 cursor-pointer border-1 border-primary mt-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
-                        </svg>
-                        <span>Print QR Code</span>
-                    </button>
-                </div>
+    <div class="container mx-auto p-6 max-w-5xl">
+        <x-floating-actions />
+
+        {{-- Name --}}
+        <h1 class="text-4xl font-extrabold mb-6 text-gray-900 border-b-2 border-primary pb-2">
+            {{ $room->name }}
+        </h1>
+
+        {{-- Description --}}
+        @if ($room->description)
+            <p class="mb-6 text-gray-700 leading-relaxed text-lg">{{ $room->description }}</p>
+        @endif
+
+        {{-- Office Hours --}}
+        @if ($room->office_days && $room->office_hours_start && $room->office_hours_end)
+            @php
+                $daysFormatted = str_replace(',', ', ', $room->office_days);
+                $start = \Carbon\Carbon::parse($room->office_hours_start)->format('H:i');
+                $end = \Carbon\Carbon::parse($room->office_hours_end)->format('H:i');
+            @endphp
+            <div
+                class="mb-6 p-4 bg-gradient-to-tr from-blue-400 to-white rounded-lg shadow-md max-w-sm">
+                <h4 class="text-base font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                    <img src="{{ asset('icons/calendar.png')}}" alt="Calendar" class="h-10 w-10 object-contain">
+                    Office Hours
+                </h4>
+                <p class="text-sm text-gray-700 mb-1">
+                    <span class="font-medium text-gray-900">Days:</span> {{ $daysFormatted }}
+                </p>
+                <p class="text-sm text-gray-700">
+                    <span class="font-medium text-gray-900">Time:</span> {{ $start }} - {{ $end }}
+                </p>
             </div>
         @endif
 
-        <div class="space-y-12">
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2">
-                @foreach ($room->staff as $member)
-                    <div class="bg-white p-4 rounded shadow">
-                        @if($member->photo_path)
-                            <img src="{{ asset('storage/' . $member->photo_path) }}" alt="{{ $member->name }}"
-                                class="w-full h-40 object-cover mb-2 rounded">
-                        @endif
-                        <h3 class="text-lg font-bold">{{ $member->name }}</h3>
-                        <p class="text-sm text-gray-600">{{ $member->position }}</p>
-                        @if ($member->email)
-                            <p class="text-sm text-blue-600">{{ $member->email }}</p>
-                        @endif
-                        @if ($member->bio)
-                            <p class="mt-1 text-sm">{{ $member->bio }}</p>
-                        @endif
-                    </div>
-                @endforeach
-            </div>
+        {{-- Cover Image --}}
+        @if ($room->image_path)
+            <section class="mb-10">
+                <h3 class="text-2xl font-semibold mb-4 text-gray-800">Cover Image</h3>
+                <img src="{{ asset('storage/' . $room->image_path) }}" alt="Cover Image"
+                    class="rounded-lg shadow-lg w-full max-h-[400px] object-cover border border-gray-300" />
+            </section>
+        @endif
+
+        {{-- Video --}}
+        @if ($room->video_path)
+            <section class="mb-10">
+                <h3 class="text-2xl font-semibold mb-4 text-gray-800">Video</h3>
+                <video controls class="w-full rounded-lg shadow-lg border border-gray-300 max-h-[400px]">
+                    <source src="{{ asset('storage/' . $room->video_path) }}" type="video/mp4" />
+                    Your browser does not support the video tag.
+                </video>
+            </section>
+        @endif
+
+        {{-- Carousel Images --}}
+        @if ($room->images && $room->images->count())
+            <section class="mb-10">
+                <h3 class="text-2xl font-semibold mb-6 text-gray-800">Carousel Images</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+                    @foreach ($room->images as $image)
+                        <div
+                            class="overflow-hidden rounded-lg shadow-md hover:scale-105 transition-transform duration-300 cursor-pointer border border-gray-200">
+                            <img src="{{ asset('storage/' . $image->image_path) }}" alt="Carousel Image"
+                                class="w-full h-40 object-cover" data-image="{{ asset('storage/' . $image->image_path) }}"
+                                onclick="openModal(this.dataset.image)" />
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+        @endif
+        <!-- Modal Markup -->
+        <div id="imageModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 hidden z-50">
+            <button onclick="closeModal()"
+                class="absolute top-5 right-5 text-gray-300 text-6xl hover:text-red-600 cursor-pointer">&times;</button>
+            <img id="modalImage" src="" alt="Full Image" class="max-w-full max-h-full rounded shadow-lg" />
         </div>
     </div>
-
-    <!-- Print Styles -->
-    <style>
-        @media print {
-            body * { visibility: hidden; }
-            #print-section, #print-section * { visibility: visible; }
-            #print-section {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                text-align: center;
-            }
-            .no-print { display: none !important; }
-        }
-    </style>
-
-    <!-- Print Section -->
-    <div id="print-section" style="position: absolute; left: -9999px; top: -9999px; visibility: hidden; display: none;">
-        <div class="p-8 text-center">
-            <h1 class="text-3xl font-bold mb-4">{{ $room->name }}</h1>
-            <p class="text-lg mb-6">{{ $room->description }}</p>
-            
-            <div class="flex justify-center mb-6">
-                @if (Str::endsWith($room->qr_code_path, '.svg'))
-                    <div class="w-64 h-64">
-                        {!! file_get_contents(storage_path('app/public/' . $room->qr_code_path)) !!}
-                    </div>
-                @else
-                    <img src="{{ asset('storage/' . $room->qr_code_path) }}" alt="QR Code for {{ $room->name }}"
-                        class="w-64 h-64">
-                @endif
-            </div>
-            
-            <div class="text-sm text-gray-600">
-                <p>Scan this QR code to view room information</p>
-                <p class="mt-2">Room ID: {{ $room->id }}</p>
-                <p class="mt-4">Generated on: {{ now()->format('M d, Y H:i') }}</p>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        function printQRCode() {
-            const printSection = document.getElementById('print-section');
-            printSection.style.display = 'block';
-            window.print();
-            setTimeout(() => { printSection.style.display = 'none'; }, 100);
-        }
-    </script>
 @endsection
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        function openModal(src) {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            modalImage.src = src;
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            modalImage.src = '';
+            modal.classList.add('hidden');
+        }
+
+        // Expose functions globally for inline onclick
+        window.openModal = openModal;
+        window.closeModal = closeModal;
+
+        // Close modal when clicking outside the image
+        const modal = document.getElementById('imageModal');
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+    });
+</script>

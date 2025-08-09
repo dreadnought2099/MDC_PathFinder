@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="w-full max-w-4xl mx-auto text-center text-5xl border-2 border-primary rounded-lg p-6">
+    <div class="w-full min-h-screen max-w-4xl mx-auto text-center text-5xl border-2 border-primary rounded-lg p-6">
         <h1><span class="text-primary">Admin</span> Dashboard</h1>
 
         <x-floating-actions />

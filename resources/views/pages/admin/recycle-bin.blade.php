@@ -1,9 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+    <x-floating-actions />
     <x-modal-scripts />
     <div x-data="{ tab: 'rooms' }" class="container mx-auto p-4">
-        <nav class="mb-4 flex space-x-4 border-b">
+        <nav class="mb-4 flex space-x-4 border-b border-primary">
             <button @click="tab = 'rooms'" :class="{ 'text-primary': tab === 'rooms' }"
                 class="pb-2 cursor-pointer hover-underline">
                 Trashed Rooms

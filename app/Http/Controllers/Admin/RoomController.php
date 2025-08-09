@@ -31,18 +31,28 @@ class RoomController extends Controller
             'description' => 'nullable|string',
             'image_path' => 'nullable|image|max:51200',
             'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200',
-            'office_hours' => 'nullable|string',
+            'office_days' => 'nullable|array',
+            'office_days.*' => 'string|in:Mon,Tue,Wed,Thu,Fri,Sat,Sun',
+            'office_hours_start' => 'nullable|date_format:H:i',
+            'office_hours_end' => 'nullable|date_format:H:i|after:office_hours_start',
             'carousel_images.*' => 'nullable|image|max:51200',
         ]);
 
         $room = new Room($validated);
 
-        // Save cover image
+        if (!empty($request->office_days)) {
+            $room->office_days = implode(',', $request->office_days);
+        } else {
+            $room->office_days = null;
+        }
+
+        $room->office_hours_start = $request->office_hours_start ?: null;
+        $room->office_hours_end = $request->office_hours_end ?: null;
+
         if ($request->hasFile('image_path')) {
             $room->image_path = $request->file('image_path')->store('room_images', 'public');
         }
 
-        // Save short video
         if ($request->hasFile('video_path')) {
             $room->video_path = $request->file('video_path')->store('room_videos', 'public');
         }
@@ -77,6 +87,8 @@ class RoomController extends Controller
 
     public function show(Room $room)
     {
+        $room->load('images');
+
         $images = $room->images;
 
         // Regenerate QR if missing
@@ -108,11 +120,28 @@ class RoomController extends Controller
             'description' => 'nullable|string',
             'image_path' => 'nullable|image|max:51200',
             'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200',
-            'office_hours' => 'nullable|string',
+            // New validations for office hours
+            'office_days' => 'nullable|array',
+            'office_days.*' => 'string|in:Mon,Tue,Wed,Thu,Fri,Sat,Sun',
+            'office_hours_start' => 'nullable|date_format:H:i',
+            'office_hours_end' => 'nullable|date_format:H:i|after:office_hours_start',
             'carousel_images.*' => 'nullable|image|max:51200',
             'remove_images' => 'nullable|array', // IDs of carousel images to delete
         ]);
 
+        // Remove 'office_hours' key if exists (to avoid overwriting)
+        unset($validated['office_hours']);
+
+        // Combine office hours if provided
+        if (!empty($request->office_days) && $request->office_hours_start && $request->office_hours_end) {
+            $daysStr = implode(',', $request->office_days);
+            $timeStr = $request->office_hours_start . ' - ' . $request->office_hours_end;
+            $room->office_hours = $daysStr . ' ' . $timeStr;
+        } else {
+            $room->office_hours = null; // Or keep old value if you want
+        }
+
+        // Update other fields
         $room->update($validated);
 
         // Update cover image
@@ -186,11 +215,6 @@ class RoomController extends Controller
             ->with('success', 'Room deleted successfully.');
     }
 
-    // public function trashed()
-    // {
-    //     $rooms = Room::onlyTrashed()->get();
-    //     return view('pages.admin.rooms.trashed', compact('rooms'));
-    // }
 
     public function recycleBin()
     {
@@ -241,4 +265,5 @@ class RoomController extends Controller
 
         return back()->with('success', 'Image removed successfully.');
     }
+
 }
