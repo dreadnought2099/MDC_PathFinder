@@ -14,8 +14,10 @@
 
     <!-- Camera scanner -->
     <div class="max-w-lg mx-auto">
-        <div id="qr-reader" class="w-full h-96 bg-gray-100 rounded-lg overflow-hidden mb-4"></div>
-        <div id="qr-reader-results" class="text-sm text-gray-600"></div>
+        <div id="qr-reader" class="mx-auto mb-4 border border-gray-300 rounded-lg overflow-hidden"
+            style="max-width: 350px;"></div>
+        <div id="qr-reader-results" class="text-sm text-gray-600 text-center"></div>
+
 
         <!-- Manual input fallback -->
         <div class="mt-4">
@@ -34,4 +36,5 @@
             </button>
         </div>
     </div>
+
 </div>
