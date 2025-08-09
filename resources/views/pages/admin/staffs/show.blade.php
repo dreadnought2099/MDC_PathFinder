@@ -12,10 +12,10 @@
 
         @if ($staff->photo_path)
             <div class="mt-4">
-                <img src="{{ asset($staff->photo_path) }}" alt="Photo of {{ $staff->name }}"
+                <img src="{{ Storage::url($staff->photo_path) }}" alt="Photo of {{ $staff->name }}"
                     class="w-40 h-40 object-cover rounded">
             </div>
         @endif
+
     </div>
 @endsection
-

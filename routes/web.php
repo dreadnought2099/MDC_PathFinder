@@ -20,7 +20,7 @@ Route::post('/admin', [LogInController::class, 'login']);
 
 // Authenticated admin routes
 Route::middleware('auth')->group(function () {
-    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+    Route::post('/logout', [LogInController::class, 'logout'])->name('logout');
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/profile', [ProfileController::class, 'index'])->name('admin.profile');
     Route::post('/admin/profile/update-image', [ProfileController::class, 'updateImage'])->name('admin.profile.updateImage');
@@ -49,5 +49,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/staff/{staff}/edit', [StaffController::class, 'edit'])->name('edit');
         Route::put('/staff/{staff}', [StaffController::class, 'update'])->name('update');
         Route::delete('/staff/{staff}', [StaffController::class, 'destroy'])->name('destroy');
+        Route::get('/staffs/trashed', [StaffController::class, 'trashed'])->name('trashed');
+        Route::get('/staffs/{id}/restore', [StaffController::class, 'restore'])->name('restore');
+        Route::get('/staffs/{id}/force-delete', [StaffController::class, 'forceDelete'])->name('forceDelete');
     });
 });
