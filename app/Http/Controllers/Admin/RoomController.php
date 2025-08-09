@@ -120,31 +120,31 @@ class RoomController extends Controller
             'description' => 'nullable|string',
             'image_path' => 'nullable|image|max:51200',
             'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200',
-            // New validations for office hours
             'office_days' => 'nullable|array',
             'office_days.*' => 'string|in:Mon,Tue,Wed,Thu,Fri,Sat,Sun',
             'office_hours_start' => 'nullable|date_format:H:i',
             'office_hours_end' => 'nullable|date_format:H:i|after:office_hours_start',
             'carousel_images.*' => 'nullable|image|max:51200',
-            'remove_images' => 'nullable|array', // IDs of carousel images to delete
+            'remove_images' => 'nullable|array',
         ]);
 
-        // Remove 'office_hours' key if exists (to avoid overwriting)
-        unset($validated['office_hours']);
-
-        // Combine office hours if provided
-        if (!empty($request->office_days) && $request->office_hours_start && $request->office_hours_end) {
-            $daysStr = implode(',', $request->office_days);
-            $timeStr = $request->office_hours_start . ' - ' . $request->office_hours_end;
-            $room->office_hours = $daysStr . ' ' . $timeStr;
+        // Set office fields manually
+        if (!empty($request->office_days)) {
+            $room->office_days = implode(',', $request->office_days);
         } else {
-            $room->office_hours = null; // Or keep old value if you want
+            $room->office_days = null;
         }
+
+        $room->office_hours_start = $request->office_hours_start ?: null;
+        $room->office_hours_end = $request->office_hours_end ?: null;
+
+        // Remove them from $validated so no overwrite
+        unset($validated['office_days'], $validated['office_hours_start'], $validated['office_hours_end']);
 
         // Update other fields
         $room->update($validated);
 
-        // Update cover image
+        // Update cover image if uploaded
         if ($request->hasFile('image_path')) {
             if ($room->image_path) {
                 Storage::disk('public')->delete($room->image_path);
@@ -152,7 +152,7 @@ class RoomController extends Controller
             $room->image_path = $request->file('image_path')->store('room_images', 'public');
         }
 
-        // Update video
+        // Update video if uploaded
         if ($request->hasFile('video_path')) {
             if ($room->video_path) {
                 Storage::disk('public')->delete($room->video_path);
@@ -265,5 +265,4 @@ class RoomController extends Controller
 
         return back()->with('success', 'Image removed successfully.');
     }
-
 }

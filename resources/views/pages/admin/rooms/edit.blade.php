@@ -1,124 +1,139 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="max-w-xl mx-auto mt-10">
-        <h2 class="text-2xl text-center font-bold mb-6">Edit Room/Office</h2>
+<div class="max-w-4xl mx-auto mt-10 p-6 bg-white rounded shadow">
 
-        <form action="{{ route('room.update', $room->id) }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            @method('PUT')
+    <h2 class="text-2xl font-bold mb-6 text-center"><span class="text-primary">Edit {{ $room->name }}</span></h2>
 
-            <div class="mb-4">
-                <label class="block text-gray-600">Room/Office Name</label>
-                <input type="text" name="name" value="{{ old('name', $room->name) }}" class="w-full border p-2 rounded"
-                    required>
-            </div>
+    @if ($errors->any())
+        <div class="mb-4 p-4 bg-red-100 text-red-700 rounded">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>• {{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-            <div class="mb-4">
-                <label class="block text-gray-600">Description</label>
-                <textarea name="description" class="w-full border p-2 rounded">{{ old('description', $room->description) }}</textarea>
-            </div>
+    <form action="{{ route('room.update', $room->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        @csrf
+        @method('PUT')
 
-            <div class="mb-4 text-gray-600">
-                <label class="block">Cover Image (optional)</label>
-                @if ($room->image_path)
-                    <div class="mb-2">
-                        <img src="{{ asset('storage/' . $room->image_path) }}" alt="Cover Image"
-                            class="h-24 object-cover rounded">
-                    </div>
-                @endif
-                <input type="file" name="image_path" class="w-full border p-2 rounded">
-            </div>
+        {{-- Name --}}
+        <div>
+            <label for="name" class="block font-semibold mb-1">Name</label>
+            <input type="text" id="name" name="name" value="{{ old('name', $room->name) }}" required
+                class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200" />
+        </div>
 
-            {{-- Existing Carousel Images --}}
-            @if ($room->images->count() > 0)
-                <div class="flex flex-wrap gap-4 mb-4">
-                    @foreach ($room->images as $image)
-                        <div class="relative">
-                            <img src="{{ asset('storage/' . $image->image_path) }}"
-                                class="h-24 w-24 object-cover rounded border">
+        {{-- Description --}}
+        <div>
+            <label for="description" class="block font-semibold mb-1">Description</label>
+            <textarea id="description" name="description" rows="4"
+                class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200">{{ old('description', $room->description) }}</textarea>
+        </div>
 
-                            {{-- Delete Carousel Image --}}
-                            <form action="{{ route('room.carousel.remove', [$room->id, $image->id]) }}" method="POST"
-                                class="absolute top-0 right-0">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="bg-red-500 text-white px-1 rounded text-xs"
-                                    onclick="return confirm('Are you sure you want to remove this image?')">
-                                    ×
-                                </button>
-                            </form>
-                        </div>
-                    @endforeach
-                </div>
-            @endif
+        {{-- Current Cover Image --}}
+        @if($room->image_path)
+        <div>
+            <label class="block font-semibold mb-1">Current Cover Image</label>
+            <img src="{{ asset('storage/' . $room->image_path) }}" alt="Cover Image" class="w-48 rounded mb-2 border" />
+        </div>
+        @endif
 
-            {{-- Add New Carousel Images --}}
-            <div class="mb-4">
-                <label for="carousel_images" class="block">Add Carousel Images</label>
-                <input type="file" name="carousel_images[]" multiple class="w-full border p-2 rounded">
-            </div>
+        {{-- Cover Image Upload --}}
+        <div>
+            <label for="image_path" class="block font-semibold mb-1">Upload New Cover Image</label>
+            <input type="file" id="image_path" name="image_path" accept="image/*" class="block" />
+        </div>
 
-            <div class="mb-8 text-gray-800 max-w-lg mx-auto">
-                <label class="block mb-3 font-semibold text-gray-900">Upload Short Video (optional)</label>
+        {{-- Current Video --}}
+        @if($room->video_path)
+        <div>
+            <label class="block font-semibold mb-1">Current Video</label>
+            <video controls class="w-64 rounded mb-2 border">
+                <source src="{{ asset('storage/' . $room->video_path) }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+        @endif
 
-                @if ($room->video_path)
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-5 border border-gray-200">
-                        <video src="{{ asset('storage/' . $room->video_path) }}" controls preload="metadata"
-                            class="block mx-auto max-w-full h-auto"></video>
-                        <div class="p-3 text-center text-sm text-gray-600 truncate"
-                            title="{{ basename($room->video_path) }}">
-                            {{ basename($room->video_path) }}
-                        </div>
-                    </div>
-                @endif
+        {{-- Video Upload --}}
+        <div>
+            <label for="video_path" class="block font-semibold mb-1">Upload New Video (mp4, avi, mpeg)</label>
+            <input type="file" id="video_path" name="video_path" accept="video/mp4,video/avi,video/mpeg" class="block" />
+        </div>
 
-                <label for="video_path"
-                    class="block text-center cursor-pointer bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-indigo-700 hover:to-blue-700 text-white rounded-md px-6 py-2 transition duration-300">
-                    Select
+        {{-- Office Days --}}
+        <div>
+            <label class="block font-semibold mb-1">Office Days</label>
+            <div class="flex flex-wrap gap-4">
+                @php
+                    $officeDays = old('office_days', explode(',', explode(' ', $room->office_hours ?? '')[0] ?? '')) ?? [];
+                    $weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                @endphp
+                @foreach($weekDays as $day)
+                <label class="inline-flex items-center space-x-2">
+                    <input type="checkbox" name="office_days[]" value="{{ $day }}" 
+                        {{ in_array($day, $officeDays) ? 'checked' : '' }} class="form-checkbox" />
+                    <span>{{ $day }}</span>
                 </label>
-                <input type="file" name="video_path" id="video_path" class="hidden"
-                    accept="video/mp4,video/avi,video/mpeg" />
+                @endforeach
             </div>
+        </div>
 
+        {{-- Office Hours Start --}}
+        <div>
+            @php
+                $officeHoursTime = old('office_hours_start', explode('-', explode(' ', $room->office_hours ?? '')[1] ?? '')[0] ?? '');
+            @endphp
+            <label for="office_hours_start" class="block font-semibold mb-1">Office Hours Start</label>
+            <input type="time" id="office_hours_start" name="office_hours_start" value="{{ $officeHoursTime }}"
+                class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200" />
+        </div>
 
-            <div class="mb-4 text-gray-600">
-                <label class="block font-semibold mb-2">Office Hours</label>
+        {{-- Office Hours End --}}
+        <div>
+            @php
+                $officeHoursEnd = old('office_hours_end', trim(explode('-', explode(' ', $room->office_hours ?? '')[1] ?? '')[1] ?? ''));
+            @endphp
+            <label for="office_hours_end" class="block font-semibold mb-1">Office Hours End</label>
+            <input type="time" id="office_hours_end" name="office_hours_end" value="{{ $officeHoursEnd }}"
+                class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200" />
+        </div>
 
-                {{-- Days checkboxes --}}
-                <div class="flex flex-wrap gap-2 mb-2">
-                    @php
-                        $days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                        $selectedDays = old('office_days', isset($room) ? explode(',', $room->office_days) : []);
-                    @endphp
-
-                    @foreach ($days as $day)
-                        <label class="inline-flex items-center gap-1 cursor-pointer">
-                            <input type="checkbox" name="office_days[]" value="{{ $day }}" class="form-checkbox"
-                                {{ in_array($day, $selectedDays) ? 'checked' : '' }} />
-                            <span>{{ $day }}</span>
+        {{-- Current Carousel Images --}}
+        @if($room->images && $room->images->count() > 0)
+        <div>
+            <label class="block font-semibold mb-2">Current Carousel Images</label>
+            <div class="grid grid-cols-3 gap-4">
+                @foreach ($room->images as $image)
+                    <div class="relative border rounded overflow-hidden">
+                        <img src="{{ asset('storage/' . $image->image_path) }}" alt="Carousel Image" class="w-full h-32 object-cover" />
+                        <label class="absolute top-1 right-1 bg-red-600 text-white rounded px-2 text-xs cursor-pointer hover:bg-red-700"
+                               title="Remove this image">
+                            <input type="checkbox" name="remove_images[]" value="{{ $image->id }}" class="hidden" />
+                            Remove
                         </label>
-                    @endforeach
-                </div>
-
-                {{-- Time inputs --}}
-                <div class="flex gap-2 items-center max-w-xs">
-                    <input type="time" name="office_hours_start" class="flex-1 border p-2 rounded"
-                        value="{{ old('office_hours_start', $room->office_hours_start ?? '') }}"
-                        placeholder="Start time" />
-                    <span class="self-center">to</span>
-                    <input type="time" name="office_hours_end" class="flex-1 border p-2 rounded"
-                        value="{{ old('office_hours_end', $room->office_hours_end ?? '') }}" placeholder="End time" />
-                </div>
+                    </div>
+                @endforeach
             </div>
+        </div>
+        @endif
 
+        {{-- Add Carousel Images --}}
+        <div>
+            <label for="carousel_images" class="block font-semibold mb-1">Add Carousel Images</label>
+            <input type="file" id="carousel_images" name="carousel_images[]" multiple accept="image/*" class="block" />
+        </div>
 
-            <div>
-                <button type="submit"
-                    class="bg-primary text-white px-4 py-2 bg-primary rounded hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer">
-                    Save Room
-                </button>
-            </div>
-        </form>
-    </div>
+        {{-- Submit --}}
+        <div>
+            <button type="submit"
+                class="bg-primary text-white px-4 py-2 bg-primary rounded hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer">
+                Update Room
+            </button>
+        </div>
+    </form>
+</div>
 @endsection
