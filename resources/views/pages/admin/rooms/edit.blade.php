@@ -82,12 +82,36 @@
             </div>
 
 
-
             <div class="mb-4 text-gray-600">
-                <label class="block">Office Hours</label>
-                <input type="text" value="{{ old('office_hours', $room->office_hours) }}" name="office_hours"
-                    class="w-full border p-2 rounded">
+                <label class="block font-semibold mb-2">Office Hours</label>
+
+                {{-- Days checkboxes --}}
+                <div class="flex flex-wrap gap-2 mb-2">
+                    @php
+                        $days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                        $selectedDays = old('office_days', isset($room) ? explode(',', $room->office_days) : []);
+                    @endphp
+
+                    @foreach ($days as $day)
+                        <label class="inline-flex items-center gap-1 cursor-pointer">
+                            <input type="checkbox" name="office_days[]" value="{{ $day }}" class="form-checkbox"
+                                {{ in_array($day, $selectedDays) ? 'checked' : '' }} />
+                            <span>{{ $day }}</span>
+                        </label>
+                    @endforeach
+                </div>
+
+                {{-- Time inputs --}}
+                <div class="flex gap-2 items-center max-w-xs">
+                    <input type="time" name="office_hours_start" class="flex-1 border p-2 rounded"
+                        value="{{ old('office_hours_start', $room->office_hours_start ?? '') }}"
+                        placeholder="Start time" />
+                    <span class="self-center">to</span>
+                    <input type="time" name="office_hours_end" class="flex-1 border p-2 rounded"
+                        value="{{ old('office_hours_end', $room->office_hours_end ?? '') }}" placeholder="End time" />
+                </div>
             </div>
+
 
             <div>
                 <button type="submit"
