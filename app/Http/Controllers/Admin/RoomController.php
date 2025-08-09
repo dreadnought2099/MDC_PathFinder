@@ -29,10 +29,10 @@ class RoomController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'image_path' => 'nullable|image|max:5120',
+            'image_path' => 'nullable|image|max:51200',
             'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200',
             'office_hours' => 'nullable|string',
-            'carousel_images.*' => 'nullable|image|max:5120',
+            'carousel_images.*' => 'nullable|image|max:51200',
         ]);
 
         $room = new Room($validated);
@@ -106,7 +106,7 @@ class RoomController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'image_path' => 'nullable|image|max:5120',
+            'image_path' => 'nullable|image|max:51200',
             'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200',
             'office_hours' => 'nullable|string',
             'carousel_images.*' => 'nullable|image|max:51200',
