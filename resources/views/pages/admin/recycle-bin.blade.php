@@ -3,10 +3,10 @@
 @section('content')
 <div x-data="{ tab: 'rooms' }" class="container mx-auto p-4">
   <nav class="mb-4 flex space-x-4 border-b">
-    <button @click="tab = 'rooms'" :class="{ 'border-primary border-b-2': tab === 'rooms' }" class="pb-2">
+    <button @click="tab = 'rooms'" :class="{ 'text-primary': tab === 'rooms' }" class="pb-2 cursor-pointer hover-underline">
       Trashed Rooms
     </button>
-    <button @click="tab = 'staff'" :class="{ 'border-primary border-b-2': tab === 'staff' }" class="pb-2">
+    <button @click="tab = 'staff'" :class="{ 'text-primary': tab === 'staff' }" class="pb-2 cursor-pointer hover-underline">
       Trashed Staff
     </button>
   </nav>
