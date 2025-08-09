@@ -37,6 +37,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/rooms/trashed', [RoomController::class, 'trashed'])->name('trashed');
         Route::post('/rooms/{id}/restore', [RoomController::class, 'restore'])->name('restore');
         Route::delete('/rooms/{id}/force-delete', [RoomController::class, 'forceDelete'])->name('forceDelete');
+        Route::delete('/rooms/{room}/carousel/{image}', [RoomController::class, 'removeCarouselImage'])->name('carousel.remove');
     });
 
 

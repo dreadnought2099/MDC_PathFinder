@@ -21,7 +21,7 @@ class Room extends Model
         'office_hours',
     ];
 
-
+    
     public function staff()
     {
         return $this->hasMany(Staff::class);

@@ -19,7 +19,7 @@
         <div id="qr-reader-results" class="text-sm text-gray-600 text-center"></div>
 
 
-        <!-- Manual input fallback -->
+        {{-- <!-- Manual input fallback -->
         <div class="mt-4">
             <p class="text-sm text-gray-500 mb-2">Or enter room ID manually:</p>
             <input type="number" id="manual-room-id" placeholder="Enter room ID"
@@ -34,7 +34,7 @@
                 class="mt-2 w-full bg-gray-500 hover:bg-white text-white hover:text-gray-500 border border-gray-500 py-2 px-4 rounded-lg transition-all duration-300 cursor-pointer">
                 Restart Camera
             </button>
-        </div>
+        </div> --}}
     </div>
 
 </div>

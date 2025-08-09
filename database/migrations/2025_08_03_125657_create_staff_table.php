@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->string('phone_num')->nullable();
             $table->string('photo_path')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -8,12 +8,11 @@
         <p class="mt-2 text-gray-700">{{ $room->description }}</p>
         @if ($room->qr_code_path)
             <div class="mt-6">
-                
                 <div class="flex flex-col items-center w-full space-y-4">
                     <div id="qr-code-container">
                         @if (Str::endsWith($room->qr_code_path, '.svg'))
                             <div class="w-60 h-60 flex items-center justify-center">
-                                {!! file_get_contents(public_path($room->qr_code_path)) !!}
+                                {!! file_get_contents(storage_path('app/public/' . $room->qr_code_path)) !!}
                             </div>
                         @else
                             <img src="{{ asset('storage/' . $room->qr_code_path) }}" alt="QR Code for {{ $room->name }}"
@@ -33,12 +32,13 @@
         @endif
 
         <div class="space-y-12">
-            {{-- <h2 class="text-xl font-semibold">Staff in this Room:</h2> --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2">
                 @foreach ($room->staff as $member)
                     <div class="bg-white p-4 rounded shadow">
-                        <img src="{{ asset('storage/' . $member->photo_path) }}" alt="{{ $member->name }}"
-                            class="w-full h-40 object-cover mb-2 rounded">
+                        @if($member->photo_path)
+                            <img src="{{ asset('storage/' . $member->photo_path) }}" alt="{{ $member->name }}"
+                                class="w-full h-40 object-cover mb-2 rounded">
+                        @endif
                         <h3 class="text-lg font-bold">{{ $member->name }}</h3>
                         <p class="text-sm text-gray-600">{{ $member->position }}</p>
                         @if ($member->email)
@@ -56,12 +56,8 @@
     <!-- Print Styles -->
     <style>
         @media print {
-            body * {
-                visibility: hidden;
-            }
-            #print-section, #print-section * {
-                visibility: visible;
-            }
+            body * { visibility: hidden; }
+            #print-section, #print-section * { visibility: visible; }
             #print-section {
                 position: absolute;
                 left: 0;
@@ -69,13 +65,11 @@
                 width: 100%;
                 text-align: center;
             }
-            .no-print {
-                display: none !important;
-            }
+            .no-print { display: none !important; }
         }
     </style>
 
-    <!-- Print Section (Hidden by default) -->
+    <!-- Print Section -->
     <div id="print-section" style="position: absolute; left: -9999px; top: -9999px; visibility: hidden; display: none;">
         <div class="p-8 text-center">
             <h1 class="text-3xl font-bold mb-4">{{ $room->name }}</h1>
@@ -84,7 +78,7 @@
             <div class="flex justify-center mb-6">
                 @if (Str::endsWith($room->qr_code_path, '.svg'))
                     <div class="w-64 h-64">
-                        {!! file_get_contents(public_path($room->qr_code_path)) !!}
+                        {!! file_get_contents(storage_path('app/public/' . $room->qr_code_path)) !!}
                     </div>
                 @else
                     <img src="{{ asset('storage/' . $room->qr_code_path) }}" alt="QR Code for {{ $room->name }}"
@@ -103,21 +97,9 @@
     <script>
         function printQRCode() {
             const printSection = document.getElementById('print-section');
-            
-            // Keep the print section hidden but make it available for print media query
-            printSection.style.position = 'absolute';
-            printSection.style.left = '-9999px';
-            printSection.style.top = '-9999px';
-            printSection.style.visibility = 'hidden';
             printSection.style.display = 'block';
-            
-            // Trigger print - the CSS @media print will handle showing the content
             window.print();
-            
-            // Hide the print section after printing
-            setTimeout(() => {
-                printSection.style.display = 'none';
-            }, 100);
+            setTimeout(() => { printSection.style.display = 'none'; }, 100);
         }
     </script>
 @endsection

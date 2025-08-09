@@ -51,7 +51,7 @@
                 <label class="block mb-1 font-medium">Photo</label>
                 <input type="file" name="photo_path" class="w-full">
                 @if ($staff->photo_path)
-                    <img src="{{ asset('storage/' . $staff->photo_path) }}" class="h-20 mt-2">
+                    <img src="{{ asset($staff->photo_path) }}" class="h-20 mt-2">
                 @endif
             </div>
 
