@@ -34,7 +34,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/room/{room}/edit', [RoomController::class, 'edit'])->name('edit');
         Route::put('/room/{room}', [RoomController::class, 'update'])->name('update');
         Route::delete('/room/{room}', [RoomController::class, 'destroy'])->name('destroy');
-        Route::get('/recycle-bin', [RoomController::class, 'recycleBin'])->name('recycle-bin');
+        Route::get('/rooms/recycle-bin', [RoomController::class, 'recycleBin'])->name('recycle-bin');
         Route::post('/rooms/{id}/restore', [RoomController::class, 'restore'])->name('restore');
         Route::delete('/rooms/{id}/force-delete', [RoomController::class, 'forceDelete'])->name('forceDelete');
         Route::delete('/rooms/{room}/carousel/{image}', [RoomController::class, 'removeCarouselImage'])->name('carousel.remove');
@@ -49,8 +49,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/staff/{staff}/edit', [StaffController::class, 'edit'])->name('edit');
         Route::put('/staff/{staff}', [StaffController::class, 'update'])->name('update');
         Route::delete('/staff/{staff}', [StaffController::class, 'destroy'])->name('destroy');
-        Route::get('/staffs/trashed', [StaffController::class, 'trashed'])->name('trashed');
-        Route::get('/staffs/{id}/restore', [StaffController::class, 'restore'])->name('restore');
+        Route::get('/staffs/recycle-bin', [RoomController::class, 'recycleBin'])->name('recycle-bin');
+        Route::post('/staffs/{id}/restore', [StaffController::class, 'restore'])->name('restore');
         Route::get('/staffs/{id}/force-delete', [StaffController::class, 'forceDelete'])->name('forceDelete');
     });
 });

@@ -90,17 +90,17 @@ class StaffController extends Controller
         return redirect()->route('staff.index')->with('success', 'Staff member moved to trash.');
     }
 
-    public function trashed()
-    {
-        $staffs = Staff::onlyTrashed()->with('room')->get();
-        return view('pages.admin.staffs.trashed', compact('staffs'));
-    }
+    // public function trashed()
+    // {
+    //     $staffs = Staff::onlyTrashed()->with('room')->get();
+    //     return view('pages.admin.staffs.trashed', compact('staffs'));
+    // }
 
     public function restore($id)
     {
         $staff = Staff::onlyTrashed()->findOrFail($id);
         $staff->restore();
-        return redirect()->route('staff.trashed')->with('success', 'Staff member restored successfully.');
+        return redirect()->route('staff.recycle-bin')->with('success', 'Staff member restored successfully.');
     }
 
     public function forceDelete($id)
@@ -113,6 +113,6 @@ class StaffController extends Controller
 
         $staff->forceDelete();
 
-        return redirect()->route('staff.trashed')->with('success', 'Staff member permanently deleted.');
+        return redirect()->route('staff.recycle-bin')->with('success', 'Staff member permanently deleted.');
     }
 }

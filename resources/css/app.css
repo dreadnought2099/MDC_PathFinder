@@ -12,7 +12,7 @@
 }
 
 @font-face {
-    font-family: "Anton";
+    font-family: "Anton,Verdana, sans-serif";
     src: url("/fonts/Anton-Regular.ttf") format("truetype");
     font-weight: normal;
     font-style: normal;

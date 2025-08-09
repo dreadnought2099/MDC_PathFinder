@@ -205,7 +205,7 @@ class RoomController extends Controller
         $room = Room::onlyTrashed()->findOrFail($id);
         $room->restore();
 
-        return redirect()->route('room.trashed')
+        return redirect()->route('room.recycle-bin')
             ->with('success', 'Room restored successfully.');
     }
 
@@ -230,7 +230,7 @@ class RoomController extends Controller
 
         $room->forceDelete();
 
-        return redirect()->route('room.trashed')
+        return redirect()->route('room.recycle-bin')
             ->with('success', 'Room permanently deleted.');
     }
 
