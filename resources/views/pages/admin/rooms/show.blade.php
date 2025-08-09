@@ -78,8 +78,8 @@
                 <h3 class="text-lg font-semibold mb-2">Room QR Code</h3>
 
                 <a href="{{ route('room.print-qrcode', $room) }}" target="_blank"
-                    class="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark">
-                    Open Printable QR Code
+                    class="bg-primary text-white px-4 py-2 bg-primary rounded hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer">
+                    Open QR Code
                 </a>
 
 

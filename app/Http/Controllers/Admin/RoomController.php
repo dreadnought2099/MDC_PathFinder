@@ -137,17 +137,12 @@ class RoomController extends Controller
             'remove_images' => 'nullable|array',
         ]);
 
-        // Set office fields manually
-        if (!empty($request->office_days)) {
-            $room->office_days = implode(',', $request->office_days);
-        } else {
-            $room->office_days = null;
-        }
-
+        // Set office days string
+        $room->office_days = !empty($request->office_days) ? implode(',', $request->office_days) : null;
         $room->office_hours_start = $request->office_hours_start ?: null;
         $room->office_hours_end = $request->office_hours_end ?: null;
 
-        // Remove them from $validated so no overwrite
+        // Remove office fields from $validated to avoid overwrite
         unset($validated['office_days'], $validated['office_hours_start'], $validated['office_hours_end']);
 
         // Update other fields
@@ -155,21 +150,27 @@ class RoomController extends Controller
 
         // Update cover image if uploaded
         if ($request->hasFile('image_path')) {
-            if ($room->image_path) {
-                Storage::disk('public')->delete($room->image_path);
+            $newPath = $request->file('image_path')->store('room_images', 'public');
+            if ($newPath) {
+                if ($room->image_path) {
+                    Storage::disk('public')->delete($room->image_path);
+                }
+                $room->image_path = $newPath;
+                $room->save();
             }
-            $room->image_path = $request->file('image_path')->store('room_images', 'public');
         }
 
         // Update video if uploaded
         if ($request->hasFile('video_path')) {
-            if ($room->video_path) {
-                Storage::disk('public')->delete($room->video_path);
+            $newVideoPath = $request->file('video_path')->store('room_videos', 'public');
+            if ($newVideoPath) {
+                if ($room->video_path) {
+                    Storage::disk('public')->delete($room->video_path);
+                }
+                $room->video_path = $newVideoPath;
+                $room->save();
             }
-            $room->video_path = $request->file('video_path')->store('room_videos', 'public');
         }
-
-        $room->save();
 
         // Remove selected carousel images
         if ($request->filled('remove_images')) {
@@ -194,6 +195,7 @@ class RoomController extends Controller
         return redirect()->route('room.show', $room->id)
             ->with('success', "{$room->name} was updated successfully.");
     }
+
 
 
     public function destroy(Room $room)
