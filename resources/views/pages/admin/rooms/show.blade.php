@@ -21,10 +21,9 @@
                 $start = \Carbon\Carbon::parse($room->office_hours_start)->format('H:i');
                 $end = \Carbon\Carbon::parse($room->office_hours_end)->format('H:i');
             @endphp
-            <div
-                class="mb-6 p-4 bg-gradient-to-tr from-blue-400 to-white rounded-lg shadow-md max-w-sm">
+            <div class="mb-6 p-4 bg-gradient-to-tr from-blue-400 to-white rounded-lg shadow-md max-w-sm">
                 <h4 class="text-base font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                    <img src="{{ asset('icons/calendar.png')}}" alt="Calendar" class="h-10 w-10 object-contain">
+                    <img src="{{ asset('icons/calendar.png') }}" alt="Calendar" class="h-10 w-10 object-contain">
                     Office Hours
                 </h4>
                 <p class="text-sm text-gray-700 mb-1">
@@ -72,6 +71,59 @@
                 </div>
             </section>
         @endif
+
+        {{-- QR Code --}}
+        @if ($room->qr_code_path)
+            <div class="mt-6 text-center">
+                <h3 class="text-lg font-semibold mb-2">Room QR Code</h3>
+
+                <a href="{{ route('room.print-qrcode', $room) }}" target="_blank"
+                    class="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark">
+                    Open Printable QR Code
+                </a>
+
+
+                <div id="qrCodeToPrint" class="inline-block">
+                    <img src="{{ asset('storage/' . $room->qr_code_path) }}" alt="QR Code for {{ $room->name }}"
+                        class="mx-auto" />
+                </div>
+            </div>
+
+            <script>
+                function printQRCode() {
+                    const qrElement = document.getElementById('qrCodeToPrint');
+                    const printWindow = window.open('', '', 'width=400,height=400');
+                    printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Print QR Code</title>
+                    <style>
+                        body {
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            height: 100vh;
+                            margin: 0;
+                        }
+                        img {
+                            max-width: 100%;
+                            max-height: 100%;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${qrElement.innerHTML}
+                </body>
+                </html>
+            `);
+                    printWindow.document.close();
+                    printWindow.focus();
+                    printWindow.print();
+                    printWindow.close();
+                }
+            </script>
+        @endif
+
         <!-- Modal Markup -->
         <div id="imageModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 hidden z-50">
             <button onclick="closeModal()"

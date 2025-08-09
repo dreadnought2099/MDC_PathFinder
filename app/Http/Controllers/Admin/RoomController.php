@@ -60,11 +60,20 @@ class RoomController extends Controller
         $room->save();
 
         // Marker ID and QR code
+        // After saving the room...
         $marker_id = 'room_' . $room->id;
+
+        // Generate QR code SVG with the room id as content
         $qrImage = QrCode::format('svg')->size(300)->generate($room->id);
+
+        // Define the path to save the QR code
         $qrPath = 'qrcodes/' . $marker_id . '.svg';
+
+        // Store the QR code SVG into the public disk
         Storage::disk('public')->put($qrPath, $qrImage);
 
+
+        // Update the room with marker_id and qr_code_path
         $room->update([
             'marker_id' => $marker_id,
             'qr_code_path' => $qrPath,
@@ -264,5 +273,10 @@ class RoomController extends Controller
         $image->delete();
 
         return back()->with('success', 'Image removed successfully.');
+    }
+
+    public function printQRCode(Room $room)
+    {
+        return view('pages.admin.rooms.print-qrcode', compact('room'));
     }
 }

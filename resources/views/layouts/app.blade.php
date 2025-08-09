@@ -8,7 +8,7 @@
 
     <title>{{ config('app.name') }}</title>
     @vite('resources/css/app.css')
-    <link rel="icon" href="{{ asset('images/pathfinder-logo.png')}}">
+    <link rel="icon" href="{{ asset('images/mdc-logo.png')}}">
 </head>
 
 <body>

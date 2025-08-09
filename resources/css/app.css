@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 @source "../views";
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -7,8 +7,9 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
+        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+        "Noto Color Emoji";
 }
 
 @font-face {
@@ -17,7 +18,6 @@
     font-weight: normal;
     font-style: normal;
 }
-
 
 @layer base {
     :root {
@@ -127,6 +127,17 @@
     .peer:focus ~ label {
         color: var(--color-primary);
     }
+
+    /* For the toggle switch background on peer checked */
+    .peer:checked + div {
+        background-color: var(--color-primary); /* or var(--color-edit) etc */
+    }
+
+    /* For the ring on peer focus */
+    .peer:focus + div {
+        --tw-ring-color: var(--color-primary);
+        box-shadow: 0 0 0 3px var(--tw-ring-color);
+    }
 }
 
 @layer components {
@@ -157,7 +168,6 @@
     .hover-underline-edit:hover::after {
         @apply left-0 w-full;
     }
-
 
     /* Delete hyperlink */
     .hover-underline-delete {

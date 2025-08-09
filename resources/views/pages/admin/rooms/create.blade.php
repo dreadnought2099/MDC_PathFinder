@@ -89,15 +89,40 @@
             <div class="mb-4 text-gray-600 max-w-sm">
                 <label class="block mb-1 font-semibold">Office Hours</label>
 
-                {{-- Days of the week checkboxes --}}
-                <div class="flex flex-wrap gap-2 mb-2">
+                <div class="flex flex-wrap gap-4 mb-4">
                     @php
                         $days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                        // Get previously selected days, fallback empty array
+                        $selectedDays = old(
+                            'office_days',
+                            isset($room) && $room->office_days ? explode(',', $room->office_days) : [],
+                        );
                     @endphp
+
                     @foreach ($days as $day)
-                        <label class="inline-flex items-center gap-1 cursor-pointer">
-                            <input type="checkbox" name="office_days[]" value="{{ $day }}" class="form-checkbox" />
-                            <span>{{ $day }}</span>
+                        <label class="inline-flex items-center cursor-pointer select-none gap-3">
+                            <input type="checkbox" name="office_days[]" value="{{ $day }}" class="peer sr-only"
+                                {{ in_array($day, $selectedDays) ? 'checked' : '' }} />
+
+                            <div
+                                class="w-6 h-6 border-2 rounded-md
+           bg-white border-gray-400
+           peer-checked:bg-primary
+           peer-checked:border-blue-600
+           peer-focus:ring-4 peer-focus:ring-blue-400
+           transition-colors duration-300 ease-in-out
+           relative flex items-center justify-center">
+                                <!-- Checkmark -->
+                                <svg class="w-5 h-5 text-white opacity-0 scale-75 peer-checked:opacity-100 peer-checked:scale-100 transition-all duration-300 ease-in-out"
+                                    fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+
+                            <span
+                                class="text-gray-800 font-semibold peer-focus:text-blue-600 peer-checked:text-blue-600 transition-colors duration-200">
+                                {{ $day }}
+                            </span>
                         </label>
                     @endforeach
                 </div>
@@ -147,15 +172,12 @@
                 // No else — keep existing preview if no file selected
             });
 
-            // Carousel images upload preview
             const carouselInput = document.getElementById('carousel_images');
             const carouselPreviewContainer = document.getElementById('carouselPreviewContainer');
             const carouselUploadIcon = document.getElementById('carouselUploadIcon');
             const carouselUploadText = document.getElementById('carouselUploadText');
 
             carouselInput.addEventListener('change', () => {
-                carouselPreviewContainer.innerHTML = ''; // Clear previous previews
-
                 if (carouselInput.files && carouselInput.files.length > 0) {
                     carouselUploadIcon.style.display = 'none';
                     carouselUploadText.style.display = 'none';
@@ -172,10 +194,9 @@
 
                         reader.readAsDataURL(file);
                     });
-                } else {
-                    carouselUploadIcon.style.display = '';
-                    carouselUploadText.style.display = '';
                 }
+
+                // Do not clear or reset the preview container here, so existing previews stay.
             });
 
             const dropZone = document.getElementById('videoDropZone');

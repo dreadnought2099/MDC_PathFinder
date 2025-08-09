@@ -38,6 +38,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/rooms/{id}/restore', [RoomController::class, 'restore'])->name('restore');
         Route::delete('/rooms/{id}/force-delete', [RoomController::class, 'forceDelete'])->name('forceDelete');
         Route::delete('/rooms/{room}/carousel/{image}', [RoomController::class, 'removeCarouselImage'])->name('carousel.remove');
+        Route::get('/room/{room}/print-qrcode', [RoomController::class, 'printQRCode'])->name('print-qrcode');
     });
 
 
