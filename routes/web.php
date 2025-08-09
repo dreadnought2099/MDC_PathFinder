@@ -51,6 +51,6 @@ Route::middleware('auth')->group(function () {
         Route::delete('/staff/{staff}', [StaffController::class, 'destroy'])->name('destroy');
         Route::get('/staffs/recycle-bin', [RoomController::class, 'recycleBin'])->name('recycle-bin');
         Route::post('/staffs/{id}/restore', [StaffController::class, 'restore'])->name('restore');
-        Route::get('/staffs/{id}/force-delete', [StaffController::class, 'forceDelete'])->name('forceDelete');
+        Route::delete('/staffs/{id}/force-delete', [StaffController::class, 'forceDelete'])->name('forceDelete');
     });
 });
