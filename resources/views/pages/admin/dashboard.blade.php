@@ -18,7 +18,7 @@
                 <span class="text-base">Manage Room/Office</span>
             </a>
 
-            <a href="{{ route('room.trashed') }}" class="text-primary inline-flex items-center space-x-2 hover-underline transform transition-all durtion-300 hover:scale-105 border-t-2 border-l-2 border-r-2 border-primary px-4 py-2 rounded">
+            <a href="{{ route('room.recycle-bin') }}" class="text-primary inline-flex items-center space-x-2 hover-underline transform transition-all durtion-300 hover:scale-105 border-t-2 border-l-2 border-r-2 border-primary px-4 py-2 rounded">
                 <img src="{{ asset('icons/recycle-bin.png') }}" alt="Recycle Bin" class="h-10 w-10 object-contain" />
                 <span class="text-base">Recycle Bin</span>
             </a>

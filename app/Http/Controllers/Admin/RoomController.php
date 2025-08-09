@@ -186,10 +186,18 @@ class RoomController extends Controller
             ->with('success', 'Room deleted successfully.');
     }
 
-    public function trashed()
+    // public function trashed()
+    // {
+    //     $rooms = Room::onlyTrashed()->get();
+    //     return view('pages.admin.rooms.trashed', compact('rooms'));
+    // }
+
+    public function recycleBin()
     {
         $rooms = Room::onlyTrashed()->get();
-        return view('pages.admin.rooms.trashed', compact('rooms'));
+        $staffs = Staff::onlyTrashed()->get();
+
+        return view('pages.admin.recycle-bin', compact('rooms', 'staffs'));
     }
 
     public function restore($id)
