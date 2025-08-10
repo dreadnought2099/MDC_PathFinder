@@ -4,6 +4,8 @@
     @props([
         'roomFallback' => 'room.index',
         'staffFallback' => 'staff.index',
+        'trashedRoomFallback' => 'room.recycle-bin',
+        'trashedStaffFallback' => 'staff.recycle-bin',
         'landing' => 'admin.dashboard',
     ])
 
@@ -14,17 +16,23 @@
         // Detect if we're on an index page for rooms or staff
         $onRoomIndex = Route::is($roomFallback);
         $onStaffIndex = Route::is($staffFallback);
+        $onTrashedRoom = Route::is($trashedRoomFallback);
+        $onTrashedStaff = Route::is($trashedStaffFallback);
 
         // Always go to landing if we're on an index page
-        if ($onRoomIndex || $onStaffIndex) {
+        if ($onRoomIndex || $onStaffIndex || $onTrashedRoom || $onTrashedStaff) {
             $previous = route($landing);
         }
         // Prevent loops back into edit/create pages
         elseif ($previous === $current || preg_match('/\/(edit|create|store)/', $previous)) {
             if (Route::is('staff.*')) {
                 $previous = route($staffFallback);
-            } else {
+            } elseif(Route::is('room.*')) {
                 $previous = route($roomFallback);
+            } elseif(Route::is('room.recycle-bin')) {
+                $previous = route($trashedRoomFallback);
+            } elseif(Route::is('staff.recycle-bin')) {
+                $previous = route($trashedStaffFallback);
             }
         }
     @endphp
