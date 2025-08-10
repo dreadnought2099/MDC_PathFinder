@@ -33,26 +33,21 @@ class RoomController extends Controller
             'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200',
             'office_days' => 'nullable|array',
             'office_days.*' => 'string|in:Mon,Tue,Wed,Thu,Fri,Sat,Sun',
-            'office_hours_start' => [
-                'nullable',
-                'regex:/^([01]\d|2[0-3]):[0-5]\d$|^(0?[1-9]|1[0-2]):[0-5]\d\s?(AM|PM)$/i'
-            ],
-            'office_hours_end' => [
-                'nullable',
-                'regex:/^([01]\d|2[0-3]):[0-5]\d$|^(0?[1-9]|1[0-2]):[0-5]\d\s?(AM|PM)$/i'
-            ],
+            // Allow HH:MM or HH:MM:SS
+            'office_hours_start' => ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/'],
+            'office_hours_end'   => ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/', 'after:office_hours_start'],
             'carousel_images.*' => 'nullable|image|max:51200',
         ]);
 
-        // Convert to 24-hour format for storage and comparison
-        if (!empty($request->office_hours_start)) {
-            $validated['office_hours_start'] = date('H:i', strtotime($request->office_hours_start));
+        // Normalize to HH:MM for storage
+        if (!empty($validated['office_hours_start'])) {
+            $validated['office_hours_start'] = date('H:i', strtotime($validated['office_hours_start']));
         }
-        if (!empty($request->office_hours_end)) {
-            $validated['office_hours_end'] = date('H:i', strtotime($request->office_hours_end));
+        if (!empty($validated['office_hours_end'])) {
+            $validated['office_hours_end'] = date('H:i', strtotime($validated['office_hours_end']));
         }
 
-        // Check end time after start time
+        // Check end time after start time manually
         if (!empty($validated['office_hours_start']) && !empty($validated['office_hours_end'])) {
             if (strtotime($validated['office_hours_end']) <= strtotime($validated['office_hours_start'])) {
                 return back()->withErrors(['office_hours_end' => 'End time must be after start time'])->withInput();
@@ -139,35 +134,37 @@ class RoomController extends Controller
             'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200',
             'office_days' => 'nullable|array',
             'office_days.*' => 'string|in:Mon,Tue,Wed,Thu,Fri,Sat,Sun',
-
-            // Accepts 24h (HH:MM) or 12h (HH:MM AM/PM)
-            'office_hours_start' => [
-                'nullable',
-                'regex:/^([01]\d|2[0-3]):[0-5]\d$|^(0?[1-9]|1[0-2]):[0-5]\d\s?(AM|PM)$/i'
-            ],
-
-            'office_hours_end' => [
-                'nullable',
-                'regex:/^([01]\d|2[0-3]):[0-5]\d$|^(0?[1-9]|1[0-2]):[0-5]\d\s?(AM|PM)$/i',
-                'after:office_hours_start'
-            ],
-
+            // Allow HH:MM or HH:MM:SS
+            'office_hours_start' => ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/'],
+            'office_hours_end'   => ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/', 'after:office_hours_start'],
             'carousel_images.*' => 'nullable|image|max:51200',
             'remove_images' => 'nullable|array',
         ]);
 
-        // Set office days string
+        // Normalize office hours
+        if (!empty($validated['office_hours_start'])) {
+            $validated['office_hours_start'] = date('H:i', strtotime($validated['office_hours_start']));
+        }
+        if (!empty($validated['office_hours_end'])) {
+            $validated['office_hours_end'] = date('H:i', strtotime($validated['office_hours_end']));
+        }
+
+        // Check end time after start time manually
+        if (!empty($validated['office_hours_start']) && !empty($validated['office_hours_end'])) {
+            if (strtotime($validated['office_hours_end']) <= strtotime($validated['office_hours_start'])) {
+                return back()->withErrors(['office_hours_end' => 'End time must be after start time'])->withInput();
+            }
+        }
+
+        // Update fields
         $room->office_days = !empty($request->office_days) ? implode(',', $request->office_days) : null;
-        $room->office_hours_start = $request->office_hours_start ?: null;
-        $room->office_hours_end = $request->office_hours_end ?: null;
+        $room->office_hours_start = $validated['office_hours_start'] ?? null;
+        $room->office_hours_end = $validated['office_hours_end'] ?? null;
 
-        // Remove office fields from $validated to avoid overwrite
         unset($validated['office_days'], $validated['office_hours_start'], $validated['office_hours_end']);
-
-        // Update other fields
         $room->update($validated);
 
-        // Update cover image if uploaded
+        // Update cover image
         if ($request->hasFile('image_path')) {
             $newPath = $request->file('image_path')->store('room_images', 'public');
             if ($newPath) {
@@ -179,7 +176,7 @@ class RoomController extends Controller
             }
         }
 
-        // Update video if uploaded
+        // Update video
         if ($request->hasFile('video_path')) {
             $newVideoPath = $request->file('video_path')->store('room_videos', 'public');
             if ($newVideoPath) {
@@ -214,7 +211,6 @@ class RoomController extends Controller
         return redirect()->route('room.show', $room->id)
             ->with('success', "{$room->name} was updated successfully.");
     }
-
 
     public function destroy(Room $room)
     {
