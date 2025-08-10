@@ -2,16 +2,9 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 items-center">
 
-            <!-- Back Button -->
-            @if (!Route::is('admin.dashboard'))
-                <a href="{{ route('admin.dashboard') }}"
-                    class="flex items-center text-black hover:text-[#157ee1] focus:outline-none cursor-pointer">
-                    <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
-                    <span class="ml-1">Back</span>
-                </a>
-            @endif
+            @unless (Route::is('admin.dashboard') || Route::is('landing.page'))
+                <x-back-button fallback="room.index" landing="admin.dashboard" />
+            @endunless
 
             <!-- Profile Dropdown -->
             <div x-data="{ open: false }" class="relative ml-auto" x-cloak>
