@@ -22,7 +22,7 @@ class StaffController extends Controller
         return view('pages.admin.staffs.create', compact('rooms'));
     }
 
-    public function store(Request $request, $id)
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'room_id'   => 'nullable|exists:rooms,id',
@@ -40,11 +40,13 @@ class StaffController extends Controller
 
         $staff = Staff::create($validated);
 
+        session()->flash('success', "{$staff->name} was added successfully.");
+
         if ($request->expectsJson()) {
             return response()->json(['redirect' => route('staff.show', $staff->id)], 200);
         }
 
-        return redirect()->route('staff.index')->with('success', 'Staff added successfully.');
+        return redirect()->route('staff.index')->with('success', "{$staff->name} was added successfully.");
     }
 
     public function show(Staff $staff)
@@ -82,6 +84,8 @@ class StaffController extends Controller
         }
 
         $staff->update($validated);
+
+        session()->flash('success', "{$staff->name} was added successfully.");
 
         if ($request->expectsJson()) {
             return response()->json(['redirect' => route('staff.show', $staff->id)], 200);

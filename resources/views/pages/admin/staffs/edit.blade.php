@@ -6,7 +6,7 @@
 
         <x-floating-actions />
 
-        <form method="POST" action="{{ route('staff.update', $staff->id) }}" enctype="multipart/form-data" class="space-y-4">
+        <form method="POST" action="{{ route('staff.update', $staff->id) }}" enctype="multipart/form-data" class="space-y-4" data-upload>
             @csrf
             @method('PUT')
 

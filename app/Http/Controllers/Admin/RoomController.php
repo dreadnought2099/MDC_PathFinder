@@ -93,7 +93,7 @@ class RoomController extends Controller
         }
 
         session()->flash('success', "{$room->name} was added successfully.");
-        
+
         if ($request->expectsJson()) {
             return response()->json(['redirect' => route('room.show', $room->id)], 200);
         }
@@ -213,6 +213,8 @@ class RoomController extends Controller
                 ]);
             }
         }
+
+        session()->flash('success', "{$room->name} was updated successfully.");
 
         if ($request->expectsJson()) {
             return response()->json(['redirect' => route('room.show', $room->id)], 200);

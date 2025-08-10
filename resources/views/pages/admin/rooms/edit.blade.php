@@ -17,7 +17,7 @@
             </div>
         @endif
 
-        <form action="{{ route('room.update', $room->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <form action="{{ route('room.update', $room->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6" data-upload>
             @csrf
             @method('PUT')
 
