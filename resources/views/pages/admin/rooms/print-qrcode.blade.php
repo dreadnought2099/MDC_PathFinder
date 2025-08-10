@@ -16,7 +16,7 @@
             margin: 0;
             padding: 60px 20px;
             background: linear-gradient(135deg, #e6f0ff, #ffffff);
-            color: #157ee1;
+            /* color: #157ee1; */
             text-align: center;
             -webkit-print-color-adjust: exact;
             user-select: none;
@@ -65,13 +65,19 @@
         .top-text {
             font-family: 'Anton', sans-serif;
             font-weight: 900;
-            font-size: 3.6rem;
+            font-size: clamp(1rem, 5vw, 3.2rem);
             color: #157ee1;
-            letter-spacing: 2.8px;
+            letter-spacing: 0.5px;
             margin-bottom: 4px;
             padding-bottom: 6px;
             text-shadow: 0 2px 6px rgba(21, 126, 225, 0.4);
             user-select: none;
+            white-space: nowrap;
+            /* keep it on one line */
+            overflow: hidden;
+            /* hide anything too long */
+            text-overflow: ellipsis;
+            /* show "..." if too long */
         }
 
         /* QR container */
@@ -108,31 +114,17 @@
         .scan-phrase {
             font-family: 'Anton', sans-serif;
             font-size: 1.4rem;
-            font-weight: 700;
             margin-top: 36px;
             letter-spacing: 1.1px;
             user-select: text;
             line-height: 1.5;
-            text-shadow: 0 1px 3px rgba(15, 94, 189, 0.6);
+            max-width: 400px;
         }
 
-        .scan-phrase .url {
-            display: block;
-            margin-top: 14px;
-            font-weight: 700;
-            font-size: 1.15rem;
+        .scan-phrase a {
             color: #157ee1;
-            background-color: #d7e5fc;
-            padding: 10px 18px;
-            border-radius: 14px;
-            user-select: text;
-            word-break: break-word;
-            box-shadow: 0 2px 6px rgba(21, 126, 225, 0.3);
-            transition: background-color 0.3s ease;
-        }
-
-        .scan-phrase .url:hover {
-            background-color: #b0cef9;
+            text-decoration: none;
+            font-weight: 600;
         }
 
         /* Print adjustments */
@@ -162,16 +154,21 @@
     <div class="print-container" role="main" aria-label="QR Code for {{ $room->name }}">
         <button class="print-btn" onclick="window.print()" aria-label="Print QR Code">Print</button>
 
-        <div class="top-text" aria-hidden="true">CampusLens</div>
+        <div class="top-text" aria-hidden="true">{{ $room->name }}</div>
 
         <div class="qr-code" aria-label="QR code image">
             <img src="{{ asset('storage/' . $room->qr_code_path) }}" alt="QR Code for {{ $room->name }}">
         </div>
 
-        <div class="scan-phrase" aria-label="Scan instructions">
-            Scan me to know more about this office by visiting this page
-            <span class="url">{{ config('app.url') }}</span>
+        <div class="scan-phrase p-4 bg-gray-50 rounded border border-gray-300 max-w-md mx-auto text-center"
+            aria-label="Scan instructions">
+            Visit
+            <a href="{{ config('app.url') }}">
+                {{ config('app.url') }}
+            </a>
+            and scan the QR Code above to know more about this office.
         </div>
+
     </div>
 </body>
 
