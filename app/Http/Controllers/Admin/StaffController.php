@@ -7,6 +7,7 @@ use App\Models\Staff;
 use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class StaffController extends Controller
 {
@@ -29,7 +30,7 @@ class StaffController extends Controller
             'name'      => 'required|string|max:255',
             'position'  => 'nullable|string|max:255',
             'bio'       => 'nullable|string',
-            'email'     => 'nullable|email|max:255',
+            'email'     => 'nullable|email|max:255|unique:staff,email',
             'phone_num' => 'nullable|string|max:20',
             'photo_path'     => 'nullable|image|max:51200',
         ]);
@@ -70,7 +71,12 @@ class StaffController extends Controller
             'name'      => 'required|string|max:255',
             'position'  => 'nullable|string|max:255',
             'bio'       => 'nullable|string',
-            'email'     => 'nullable|email|max:255',
+            'email' => [
+                'nullable',
+                'email',
+                'max:255',
+                Rule::unique('staff', 'email')->ignore($staff->id),
+            ],
             'phone_num' => 'nullable|string|max:20',
             'photo_path'     => 'nullable|image|max:51200',
         ]);
@@ -98,20 +104,14 @@ class StaffController extends Controller
     {
         $staff = Staff::findOrFail($id);
         $staff->delete();
-        return redirect()->route('staff.index')->with('success', 'Staff member moved to trash.');
+        return redirect()->route('staff.index')->with('success', "{$staff->name} moved to recycle bin");
     }
-
-    // public function trashed()
-    // {
-    //     $staffs = Staff::onlyTrashed()->with('room')->get();
-    //     return view('pages.admin.staffs.trashed', compact('staffs'));
-    // }
 
     public function restore($id)
     {
         $staff = Staff::onlyTrashed()->findOrFail($id);
         $staff->restore();
-        return redirect()->route('staff.recycle-bin')->with('success', 'Staff member restored successfully.');
+        return redirect()->route('staff.recycle-bin')->with('success', "{$staff->name} restored successfully.");
     }
 
     public function forceDelete($id)
@@ -124,6 +124,6 @@ class StaffController extends Controller
 
         $staff->forceDelete();
 
-        return redirect()->route('staff.recycle-bin')->with('success', 'Staff member permanently deleted.');
+        return redirect()->route('staff.recycle-bin')->with('success', "{$staff->name} permanently deleted.");
     }
 }

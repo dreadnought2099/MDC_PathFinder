@@ -17,7 +17,8 @@
             </div>
         @endif
 
-        <form action="{{ route('room.update', $room->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6" data-upload>
+        <form action="{{ route('room.update', $room->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6"
+            data-upload>
             @csrf
             @method('PUT')
 
@@ -90,8 +91,6 @@
 
             <div>
                 <label for="office_hours_start" class="block font-semibold mb-1">Office Hours Start</label>
-                {{-- <input type="time" id="office_hours_start" name="office_hours_start" value="{{ $officeHoursStart }}"
-                    class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200" /> --}}
                 <input type="time" name="office_hours_start"
                     value="{{ old('office_hours_start', $room->office_hours_start ?? '') }}"
                     class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200">
@@ -99,9 +98,9 @@
 
             <div>
                 <label for="office_hours_end" class="block font-semibold mb-1">Office Hours End</label>
-                {{-- <input type="time" id="office_hours_end" name="office_hours_end" value="{{ $officeHoursEnd }}"
-                    class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200" /> --}}
-                    <input type="time" name="office_hours_end" value="{{ old('office_hours_end', $room->office_hours_end ?? '') }}" class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200">
+                <input type="time" name="office_hours_end"
+                    value="{{ old('office_hours_end', $room->office_hours_end ?? '') }}"
+                    class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200">
             </div>
 
             {{-- Current Carousel Images --}}
@@ -152,7 +151,6 @@
     </div>
 @endsection
 
-
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const carouselInput = document.getElementById('carousel_images');
@@ -161,46 +159,45 @@
         const carouselUploadText = document.getElementById('carouselUploadText');
 
         function updateUploadIconVisibility() {
-            // Count previews that are not marked for removal
             const visiblePreviews = [...carouselPreviewContainer.children].filter(div => {
                 const checkbox = div.querySelector('input[type="checkbox"]');
                 return !checkbox || !checkbox.checked;
             });
-            if (visiblePreviews.length > 0) {
-                carouselUploadIcon.style.display = 'none';
-                carouselUploadText.style.display = 'none';
-            } else {
-                carouselUploadIcon.style.display = '';
-                carouselUploadText.style.display = '';
-            }
+            carouselUploadIcon.style.display = visiblePreviews.length > 0 ? 'none' : '';
+            carouselUploadText.style.display = visiblePreviews.length > 0 ? 'none' : '';
         }
 
         updateUploadIconVisibility();
 
         carouselInput.addEventListener('change', () => {
-            // Clear previous new previews (those WITHOUT a checkbox)
+            // ✅ Always clear new previews before adding new files
             [...carouselPreviewContainer.children].forEach(div => {
                 if (!div.querySelector('input[type="checkbox"]')) {
-                    carouselPreviewContainer.removeChild(div);
+                    div.remove();
                 }
             });
 
-            const existingCount = [...carouselPreviewContainer.children].filter(div => {
-                const checkbox = div.querySelector('input[type="checkbox"]');
-                return !checkbox || !checkbox.checked;
-            }).length;
-
+            // ✅ Get selected files
             const newFiles = Array.from(carouselInput.files);
 
+            // ✅ Clear the input so the same file can be reselected later
+            carouselInput.value = '';
+
+            // ✅ Count only existing images NOT marked for removal
+            const existingCount = [...carouselPreviewContainer.children].filter(div => {
+                const checkbox = div.querySelector('input[type="checkbox"]');
+                return checkbox && !checkbox.checked;
+            }).length;
+
+            // ✅ Enforce total limit
             if (existingCount + newFiles.length > 10) {
                 alert('You can upload max 10 images in total.');
-                carouselInput.value = ''; // clear input
                 return;
             }
 
+            // ✅ Show previews for new files
             newFiles.forEach(file => {
                 const reader = new FileReader();
-
                 reader.onload = e => {
                     const container = document.createElement('div');
                     container.className =
@@ -215,7 +212,6 @@
 
                     updateUploadIconVisibility();
                 };
-
                 reader.readAsDataURL(file);
             });
         });
@@ -223,11 +219,7 @@
         carouselPreviewContainer.addEventListener('change', e => {
             if (e.target.matches('input[type="checkbox"]')) {
                 const parentDiv = e.target.closest('div');
-                if (e.target.checked) {
-                    parentDiv.style.opacity = '0.4'; // visually mark as removed
-                } else {
-                    parentDiv.style.opacity = '1';
-                }
+                parentDiv.style.opacity = e.target.checked ? '0.4' : '1';
                 updateUploadIconVisibility();
             }
         });

@@ -163,7 +163,7 @@
         <div class="scan-phrase p-4 bg-gray-50 rounded border border-gray-300 max-w-md mx-auto text-center"
             aria-label="Scan instructions">
             Visit
-            <a href="{{ config('app.url') }}">
+            <a href="{{ config('app.url') }}" target="_blank">
                 {{ config('app.url') }}
             </a>
             and scan the QR Code above to know more about this office.

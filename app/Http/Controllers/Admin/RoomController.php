@@ -36,7 +36,8 @@ class RoomController extends Controller
             // Allow HH:MM or HH:MM:SS
             'office_hours_start' => ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/'],
             'office_hours_end'   => ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/', 'after:office_hours_start'],
-            'carousel_images.*' => 'nullable|image|max:51200',
+            'carousel_images.*' => 'nullable|image|max:50',
+            'carousel_images.*' => 'image|mimes:jpg,jpeg,png|max:51200',
         ]);
 
         // Normalize to HH:MM for storage
@@ -143,7 +144,8 @@ class RoomController extends Controller
             // Allow HH:MM or HH:MM:SS
             'office_hours_start' => ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/'],
             'office_hours_end'   => ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/', 'after:office_hours_start'],
-            'carousel_images.*' => 'nullable|image|max:51200',
+            'carousel_images.*' => 'nullable|image|max:50',
+            'carousel_images.*' => 'image|mimes:jpg,jpeg,png|max:51200',
             'remove_images' => 'nullable|array',
         ]);
 
