@@ -57,7 +57,9 @@
 
             <div>
                 <button type="submit"
-                    class="bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary transition-all duration-300 cursor-pointer px-4 py-2 rounded">Update</button>
+                    class="bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary transition-all duration-300 cursor-pointer px-4 py-2 rounded">
+                    Update Staff
+                </button>
             </div>
         </form>
     </div>

@@ -80,7 +80,7 @@ class StaffController extends Controller
 
         $staff->update($validated);
 
-        return redirect()->route('staff.index')->with('success', 'Staff member updated successfully.');
+        return redirect()->route('staff.index')->with('success', "{$staff->name} updated successfully.");
     }
 
     public function destroy($id)

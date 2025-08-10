@@ -92,6 +92,10 @@ class RoomController extends Controller
             }
         }
 
+        if ($request->expectsJson()) {
+            return response()->json(['redirect' => route('room.show', $room->id)], 200);
+        }
+
         return redirect()->route('room.show', $room->id)
             ->with('success', "{$room->name} was added successfully.");
     }
@@ -206,6 +210,10 @@ class RoomController extends Controller
                     'image_path' => $path
                 ]);
             }
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json(['redirect' => route('room.show', $room->id)], 200);
         }
 
         return redirect()->route('room.show', $room->id)
