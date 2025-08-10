@@ -190,8 +190,8 @@
             }).length;
 
             // ✅ Enforce total limit
-            if (existingCount + newFiles.length > 10) {
-                alert('You can upload max 10 images in total.');
+            if (existingCount + newFiles.length > 50) {
+                alert('You can upload max 50 images in total.');
                 return;
             }
 
