@@ -4,7 +4,7 @@
     <div class="max-w-xl mx-auto mt-10">
         <h2 class="text-2xl text-center mb-6">Add Staff Member</h2>
 
-        <form action="{{ route('staff.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('staff.store') }}" method="POST" enctype="multipart/form-data" data-upload>
             @csrf
 
             <div class="mb-4">

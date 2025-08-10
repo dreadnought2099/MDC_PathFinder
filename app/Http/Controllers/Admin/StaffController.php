@@ -22,7 +22,7 @@ class StaffController extends Controller
         return view('pages.admin.staffs.create', compact('rooms'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, $id)
     {
         $validated = $request->validate([
             'room_id'   => 'nullable|exists:rooms,id',
@@ -38,7 +38,11 @@ class StaffController extends Controller
             $validated['photo_path'] = $request->file('photo_path')->store('staff_photos', 'public');
         }
 
-        Staff::create($validated);
+        $staff = Staff::create($validated);
+
+        if ($request->expectsJson()) {
+            return response()->json(['redirect' => route('staff.show', $staff->id)], 200);
+        }
 
         return redirect()->route('staff.index')->with('success', 'Staff added successfully.');
     }
@@ -46,7 +50,6 @@ class StaffController extends Controller
     public function show(Staff $staff)
     {
         return view('pages.admin.staffs.show', compact('staff'));
-
     }
 
     public function edit($id)
@@ -79,6 +82,10 @@ class StaffController extends Controller
         }
 
         $staff->update($validated);
+
+        if ($request->expectsJson()) {
+            return response()->json(['redirect' => route('staff.show', $staff->id)], 200);
+        }
 
         return redirect()->route('staff.index')->with('success', "{$staff->name} updated successfully.");
     }
