@@ -13,7 +13,7 @@
              class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
              style="display: none;">
             <div class="bg-white rounded p-6 w-96 shadow-lg">
-                <h2 class="text-lg font-bold mb-4">{{ $title ?? 'Uploading...' }}</h2>
+                <h2 class="text-lg mb-4">{{ $title ?? 'Uploading...' }}</h2>
 
                 <!-- Progress Bar -->
                 <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden relative">

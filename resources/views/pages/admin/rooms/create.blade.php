@@ -42,6 +42,7 @@
                 </label>
             </div>
 
+            {{-- Carousel Images --}}
             <div class="mb-4 text-gray-600 max-w-xl mx-auto">
                 <label class="block mb-2 font-semibold text-gray-700">Carousel Images (optional)</label>
 
@@ -52,14 +53,16 @@
                         fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                     </svg>
-                    <span id="carouselUploadText" class="text-gray-500 mb-4">Click to upload images</span>
+                    <span id="carouselUploadText" class="text-gray-500 mb-4">Click to upload images (max 50)</span>
 
                     <input type="file" name="carousel_images[]" id="carousel_images" class="hidden" accept="image/*"
                         multiple />
 
+                    {{-- Preview Container --}}
                     <div id="carouselPreviewContainer" class="flex flex-wrap gap-3 w-full justify-start"></div>
                 </label>
             </div>
+
 
             <div class="mb-4 text-gray-600 max-w-xl mx-auto">
                 <label class="block mb-2 font-semibold text-gray-700">Short Video (optional)</label>
@@ -177,27 +180,70 @@
             const carouselUploadIcon = document.getElementById('carouselUploadIcon');
             const carouselUploadText = document.getElementById('carouselUploadText');
 
-            carouselInput.addEventListener('change', () => {
-                if (carouselInput.files && carouselInput.files.length > 0) {
-                    carouselUploadIcon.style.display = 'none';
-                    carouselUploadText.style.display = 'none';
+            let selectedFiles = [];
 
-                    Array.from(carouselInput.files).forEach(file => {
-                        const reader = new FileReader();
+            function updateUploadIconVisibility() {
+                carouselUploadIcon.style.display = selectedFiles.length > 0 ? 'none' : '';
+                carouselUploadText.style.display = selectedFiles.length > 0 ? 'none' : '';
+            }
 
-                        reader.onload = e => {
-                            const img = document.createElement('img');
-                            img.src = e.target.result;
-                            img.className = 'w-24 h-24 object-cover rounded shadow';
-                            carouselPreviewContainer.appendChild(img);
+            function updateInputFiles() {
+                const dt = new DataTransfer();
+                selectedFiles.forEach(file => dt.items.add(file));
+                carouselInput.files = dt.files;
+            }
+
+            function renderPreviews() {
+                carouselPreviewContainer.innerHTML = '';
+
+                selectedFiles.forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        const container = document.createElement('div');
+                        container.className =
+                            'relative w-24 h-24 rounded overflow-hidden shadow border border-gray-300';
+
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'w-full h-full object-cover rounded';
+
+                        const removeBtn = document.createElement('button');
+                        removeBtn.innerHTML = '&times;';
+                        removeBtn.className =
+                            'absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow';
+                        removeBtn.onclick = ev => {
+                            ev.preventDefault();
+                            selectedFiles.splice(index, 1);
+                            renderPreviews();
+                            updateInputFiles();
+                            updateUploadIconVisibility();
                         };
 
-                        reader.readAsDataURL(file);
-                    });
+                        container.appendChild(img);
+                        container.appendChild(removeBtn);
+                        carouselPreviewContainer.appendChild(container);
+                    };
+                    reader.readAsDataURL(file);
+                });
+
+                updateUploadIconVisibility();
+            }
+
+            carouselInput.addEventListener('change', () => {
+                const newFiles = Array.from(carouselInput.files);
+                carouselInput.value = ''; // so same file can be reselected
+
+                if (selectedFiles.length + newFiles.length > 50) {
+                    alert('You can upload max 50 images.');
+                    return;
                 }
 
-                // Do not clear or reset the preview container here, so existing previews stay.
+                selectedFiles = selectedFiles.concat(newFiles);
+                renderPreviews();
+                updateInputFiles();
             });
+
+            updateUploadIconVisibility();
 
             const dropZone = document.getElementById('videoDropZone');
             const videoInput = document.getElementById('video_path');
