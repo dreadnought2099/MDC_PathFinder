@@ -15,8 +15,8 @@
 
     @if ($room->image_path)
         <div class="mb-4">
-            <img src="{{ asset($room->image_path) }}" alt="{{ $room->name }}"
-                class="w-full h-64 object-cover rounded-lg">
+            <img src="{{ Storage::url($room->image_path) }}" alt="{{ $room->name }}"
+                class="w-full object-cover rounded-lg">
         </div>
     @endif
 
@@ -27,8 +27,6 @@
         </div>
     @endif
 
-    
-
     @if ($room->video_path)
         <div class="mb-4">
             <h3 class="text-lg font-semibold text-gray-800 mb-2">Room Video:</h3>
@@ -36,6 +34,25 @@
                 <source src="{{ asset('storage/' . $room->video_path) }}" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
+        </div>
+    @endif
+
+    @if ($room->images && $room->images->count())
+        <div id="roomCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                @foreach ($room->images as $index => $image)
+                    <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                        <img src="{{ Storage::url($image->image_path) }}" class="d-block w-100 rounded-lg"
+                            alt="Carousel Image {{ $index + 1 }}">
+                    </div>
+                @endforeach
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#roomCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#roomCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+            </button>
         </div>
     @endif
 
