@@ -170,32 +170,32 @@
         updateUploadIconVisibility();
 
         carouselInput.addEventListener('change', () => {
-            // ✅ Always clear new previews before adding new files
+            // Always clear new previews before adding new files
             [...carouselPreviewContainer.children].forEach(div => {
                 if (!div.querySelector('input[type="checkbox"]')) {
                     div.remove();
                 }
             });
 
-            // ✅ Get selected files
+            // Get selected files
             const newFiles = Array.from(carouselInput.files);
 
-            // ✅ Clear the input so the same file can be reselected later
+            // Clear the input so the same file can be reselected later
             carouselInput.value = '';
 
-            // ✅ Count only existing images NOT marked for removal
+            // Count only existing images NOT marked for removal
             const existingCount = [...carouselPreviewContainer.children].filter(div => {
                 const checkbox = div.querySelector('input[type="checkbox"]');
                 return checkbox && !checkbox.checked;
             }).length;
 
-            // ✅ Enforce total limit
+            // Enforce total limit
             if (existingCount + newFiles.length > 50) {
                 alert('You can upload max 50 images in total.');
                 return;
             }
 
-            // ✅ Show previews for new files
+            // Show previews for new files
             newFiles.forEach(file => {
                 const reader = new FileReader();
                 reader.onload = e => {
