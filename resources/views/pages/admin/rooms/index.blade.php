@@ -27,6 +27,10 @@
                                 class="text-edit hover-underline-edit hover:scale-105 transform transition duration-200">
                                 Edit
                             </a>
+                            <a href="{{ route('room.assignStaff', $room->id) }}"
+                                class="text-primary hover-underline hover:scale-105 transform transition duration-200">
+                                Assign Staff
+                            </a>
                             <button onclick="openRoomModal('{{ $room->id }}', '{{ addslashes($room->name) }}')"
                                 class="text-secondary hover-underline-delete hover:scale-105 transform transition duration-200 cursor-pointer">
                                 Delete

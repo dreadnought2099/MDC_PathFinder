@@ -39,6 +39,11 @@ Route::middleware('auth')->group(function () {
         Route::delete('/rooms/{id}/force-delete', [RoomController::class, 'forceDelete'])->name('forceDelete');
         Route::delete('/rooms/{room}/carousel/{image}', [RoomController::class, 'removeCarouselImage'])->name('carousel.remove');
         Route::get('/room/{room}/print-qrcode', [RoomController::class, 'printQRCode'])->name('print-qrcode');
+
+        // Staff assignment & removal
+        Route::get('staff/assign', [RoomController::class, 'assign'])->name('assign'); // show form
+        Route::post('staff/assign', [RoomController::class, 'assignStaff'])->name('assignStaff'); // handle form submit
+        Route::patch('staff/remove/{id}', [StaffController::class, 'removeFromRoom'])->name('remove'); // remove staff from room
     });
 
 

@@ -13,13 +13,17 @@ return new class extends Migration
     {
         Schema::create('staff', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('room_id')->nullable()->constrained('rooms')->onDelete('set null');
+            $table->foreignId('room_id')
+                    ->nullable()
+                    ->constrained('rooms')
+                    ->onDelete('set null');
             $table->string('name');
             $table->string('position')->nullable();
             $table->text('bio')->nullable();
             $table->string('email')->nullable();
             $table->string('phone_num')->nullable();
             $table->string('photo_path')->nullable();
+            $table->unique(['id', 'room_id']);
             $table->softDeletes();
             $table->timestamps();
         });

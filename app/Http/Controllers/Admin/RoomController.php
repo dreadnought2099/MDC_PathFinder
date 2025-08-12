@@ -106,7 +106,7 @@ class RoomController extends Controller
     public function show(Room $room)
     {
         $room->load('images');
-
+        $room->load('staff'); // Eager load assigned staff
         $images = $room->images;
 
         // Regenerate QR if missing
@@ -309,5 +309,40 @@ class RoomController extends Controller
     public function printQRCode(Room $room)
     {
         return view('pages.admin.rooms.print-qrcode', compact('room'));
+    }
+
+    public function assign()
+    {
+        $rooms = Room::all();
+        $staff = Staff::with('room')->get();
+
+        return view('pages.admin.rooms.assign', compact('rooms', 'staff'));
+    }
+
+    // Handle staff assignment POST request
+    public function assignStaff(Request $request)
+    {
+        $request->validate([
+            'room_id' => 'required|exists:rooms,id',
+            'staff_ids' => 'required|array',
+            'staff_ids.*' => 'exists:staff,id',
+        ]);
+
+        // Update staff records to assign them to the room
+        Staff::whereIn('id', $request->staff_ids)->update([
+            'room_id' => $request->room_id
+        ]);
+
+        return redirect()->route('room.assign')->with('success', 'Staff assigned successfully.');
+    }
+
+    // Remove staff from assigned room
+    public function removeFromRoom($id)
+    {
+        $staff = Staff::findOrFail($id);
+        $staff->room_id = null;
+        $staff->save();
+
+        return back()->with('success', "{$staff->name} removed from room.");
     }
 }

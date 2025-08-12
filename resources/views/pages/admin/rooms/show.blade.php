@@ -74,6 +74,43 @@
             </section>
         @endif
 
+        {{-- Staff Assigned to Room --}}
+        @if ($room->staff->isNotEmpty())
+            <section class="mb-10">
+                <h3 class="text-2xl font-semibold mb-6 text-gray-800">Assigned Staff</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    @foreach ($room->staff as $member)
+                        <div class="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200">
+                            <!-- Image (clickable for modal) -->
+                            <div class="cursor-pointer"
+                                onclick="openModal('{{ Storage::url($member->photo_path ?? 'images/default.jpg') }}')">
+                                <img src="{{ Storage::url($member->photo_path ?? 'images/default.jpg') }}"
+                                    alt="{{ $member->name }}" class="w-full h-48 object-cover">
+                            </div>
+
+                            <!-- Name and Position -->
+                            <div class="p-4 text-center">
+                                <a href="{{ route('staff.show', $member->id) }}"
+                                    class="block text-lg font-semibold text-primary hover:underline">
+                                    {{ $member->name }}
+                                </a>
+                                <p class="text-sm text-gray-600">{{ $member->position ?? 'No position' }}</p>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+        @else
+            <p class="text-gray-500 mt-4">No staff assigned to this room.</p>
+        @endif
+
+        <!-- Modal Markup -->
+        <div id="imageModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+            <button onclick="closeModal()"
+                class="absolute top-5 right-5 text-gray-300 text-6xl hover:text-red-600 cursor-pointer">&times;</button>
+            <img id="modalImage" src="" alt="Full Image" class="max-w-full max-h-full rounded shadow-lg" />
+        </div>
+
         {{-- QR Code --}}
         @if ($room->qr_code_path)
             <div class="mt-6 text-center">
