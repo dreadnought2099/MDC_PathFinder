@@ -3,7 +3,6 @@
 
 <head>
     <meta charset="UTF-8" />
-    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet" />
     <title>Print QR Code - {{ $room->name }}</title>
     <style>
         /* Reset */
@@ -11,15 +10,27 @@
             box-sizing: border-box;
         }
 
+        @font-face {
+            font-family: 'Anton';
+            src: url('{{ asset('font/Anton-Regular.ttf') }}') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Anton', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 60px 20px;
             background: linear-gradient(135deg, #e6f0ff, #ffffff);
-            /* color: #157ee1; */
             text-align: center;
             -webkit-print-color-adjust: exact;
             user-select: none;
+        }
+
+        ::selection {
+            background-color: #157ee1;
+            color: white;
         }
 
         .print-container {

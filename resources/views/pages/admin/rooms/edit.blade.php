@@ -159,6 +159,7 @@
         const carouselUploadText = document.getElementById('carouselUploadText');
 
         function updateUploadIconVisibility() {
+            // Count existing images NOT marked for removal
             const visiblePreviews = [...carouselPreviewContainer.children].filter(div => {
                 const checkbox = div.querySelector('input[type="checkbox"]');
                 return !checkbox || !checkbox.checked;
@@ -170,26 +171,26 @@
         updateUploadIconVisibility();
 
         carouselInput.addEventListener('change', () => {
-            // Always clear new previews before adding new files
+            // Remove previews of newly added files only (no checkbox means new)
             [...carouselPreviewContainer.children].forEach(div => {
                 if (!div.querySelector('input[type="checkbox"]')) {
                     div.remove();
                 }
             });
 
-            // Get selected files
+            // Get selected files from input
             const newFiles = Array.from(carouselInput.files);
 
-            // Clear the input so the same file can be reselected later
-            carouselInput.value = '';
+            // *** FIX: DO NOT clear the file input value here ***
+            // carouselInput.value = '';  // <-- Remove or comment this line
 
-            // Count only existing images NOT marked for removal
+            // Count existing images NOT marked for removal
             const existingCount = [...carouselPreviewContainer.children].filter(div => {
                 const checkbox = div.querySelector('input[type="checkbox"]');
                 return checkbox && !checkbox.checked;
             }).length;
 
-            // Enforce total limit
+            // Enforce max total images limit
             if (existingCount + newFiles.length > 50) {
                 alert('You can upload max 50 images in total.');
                 return;
@@ -216,6 +217,7 @@
             });
         });
 
+        // Toggle opacity on old images when their checkbox is toggled
         carouselPreviewContainer.addEventListener('change', e => {
             if (e.target.matches('input[type="checkbox"]')) {
                 const parentDiv = e.target.closest('div');

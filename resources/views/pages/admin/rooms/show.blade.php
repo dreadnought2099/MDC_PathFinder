@@ -55,6 +55,8 @@
             </section>
         @endif
 
+        {{-- For Debugging --}}
+        {{-- <pre>{{ print_r($room->images->pluck('image_path')->toArray()) }}</pre> --}}
         {{-- Carousel Images --}}
         @if ($room->images && $room->images->count())
             <section class="mb-10">

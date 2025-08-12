@@ -30,14 +30,13 @@ class RoomController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'image_path' => 'nullable|image|max:51200',
-            'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200',
+            'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:102400',
             'office_days' => 'nullable|array',
             'office_days.*' => 'string|in:Mon,Tue,Wed,Thu,Fri,Sat,Sun',
             // Allow HH:MM or HH:MM:SS
             'office_hours_start' => ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/'],
             'office_hours_end'   => ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/', 'after:office_hours_start'],
-            'carousel_images.*' => 'nullable|image|max:50',
-            'carousel_images.*' => 'image|mimes:jpg,jpeg,png|max:51200',
+            'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:102400',
         ]);
 
         // Normalize to HH:MM for storage
@@ -122,7 +121,7 @@ class RoomController extends Controller
             ]);
         }
 
-        return view('pages.admin.rooms.show', compact('room', 'images'));
+        return view('pages.admin.rooms.show', compact('room'));
     }
 
     public function edit(Room $room)
@@ -138,14 +137,13 @@ class RoomController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'image_path' => 'nullable|image|max:51200',
-            'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200',
+            'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:102400',
             'office_days' => 'nullable|array',
             'office_days.*' => 'string|in:Mon,Tue,Wed,Thu,Fri,Sat,Sun',
             // Allow HH:MM or HH:MM:SS
             'office_hours_start' => ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/'],
             'office_hours_end'   => ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/', 'after:office_hours_start'],
-            'carousel_images.*' => 'nullable|image|max:50',
-            'carousel_images.*' => 'image|mimes:jpg,jpeg,png|max:51200',
+            'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:102400',
             'remove_images' => 'nullable|array',
         ]);
 
@@ -215,6 +213,9 @@ class RoomController extends Controller
                 ]);
             }
         }
+
+        // Reload images relation (optional if you need fresh collection immediately)
+        $room->load('images');
 
         session()->flash('success', "{$room->name} was updated successfully.");
 
