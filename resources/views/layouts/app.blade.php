@@ -12,7 +12,7 @@
     </head>
 
     <body>
-        <div id="success-message-container" class="absolute top-24 right-4 z-100">
+        <div id="success-message-container" class="absolute top-24 right-4 z-49">
             @if (session('success') || session('error') || session('info') || $errors->any())
                 <div id="message"
                     class="p-3 rounded-md shadow-lg border-l-4
