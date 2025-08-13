@@ -6,12 +6,6 @@
 
         <h1 class="text-2xl font-bold mb-4">Assign Staff to Room</h1>
 
-        {{-- @if (session('success'))
-            <div class="bg-green-200 text-green-800 p-2 rounded mb-4">
-                {{ session('success') }}
-            </div>
-        @endif --}}
-
         {{-- Room selection GET form --}}
         <form method="GET" action="{{ route('room.assign') }}" class="mb-4">
             <select name="roomId" onchange="this.form.submit()" class="w-full border rounded p-2">
@@ -37,6 +31,7 @@
                             $assignedRoomId = $member->room_id;
                             $isSelectedRoom = isset($selectedRoom) && $assignedRoomId == $selectedRoom->id;
                             $isAssignedOtherRoom = $assignedRoomId && !$isSelectedRoom;
+                            $textClass = $isAssignedOtherRoom ? 'text-gray-400' : ''; // gray out name
                         @endphp
                         <label class="flex items-center space-x-2">
                             <input type="checkbox" data-staff-id="{{ $member->id }}" name="staff_ids[]"
@@ -44,7 +39,7 @@
                                 class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                 @if ($isSelectedRoom) checked @endif
                                 @if ($isAssignedOtherRoom) disabled @endif>
-                            <span>{{ $member->name }}</span>
+                            <span class="{{ $textClass }}">{{ $member->name }}</span>
                         </label>
                     @endforeach
                 </div>
@@ -57,7 +52,7 @@
         </form>
 
         <!-- Confirmation Modal -->
-        <div id="confirmModal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden">
+        <div id="confirmModal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50">
             <div class="bg-white p-6 rounded shadow-lg max-w-sm w-full">
                 <h2 class="text-xl mb-4">Confirm <span class="text-secondary">Unassign</span></h2>
                 <p id="modalMessage" class="mb-4 text-gray-700"></p>
@@ -112,14 +107,16 @@
                                 'Content-Type': 'application/json'
                             }
                         })
-                        .then(res => res.json())        
+                        .then(res => res.json())
                         .then(data => {
+                            modal.classList.add('hidden');
                             if (data.success) {
-                                currentCheckbox.checked = false;
+                                currentCheckbox.checked = false; // uncheck
+                                alert(data.message); // <-- show the message here
                             } else {
                                 alert(data.message || 'Failed to unassign staff.');
                             }
-                            modal.classList.add('hidden');
+
                             currentCheckbox = null;
                             currentStaffId = null;
                         })
