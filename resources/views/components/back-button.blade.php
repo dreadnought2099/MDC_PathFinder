@@ -24,7 +24,7 @@
             $previous = route($landing);
         }
         // Prevent loops back into edit/create pages
-        elseif ($previous === $current || preg_match('/\/(edit|create|store|assign)/', $previous)) {
+        elseif ($previous === $current || preg_match('/\/(edit|create|store)/', $previous)) {
             if (Route::is('staff.*')) {
                 $previous = route($staffFallback);
             } elseif (Route::is('room.*')) {
@@ -34,10 +34,6 @@
             } elseif (Route::is('staff.recycle-bin')) {
                 $previous = route($trashedStaffFallback);
             }
-        }
-
-        if ($previous === $current) {
-            $previous = route($landing);
         }
     @endphp
 

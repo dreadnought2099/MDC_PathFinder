@@ -321,7 +321,6 @@ class RoomController extends Controller
         return view('pages.admin.rooms.assign', compact('rooms', 'staff', 'selectedRoom'));
     }
 
-    // Handle staff assignment POST request
     public function assignStaff(Request $request)
     {
         $request->validate([
@@ -333,26 +332,35 @@ class RoomController extends Controller
         $roomId = $request->room_id;
         $staffIds = $request->staff_ids ?? [];
 
-        // Unassign staff previously assigned to this room but NOT in submitted list
-        Staff::where('room_id', $roomId)
-            ->whereNotIn('id', $staffIds)
-            ->update(['room_id' => null]);
+        $currentlyAssigned = Staff::where('room_id', $roomId)->pluck('id')->toArray();
 
-        // Assign checked staff to this room
-        if (!empty($staffIds)) {
-            Staff::whereIn('id', $staffIds)->update(['room_id' => $roomId]);
+        $toUnassign = array_diff($currentlyAssigned, $staffIds);
+        $toAssign = array_diff($staffIds, $currentlyAssigned);
+
+        if (!empty($toUnassign)) {
+            Staff::whereIn('id', $toUnassign)->update(['room_id' => null]);
+        }
+        if (!empty($toAssign)) {
+            Staff::whereIn('id', $toAssign)->update(['room_id' => $roomId]);
         }
 
-        return redirect()->route('room.assign', $roomId)->with('success', 'Staff assigned successfully.');
+        if (!empty($toAssign) || !empty($toUnassign)) {
+            return redirect()->route('room.assign', $roomId)
+                ->with('success', 'Staff assignment updated successfully.');
+        }
+
+        return redirect()->route('room.assign', $roomId);
     }
 
-    // Remove staff from assigned room
     public function removeFromRoom($id)
     {
         $staff = Staff::findOrFail($id);
         $staff->room_id = null;
         $staff->save();
 
-        return back()->with('success', "{$staff->name} removed from room.");
+        return response()->json([
+            'success' => true,
+            'message' => "{$staff->name} removed from room."
+        ]);
     }
 }

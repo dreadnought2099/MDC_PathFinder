@@ -43,7 +43,7 @@ Route::middleware('auth')->group(function () {
         // Staff assignment & removal
         Route::get('staff/assign/{roomId?}', [RoomController::class, 'assign'])->name('assign');
         Route::post('staff/assign', [RoomController::class, 'assignStaff'])->name('assignStaff'); // handle form submit
-        Route::patch('staff/remove/{id}', [StaffController::class, 'removeFromRoom'])->name('remove'); // remove staff from room
+        Route::patch('staff/remove/{id}', [RoomController::class, 'removeFromRoom'])->name('remove'); // remove staff from room
     });
 
 
