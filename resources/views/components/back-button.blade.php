@@ -24,16 +24,20 @@
             $previous = route($landing);
         }
         // Prevent loops back into edit/create pages
-        elseif ($previous === $current || preg_match('/\/(edit|create|store)/', $previous)) {
+        elseif ($previous === $current || preg_match('/\/(edit|create|store|assign)/', $previous)) {
             if (Route::is('staff.*')) {
                 $previous = route($staffFallback);
-            } elseif(Route::is('room.*')) {
+            } elseif (Route::is('room.*')) {
                 $previous = route($roomFallback);
-            } elseif(Route::is('room.recycle-bin')) {
+            } elseif (Route::is('room.recycle-bin')) {
                 $previous = route($trashedRoomFallback);
-            } elseif(Route::is('staff.recycle-bin')) {
+            } elseif (Route::is('staff.recycle-bin')) {
                 $previous = route($trashedStaffFallback);
             }
+        }
+
+        if ($previous === $current) {
+            $previous = route($landing);
         }
     @endphp
 
