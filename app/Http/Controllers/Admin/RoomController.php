@@ -311,12 +311,13 @@ class RoomController extends Controller
         return view('pages.admin.rooms.print-qrcode', compact('room'));
     }
 
-    public function assign()
+    public function assign($roomId = null)
     {
         $rooms = Room::all();
         $staff = Staff::with('room')->get();
+        $selectedRoom = $roomId ? Room::find($roomId) : null;
 
-        return view('pages.admin.rooms.assign', compact('rooms', 'staff'));
+        return view('pages.admin.rooms.assign', compact('rooms', 'staff', 'selectedRoom'));
     }
 
     // Handle staff assignment POST request

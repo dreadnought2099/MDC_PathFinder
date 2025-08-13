@@ -22,10 +22,10 @@
 
             <a href="{{ route('room.assign') }}"
                 class="text-primary hover-underline hover:scale-105 transform transition duration-200">
-                <img src="{{ asset('icons/manage-office1.png') }}" alt="Assign Staf"
-                    class="h-10 w-10 object-contain" />
+                <img src="{{ asset('icons/assign-staff.png') }}" alt="Assign Staff" class="h-10 w-10 object-contain" />
                 <span class="text-base">Assign Staff</span>
             </a>
+
             <a href="{{ route('room.recycle-bin') }}"
                 class="text-primary inline-flex items-center space-x-2 hover-underline transform transition-all duration-300 hover:scale-105 border-t-2 border-l-2 border-r-2 border-primary px-4 py-2 rounded">
                 <img src="{{ asset('icons/recycle-bin.png') }}" alt="Recycle Bin" class="h-10 w-10 object-contain" />

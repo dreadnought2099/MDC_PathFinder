@@ -16,9 +16,13 @@
                 <label class="block font-medium">Select Room:</label>
                 <select name="room_id" class="w-full border rounded p-2">
                     @foreach ($rooms as $room)
-                        <option value="{{ $room->id }}">{{ $room->name }}</option>
+                        <option value="{{ $room->id }}"
+                            {{ isset($selectedRoom) && $selectedRoom->id == $room->id ? 'selected' : '' }}>
+                            {{ $room->name }}
+                        </option>
                     @endforeach
                 </select>
+
             </div>
 
             <div class="mb-4">
