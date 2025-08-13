@@ -17,16 +17,6 @@
                 <textarea name="description" class="w-full border p-2 rounded"></textarea>
             </div>
 
-            {{-- <div class="mb-4">
-                <label for="staff_id">Assign Staff</label>
-                <select name="staff_id" class="w-full border p-2 rounded" required>
-                    <option value="">Select a Staff</option>
-                    @foreach ($staffs as $staff)
-                        <option value="{{ $staff->id }}">{{ $staff->name }}</option>
-                    @endforeach
-                </select>
-            </div> --}}
-
             <div class="mb-4 text-gray-600">
                 <label class="block mb-2 font-semibold text-gray-700">Cover Image (optional)</label>
 
