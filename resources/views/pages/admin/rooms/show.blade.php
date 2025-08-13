@@ -91,7 +91,7 @@
                             <!-- Name and Position -->
                             <div class="p-4 text-center">
                                 <a href="{{ route('staff.show', $member->id) }}"
-                                    class="block text-lg font-semibold text-primary hover:underline">
+                                    class="block text-lg font-semibold text-primary hover-underline">
                                     {{ $member->name }}
                                 </a>
                                 <p class="text-sm text-gray-600">{{ $member->position ?? 'No position' }}</p>
