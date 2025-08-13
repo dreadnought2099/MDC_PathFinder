@@ -311,11 +311,12 @@ class RoomController extends Controller
         return view('pages.admin.rooms.print-qrcode', compact('room'));
     }
 
-    public function assign($roomId = null)
+    public function assign(Request $request, $roomId = null)
     {
+        $selectedRoomId = $request->input('roomId') ?? $roomId;
         $rooms = Room::all();
         $staff = Staff::with('room')->get();
-        $selectedRoom = $roomId ? Room::find($roomId) : null;
+        $selectedRoom = $selectedRoomId ? Room::find($selectedRoomId) : null;
 
         return view('pages.admin.rooms.assign', compact('rooms', 'staff', 'selectedRoom'));
     }
@@ -325,16 +326,24 @@ class RoomController extends Controller
     {
         $request->validate([
             'room_id' => 'required|exists:rooms,id',
-            'staff_ids' => 'required|array',
+            'staff_ids' => 'nullable|array',
             'staff_ids.*' => 'exists:staff,id',
         ]);
 
-        // Update staff records to assign them to the room
-        Staff::whereIn('id', $request->staff_ids)->update([
-            'room_id' => $request->room_id
-        ]);
+        $roomId = $request->room_id;
+        $staffIds = $request->staff_ids ?? [];
 
-        return redirect()->route('room.assign')->with('success', 'Staff assigned successfully.');
+        // Unassign staff previously assigned to this room but NOT in submitted list
+        Staff::where('room_id', $roomId)
+            ->whereNotIn('id', $staffIds)
+            ->update(['room_id' => null]);
+
+        // Assign checked staff to this room
+        if (!empty($staffIds)) {
+            Staff::whereIn('id', $staffIds)->update(['room_id' => $roomId]);
+        }
+
+        return redirect()->route('room.assign', $roomId)->with('success', 'Staff assigned successfully.');
     }
 
     // Remove staff from assigned room

@@ -10,35 +10,49 @@
             </div>
         @endif
 
+        {{-- Room selection GET form for reloading page --}}
+        <form method="GET" action="{{ route('room.assign') }}" class="mb-4">
+            <select name="roomId" onchange="this.form.submit()" class="w-full border rounded p-2">
+                @foreach ($rooms as $room)
+                    <option value="{{ $room->id }}"
+                        {{ isset($selectedRoom) && $selectedRoom->id == $room->id ? 'selected' : '' }}>
+                        {{ $room->name }}
+                    </option>
+                @endforeach
+            </select>
+        </form>
+
+        {{-- Staff assignment POST form --}}
         <form action="{{ route('room.assignStaff') }}" method="POST">
             @csrf
-            <div class="mb-4">
-                <label class="block font-medium">Select Room:</label>
-                <select name="room_id" class="w-full border rounded p-2">
-                    @foreach ($rooms as $room)
-                        <option value="{{ $room->id }}"
-                            {{ isset($selectedRoom) && $selectedRoom->id == $room->id ? 'selected' : '' }}>
-                            {{ $room->name }}
-                        </option>
-                    @endforeach
-                </select>
+            {{-- Add hidden input to keep selected room --}}
+            <input type="hidden" name="room_id" value="{{ $selectedRoom->id ?? '' }}">
 
-            </div>
-
+            {{-- Staff checkboxes --}}
             <div class="mb-4">
                 <label class="block font-medium">Select Staff:</label>
                 <div class="space-y-2">
                     @foreach ($staff as $member)
+                        @php
+                            $assignedRoomId = $member->room_id;
+                            $isSelectedRoom = isset($selectedRoom) && $assignedRoomId == $selectedRoom->id;
+                            $isAssignedOtherRoom = $assignedRoomId && !$isSelectedRoom;
+                        @endphp
                         <label class="flex items-center space-x-2">
                             <input type="checkbox" name="staff_ids[]" value="{{ $member->id }}"
-                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                @if ($assignedRoomId) checked @endif
+                                @if ($isAssignedOtherRoom) disabled @endif>
                             <span>{{ $member->name }}</span>
                         </label>
                     @endforeach
                 </div>
             </div>
 
-            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Assign</button>
+            <button type="submit"
+                class="bg-primary text-white px-4 py-2 rounded hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer">
+                Assign
+            </button>
         </form>
     </div>
 @endsection
