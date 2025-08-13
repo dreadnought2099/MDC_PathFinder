@@ -313,10 +313,10 @@ class RoomController extends Controller
 
     public function assign(Request $request, $roomId = null)
     {
-        $selectedRoomId = $request->input('roomId') ?? $roomId;
         $rooms = Room::all();
+        $roomId = $request->query('roomId') ?? ($rooms->first()->id ?? null);
+        $selectedRoom = $roomId ? Room::find($roomId) : null;
         $staff = Staff::with('room')->get();
-        $selectedRoom = $selectedRoomId ? Room::find($selectedRoomId) : null;
 
         return view('pages.admin.rooms.assign', compact('rooms', 'staff', 'selectedRoom'));
     }
