@@ -17,6 +17,12 @@
             </div>
         @endif
 
+        @if (session('success'))
+            <div class="mb-4 p-4 bg-green-100 text-green-700 rounded">
+                {{ session('success') }}
+            </div>
+        @endif
+
         <form action="{{ route('room.update', $room->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6"
             data-upload>
             @csrf
@@ -37,11 +43,14 @@
             </div>
 
             {{-- Current Cover Image --}}
-            @if ($room->image_path)
+            @if ($room->image_path && Storage::disk('public')->exists($room->image_path))
                 <div>
                     <label class="block font-semibold mb-1">Current Cover Image</label>
-                    <img src="{{ asset('storage/' . $room->image_path) }}" alt="Cover Image"
-                        class="w-48 rounded mb-2 border" />
+                    <img src="{{ Storage::url($room->image_path) }}" alt="Cover Image" class="w-48 rounded mb-2 border" />
+                    <label class="inline-flex items-center space-x-2">
+                        <input type="checkbox" name="remove_image_path" value="1" id="remove_image_path" class="form-checkbox" />
+                        <span>Remove Cover Image</span>
+                    </label>
                 </div>
             @endif
 
@@ -52,13 +61,17 @@
             </div>
 
             {{-- Current Video --}}
-            @if ($room->video_path)
+            @if ($room->video_path && Storage::disk('public')->exists($room->video_path))
                 <div>
                     <label class="block font-semibold mb-1">Current Video</label>
                     <video controls class="w-64 rounded mb-2 border">
-                        <source src="{{ asset('storage/' . $room->video_path) }}" type="video/mp4">
+                        <source src="{{ Storage::url($room->video_path) }}" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
+                    <label class="inline-flex items-center space-x-2">
+                        <input type="checkbox" name="remove_video_path" value="1" id="remove_video_path" class="form-checkbox" />
+                        <span>Remove Video</span>
+                    </label>
                 </div>
             @endif
 
@@ -71,8 +84,6 @@
 
             @php
                 $officeDays = old('office_days', $room->office_days ? explode(',', $room->office_days) : []);
-                $officeHoursStart = old('office_hours_start', $room->office_hours_start ?? '');
-                $officeHoursEnd = old('office_hours_end', $room->office_hours_end ?? '');
             @endphp
 
             <div>
@@ -81,8 +92,9 @@
                     @foreach (['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as $day)
                         @php $inputId = "office_days_{$day}" @endphp
                         <label for="{{ $inputId }}" class="inline-flex items-center space-x-2">
-                            <input type="checkbox" id="{{ $inputId }}" name="office_days[]" value="{{ $day }}"
-                                {{ in_array($day, $officeDays) ? 'checked' : '' }} class="form-checkbox" />
+                            <input type="checkbox" id="{{ $inputId }}" name="office_days[]"
+                                value="{{ $day }}" {{ in_array($day, $officeDays) ? 'checked' : '' }}
+                                class="form-checkbox" />
                             <span>{{ $day }}</span>
                         </label>
                     @endforeach
@@ -91,15 +103,15 @@
 
             <div>
                 <label for="office_hours_start" class="block font-semibold mb-1">Office Hours Start</label>
-                <input type="time" name="office_hours_start"
-                    value="{{ old('office_hours_start', $room->office_hours_start ?? '') }}"
+                <input type="time" name="office_hours_start" id="office_hours_start"
+                    value="{{ old('office_hours_start', $room->office_hours_start ? date('H:i', strtotime($room->office_hours_start)) : '') }}"
                     class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200">
             </div>
 
             <div>
                 <label for="office_hours_end" class="block font-semibold mb-1">Office Hours End</label>
-                <input type="time" name="office_hours_end"
-                    value="{{ old('office_hours_end', $room->office_hours_end ?? '') }}"
+                <input type="time" name="office_hours_end" id="office_hours_end"
+                    value="{{ old('office_hours_end', $room->office_hours_end ? date('H:i', strtotime($room->office_hours_end)) : '') }}"
                     class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200">
             </div>
 
@@ -123,17 +135,25 @@
                         {{-- Existing images --}}
                         @if ($room->images && $room->images->count() > 0)
                             @foreach ($room->images as $image)
-                                <div class="relative w-24 h-24 rounded overflow-hidden shadow border border-gray-300">
-                                    <img src="{{ asset('storage/' . $image->image_path) }}" alt="Carousel Image"
-                                        class="w-full h-full object-cover rounded" />
-                                    <label
-                                        class="absolute top-1 right-1 bg-red-600 text-white rounded px-1 text-xs cursor-pointer opacity-0 hover:opacity-100 transition-opacity"
-                                        title="Remove this image">
-                                        <input type="checkbox" name="remove_images[]" value="{{ $image->id }}"
-                                            class="hidden" />
-                                        ✕
-                                    </label>
-                                </div>
+                                @if (Storage::disk('public')->exists($image->image_path))
+                                    <div
+                                        class="relative w-24 h-24 rounded overflow-hidden shadow border {{ $image->trashed() ? 'border-red-400 opacity-50' : 'border-gray-300' }}">
+                                        <img src="{{ Storage::url($image->image_path) }}" alt="Carousel Image"
+                                            class="w-full h-full object-cover rounded" />
+                                        @if ($image->trashed())
+                                            <span
+                                                class="absolute top-1 left-1 bg-yellow-600 text-white rounded px-1 text-xs">Deleted</span>
+                                        @else
+                                            <label
+                                                class="absolute top-1 right-1 bg-red-600 text-white rounded px-1 text-xs cursor-pointer opacity-0 hover:opacity-100 transition-opacity"
+                                                title="Remove this image">
+                                                <input type="checkbox" name="remove_images[]" value="{{ $image->id }}"
+                                                    class="hidden" />
+                                                ✕
+                                            </label>
+                                        @endif
+                                    </div>
+                                @endif
                             @endforeach
                         @endif
                     </div>
@@ -143,7 +163,7 @@
             {{-- Submit --}}
             <div>
                 <button type="submit"
-                    class="bg-primary text-white px-4 py-2 bg-primary rounded hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer">
+                    class="bg-primary text-white px-4 py-2 rounded hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer">
                     Update Room
                 </button>
             </div>
@@ -164,8 +184,8 @@
                 const checkbox = div.querySelector('input[type="checkbox"]');
                 return !checkbox || !checkbox.checked;
             });
-            carouselUploadIcon.style.display = visiblePreviews.length > 0 ? 'none' : '';
-            carouselUploadText.style.display = visiblePreviews.length > 0 ? 'none' : '';
+            carouselUploadIcon.style.display = visiblePreviews.length > 0 ? 'none' : 'block';
+            carouselUploadText.style.display = visiblePreviews.length > 0 ? 'none' : 'block';
         }
 
         updateUploadIconVisibility();
@@ -180,9 +200,6 @@
 
             // Get selected files from input
             const newFiles = Array.from(carouselInput.files);
-
-            // *** FIX: DO NOT clear the file input value here ***
-            // carouselInput.value = '';  // <-- Remove or comment this line
 
             // Count existing images NOT marked for removal
             const existingCount = [...carouselPreviewContainer.children].filter(div => {
