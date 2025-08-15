@@ -21,11 +21,10 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
                 <!-- Manage Staff Card -->
-                <a href="{{ route('staff.index') }}"
-                    class="group bg-white rounded-xl shadow-md hover:shadow-xl transform transition-all duration-300 hover:-translate-y-2 border-l-4 border-primary p-6">
+                <a href="{{ route('staff.index') }}" class="group card-shadow-hover shadow-primary-hover p-6">
+
                     <div class="flex flex-col items-center text-center space-y-4">
-                        <div
-                            class="bg-primary/10 p-4 rounded-full group-hover:bg-primary/20 transition-colors duration-300">
+                        <div class="bg-primary-10 hover:bg-primary-20 p-4 rounded-full transition-all duration-300">
                             <img src="{{ asset('icons/manager-1.png') }}" alt="Manage Staff"
                                 class="h-12 w-12 object-contain" />
                         </div>
@@ -34,17 +33,19 @@
                                 class="text-lg font-semibold text-gray-800 group-hover:text-primary transition-colors duration-300">
                                 Manage Staff
                             </h3>
-                            <p class="text-sm text-gray-600 mt-1">Organize staff members</p>
+                            <p class="text-sm text-gray-600 mt-1 group-hover:text-gray-700 transition-colors duration-300">
+                                Organize staff members
+                            </p>
                         </div>
                     </div>
                 </a>
 
                 <!-- Manage Rooms Card -->
                 <a href="{{ route('room.index') }}"
-                    class="group bg-white rounded-xl shadow-md hover:shadow-xl transform transition-all duration-300 hover:-translate-y-2 border-l-4 border-primary p-6">
+                    class="group card-shadow-hover shadow-primary-hover p-6">
                     <div class="flex flex-col items-center text-center space-y-4">
                         <div
-                            class="bg-primary/10 p-4 rounded-full group-hover:bg-primary/20 transition-colors duration-300">
+                            class="bg-primary-10 hover:bg-primary-20 p-4 rounded-full transition-all duration-300">
                             <img src="{{ asset('icons/manage-office1.png') }}" alt="Manage Room/Office"
                                 class="h-12 w-12 object-contain" />
                         </div>
@@ -60,10 +61,10 @@
 
                 <!-- Assign Staff Card -->
                 <a href="{{ route('room.assign') }}"
-                    class="group bg-white rounded-xl shadow-md hover:shadow-xl transform transition-all duration-300 hover:-translate-y-2 border-l-4 border-primary p-6">
+                    class="group card-shadow-hover shadow-primary-hover p-6">
                     <div class="flex flex-col items-center text-center space-y-4">
                         <div
-                            class="bg-primary/10 p-4 rounded-full group-hover:bg-primary/20 transition-colors duration-300">
+                            class="bg-primary-10 hover:bg-primary-20 p-4 rounded-full transition-all duration-300">
                             <img src="{{ asset('icons/assign-staff.png') }}" alt="Assign Staff"
                                 class="h-12 w-12 object-contain" />
                         </div>
@@ -79,15 +80,15 @@
 
                 <!-- Recycle Bin Card -->
                 <a href="{{ route('room.recycle-bin') }}"
-                    class="group bg-white rounded-xl shadow-md hover:shadow-xl transform transition-all duration-300 hover:-translate-y-2 border-l-4 border-red-500 p-6">
+                    class="group card-shadow-hover shadow-primary-hover p-6">
                     <div class="flex flex-col items-center text-center space-y-4">
-                        <div class="bg-red-50 p-4 rounded-full group-hover:bg-red-100 transition-colors duration-300">
+                        <div class="bg-primary-10 hover:bg-primary-20 p-4 rounded-full transition-all duration-300">
                             <img src="{{ asset('icons/recycle-bin.png') }}" alt="Recycle Bin"
                                 class="h-12 w-12 object-contain" />
                         </div>
                         <div>
                             <h3
-                                class="text-lg font-semibold text-gray-800 group-hover:text-red-600 transition-colors duration-300">
+                                class="text-lg font-semibold text-gray-800 group-hover:text-primary transition-colors duration-300">
                                 Recycle Bin
                             </h3>
                             <p class="text-sm text-gray-600 mt-1">Restore or permanently delete items</p>

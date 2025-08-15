@@ -75,7 +75,7 @@
     }
 
     .border-primary {
-        border-color: var(--color-primary);
+        background-color: var(--color-primary);
     }
 
     .border-secondary {
@@ -115,6 +115,65 @@
         color: var(--color-dark);
     }
 
+    /* ========================================
+       GROUP HOVER UTILITIES - Added for group hover functionality
+       ======================================== */
+
+    /* Group hover text colors */
+    .group:hover .group-hover\:text-primary {
+        color: var(--color-primary);
+    }
+
+    .group:hover .group-hover\:text-secondary {
+        color: var(--color-secondary);
+    }
+
+    .group:hover .group-hover\:text-edit {
+        color: var(--color-edit);
+    }
+
+    .group:hover .group-hover\:text-note {
+        color: var(--color-note);
+    }
+
+    .group:hover .group-hover\:text-gray-700 {
+        color: rgb(55 65 81);
+    }
+
+    /* Group hover background colors */
+    .group:hover .group-hover\:bg-primary {
+        background-color: var(--color-primary);
+    }
+
+    .group:hover .group-hover\:bg-primary-10 {
+        background-color: rgba(21, 126, 225, 0.1);
+    }
+
+    .group:hover .group-hover\:bg-primary-20 {
+        background-color: rgba(21, 126, 225, 0.2);
+    }
+
+    .group:hover .group-hover\:bg-secondary {
+        background-color: var(--color-secondary);
+    }
+
+    .group:hover .group-hover\:bg-edit {
+        background-color: var(--color-edit);
+    }
+
+    /* Group hover border colors */
+    .group:hover .group-hover\:border-primary {
+        border-color: var(--color-primary);
+    }
+
+    .group:hover .group-hover\:border-secondary {
+        border-color: var(--color-secondary);
+    }
+
+    /* ========================================
+       END GROUP HOVER UTILITIES
+       ======================================== */
+
     .focus\:ring-primary:focus {
         --tw-ring-color: var(--color-primary);
         box-shadow: 0 0 0 1px var(--tw-ring-color);
@@ -138,6 +197,62 @@
         --tw-ring-color: var(--color-primary);
         box-shadow: 0 0 0 3px var(--tw-ring-color);
     }
+
+    /* ========================================
+       CARD BOX SHADOW EFFECTS - Added for enhanced card hover states
+       ======================================== */
+
+    /* Primary color box shadow on hover */
+    .shadow-primary-hover {
+        transition: all 0.3s ease;
+    }
+
+    .shadow-primary-hover:hover {
+        box-shadow: 0 10px 40px rgba(21, 126, 225, 0.3);
+    }
+
+    /* Primary background with opacity */
+    .bg-primary-10 {
+        background-color: rgba(21, 126, 225, 0.1);
+    }
+
+    .bg-primary-20 {
+        background-color: rgba(21, 126, 225, 0.2);
+    }
+
+    .hover\:bg-primary-20:hover {
+        background-color: rgba(21, 126, 225, 0.2);
+    }
+
+    /* Box shadow variations for different intensities */
+    .shadow-primary-light:hover {
+        box-shadow: 0 8px 25px rgba(21, 126, 225, 0.2);
+    }
+
+    .shadow-primary-medium:hover {
+        box-shadow: 0 15px 35px rgba(21, 126, 225, 0.25);
+    }
+
+    .shadow-primary-strong:hover {
+        box-shadow: 0 20px 50px rgba(21, 126, 225, 0.4);
+    }
+
+    /* Box shadow variations for different color themes */
+    .shadow-secondary-hover:hover {
+        box-shadow: 0 10px 40px rgba(163, 22, 33, 0.3);
+    }
+
+    .shadow-edit-hover:hover {
+        box-shadow: 0 10px 40px rgba(225, 162, 36, 0.3);
+    }
+
+    .shadow-note-hover:hover {
+        box-shadow: 0 10px 40px rgba(247, 55, 79, 0.3);
+    }
+
+    /* ========================================
+       END CARD BOX SHADOW EFFECTS
+       ======================================== */
 }
 
 @layer components {
@@ -183,4 +298,21 @@
     .hover-underline-delete:hover::after {
         @apply left-0 w-full;
     }
+
+    /* ========================================
+       CARD COMPONENTS - Added for reusable card styling with box shadow
+       ======================================== */
+
+    .card-shadow-hover {
+        @apply bg-white rounded-xl shadow-md hover:shadow-xl transform transition-all duration-300 hover:-translate-y-2;
+    }
+
+    .card-shadow-hover:hover {
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1),
+            0 10px 40px rgba(21, 126, 225, 0.3);
+    }
+
+    /* ========================================
+       END CARD COMPONENTS
+       ======================================== */
 }
