@@ -51,25 +51,32 @@ class RoomController extends Controller
             }
         }
 
-        $room = new Room($validated);
+        // Save the room first to get its ID
+        $room = Room::create($validated);
 
         $room->office_days = !empty($request->office_days) ? implode(',', $request->office_days) : null;
         $room->office_hours_start = $validated['office_hours_start'] ?? null;
         $room->office_hours_end = $validated['office_hours_end'] ?? null;
-
-        if ($request->hasFile('image_path')) {
-            $room->image_path = $request->file('image_path')->store('room_images', 'public');
-        }
-
-        if ($request->hasFile('video_path')) {
-            $room->video_path = $request->file('video_path')->store('room_videos', 'public');
-        }
-
         $room->save();
 
+        // Cover image
+        if ($request->hasFile('image_path')) {
+            $path = $request->file('image_path')->store('rooms/' . $room->id . '/cover_images', 'public');
+            $room->image_path = $path;
+            $room->save();
+        }
+
+        // Video
+        if ($request->hasFile('video_path')) {
+            $path = $request->file('video_path')->store('rooms/' . $room->id . '/videos', 'public');
+            $room->video_path = $path;
+            $room->save();
+        }
+
+        // Generate QR code
         $marker_id = 'room_' . $room->id;
         $qrImage = QrCode::format('svg')->size(300)->generate($room->id);
-        $qrPath = 'qrcodes/' . $marker_id . '.svg';
+        $qrPath = 'rooms/' . $room->id . '/qrcodes/' . $marker_id . '.svg';
         Storage::disk('public')->put($qrPath, $qrImage);
 
         $room->update([
@@ -77,9 +84,10 @@ class RoomController extends Controller
             'qr_code_path' => $qrPath,
         ]);
 
+        // Carousel images
         if ($request->hasFile('carousel_images')) {
             foreach ($request->file('carousel_images') as $carouselImage) {
-                $path = $carouselImage->store('carousel_images/' . $room->id, 'public');
+                $path = $carouselImage->store('rooms/' . $room->id . '/carousel', 'public');
                 RoomImage::create([
                     'room_id' => $room->id,
                     'image_path' => $path
@@ -162,6 +170,9 @@ class RoomController extends Controller
         $room->office_hours_end = $validated['office_hours_end'] ?? null;
 
         unset($validated['office_days'], $validated['office_hours_start'], $validated['office_hours_end']);
+        unset($validated['image_path'], $validated['video_path'], $validated['carousel_images'], $validated['remove_images']);
+
+        // Update basic room data first
         $room->update($validated);
 
         // Handle main image removal
@@ -173,16 +184,17 @@ class RoomController extends Controller
             $room->save();
         }
 
-        // Handle new main image upload
+        // Update cover image (permanently delete old one)
         if ($request->hasFile('image_path')) {
-            $newPath = $request->file('image_path')->store('room_images', 'public');
-            if ($newPath) {
-                if ($room->image_path && Storage::disk('public')->exists($room->image_path)) {
-                    Storage::disk('public')->delete($room->image_path);
-                }
-                $room->image_path = $newPath;
-                $room->save();
+            // Permanently delete old cover image file
+            if ($room->image_path && Storage::disk('public')->exists($room->image_path)) {
+                Storage::disk('public')->delete($room->image_path);
             }
+
+            // Store new cover image
+            $newImagePath = $request->file('image_path')->store('rooms/' . $room->id . '/cover_images', 'public');
+            $room->image_path = $newImagePath;
+            $room->save();
         }
 
         // Handle video removal
@@ -194,33 +206,37 @@ class RoomController extends Controller
             $room->save();
         }
 
-        // Handle new video upload
+        // Update video (permanently delete old one)
         if ($request->hasFile('video_path')) {
-            $newVideoPath = $request->file('video_path')->store('room_videos', 'public');
-            if ($newVideoPath) {
-                if ($room->video_path && Storage::disk('public')->exists($room->video_path)) {
-                    Storage::disk('public')->delete($room->video_path);
-                }
-                $room->video_path = $newVideoPath;
-                $room->save();
+            // Permanently delete old video file
+            if ($room->video_path && Storage::disk('public')->exists($room->video_path)) {
+                Storage::disk('public')->delete($room->video_path);
             }
+
+            // Store new video
+            $newVideoPath = $request->file('video_path')->store('rooms/' . $room->id . '/videos', 'public');
+            $room->video_path = $newVideoPath;
+            $room->save();
         }
 
-        // Permanently delete selected carousel images
+
+        // Permanently delete selected carousel images (same as before)
         if ($request->filled('remove_images')) {
             $images = RoomImage::whereIn('id', $request->remove_images)->get();
             foreach ($images as $img) {
+                // Permanently delete file from storage
                 if ($img->image_path && Storage::disk('public')->exists($img->image_path)) {
                     Storage::disk('public')->delete($img->image_path);
                 }
-                $img->forceDelete(); // Permanently delete
+                // Permanently delete database record
+                $img->forceDelete();
             }
         }
 
-        // Handle new carousel images
+        // Add new carousel images
         if ($request->hasFile('carousel_images')) {
             foreach ($request->file('carousel_images') as $carouselImage) {
-                $path = $carouselImage->store('carousel_images/' . $room->id, 'public');
+                $path = $carouselImage->store('rooms/' . $room->id . '/carousel', 'public');
                 RoomImage::create([
                     'room_id' => $room->id,
                     'image_path' => $path
@@ -271,10 +287,11 @@ class RoomController extends Controller
         if (!$room->qr_code_path || !Storage::disk('public')->exists($room->qr_code_path)) {
             $marker_id = 'room_' . $room->id;
             $qrImage = QrCode::format('svg')->size(300)->generate($room->id);
-            $qrPath = 'qrcodes/' . $marker_id . '.svg';
+            $qrPath = 'rooms/' . $room->id . '/qrcodes/' . $marker_id . '.svg';
             Storage::disk('public')->put($qrPath, $qrImage);
 
             $room->update([
+                'marker_id' => $marker_id,
                 'qr_code_path' => $qrPath,
             ]);
         }

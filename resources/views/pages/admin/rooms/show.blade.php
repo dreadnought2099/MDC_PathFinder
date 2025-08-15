@@ -40,7 +40,7 @@
             <section class="mb-10">
                 <h3 class="text-2xl font-semibold mb-4 text-gray-800">Cover Image</h3>
                 <img src="{{ Storage::url($room->image_path) }}" alt="Cover Image"
-                    class="rounded-lg shadow-lg w-full max-h-[400px] object-cover border border-gray-300"
+                    class="rounded-lg shadow-lg w-full max-h-[400px] object-cover border border-gray-300 cursor-pointer"
                     onclick="openModal(this.src)" />
             </section>
         @endif
@@ -84,7 +84,7 @@
                 <h3 class="text-2xl font-semibold mb-6 text-gray-800">Assigned Staff</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     @foreach ($room->staff as $member)
-                        <div class="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200">
+                        <div class="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200 hover:scale-110 transition-all duration-300 ease-in-out">
                             <div class="cursor-pointer"
                                 onclick="openModal('{{ Storage::url($member->photo_path ?? 'images/default.jpg') }}')">
                                 <img src="{{ Storage::url($member->photo_path ?? 'images/default.jpg') }}"
@@ -92,7 +92,7 @@
                             </div>
                             <div class="p-4 text-center">
                                 <a href="{{ route('staff.show', $member->id) }}"
-                                    class="block text-lg font-semibold text-primary hover:underline">
+                                    class="block text-lg font-semibold text-primary hover-underline">
                                     {{ $member->name }}
                                 </a>
                                 <p class="text-sm text-gray-600">{{ $member->position ?? 'No position' }}</p>

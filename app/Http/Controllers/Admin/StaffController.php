@@ -23,7 +23,7 @@ class StaffController extends Controller
         return view('pages.admin.staffs.create', compact('rooms'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, Staff $staff)
     {
         $validated = $request->validate([
             'room_id'   => 'nullable|exists:rooms,id',
@@ -32,14 +32,18 @@ class StaffController extends Controller
             'bio'       => 'nullable|string',
             'email'     => 'nullable|email|max:255|unique:staff,email',
             'phone_num' => 'nullable|string|max:20',
-            'photo_path'     => 'nullable|image|max:51200',
+            'photo_path' => 'nullable|image|max:51200',
         ]);
 
-        if ($request->hasFile('photo_path')) {
-            $validated['photo_path'] = $request->file('photo_path')->store('staff_photos', 'public');
-        }
-
+        // Create staff first
         $staff = Staff::create($validated);
+
+        // Then handle photo upload
+        if ($request->hasFile('photo_path')) {
+            $path = $request->file('photo_path')
+                ->store('staffs/' . $staff->id, 'public');
+            $staff->update(['photo_path' => $path]);
+        }
 
         session()->flash('success', "{$staff->name} was added successfully.");
 
@@ -47,7 +51,8 @@ class StaffController extends Controller
             return response()->json(['redirect' => route('staff.show', $staff->id)], 200);
         }
 
-        return redirect()->route('staff.index')->with('success', "{$staff->name} was added successfully.");
+        return redirect()->route('staff.index')
+            ->with('success', "{$staff->name} was added successfully.");
     }
 
     public function show(Staff $staff)
@@ -78,20 +83,31 @@ class StaffController extends Controller
                 Rule::unique('staff', 'email')->ignore($staff->id),
             ],
             'phone_num' => 'nullable|string|max:20',
-            'photo_path'     => 'nullable|image|max:51200',
+            'photo_path' => 'nullable|image|max:51200',
         ]);
 
+        // Remove photo_path from validated data to handle it separately
+        unset($validated['photo_path']);
+
+        // Handle photo upload
         if ($request->hasFile('photo_path')) {
             // Delete old photo if exists
             if ($staff->photo_path && Storage::disk('public')->exists($staff->photo_path)) {
                 Storage::disk('public')->delete($staff->photo_path);
             }
-            $validated['photo_path'] = $request->file('photo_path')->store('staff_photos', 'public');
+
+            // Store new photo under staffs/{staff_id}/
+            $path = $request->file('photo_path')
+                ->store('staffs/' . $staff->id, 'public');
+
+            // Add the new path to the data to be updated
+            $validated['photo_path'] = $path;
         }
 
+        // Update staff with all validated data (including photo_path if uploaded)
         $staff->update($validated);
 
-        session()->flash('success', "{$staff->name} was added successfully.");
+        session()->flash('success', "{$staff->name} updated successfully.");
 
         if ($request->expectsJson()) {
             return response()->json(['redirect' => route('staff.show', $staff->id)], 200);
@@ -118,8 +134,8 @@ class StaffController extends Controller
     {
         $staff = Staff::onlyTrashed()->findOrFail($id);
 
-        if ($staff->photo_path && Storage::disk('public')->exists($staff->photo_path)) {
-            Storage::disk('public')->delete($staff->photo_path);
+        if (Storage::disk('public')->exists('staffs/' . $staff->id)) {
+            Storage::disk('public')->deleteDirectory('staffs/' . $staff->id);
         }
 
         $staff->forceDelete();
