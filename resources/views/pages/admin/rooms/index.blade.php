@@ -56,7 +56,7 @@
                                             Edit
                                         </a>
                                         <a href="{{ route('room.assign', $room->id) }}"
-                                            class="text-primary hover-underline hover:scale-105 transform transition duration-200">
+                                            class="text-tertiary hover-underline-tertiary hover:scale-105 transform transition duration-200">
                                             Assign Staff
                                         </a>
                                         <button

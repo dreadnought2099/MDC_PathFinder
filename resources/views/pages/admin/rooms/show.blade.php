@@ -1,128 +1,198 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container mx-auto p-6 max-w-5xl">
-        <x-floating-actions />
+    <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+        <div class="container mx-auto p-8 max-w-6xl">
+            <x-floating-actions />
 
-        {{-- Name --}}
-        <h1 class="text-4xl font-extrabold mb-6 text-gray-900 border-b-2 border-primary pb-2">
-            {{ $room->name }}
-        </h1>
-
-        {{-- Description --}}
-        @if ($room->description)
-            <p class="mb-6 text-gray-700 leading-relaxed text-lg">{{ $room->description }}</p>
-        @endif
-
-        {{-- Office Hours --}}
-        @if ($room->office_days && $room->office_hours_start && $room->office_hours_end)
-            @php
-                $daysFormatted = str_replace(',', ', ', $room->office_days);
-                $start = \Carbon\Carbon::parse($room->office_hours_start)->format('H:i');
-                $end = \Carbon\Carbon::parse($room->office_hours_end)->format('H:i');
-            @endphp
-            <div class="mb-6 p-4 bg-gradient-to-tr from-blue-400 to-white rounded-lg shadow-md max-w-sm">
-                <h4 class="text-base font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                    <img src="{{ asset('icons/calendar.png') }}" alt="Calendar" class="h-10 w-10 object-contain">
-                    Office Hours
-                </h4>
-                <p class="text-sm text-gray-700 mb-1">
-                    <span class="font-medium text-gray-900">Days:</span> {{ $daysFormatted }}
-                </p>
-                <p class="text-sm text-gray-700">
-                    <span class="font-medium text-gray-900">Time:</span> {{ $start }} - {{ $end }}
-                </p>
-            </div>
-        @endif
-
-        {{-- Cover Image --}}
-        @if ($room->image_path && Storage::disk('public')->exists($room->image_path))
-            <section class="mb-10">
-                <h3 class="text-2xl font-semibold mb-4 text-gray-800">Cover Image</h3>
-                <img src="{{ Storage::url($room->image_path) }}" alt="Cover Image"
-                    class="rounded-lg shadow-lg w-full max-h-[400px] object-cover border border-gray-300 cursor-pointer"
-                    onclick="openModal(this.src)" />
-            </section>
-        @endif
-
-        {{-- Video --}}
-        @if ($room->video_path && Storage::disk('public')->exists($room->video_path))
-            <section class="mb-10">
-                <h3 class="text-2xl font-semibold mb-4 text-gray-800">Video</h3>
-                <video controls class="w-full rounded-lg shadow-lg border border-gray-300 max-h-[400px]">
-                    <source src="{{ Storage::url($room->video_path) }}" type="video/mp4" />
-                    Your browser does not support the video tag.
-                </video>
-            </section>
-        @endif
-
-        {{-- Carousel Images --}}
-        @if ($room->images && $room->images->count())
-            <section class="mb-10">
-                <h3 class="text-2xl font-semibold mb-6 text-gray-800">Carousel Images</h3>
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-                    @foreach ($room->images as $image)
-                        @if (Storage::disk('public')->exists($image->image_path))
-                            <div
-                                class="overflow-hidden rounded-lg shadow-md hover:scale-105 transition-transform duration-300 cursor-pointer border {{ $image->trashed() ? 'border-red-400 opacity-50' : 'border-gray-200' }}">
-                                <img src="{{ Storage::url($image->image_path) }}" alt="Carousel Image"
-                                    class="w-full h-40 object-cover" onclick="openModal(this.src)" />
-                                @if ($image->trashed())
-                                    <span
-                                        class="absolute top-1 left-1 bg-yellow-600 text-white rounded px-1 text-xs">Deleted</span>
-                                @endif
-                            </div>
-                        @endif
-                    @endforeach
+            {{-- Header Section --}}
+            <div class="bg-white rounded-2xl shadow-lg p-8 mb-8 border border-slate-200">
+                {{-- Name --}}
+                <div class="text-center mb-6">
+                    <h1
+                        class="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        {{ $room->name }}
+                    </h1>
+                    <div class="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full"></div>
                 </div>
-            </section>
-        @endif
 
-        {{-- Staff Assigned to Room --}}
-        @if ($room->staff->isNotEmpty())
-            <section class="mb-10">
-                <h3 class="text-2xl font-semibold mb-6 text-gray-800">Assigned Staff</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                    @foreach ($room->staff as $member)
-                        <div class="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200 hover:scale-110 transition-all duration-300 ease-in-out">
-                            <div class="cursor-pointer"
-                                onclick="openModal('{{ Storage::url($member->photo_path ?? 'images/default.jpg') }}')">
-                                <img src="{{ Storage::url($member->photo_path ?? 'images/default.jpg') }}"
-                                    alt="{{ $member->name }}" class="w-full h-48 object-cover">
+                {{-- Description --}}
+                @if ($room->description)
+                    <div class="max-w-4xl mx-auto text-center">
+                        <p class="text-xl text-slate-700 leading-relaxed font-light">{{ $room->description }}</p>
+                    </div>
+                @endif
+            </div>
+
+            {{-- Office Hours Card --}}
+            @if ($room->office_days && $room->office_hours_start && $room->office_hours_end)
+                @php
+                    $daysFormatted = str_replace(',', ', ', $room->office_days);
+                    $start = \Carbon\Carbon::parse($room->office_hours_start)->format('H:i');
+                    $end = \Carbon\Carbon::parse($room->office_hours_end)->format('H:i');
+                @endphp
+                <div class="mb-10 flex justify-center">
+                    <div
+                        class="bg-gradient-to-br from-emerald-400 via-teal-400 to-cyan-400 p-6 rounded-2xl shadow-xl max-w-md w-full border-2 border-white/20 backdrop-blur-sm">
+                        <div class="flex items-center justify-center mb-4">
+                            <div class="bg-white/20 p-3 rounded-xl mr-3 backdrop-blur-sm">
+                                <img src="{{ asset('icons/calendar.png') }}" alt="Calendar" class="h-8 w-8 object-contain">
                             </div>
-                            <div class="p-4 text-center">
-                                <a href="{{ route('staff.show', $member->id) }}"
-                                    class="block text-lg font-semibold text-primary hover-underline">
-                                    {{ $member->name }}
-                                </a>
-                                <p class="text-sm text-gray-600">{{ $member->position ?? 'No position' }}</p>
+                            <h4 class="text-xl font-bold text-white">Office Hours</h4>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="bg-white/10 p-3 rounded-xl backdrop-blur-sm">
+                                <p class="text-white/90 text-sm font-medium mb-1">Days</p>
+                                <p class="text-white font-semibold">{{ $daysFormatted }}</p>
+                            </div>
+                            <div class="bg-white/10 p-3 rounded-xl backdrop-blur-sm">
+                                <p class="text-white/90 text-sm font-medium mb-1">Time</p>
+                                <p class="text-white font-semibold">{{ $start }} - {{ $end }}</p>
                             </div>
                         </div>
-                    @endforeach
+                    </div>
                 </div>
-            </section>
-        @else
-            <p class="text-gray-500 mt-4">No staff assigned to this room.</p>
-        @endif
+            @endif
 
-        {{-- QR Code --}}
-        @if ($room->qr_code_path && Storage::disk('public')->exists($room->qr_code_path))
-            <div class="mt-6 text-center">
-                <h3 class="text-lg font-semibold mb-2">Room QR Code</h3>
-                <img src="{{ Storage::url($room->qr_code_path) }}" alt="QR Code for {{ $room->name }}"
-                    class="mx-auto max-w-[200px]" />
-                <a href="{{ route('room.print-qrcode', $room->id) }}" target="_blank"
-                    class="mt-2 inline-block bg-primary text-white px-4 py-2 rounded hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer">
-                    Print QR Code
-                </a>
-            </div>
-        @endif
+            {{-- Cover Image Section --}}
+            @if ($room->image_path && Storage::disk('public')->exists($room->image_path))
+                <section class="mb-12">
+                    <div class="text-center mb-8">
+                        <h3 class="text-3xl font-bold text-slate-800 mb-2">Cover Image</h3>
+                        <div class="w-16 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full"></div>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
+                        <div class="overflow-hidden rounded-xl">
+                            <img src="{{ Storage::url($room->image_path) }}" alt="Cover Image"
+                                class="w-full max-h-[500px] object-cover cursor-pointer hover:scale-105 transition-all duration-500 ease-out"
+                                onclick="openModal(this.src)" />
+                        </div>
+                    </div>
+                </section>
+            @endif
 
-        {{-- Modal Markup --}}
-        <div id="imageModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+            {{-- Video Section --}}
+            @if ($room->video_path && Storage::disk('public')->exists($room->video_path))
+                <section class="mb-12">
+                    <div class="text-center mb-8">
+                        <h3 class="text-3xl font-bold text-slate-800 mb-2">Video</h3>
+                        <div class="w-16 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full"></div>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
+                        <div class="overflow-hidden rounded-xl">
+                            <video controls class="w-full rounded-xl shadow-md max-h-[500px]">
+                                <source src="{{ Storage::url($room->video_path) }}" type="video/mp4" />
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    </div>
+                </section>
+            @endif
+
+            {{-- Carousel Images Section --}}
+            @if ($room->images && $room->images->count())
+                <section class="mb-12">
+                    <div class="text-center mb-8">
+                        <h3 class="text-3xl font-bold text-slate-800 mb-2">Image Gallery</h3>
+                        <div class="w-16 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full"></div>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            @foreach ($room->images as $image)
+                                @if (Storage::disk('public')->exists($image->image_path))
+                                    <div class="relative group">
+                                        <div
+                                            class="overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer 
+                                            {{ $image->trashed() ? 'border-2 border-red-300 opacity-60' : 'border border-slate-200' }}
+                                            transform hover:scale-105">
+                                            <img src="{{ Storage::url($image->image_path) }}" alt="Gallery Image"
+                                                class="w-full h-48 object-cover" onclick="openModal(this.src)" />
+                                            @if ($image->trashed())
+                                                <div
+                                                    class="absolute top-2 left-2 bg-red-500 text-white rounded-lg px-3 py-1 text-xs font-medium shadow-lg">
+                                                    Deleted
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
+                    </div>
+                </section>
+            @endif
+
+            {{-- Staff Section --}}
+            @if ($room->staff->isNotEmpty())
+                <section class="mb-12">
+                    <div class="text-center mb-8">
+                        <h3 class="text-3xl font-bold text-slate-800 mb-2">Assigned Staff</h3>
+                        <div class="w-16 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full"></div>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                            @foreach ($room->staff as $member)
+                                <div
+                                    class="bg-gradient-to-br from-slate-50 to-white rounded-xl shadow-md hover:shadow-xl border border-slate-200 overflow-hidden group transform hover:scale-105 transition-all duration-300">
+                                    <div class="cursor-pointer overflow-hidden"
+                                        onclick="openModal('{{ Storage::url($member->photo_path ?? 'images/default.jpg') }}')">
+                                        <img src="{{ Storage::url($member->photo_path ?? 'images/default.jpg') }}"
+                                            alt="{{ $member->name }}"
+                                            class="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500">
+                                    </div>
+                                    <div class="p-6 text-center">
+                                        <a href="{{ route('staff.show', $member->id) }}"
+                                            class="block text-xl font-bold text-slate-800 hover:text-blue-600 transition-colors duration-300 mb-2">
+                                            {{ $member->name }}
+                                        </a>
+                                        <p class="text-slate-600 font-medium">
+                                            {{ $member->position ?? 'No position assigned' }}</p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </section>
+            @else
+                <div class="text-center py-8">
+                    <div class="bg-slate-100 rounded-2xl p-8 border border-slate-200">
+                        <div class="text-slate-400 text-6xl mb-4">👥</div>
+                        <p class="text-slate-600 text-lg font-medium">No staff assigned to this room yet.</p>
+                    </div>
+                </div>
+            @endif
+
+            {{-- QR Code Section --}}
+            @if ($room->qr_code_path && Storage::disk('public')->exists($room->qr_code_path))
+                <div class="mt-12">
+                    <div class="bg-white rounded-2xl shadow-lg p-8 text-center border border-slate-200">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-6">Room QR Code</h3>
+                        <div class="inline-block bg-slate-50 p-6 rounded-xl border-2 border-slate-200 mb-6">
+                            <img src="{{ Storage::url($room->qr_code_path) }}" alt="QR Code for {{ $room->name }}"
+                                class="max-w-[200px] mx-auto" />
+                        </div>
+                        <div>
+                            <a href="{{ route('room.print-qrcode', $room->id) }}" target="_blank"
+                                class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
+                                    </path>
+                                </svg>
+                                Print QR Code
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        </div>
+
+        {{-- Modal Markup (unchanged functionality) --}}
+        <div id="imageModal"
+            class="fixed inset-0 bg-black/70 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
             <button onclick="closeModal()"
-                class="absolute top-5 right-5 text-gray-300 text-6xl hover:text-red-600 cursor-pointer">&times;</button>
-            <img id="modalImage" src="" alt="Full Image" class="max-w-full max-h-full rounded shadow-lg" />
+                class="absolute top-5 right-5 text-white/80 text-6xl hover:text-red-400 cursor-pointer transition-colors duration-300 z-10">&times;</button>
+            <img id="modalImage" src="" alt="Full Image" class="max-w-full max-h-full rounded-xl shadow-2xl" />
         </div>
     </div>
 @endsection

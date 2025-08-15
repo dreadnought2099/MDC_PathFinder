@@ -24,7 +24,7 @@
         --color-primary: #157ee1;
         --color-secondary: #FB4141;
         --color-edit: #e1a224;
-        --color-note: #f7374f;
+        --color-tertiary: #16C47F;
     }
 
     ::selection {
@@ -54,8 +54,8 @@
         background-color: var(--color-secondary);
     }
 
-    .bg-note {
-        background-color: var(--color-note);
+    .bg-tertiary {
+        background-color: var(--color-tertiary);
     }
 
     .text-primary {
@@ -70,8 +70,8 @@
         color: var(--color-edit);
     }
 
-    .text-note {
-        color: var(--color-note);
+    .text-tertiary {
+        color: var(--color-tertiary);
     }
 
     .border-primary {
@@ -132,8 +132,8 @@
         color: var(--color-edit);
     }
 
-    .group:hover .group-hover\:text-note {
-        color: var(--color-note);
+    .group:hover .group-hover\:text-tertiary {
+        color: var(--color-tertiary);
     }
 
     .group:hover .group-hover\:text-gray-700 {
@@ -246,7 +246,7 @@
         box-shadow: 0 10px 40px rgba(225, 162, 36, 0.3);
     }
 
-    .shadow-note-hover:hover {
+    .shadow-tertiary-hover:hover {
         box-shadow: 0 10px 40px rgba(247, 55, 79, 0.3);
     }
 
@@ -299,6 +299,20 @@
         @apply left-0 w-full;
     }
 
+    /* Assign Staff hyperlink */
+    .hover-underline-tertiary {
+        @apply relative inline-block;
+    }
+
+    .hover-underline-tertiary::after {
+        content: "";
+        @apply absolute left-1/2 bottom-0 w-0 h-0.5 transition-all duration-500 ease-in-out;
+        background-color: var(--color-tertiary);
+    }
+
+    .hover-underline-tertiary:hover::after {
+        @apply left-0 w-full;
+    }
     /* ========================================
        CARD COMPONENTS - Added for reusable card styling with box shadow
        ======================================== */
