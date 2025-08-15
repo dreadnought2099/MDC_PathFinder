@@ -21,6 +21,7 @@
         {{-- Staff assignment POST form --}}
         <form action="{{ route('room.assign.update') }}" method="POST" id="assignForm">
             @csrf
+            @method('PUT')
             <input type="hidden" name="room_id" value="{{ $selectedRoom->id ?? '' }}">
 
             <div class="mb-4">

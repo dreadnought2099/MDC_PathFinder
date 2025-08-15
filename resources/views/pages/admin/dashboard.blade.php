@@ -1,36 +1,131 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="w-full min-h-screen max-w-4xl mx-auto text-center text-5xl border-2 border-primary rounded-lg p-12 mb-10">
-        <h1><span class="text-primary">Admin</span> Dashboard</h1>
+    <div class="min-h-screen bg-gray-50 py-8 px-4">
+        <div class="max-w-6xl mx-auto">
 
-        <x-floating-actions />
+            <!-- Header Section -->
+            <div class="text-center mb-12">
+                <h1 class="text-5xl font-bold text-gray-800 mb-4">
+                    <span class="text-primary">Admin</span> Dashboard
+                </h1>
+                <p class="text-lg text-gray-600">Manage your organization's staff and office spaces</p>
+            </div>
 
-        <div class="flex space-x-8 justify-start items-center mt-16">
-            <a href="{{ route('staff.index') }}"
-                class="text-primary inline-flex items-center space-x-2 hover-underline transform transition-all duration-300 hover:scale-105 border-t-2 border-l-2 border-r-2 border-primary px-4 py-2 rounded">
-                <img src="{{ asset('icons/manager-1.png') }}" alt="Manage Staff" class="h-10 w-10 object-contain" />
-                <span class="text-base">Manage Staff</span>
-            </a>
+            <!-- Floating Actions Component -->
+            <div class="mb-8">
+                <x-floating-actions />
+            </div>
 
-            <a href="{{ route('room.index') }}"
-                class="text-primary inline-flex items-center space-x-2 hover-underline transform transition-all duration-300 hover:scale-105 border-t-2 border-l-2 border-r-2 border-primary px-4 py-2 rounded">
-                <img src="{{ asset('icons/manage-office1.png') }}" alt="Manage Room/Office"
-                    class="h-10 w-10 object-contain" />
-                <span class="text-base">Manage Room/Office</span>
-            </a>
+            <!-- Main Actions Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
-            <a href="{{ route('room.assign') }}"
-                class="text-primary hover-underline hover:scale-105 transform transition duration-200">
-                <img src="{{ asset('icons/assign-staff.png') }}" alt="Assign Staff" class="h-10 w-10 object-contain" />
-                <span class="text-base">Assign Staff</span>
-            </a>
+                <!-- Manage Staff Card -->
+                <a href="{{ route('staff.index') }}"
+                    class="group bg-white rounded-xl shadow-md hover:shadow-xl transform transition-all duration-300 hover:-translate-y-2 border-l-4 border-primary p-6">
+                    <div class="flex flex-col items-center text-center space-y-4">
+                        <div
+                            class="bg-primary/10 p-4 rounded-full group-hover:bg-primary/20 transition-colors duration-300">
+                            <img src="{{ asset('icons/manager-1.png') }}" alt="Manage Staff"
+                                class="h-12 w-12 object-contain" />
+                        </div>
+                        <div>
+                            <h3
+                                class="text-lg font-semibold text-gray-800 group-hover:text-primary transition-colors duration-300">
+                                Manage Staff
+                            </h3>
+                            <p class="text-sm text-gray-600 mt-1">Organize staff members</p>
+                        </div>
+                    </div>
+                </a>
 
-            <a href="{{ route('room.recycle-bin') }}"
-                class="text-primary inline-flex items-center space-x-2 hover-underline transform transition-all duration-300 hover:scale-105 border-t-2 border-l-2 border-r-2 border-primary px-4 py-2 rounded">
-                <img src="{{ asset('icons/recycle-bin.png') }}" alt="Recycle Bin" class="h-10 w-10 object-contain" />
-                <span class="text-base">Recycle Bin</span>
-            </a>
+                <!-- Manage Rooms Card -->
+                <a href="{{ route('room.index') }}"
+                    class="group bg-white rounded-xl shadow-md hover:shadow-xl transform transition-all duration-300 hover:-translate-y-2 border-l-4 border-primary p-6">
+                    <div class="flex flex-col items-center text-center space-y-4">
+                        <div
+                            class="bg-primary/10 p-4 rounded-full group-hover:bg-primary/20 transition-colors duration-300">
+                            <img src="{{ asset('icons/manage-office1.png') }}" alt="Manage Room/Office"
+                                class="h-12 w-12 object-contain" />
+                        </div>
+                        <div>
+                            <h3
+                                class="text-lg font-semibold text-gray-800 group-hover:text-primary transition-colors duration-300">
+                                Manage Rooms/Offices
+                            </h3>
+                            <p class="text-sm text-gray-600 mt-1">Configure office spaces and rooms</p>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Assign Staff Card -->
+                <a href="{{ route('room.assign') }}"
+                    class="group bg-white rounded-xl shadow-md hover:shadow-xl transform transition-all duration-300 hover:-translate-y-2 border-l-4 border-primary p-6">
+                    <div class="flex flex-col items-center text-center space-y-4">
+                        <div
+                            class="bg-primary/10 p-4 rounded-full group-hover:bg-primary/20 transition-colors duration-300">
+                            <img src="{{ asset('icons/assign-staff.png') }}" alt="Assign Staff"
+                                class="h-12 w-12 object-contain" />
+                        </div>
+                        <div>
+                            <h3
+                                class="text-lg font-semibold text-gray-800 group-hover:text-primary transition-colors duration-300">
+                                Assign Staff
+                            </h3>
+                            <p class="text-sm text-gray-600 mt-1">Link staff members to rooms</p>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Recycle Bin Card -->
+                <a href="{{ route('room.recycle-bin') }}"
+                    class="group bg-white rounded-xl shadow-md hover:shadow-xl transform transition-all duration-300 hover:-translate-y-2 border-l-4 border-red-500 p-6">
+                    <div class="flex flex-col items-center text-center space-y-4">
+                        <div class="bg-red-50 p-4 rounded-full group-hover:bg-red-100 transition-colors duration-300">
+                            <img src="{{ asset('icons/recycle-bin.png') }}" alt="Recycle Bin"
+                                class="h-12 w-12 object-contain" />
+                        </div>
+                        <div>
+                            <h3
+                                class="text-lg font-semibold text-gray-800 group-hover:text-red-600 transition-colors duration-300">
+                                Recycle Bin
+                            </h3>
+                            <p class="text-sm text-gray-600 mt-1">Restore or permanently delete items</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Quick Stats Section (Optional) -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Quick Overview</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                    <!-- Total Staff -->
+                    <div class="text-center p-4 bg-blue-50 rounded-lg">
+                        <div class="text-3xl font-bold text-blue-600 mb-2">
+                            {{ \App\Models\Staff::count() }}
+                        </div>
+                        <div class="text-sm text-gray-600">Total Staff Members</div>
+                    </div>
+
+                    <!-- Total Rooms -->
+                    <div class="text-center p-4 bg-green-50 rounded-lg">
+                        <div class="text-3xl font-bold text-green-600 mb-2">
+                            {{ \App\Models\Room::count() }}
+                        </div>
+                        <div class="text-sm text-gray-600">Total Rooms</div>
+                    </div>
+
+                    <!-- Assignments -->
+                    <div class="text-center p-4 bg-purple-50 rounded-lg">
+                        <div class="text-3xl font-bold text-purple-600 mb-2">
+                            {{ \App\Models\Staff::whereNotNull('room_id')->count() }}
+                        </div>
+                        <div class="text-sm text-gray-600">Staff Assignments</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 @endsection
