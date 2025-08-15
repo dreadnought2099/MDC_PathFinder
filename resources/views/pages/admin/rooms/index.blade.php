@@ -74,7 +74,7 @@
             const form = document.getElementById('roomDeleteForm');
 
             nameSpan.textContent = name;
-            form.action = `/admin/room/${id}`; // Fixed route path
+            form.action = `/admin/rooms/${id}`; // Fixed route path
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }

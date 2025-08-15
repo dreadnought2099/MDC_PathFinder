@@ -19,7 +19,7 @@
         </form>
 
         {{-- Staff assignment POST form --}}
-        <form action="{{ route('room.assignStaff') }}" method="POST" id="assignForm">
+        <form action="{{ route('room.assign.update') }}" method="POST" id="assignForm">
             @csrf
             <input type="hidden" name="room_id" value="{{ $selectedRoom->id ?? '' }}">
 
