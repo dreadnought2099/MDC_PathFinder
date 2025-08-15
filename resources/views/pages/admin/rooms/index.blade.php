@@ -31,7 +31,7 @@
                                 class="text-primary hover-underline hover:scale-105 transform transition duration-200">
                                 Assign Staff
                             </a>
-                            
+
                             <button onclick="openRoomModal('{{ $room->id }}', '{{ addslashes($room->name) }}')"
                                 class="text-secondary hover-underline-delete hover:scale-105 transform transition duration-200 cursor-pointer">
                                 Delete
@@ -43,27 +43,51 @@
         </table>
     </div>
 
-    <!-- Modal -->
-    <div id="roomDeleteModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-        <div class="bg-white rounded-lg p-6 w-full max-w-sm shadow-lg">
-            <h2 class="text-xl mb-4">Confirm Deletion</h2>
-            <p class="mb-4">Are you sure you want to delete <span id="roomName" class="text-primary"></span>?</p>
-
-            <form id="roomDeleteForm" method="POST">
-                @csrf
-                @method('DELETE')
-
-                <div class="flex justify-end space-x-2">
-                    <button type="button" onclick="closeRoomModal()"
-                        class="px-4 py-2 bg-gray-300 hover:text-white hover:bg-gray-400 rounded transition-all duration-300 cursor-pointer">
-                        Cancel
-                    </button>
-                    <button type="submit"
-                        class="px-4 py-2 bg-secondary text-white rounded hover:bg-white hover:text-secondary border-2 border-secondary transition-all duration-300 cursor-pointer">
-                        Confirm
+    <!-- Room Delete Modal with animation -->
+    <div id="roomDeleteModal"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden transition-all duration-300 opacity-0"
+        onclick="closeRoomModal()">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform transition-all duration-300 scale-95"
+            onclick="event.stopPropagation()">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl text-gray-900">Confirm Deletion</h2>
+                    <button onclick="closeRoomModal()"
+                        class="text-gray-400 hover:text-red-600 transition-colors duration-200 cursor-pointer">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                            </path>
+                        </svg>
                     </button>
                 </div>
-            </form>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="px-6 py-4">
+                <p class="text-gray-700 text-sm leading-relaxed">
+                    Are you sure you want to delete <span id="roomName" class="text-secondary"></span>?
+                    This action cannot be undone.
+                </p>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-4 bg-gray-50 rounded-b-2xl">
+                <form id="roomDeleteForm" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" onclick="closeRoomModal()"
+                            class="px-4 py-2 text-sm font-medium border border-gray-400 hover:text-white hover:bg-gray-400 rounded-lg transition-all duration-300 cursor-pointer">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                            class="px-4 py-2 text-sm font-medium text-white bg-secondary border border-red-600 rounded-lg hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer">
+                            Delete Room
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -74,19 +98,41 @@
             const form = document.getElementById('roomDeleteForm');
 
             nameSpan.textContent = name;
-            form.action = `/admin/rooms/${id}`; // Fixed route path
+            form.action = `/admin/rooms/${id}`;
+
             modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('.bg-white').classList.remove('scale-95');
+                modal.querySelector('.bg-white').classList.add('scale-100');
+            }, 10);
+
+            document.body.style.overflow = 'hidden';
         }
 
         function closeRoomModal() {
             const modal = document.getElementById('roomDeleteModal');
-            modal.classList.remove('flex');
-            modal.classList.add('hidden');
+            const modalContent = modal.querySelector('.bg-white');
+
+            modal.classList.add('opacity-0');
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 300);
         }
 
+        // Close modal on Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeRoomModal();
+        });
+
+        // Close modal when clicking outside
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('roomDeleteModal');
+            if (e.target === modal) closeRoomModal();
         });
     </script>
 @endsection
