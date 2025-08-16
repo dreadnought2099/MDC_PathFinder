@@ -21,10 +21,10 @@
                 <table class="w-full">
                     <thead>
                         <tr class="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                            <th class="px-6 py-4 text-left text-sm text-gray-700 uppercase tracking-wide">
                                 Room Name
                             </th>
-                            <th class="px-6 py-4 text-right text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                            <th class="px-6 py-4 text-right text-sm text-gray-700 uppercase tracking-wide">
                                 Actions
                             </th>
                         </tr>
@@ -113,10 +113,23 @@
             </div>
 
             <div class="px-6 py-4">
-                <p class="text-gray-700 text-sm leading-relaxed">
-                    Are you sure you want to delete <span id="roomName" class="text-red-600"></span>?
-                    This action cannot be undone.
-                </p>
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
+                                </path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-gray-700 text-sm leading-relaxed">
+                            Are you sure you want to delete <span id="roomName" class="text-red-600"></span>?
+                            This action cannot be undone.
+                        </p>
+                    </div>
+                </div>
             </div>
 
             <div class="px-6 py-4 bg-gray-50 rounded-b-2xl">

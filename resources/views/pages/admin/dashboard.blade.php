@@ -30,7 +30,7 @@
                         </div>
                         <div>
                             <h3
-                                class="text-lg font-semibold text-gray-800 group-hover:text-primary transition-colors duration-300">
+                                class="text-lg text-gray-800 group-hover:text-primary transition-colors duration-300">
                                 Manage Staff
                             </h3>
                             <p class="text-sm text-gray-600 mt-1 group-hover:text-gray-700 transition-colors duration-300">
@@ -51,7 +51,7 @@
                         </div>
                         <div>
                             <h3
-                                class="text-lg font-semibold text-gray-800 group-hover:text-primary transition-colors duration-300">
+                                class="text-lg text-gray-800 group-hover:text-primary transition-colors duration-300">
                                 Manage Rooms/Offices
                             </h3>
                             <p class="text-sm text-gray-600 mt-1">Configure office spaces and rooms</p>
@@ -70,7 +70,7 @@
                         </div>
                         <div>
                             <h3
-                                class="text-lg font-semibold text-gray-800 group-hover:text-primary transition-colors duration-300">
+                                class="text-lg text-gray-800 group-hover:text-primary transition-colors duration-300">
                                 Assign Staff
                             </h3>
                             <p class="text-sm text-gray-600 mt-1">Link staff members to rooms</p>
@@ -88,7 +88,7 @@
                         </div>
                         <div>
                             <h3
-                                class="text-lg font-semibold text-gray-800 group-hover:text-primary transition-colors duration-300">
+                                class="text-lg text-gray-800 group-hover:text-primary transition-colors duration-300">
                                 Recycle Bin
                             </h3>
                             <p class="text-sm text-gray-600 mt-1">Restore or permanently delete items</p>
@@ -99,7 +99,7 @@
 
             <!-- Quick Stats Section (Optional) -->
             <div class="bg-white rounded-xl shadow-md p-6">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Quick Overview</h2>
+                <h2 class="text-2xl text-gray-800 mb-6 text-center">Quick Overview</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
                     <!-- Total Staff -->

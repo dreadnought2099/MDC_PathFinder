@@ -135,7 +135,7 @@
                                 <div
                                     class="bg-gradient-to-br from-slate-50 to-white rounded-xl shadow-md hover:shadow-xl border border-slate-200 overflow-hidden group transform hover:scale-105 transition-all duration-300">
                                     <div class="cursor-pointer overflow-hidden"
-                                        onclick="openModal('{{ Storage::url($member->photo_path ?? 'images/default.jpg') }}')">
+                                        onclick="openModal('{{ Storage::url($member->photo_path ?? 'images/profile.jpeg') }}')">
                                         <img src="{{ Storage::url($member->photo_path ?? 'images/default.jpg') }}"
                                             alt="{{ $member->name }}"
                                             class="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500">
@@ -156,7 +156,11 @@
             @else
                 <div class="text-center py-8">
                     <div class="bg-slate-100 rounded-2xl p-8 border border-slate-200">
-                        <div class="text-slate-400 text-6xl mb-4">👥</div>
+                        <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                            </path>
+                        </svg>
                         <p class="text-slate-600 text-lg font-medium">No staff assigned to this room yet.</p>
                     </div>
                 </div>
@@ -189,7 +193,7 @@
 
         {{-- Modal Markup (unchanged functionality) --}}
         <div id="imageModal"
-            class="fixed inset-0 bg-black/70 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+            class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
             <button onclick="closeModal()"
                 class="absolute top-5 right-5 text-white/80 text-6xl hover:text-red-400 cursor-pointer transition-colors duration-300 z-10">&times;</button>
             <img id="modalImage" src="" alt="Full Image" class="max-w-full max-h-full rounded-xl shadow-2xl" />

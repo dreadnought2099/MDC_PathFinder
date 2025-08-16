@@ -71,7 +71,7 @@
                             <label class="block text-sm font-semibold text-gray-800 mb-2">Photo</label>
                             <div class="space-y-4">
                                 <input type="file" name="photo_path" accept="image/*"
-                                    class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary file:text-white file:cursor-pointer hover:file:bg-blue-700">
+                                    class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary file:text-white file:cursor-pointer hover:file:bg-blue-500">
                                 
                                 @if ($staff->photo_path)
                                     <div class="flex items-center space-x-4">

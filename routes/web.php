@@ -113,7 +113,7 @@ Route::middleware('auth')->group(function () {
         
         // SPECIFIC ROUTES - These MUST come before {staff} routes
         Route::get('/staff/create', [StaffController::class, 'create'])->name('create');
-        Route::get('/staff/recycle-bin', [StaffController::class, 'recycleBin'])->name('recycle-bin');
+        Route::get('/staff/recycle-bin', [RoomController::class, 'recycleBin'])->name('recycle-bin');
         
         // PARAMETERIZED ROUTES - These come after specific routes
         Route::get('/staff/{staff}', [StaffController::class, 'show'])->name('show');

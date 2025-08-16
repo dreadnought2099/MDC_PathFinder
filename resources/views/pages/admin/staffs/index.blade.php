@@ -105,7 +105,7 @@
             <!-- Modal Header -->
             <div class="px-6 py-4 border-b border-gray-200">
                 <div class="flex items-center justify-between">
-                    <h2 class="text-xl text-gray-900">Confirm Deletion</h2>
+                    <h2 class="text-xl text-gray-900">Confirm <span class="text-secondary">Deletion</span></h2>
                     <button onclick="closeModal()"
                         class="text-gray-400 hover:text-red-600 transition-colors duration-200 cursor-pointer">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

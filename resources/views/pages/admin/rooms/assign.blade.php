@@ -100,7 +100,7 @@
                 confirmBtn.addEventListener('click', () => {
                     if (!currentStaffId) return;
 
-                    fetch(`/admin/staff/remove/${currentStaffId}`, {
+                    fetch(`/admin/rooms/staff/${currentStaffId}/remove`, {
                             method: 'PATCH',
                             headers: {
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
