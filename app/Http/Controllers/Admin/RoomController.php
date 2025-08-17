@@ -7,6 +7,7 @@ use App\Models\Room;
 use App\Models\RoomImage;
 use App\Models\Staff;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
@@ -343,7 +344,9 @@ class RoomController extends Controller
     public function assign(Request $request, $roomId = null)
     {
         $rooms = Room::all();
-        $roomId = $request->query('roomId') ?? ($rooms->first()->id ?? null);
+        
+        // Use route parameter first, then query parameter, then default
+        $roomId = $roomId ?? $request->query('roomId') ?? ($rooms->first()->id ?? null);
         $selectedRoom = $roomId ? Room::find($roomId) : null;
         $staff = Staff::with('room')->get();
 
@@ -352,6 +355,9 @@ class RoomController extends Controller
 
     public function assignStaff(Request $request)
     {
+        //For Debugging
+        Log::info('Room ID received: ' . $request->room_id);
+
         $request->validate([
             'room_id' => 'required|exists:rooms,id',
             'staff_ids' => 'nullable|array',
@@ -373,12 +379,11 @@ class RoomController extends Controller
             Staff::whereIn('id', $toAssign)->update(['room_id' => $roomId]);
         }
 
-        if (!empty($toAssign) || !empty($toUnassign)) {
-            return redirect()->route('room.assign', $roomId)
-                ->with('success', 'Staff assignment updated successfully.');
-        }
+        //For Debugging
+        Log::info('Redirecting to room: ' . $request->room_id);
 
-        return redirect()->route('room.assign', $roomId);
+        // Change this redirect to use route parameter instead of query parameter
+        return redirect()->route('room.assign', $request->room_id);
     }
 
     public function removeFromRoom($id)
@@ -389,7 +394,6 @@ class RoomController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => "{$staff->name} removed from room."
         ]);
     }
 }
