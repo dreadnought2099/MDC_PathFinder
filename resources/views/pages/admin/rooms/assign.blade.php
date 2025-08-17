@@ -4,7 +4,7 @@
     <div class="max-w-2xl mx-auto p-6">
         <x-floating-actions />
 
-        <h1 class="text-3xl font-bold mb-6 text-gray-800">Assign Staff to Room</h1>
+        <h1 class="text-3xl font-bold mb-6 text-gray-800"><span class="text-primary">Assign</span> Staff to Room</h1>
 
         {{-- Room selection GET form --}}
         <div class="mb-6">
