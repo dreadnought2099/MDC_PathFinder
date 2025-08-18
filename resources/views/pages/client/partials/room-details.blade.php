@@ -46,9 +46,9 @@
     <!-- Cover Image -->
     @if ($room->image_path)
         <div>
-            <h2 class="text-lg font-semibold text-gray-700 mb-2">Cover Image</h2>
-            <img src="{{ asset('storage/' . $room->image_path) }}" alt="Cover Image"
-                class="w-full rounded-lg shadow-lg max-h-[400px] object-cover border border-gray-300 cursor-pointer"
+            <h2 class="text-lg font-semibold text-gray-700 mb-6">Cover Image</h2>
+            <img src="{{ Storage::url($room->image_path) }}" alt="Cover Image"
+                class="w-full max-h-[500px] object-cover cursor-pointer hover:scale-105 transition-all duration-500 ease-out rounded-lg"
                 onclick="openModal('{{ asset('storage/' . $room->image_path) }}')" />
         </div>
     @endif
@@ -87,18 +87,21 @@
             <h2 class="text-lg font-semibold text-gray-800 mb-3">Assigned Staff</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 @foreach ($room->staff as $member)
-                    <div class="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200">
-                        <div class="cursor-pointer"
-                            onclick="openModal('{{ Storage::url($member->photo_path ?? 'images/default.jpg') }}')">
+                    <div
+                        class="bg-gradient-to-br from-slate-50 to-white rounded-xl shadow-md hover:shadow-xl border border-slate-200 overflow-hidden group transform hover:scale-105 transition-all duration-300">
+                        <div class="cursor-pointer overflow-hidden"
+                            onclick="openModal('{{ Storage::url($member->photo_path ?? 'images/profile.jpeg') }}')">
                             <img src="{{ Storage::url($member->photo_path ?? 'images/default.jpg') }}"
-                                alt="{{ $member->name }}" class="w-full h-48 object-cover">
+                                alt="{{ $member->name }}"
+                                class="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500">
                         </div>
-                        <div class="p-4 text-center">
+                        <div class="p-6 text-center">
                             <a href="{{ route('staff.show', $member->id) }}"
-                                class="block text-lg font-semibold text-primary hover:underline">
+                                class="block text-xl font-bold text-slate-800 hover:text-blue-600 transition-colors duration-300 mb-2">
                                 {{ $member->name }}
                             </a>
-                            <p class="text-sm text-gray-600">{{ $member->position ?? 'No position' }}</p>
+                            <p class="text-slate-600 font-medium">
+                                {{ $member->position ?? 'No position assigned' }}</p>
                         </div>
                     </div>
                 @endforeach

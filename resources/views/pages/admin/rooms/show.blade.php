@@ -73,7 +73,6 @@
                 <section class="mb-12">
                     <div class="text-center mb-8">
                         <h3 class="text-3xl font-bold text-slate-800 mb-2">Video</h3>
-                        <div class="w-16 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full"></div>
                     </div>
                     <div class="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
                         <div class="overflow-hidden rounded-xl">
@@ -91,7 +90,6 @@
                 <section class="mb-12">
                     <div class="text-center mb-8">
                         <h3 class="text-3xl font-bold text-slate-800 mb-2">Image Gallery</h3>
-                        <div class="w-16 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full"></div>
                     </div>
                     <div class="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -124,7 +122,6 @@
                 <section class="mb-12">
                     <div class="text-center mb-8">
                         <h3 class="text-3xl font-bold text-slate-800 mb-2">Assigned Staff</h3>
-                        <div class="w-16 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full"></div>
                     </div>
                     <div class="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
