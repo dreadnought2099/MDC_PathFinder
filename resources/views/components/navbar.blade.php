@@ -1,13 +1,18 @@
 <nav class="bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16 items-center">
+        <div class="flex h-16 items-center">
+            <!-- Left side (back button) -->
+            <div class="flex-shrink-0">
+                @unless (Route::is('admin.dashboard') || Route::is('landing.page'))
+                    <x-back-button fallback="room.index" landing="admin.dashboard" />
+                @endunless
+            </div>
 
-            @unless (Route::is('admin.dashboard') || Route::is('landing.page'))
-                <x-back-button fallback="room.index" landing="admin.dashboard" />
-            @endunless
+            <!-- Spacer to push profile to the right -->
+            <div class="flex-grow"></div>
 
-            <!-- Profile Dropdown -->
-            <div x-data="{ open: false }" class="relative ml-auto" x-cloak>
+            <!-- Right side (profile) -->
+            <div class="relative" x-data="{ open: false }" x-cloak>
                 <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none cursor-pointer">
                     <img x-ref="navbarProfile"
                         src="{{ Auth::user()->profile_photo_path ? Storage::url(Auth::user()->profile_photo_path) : asset('images/profile.jpeg') }}"
@@ -17,9 +22,9 @@
                     </svg>
                 </button>
 
-                <!-- Dropdown Menu -->
+                <!-- Dropdown -->
                 <div x-show="open" x-cloak x-transition @click.away="open = false"
-                    class="absolute right-0 mt-2 w-48 bg-white border border-[#157ee1] rounded shadow-lg z-50 left-auto">
+                    class="absolute right-0 mt-2 w-48 bg-white border border-[#157ee1] rounded shadow-lg z-50">
                     <a href="{{ route('admin.profile') }}"
                         class="block px-4 py-2 text-sm text-[#157ee1] hover:bg-gray-100">Profile</a>
 
