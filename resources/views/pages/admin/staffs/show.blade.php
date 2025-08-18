@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="min-h-screen bg-gray-50 py-8 px-4">
+    <div class="min-h-screen bg-white py-8 px-4">
         <div class="max-w-2xl mx-auto">
 
             <!-- Floating Actions -->
