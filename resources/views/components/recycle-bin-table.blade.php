@@ -1,4 +1,4 @@
-@props(['items', 'routePrefix', 'title', 'emptyMessage'])
+@props(['items', 'routePrefix', 'title', 'emptyMessage', 'tab'])
 
 <div class="mb-12">
     <h2 class="text-2xl font-semibold text-center mb-8">{{ $title }}</h2>
@@ -11,7 +11,6 @@
                 <table class="min-w-full table-auto">
                     <thead class="bg-gray-100">
                         <tr>
-
                             <th class="px-6 py-4 text-left text-sm font-medium text-gray-700">ID</th>
                             <th class="px-6 py-4 text-left text-sm font-medium text-gray-700">Name</th>
                             <th class="px-6 py-4 text-left text-sm font-medium text-gray-700">Deleted At</th>
@@ -100,6 +99,7 @@
                                                 <form action="{{ route("{$routePrefix}.restore", $item->id) }}"
                                                     method="POST">
                                                     @csrf
+                                                    <input type="hidden" name="tab" value="{{ $tab }}">
                                                     <div class="flex justify-end space-x-3">
                                                         <button type="button"
                                                             onclick="hideModal('restoreModal-{{ $routePrefix }}-{{ $item->id }}')"
@@ -169,6 +169,8 @@
                                                     method="POST">
                                                     @csrf
                                                     @method('DELETE')
+                                                    <input type="hidden" name="tab"
+                                                        value="{{ $tab }}">
                                                     <div class="flex justify-end space-x-3">
                                                         <button type="button"
                                                             onclick="hideModal('deleteModal-{{ $routePrefix }}-{{ $item->id }}')"
