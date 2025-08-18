@@ -18,7 +18,7 @@
                 </button>
 
                 <!-- Dropdown Menu -->
-                <div x-show="open" x-transition @click.away="open = false"
+                <div x-show="open" x-cloak x-transition @click.away="open = false"
                     class="absolute right-0 mt-2 w-48 bg-white border border-[#157ee1] rounded shadow-lg z-50 left-auto">
                     <a href="{{ route('admin.profile') }}"
                         class="block px-4 py-2 text-sm text-[#157ee1] hover:bg-gray-100">Profile</a>

@@ -21,10 +21,10 @@
                 <table class="w-full">
                     <thead>
                         <tr class="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                            <th class="px-6 py-4 text-left text-sm text-gray-700 uppercase tracking-wide">
                                 Staff Member
                             </th>
-                            <th class="px-6 py-4 text-right text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                            <th class="px-6 py-4 text-right text-sm text-gray-700 uppercase tracking-wide">
                                 Actions
                             </th>
                         </tr>
@@ -82,7 +82,7 @@
                                             </svg>
                                         </div>
                                         <div class="text-center">
-                                            <h3 class="text-lg font-medium text-gray-900 mb-2">No staff members found</h3>
+                                            <h3 class="text-lg font-medium text-gray-700 mb-2">No staff members found</h3>
                                             <p class="text-gray-500 text-sm">Get started by adding your first team member.
                                             </p>
                                         </div>

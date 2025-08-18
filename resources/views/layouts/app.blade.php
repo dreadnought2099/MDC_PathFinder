@@ -9,9 +9,23 @@
     <title>{{ config('app.name') }}</title>
     @vite('resources/css/app.css')
     <link rel="icon" href="{{ asset('images/mdc-logo.png') }}">
+
+    <!-- Alpine.js CDN: Pinned to v3.14.1 for stability, loaded with defer to avoid render-blocking -->
+    <script src="https://unpkg.com/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
+
+    <!-- FilePond CSS: Moved to <head> for proper rendering, pinned to v4.31.1 for stability -->
+    <link href="https://unpkg.com/filepond@4.31.1/dist/filepond.min.css" rel="stylesheet">
+
+    <!-- x-cloak CSS: Ensures Alpine.js components (e.g., navbar dropdown) are hidden until initialized -->
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
 </head>
 
 <body>
+    <!-- Success/Error Message Container: Displays session messages or validation errors -->
     <div id="success-message-container" class="absolute top-24 right-4 z-49">
         @if (session('success') || session('error') || session('info') || $errors->any())
             <div id="message"
@@ -38,6 +52,7 @@
                 @endforeach
             </div>
 
+            <!-- Auto-hide message after 5 seconds with fade-out animation -->
             <script>
                 setTimeout(() => {
                     const messageDiv = document.getElementById('message');
@@ -51,147 +66,146 @@
             </script>
         @endif
     </div>
+
+    <!-- Navbar: Includes dropdown with x-cloak to prevent flash on page load -->
     @include('components.navbar')
 
-    {{-- Main Content --}}
+    <!-- Main Content: Yields content from child views (e.g., profile.blade.php) -->
     <main class="flex-grow container mx-auto px-4 py-6">
         @yield('content')
     </main>
 
-    <script src="//unpkg.com/alpinejs" defer></script>
+    <!-- FilePond JS: Pinned to v4.31.1, loaded at bottom of <body> to avoid blocking rendering -->
+    <script src="https://unpkg.com/filepond@4.31.1/dist/filepond.min.js"></script>
 
-    <!-- FilePond CSS -->
-    <link href="https://unpkg.com/filepond/dist/filepond.min.css" rel="stylesheet">
-
-    <!-- FilePond JS -->
-    <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
-
+    <!-- FilePond Initialization: Only runs if FilePond inputs exist to avoid unnecessary DOM parsing -->
     <script>
-        FilePond.registerPlugin(); // optional if you're using plugins
-        FilePond.parse(document.body);
+        if (document.querySelector('.filepond')) {
+            FilePond.parse(document.body);
+        }
     </script>
 
+    <!-- Form Submission Handler: Handles forms with data-upload attribute for file uploads -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Clears validation error messages and styling from form
+            function clearErrors(form) {
+                form.querySelectorAll('.field-error').forEach(n => n.remove());
+                form.querySelectorAll('.is-invalid').forEach(i => i.classList.remove('is-invalid'));
+            }
+
+            // Displays validation errors next to form inputs or via alert
+            function showErrors(form, errors) {
+                const messages = [];
+                for (let key in errors) {
+                    messages.push(...errors[key]);
+                    let base = key.split('.')[0]; // Handle nested fields (e.g., office_days.0)
+                    let input = form.querySelector(`[name="${key}"], [name="${base}"], [name="${base}[]"]`);
+                    if (input) {
+                        input.classList.add('is-invalid');
+                        const small = document.createElement('small');
+                        small.className = 'field-error text-red-600';
+                        small.innerText = errors[key][0];
+                        input.parentNode.insertBefore(small, input.nextSibling);
+                    }
+                }
+                if (messages.length) alert(messages.join("\n"));
+            }
+
+            // Attach submit handler to forms with data-upload attribute
+            document.querySelectorAll('form[data-upload]').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    clearErrors(form);
+
+                    const formData = new FormData(form);
+                    const xhr = new XMLHttpRequest();
+
+                    // Dispatch upload-start event for progress modal
+                    window.dispatchEvent(new CustomEvent('upload-start'));
+
+                    // Set up XHR request with CSRF token and headers
+                    const token = document.head.querySelector('meta[name="csrf-token"]')?.content;
+                    xhr.open((form.method || 'POST').toUpperCase(), form.action);
+                    if (token) xhr.setRequestHeader('X-CSRF-TOKEN', token);
+                    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                    xhr.setRequestHeader('Accept', 'application/json');
+
+                    // Update progress event for upload progress modal
+                    xhr.upload.addEventListener('progress', function(ev) {
+                        if (ev.lengthComputable) {
+                            const percent = Math.round((ev.loaded / ev.total) * 100);
+                            window.dispatchEvent(new CustomEvent('upload-progress', {
+                                detail: { progress: percent }
+                            }));
+                        }
+                    });
+
+                    // Handle successful response or redirect
+                    xhr.addEventListener('load', function() {
+                        window.dispatchEvent(new CustomEvent('upload-finish'));
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            try {
+                                const json = JSON.parse(xhr.responseText || '{}');
+                                if (json.redirect) {
+                                    window.location.href = json.redirect;
+                                    return;
+                                }
+                            } catch (err) {
+                                /* not JSON; ignore */
+                            }
+                            window.location.reload();
+                            return;
+                        }
+
+                        // Handle validation errors (422 status)
+                        if (xhr.status === 422) {
+                            let payload = {};
+                            try {
+                                payload = JSON.parse(xhr.responseText);
+                            } catch (e) {}
+                            if (payload.errors) {
+                                showErrors(form, payload.errors);
+                                return;
+                            }
+                        }
+
+                        // Handle other errors
+                        alert('Upload failed. Please try again.');
+                    });
+
+                    // Handle network errors
+                    xhr.addEventListener('error', function() {
+                        window.dispatchEvent(new CustomEvent('upload-finish'));
+                        alert('Network error. Upload failed.');
+                    });
+
+                    xhr.send(formData);
+                });
+            });
+
+            // Prevent navigation during uploads
+            let isUploading = false;
+            window.addEventListener('upload-start', () => {
+                isUploading = true;
+            });
+            window.addEventListener('upload-finish', () => {
+                isUploading = false;
+            });
+            window.addEventListener('beforeunload', (e) => {
+                if (isUploading) {
+                    e.preventDefault();
+                    e.returnValue = ''; // Show confirm dialog in Chrome
+                }
+            });
+        });
+    </script>
+
+    <!-- Yield additional scripts from child views (e.g., Cropper.js in profile.blade.php) -->
     @yield('scripts')
+
+    <!-- Upload Progress Modal: Used for forms with data-upload attribute -->
     <x-upload-progress-modal />
 </body>
 
 </html>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-
-        function clearErrors(form) {
-            form.querySelectorAll('.field-error').forEach(n => n.remove());
-            form.querySelectorAll('.is-invalid').forEach(i => i.classList.remove('is-invalid'));
-        }
-
-        function showErrors(form, errors) {
-            // flatten messages and alert as fallback
-            const messages = [];
-            for (let key in errors) {
-                messages.push(...errors[key]);
-                // try insert small message after the input if exists
-                let base = key.split('.')[0]; // handle office_days.0 etc
-                let input = form.querySelector(`[name="${key}"], [name="${base}"], [name="${base}[]"]`);
-                if (input) {
-                    input.classList.add('is-invalid');
-                    const small = document.createElement('small');
-                    small.className = 'field-error text-red-600';
-                    small.innerText = errors[key][0];
-                    input.parentNode.insertBefore(small, input.nextSibling);
-                }
-            }
-            if (messages.length) alert(messages.join("\n"));
-        }
-
-        document.querySelectorAll('form[data-upload]').forEach(form => {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                clearErrors(form);
-
-                const formData = new FormData(form);
-                const xhr = new XMLHttpRequest();
-
-                // dispatch start event (component listens)
-                window.dispatchEvent(new CustomEvent('upload-start'));
-
-                // headers
-                const token = document.head.querySelector('meta[name="csrf-token"]')?.content;
-                xhr.open((form.method || 'POST').toUpperCase(), form.action);
-
-                if (token) xhr.setRequestHeader('X-CSRF-TOKEN', token);
-                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-                xhr.setRequestHeader('Accept', 'application/json');
-
-                xhr.upload.addEventListener('progress', function(ev) {
-                    if (ev.lengthComputable) {
-                        const percent = Math.round((ev.loaded / ev.total) * 100);
-                        window.dispatchEvent(new CustomEvent('upload-progress', {
-                            detail: {
-                                progress: percent
-                            }
-                        }));
-                    }
-                });
-
-                xhr.addEventListener('load', function() {
-                    window.dispatchEvent(new CustomEvent('upload-finish'));
-                    // success HTTP 2xx
-                    if (xhr.status >= 200 && xhr.status < 300) {
-                        try {
-                            const json = JSON.parse(xhr.responseText || '{}');
-                            if (json.redirect) {
-                                window.location.href = json.redirect;
-                                return;
-                            }
-                        } catch (err) {
-                            /* not JSON; ignore */ }
-                        // fallback: reload
-                        window.location.reload();
-                        return;
-                    }
-
-                    // Validation errors (Laravel returns 422 with JSON)
-                    if (xhr.status === 422) {
-                        let payload = {};
-                        try {
-                            payload = JSON.parse(xhr.responseText);
-                        } catch (e) {}
-                        if (payload.errors) {
-                            showErrors(form, payload.errors);
-                            return;
-                        }
-                    }
-
-                    // other errors
-                    alert('Upload failed. Please try again.');
-                });
-
-                xhr.addEventListener('error', function() {
-                    window.dispatchEvent(new CustomEvent('upload-finish'));
-                    alert('Network error. Upload failed.');
-                });
-
-                xhr.send(formData);
-            });
-        });
-
-        let isUploading = false;
-
-        window.addEventListener('upload-start', () => {
-            isUploading = true;
-        });
-
-        window.addEventListener('upload-finish', () => {
-            isUploading = false;
-        });
-
-        window.addEventListener('beforeunload', (e) => {
-            if (isUploading) {
-                e.preventDefault();
-                e.returnValue = ''; // Required for Chrome to show confirm dialog
-            }
-        });
-    });
-</script>

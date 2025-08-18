@@ -80,7 +80,7 @@
                                             </svg>
                                         </div>
                                         <div class="text-center">
-                                            <h3 class="text-lg font-medium text-gray-900 mb-2">No rooms found</h3>
+                                            <h3 class="text-lg font-medium text-gray-700 mb-2">No rooms found</h3>
                                             <p class="text-gray-500 text-sm">Add your first room to get started.</p>
                                         </div>
                                     </div>
