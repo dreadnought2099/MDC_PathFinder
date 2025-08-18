@@ -9,7 +9,7 @@
             <h2 class="text-2xl text-center mb-6">Profile</h2>
 
             <!-- Profile Image Wrapper -->
-            <div class="relative w-40 h-40 mx-auto mb-4">
+            <div class="relative w-40 h-40 mx-auto mb-16">
                 <img src="{{ $user->profile_photo_path ? asset('storage/' . $user->profile_photo_path) . '?v=' . time() : asset('images/profile.jpeg') }}"
                     alt="Profile" class="w-full h-full rounded-full object-cover border">
 
