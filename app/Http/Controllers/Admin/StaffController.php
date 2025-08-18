@@ -60,6 +60,11 @@ class StaffController extends Controller
         return view('pages.admin.staffs.show', compact('staff'));
     }
 
+    public function clientShow(Staff $staff) 
+    {
+        return view('pages.client.client-show', compact('staff'));
+    }
+
     public function edit($id)
     {
         $staff = Staff::findOrFail($id);

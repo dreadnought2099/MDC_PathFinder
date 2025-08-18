@@ -22,6 +22,9 @@ Route::get('/', [HomeController::class, 'index'])->name('index');
 // AR Tour page - scan QR codes to view room information
 Route::get('/scan-marker', [TourController::class, 'index'])->name('ar.view');
 
+// Client-facing staff profile
+Route::get('/staffs/{staff}', [StaffController::class, 'clientShow'])->name('staffs.client-show');
+
 /*
 |--------------------------------------------------------------------------
 | Admin Authentication Routes
