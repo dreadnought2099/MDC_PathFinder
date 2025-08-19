@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="max-w-xl mx-auto mt-10">
-        <h2 class="text-2xl text-center mb-6">Add Staff Member</h2>
+    <div class="max-w-xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-6">
+        <h2 class="text-2xl text-center mb-6"><span class="text-primary">Add</span> Staff Member</h2>
 
         <form action="{{ route('staff.store') }}" method="POST" enctype="multipart/form-data" data-upload>
             @csrf
@@ -40,7 +40,7 @@
             <div>
                 <button type="submit"
                     class="bg-primary text-white px-4 py-2 bg-primary rounded hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer">
-                    Create Staff
+                    Save Staff
                 </button>
             </div>
         </form>

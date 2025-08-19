@@ -1,24 +1,24 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="max-w-xl mx-auto mt-10">
-        <h2 class="text-2xl text-center font-bold mb-6">Add New <span class="text-primary">Room/Office</span></h2>
+    <div class="max-w-xl mx-auto mt-10 border-2 border-primary p-6 rounded-lg shadow-2xl">
+        <h2 class="text-2xl text-center font-bold mb-6"><span class="text-primary">Add</span> New Office</h2>
 
         <form action="{{ route('room.store') }}" method="POST" enctype="multipart/form-data" data-upload>
             @csrf
 
             <div class="mb-4">
-                <label class="block text-gray-600">Room/Office Name</label>
+                <label class="block">Office Name</label>
                 <input type="text" name="name" class="w-full border p-2 rounded" required>
             </div>
 
             <div class="mb-4">
-                <label class="block text-gray-600">Description</label>
+                <label class="block">Description</label>
                 <textarea name="description" class="w-full border p-2 rounded"></textarea>
             </div>
 
-            <div class="mb-4 text-gray-600">
-                <label class="block mb-2 font-semibold text-gray-700">Cover Image (optional)</label>
+            <div class="mb-4">
+                <label class="block mb-2">Cover Image (optional)</label>
 
                 <label for="image_path" id="uploadBox"
                     class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors overflow-hidden relative">
@@ -33,8 +33,8 @@
             </div>
 
             {{-- Carousel Images --}}
-            <div class="mb-4 text-gray-600 max-w-xl mx-auto">
-                <label class="block mb-2 font-semibold text-gray-700">Carousel Images (optional)</label>
+            <div class="mb-4 max-w-xl mx-auto">
+                <label class="block mb-2">Carousel Images (optional)</label>
 
                 <label for="carousel_images" id="carouselUploadBox"
                     class="flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors p-4 overflow-auto relative">
@@ -54,8 +54,8 @@
             </div>
 
 
-            <div class="mb-4 text-gray-600 max-w-xl mx-auto">
-                <label class="block mb-2 font-semibold text-gray-700">Short Video (optional)</label>
+            <div class="mb-4 max-w-xl mx-auto">
+                <label class="block mb-2">Short Video (optional)</label>
 
                 <div id="videoDropZone"
                     class="relative w-full min-h-[150px] border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center text-gray-500 cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors p-4">
@@ -79,8 +79,8 @@
                 </div>
             </div>
 
-            <div class="mb-4 text-gray-600 max-w-sm">
-                <label class="block mb-1 font-semibold">Office Hours</label>
+            <div class="mb-4 max-w-sm">
+                <label class="block mb-1">Office Hours</label>
 
                 <div class="flex flex-wrap gap-4 mb-4">
                     @php
@@ -113,7 +113,7 @@
                             </div>
 
                             <span
-                                class="text-gray-800 font-semibold peer-focus:text-blue-600 peer-checked:text-blue-600 transition-colors duration-200">
+                                class="peer-focus:text-blue-600 peer-checked:text-blue-600 transition-colors duration-200">
                                 {{ $day }}
                             </span>
                         </label>
