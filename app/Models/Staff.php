@@ -12,7 +12,11 @@ class Staff extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'name',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'suffix',
+        'credentials',
         'position',
         'bio',
         'email',
@@ -24,5 +28,14 @@ class Staff extends Model
     public function room()
     {
         return $this->belongsTo(Room::class);
-    }   
+    }
+
+    // Accessor to trim Staff Name
+    public function getFullNameAttribute()
+    {
+        return trim($this->first_name . ' ' .
+            ($this->middle_name ? $this->middle_name . ' ' : '') .
+            $this->last_name .
+            ($this->suffix ? ' ' . $this->suffix : ''));
+    }
 }

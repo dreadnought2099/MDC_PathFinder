@@ -14,10 +14,14 @@ return new class extends Migration
         Schema::create('staff', function (Blueprint $table) {
             $table->id();
             $table->foreignId('room_id')
-                    ->nullable()
-                    ->constrained('rooms')
-                    ->onDelete('set null');
-            $table->string('name');
+                ->nullable()
+                ->constrained('rooms')
+                ->onDelete('set null');
+            $table->string('first_name');
+            $table->string('middle_name')->nullable();
+            $table->string('last_name');
+            $table->string('suffix')->nullable();   // Jr., Sr., II, III, IV
+            $table->string('credentials')->nullable(); // MD, RN, CPA, PhD, LPT
             $table->string('position')->nullable();
             $table->text('bio')->nullable();
             $table->string('email')->nullable();

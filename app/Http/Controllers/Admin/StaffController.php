@@ -27,7 +27,11 @@ class StaffController extends Controller
     {
         $validated = $request->validate([
             'room_id'   => 'nullable|exists:rooms,id',
-            'name'      => 'required|string|max:255',
+            'first_name'    => 'required|string|max:255',
+            'middle_name'    => 'required|string|max:255',
+            'last_name'    => 'required|string|max:255',
+            'suffix'    => 'nullable|string|max:50',
+            'credentials'    => 'nullable|string|max:255',
             'position'  => 'nullable|string|max:255',
             'bio'       => 'nullable|string',
             'email'     => 'nullable|email|max:255|unique:staff,email',
@@ -45,14 +49,14 @@ class StaffController extends Controller
             $staff->update(['photo_path' => $path]);
         }
 
-        session()->flash('success', "{$staff->name} was added successfully.");
+        session()->flash('success', "{$staff->full_name} was added successfully.");
 
         if ($request->expectsJson()) {
             return response()->json(['redirect' => route('staff.show', $staff->id)], 200);
         }
 
         return redirect()->route('staff.index')
-            ->with('success', "{$staff->name} was added successfully.");
+            ->with('success', "{$staff->full_name} was added successfully.");
     }
 
     public function show(Staff $staff)
@@ -60,7 +64,7 @@ class StaffController extends Controller
         return view('pages.admin.staffs.show', compact('staff'));
     }
 
-    public function clientShow(Staff $staff) 
+    public function clientShow(Staff $staff)
     {
         return view('pages.client.client-show', compact('staff'));
     }
@@ -78,7 +82,11 @@ class StaffController extends Controller
 
         $validated = $request->validate([
             'room_id'   => 'nullable|exists:rooms,id',
-            'name'      => 'required|string|max:255',
+            'first_name'    => 'required|string|max:255',
+            'middle_name'    => 'required|string|max:255',
+            'last_name'    => 'required|string|max:255',
+            'suffix'    => 'nullable|string|max:50',
+            'credentials'    => 'nullable|string|max:255',
             'position'  => 'nullable|string|max:255',
             'bio'       => 'nullable|string',
             'email' => [
@@ -112,27 +120,27 @@ class StaffController extends Controller
         // Update staff with all validated data (including photo_path if uploaded)
         $staff->update($validated);
 
-        session()->flash('success', "{$staff->name} updated successfully.");
+        session()->flash('success', "{$staff->full_name} updated successfully.");
 
         if ($request->expectsJson()) {
             return response()->json(['redirect' => route('staff.show', $staff->id)], 200);
         }
 
-        return redirect()->route('staff.index')->with('success', "{$staff->name} updated successfully.");
+        return redirect()->route('staff.index')->with('success', "{$staff->full_name} updated successfully.");
     }
 
     public function destroy($id)
     {
         $staff = Staff::findOrFail($id);
         $staff->delete();
-        return redirect()->route('staff.index')->with('success', "{$staff->name} moved to recycle bin");
+        return redirect()->route('staff.index')->with('success', "{$staff->full_name} moved to recycle bin");
     }
 
     public function restore($id)
     {
         $staff = Staff::onlyTrashed()->findOrFail($id);
         $staff->restore();
-        return redirect()->route('staff.recycle-bin')->with('success', "{$staff->name} restored successfully.");
+        return redirect()->route('staff.recycle-bin')->with('success', "{$staff->full_name} restored successfully.");
     }
 
     public function forceDelete($id)
@@ -145,6 +153,6 @@ class StaffController extends Controller
 
         $staff->forceDelete();
 
-        return redirect()->route('staff.recycle-bin')->with('success', "{$staff->name} permanently deleted.");
+        return redirect()->route('staff.recycle-bin')->with('success', "{$staff->full_name} permanently deleted.");
     }
 }

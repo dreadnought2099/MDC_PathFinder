@@ -19,7 +19,20 @@
 
             <!-- Header -->
             <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6">
-                <h1 class="text-3xl font-bold text-white">{{ $staff->name }}</h1>
+                <h3 class="text-2xl text-white">
+                    {{ $staff->first_name }}
+                    @if ($staff->middle_name)
+                        {{ $staff->middle_name }}
+                    @endif
+                    {{ $staff->last_name }}
+                    @if ($staff->suffix)
+                        {{ $staff->suffix }}
+                    @endif
+                    @if ($staff->credentials)
+                        , {{ $staff->credentials }}
+                    @endif
+                </h3>
+
             </div>
 
             <!-- Content -->

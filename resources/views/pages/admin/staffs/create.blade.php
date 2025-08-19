@@ -8,8 +8,40 @@
             @csrf
 
             <div class="mb-4">
-                <label class="block">Full Name</label>
-                <input type="text" name="name" class="w-full border p-2 rounded" required>
+                <label class="block">First Name</label>
+                <input type="text" name="first_name" class="w-full border p-2 rounded" required>
+            </div>
+
+            <div class="mb-4">
+                <label class="block">Last Name</label>
+                <input type="text" name="last_name" class="w-full border p-2 rounded" required>
+            </div>
+
+            <div class="mb-4">
+                <label class="block">Middle Name</label>
+                <input type="text" name="middle_name" class="w-full border p-2 rounded" required>
+            </div>
+
+            <div class="mb-4">
+                <label class="block font-medium">Suffix (Optional)</label>
+                <select name="suffix" class="w-full border p-2 rounded">
+                    <option value="">None</option>
+                    <option value="Jr.">Jr.</option>
+                    <option value="Sr.">Sr.</option>
+                    <option value="II">II</option>
+                    <option value="III">III</option>
+                    <option value="V">V</option>
+                    <option value="VI">VI</option>
+                    <option value="VII">VII</option>
+                    <option value="VIII">VIII</option>
+                    <option value="IX">IX</option>
+                    <option value="X">X</option>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label class="block font-medium">Professional Credentials (Optional)</label>
+                <input type="text" name="credentials" class="w-full border p-2 rounded" placeholder="e.g. MD, CPA, RN">
             </div>
 
             <div class="mb-4">
