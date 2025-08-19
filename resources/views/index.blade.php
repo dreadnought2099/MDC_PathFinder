@@ -10,7 +10,7 @@
 
         <!-- Button at the bottom -->
         <a href="{{ route('ar.view') }}"
-            class="bg-primary hover:bg-white hover:text-primary text-white py-2 px-6 rounded-xl shadow-lg border border-primary transition-all duration-300">
+            class="bg-primary hover:bg-white hover:text-primary text-white py-4 text-xl px-6 rounded-2xl shadow-lg border border-primary transition-all duration-300">
             Start Campus Tour
         </a>
     </div>

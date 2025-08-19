@@ -99,7 +99,7 @@
                         </div>
                         <div class="p-6 text-center">
                             <a href="{{ route('staff.client-show', $member->id) }}"
-                                class="block text-lg font-bold text-slate-800 hover:text-primary transition-colors mb-1">
+                                class="block text-lg font-bold text-slate-800 hover:text-primary transition-colors mb-1" target="_blank" rel="noopener noreferrer">
                                 {{ $member->full_name }}
                             </a>
                             <p class="text-slate-600 text-sm">
