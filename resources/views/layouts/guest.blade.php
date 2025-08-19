@@ -46,7 +46,7 @@
         </script>
     </div>
 
-    <main class="@yield('main-class', 'container mx-auto p-4')">
+    <main class="@yield('main-class', 'container mx-auto')">
         @yield('content')
     </main>
 

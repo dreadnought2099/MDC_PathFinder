@@ -71,7 +71,7 @@
     @include('components.navbar')
 
     <!-- Main Content: Yields content from child views (e.g., profile.blade.php) -->
-    <main class="flex-grow container mx-auto px-4 py-6">
+    <main class="flex-grow container mx-auto">
         @yield('content')
     </main>
 

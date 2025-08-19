@@ -1,6 +1,6 @@
 @props(['staff'])
 
-<div class="min-h-screen bg-red-200 py-8 px-4">
+<div class="min-h-screen bg-white py-8 px-4">
     <div class="max-w-2xl mx-auto">
 
         <!-- Floating Actions for admin access only -->

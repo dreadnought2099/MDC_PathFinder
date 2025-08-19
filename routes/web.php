@@ -23,7 +23,7 @@ Route::get('/', [HomeController::class, 'index'])->name('index');
 Route::get('/scan-marker', [TourController::class, 'index'])->name('ar.view');
 
 // Client-facing staff profile
-Route::get('/staffs/{staff}', [StaffController::class, 'clientShow'])->name('staffs.client-show');
+Route::get('/staffs/{staff}', [StaffController::class, 'clientShow'])->name('staff.client-show');
 
 /*
 |--------------------------------------------------------------------------

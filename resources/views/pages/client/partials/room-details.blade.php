@@ -98,7 +98,7 @@
                                 class="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500">
                         </div>
                         <div class="p-6 text-center">
-                            <a href="{{ route('staffs.client-show', $member->id) }}"
+                            <a href="{{ route('staff.client-show', $member->id) }}"
                                 class="block text-lg font-bold text-slate-800 hover:text-primary transition-colors mb-1">
                                 {{ $member->full_name }}
                             </a>
