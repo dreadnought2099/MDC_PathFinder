@@ -1,8 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="max-w-xl mx-auto mt-10 border-2 border-primary p-6 rounded-lg shadow-2xl">
-        <h2 class="text-2xl text-center font-bold mb-6"><span class="text-primary">Add</span> New Office</h2>
+    <x-floating-actions />
+
+    <div class="max-w-xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-6">
+        <h2 class="text-2xl text-center mb-6"><span class="text-primary">Add</span> New Office</h2>
 
         <form action="{{ route('room.store') }}" method="POST" enctype="multipart/form-data" data-upload>
             @csrf

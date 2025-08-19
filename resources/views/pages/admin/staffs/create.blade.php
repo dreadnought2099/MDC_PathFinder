@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
+    <x-floating-actions />
+
     <div class="max-w-xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-6">
         <h2 class="text-2xl text-center mb-6"><span class="text-primary">Add</span> Staff Member</h2>
 
