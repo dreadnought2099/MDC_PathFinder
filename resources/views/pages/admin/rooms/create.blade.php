@@ -134,7 +134,7 @@
 
             <div>
                 <button type="submit"
-                    class="bg-primary text-white px-4 py-2 bg-primary rounded hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer">
+                    class="w-full bg-primary text-white px-4 py-2 bg-primary rounded-xl hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer">
                     Save Room
                 </button>
             </div>
