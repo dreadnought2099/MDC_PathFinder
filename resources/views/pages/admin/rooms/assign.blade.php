@@ -45,7 +45,7 @@
                                     class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary focus:ring-2"
                                     @if ($isSelectedRoom) checked @endif
                                     @if ($isAssignedOtherRoom) disabled @endif>
-                                <span class="{{ $textClass }} font-medium">{{ $member->name }}</span>
+                                <span class="{{ $textClass }} font-medium">{{ $member->first_name }} {{ $member->last_name }}</span>
                             </label>
                         @endforeach
                     </div>

@@ -145,7 +145,7 @@
                     @method('DELETE')
                     <div class="flex justify-end space-x-3">
                         <button type="button" onclick="closeModal()"
-                            class="px-4 py-2 text-sm font-medium  border-1 border-gray-400 hover:text-white hover:bg-gray-400 rounded-lg transition-all duration-300 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 cursor-pointer">
+                            class="px-4 py-2 text-sm font-medium border border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-lg transition-all duration-300 cursor-pointer">
                             Cancel
                         </button>
                         <button type="submit"
