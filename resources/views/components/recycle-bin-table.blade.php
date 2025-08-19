@@ -19,12 +19,17 @@
                     </thead>
                     <tbody class="divide-y divide-gray-200">
                         @foreach ($items as $item)
+                            {{-- Fallback for Staff Name --}}
+                            @php
+                                $displayName = $item->name ?? trim($item->first_name . ' ' . $item->last_name);
+                            @endphp
+
                             <tr class="hover:bg-gray-50 transition-colors duration-200">
                                 <td class="px-6 py-4">
                                     <div class="text-sm font-medium text-gray-900">{{ $item->id }}</div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <div class="text-sm font-medium text-gray-900">{{ $item->first_name }} {{ $item->last_name }}</div>
+                                    <div class="text-sm font-medium text-gray-900">{{ $displayName }}</div>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="text-sm text-gray-600">
@@ -89,7 +94,7 @@
                                                         <p class="text-gray-700 leading-relaxed">
                                                             Are you sure you want to restore
                                                             <span
-                                                                class="font-medium text-blue-600">{{ $item->name }}</span>?
+                                                                class="font-medium text-blue-600">{{ $displayName }}</span>?
                                                         </p>
                                                     </div>
                                                 </div>
@@ -157,7 +162,7 @@
                                                         <p class="text-gray-700 leading-relaxed">
                                                             Are you sure you want to permanently delete
                                                             <span
-                                                                class="font-medium text-red-600">{{ $item->name }}</span>?
+                                                                class="font-medium text-red-600">{{ $displayName }}</span>?
                                                             This action cannot be undone.
                                                         </p>
                                                     </div>

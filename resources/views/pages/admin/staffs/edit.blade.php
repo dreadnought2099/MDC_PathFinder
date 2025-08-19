@@ -94,7 +94,7 @@
                         <!-- Credentials Field -->
                         <div>
                             <label class="block text-sm font-semibold text-gray-800 mb-2">Credentials</label>
-                            <input type="text" name="name" value="{{ old('name', $staff->credentials) }}"
+                            <input type="text" name="credentials" value="{{ old('credentials', $staff->credentials) }}"
                                 class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300">
                             @error('name')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>

@@ -28,7 +28,7 @@ class StaffController extends Controller
         $validated = $request->validate([
             'room_id'   => 'nullable|exists:rooms,id',
             'first_name'    => 'required|string|max:255',
-            'middle_name'    => 'required|string|max:255',
+            'middle_name'    => 'nullable|string|max:255',
             'last_name'    => 'required|string|max:255',
             'suffix'    => 'nullable|string|max:50',
             'credentials'    => 'nullable|string|max:255',
@@ -83,7 +83,7 @@ class StaffController extends Controller
         $validated = $request->validate([
             'room_id'   => 'nullable|exists:rooms,id',
             'first_name'    => 'required|string|max:255',
-            'middle_name'    => 'required|string|max:255',
+            'middle_name'    => 'nullable|string|max:255',
             'last_name'    => 'required|string|max:255',
             'suffix'    => 'nullable|string|max:50',
             'credentials'    => 'nullable|string|max:255',
