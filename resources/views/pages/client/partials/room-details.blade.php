@@ -124,7 +124,7 @@
 <!-- Reusable Image Modal Markup -->
 <div id="imageModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
     <button onclick="closeModal()"
-        class="absolute top-5 right-5 text-gray-300 text-6xl hover:text-red-600 cursor-pointer">&times;</button>
+        class="absolute top-5 right-5 text-gray-300 text-8xl hover:text-secondary cursor-pointer">&times;</button>
     <img id="modalImage" src="" alt="Full Image" class="max-w-full max-h-full rounded shadow-lg" />
 </div>
 

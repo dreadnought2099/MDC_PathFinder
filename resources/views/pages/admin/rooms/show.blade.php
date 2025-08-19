@@ -191,7 +191,7 @@
         <div id="imageModal"
             class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
             <button onclick="closeModal()"
-                class="absolute top-5 right-5 text-white/80 text-6xl hover:text-red-400 cursor-pointer transition-colors duration-300 z-10">&times;</button>
+                class="absolute top-5 right-5 text-white/80 text-8xl hover:text-secondary cursor-pointer transition-colors duration-300 z-10">&times;</button>
             <img id="modalImage" src="" alt="Full Image" class="max-w-full max-h-full rounded-xl shadow-2xl" />
         </div>
     </div>
