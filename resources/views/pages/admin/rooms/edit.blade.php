@@ -3,9 +3,9 @@
 @section('content')
     <x-floating-actions />
 
-    <div class="max-w-4xl mx-auto mt-10 p-6 bg-white rounded shadow">
+    <div class="max-w-4xl mx-auto mt-10 p-10 bg-white border-1 border-primary rounded-lg shadow">
 
-        <h2 class="text-2xl font-bold mb-6 text-center"><span class="text-primary">Edit {{ $room->name }}</span></h2>
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-2"><span class="text-primary">Edit</span> {{ $room->name }}</h2>
 
         @if ($errors->any())
             <div class="mb-4 p-4 bg-red-100 text-red-700 rounded">
@@ -163,7 +163,7 @@
             {{-- Submit --}}
             <div>
                 <button type="submit"
-                    class="bg-primary text-white px-4 py-2 rounded hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer">
+                    class="w-full bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary transition-all duration-300 px-6 py-3 rounded-xl shadow-md hover:shadow-lg cursor-pointer">
                     Update Room
                 </button>
             </div>

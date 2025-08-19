@@ -21,7 +21,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
                 <!-- Manage Staff Card -->
-                <a href="{{ route('staff.index') }}" class="group card-shadow-hover shadow-primary-hover p-6">
+                <a href="{{ route('staff.index') }}" class="group card-shadow-hover shadow-primary-hover p-6 border-2 border-primary">
 
                     <div class="flex flex-col items-center text-center space-y-4">
                         <div class="bg-primary-10 hover:bg-primary-20 p-4 rounded-full transition-all duration-300">
@@ -42,7 +42,7 @@
 
                 <!-- Manage Rooms Card -->
                 <a href="{{ route('room.index') }}"
-                    class="group card-shadow-hover shadow-primary-hover p-6">
+                    class="group card-shadow-hover shadow-primary-hover p-6 border-2 border-primary">
                     <div class="flex flex-col items-center text-center space-y-4">
                         <div
                             class="bg-primary-10 hover:bg-primary-20 p-4 rounded-full transition-all duration-300">
@@ -61,7 +61,7 @@
 
                 <!-- Assign Staff Card -->
                 <a href="{{ route('room.assign') }}"
-                    class="group card-shadow-hover shadow-primary-hover p-6">
+                    class="group card-shadow-hover shadow-primary-hover p-6 border-2 border-primary">
                     <div class="flex flex-col items-center text-center space-y-4">
                         <div
                             class="bg-primary-10 hover:bg-primary-20 p-4 rounded-full transition-all duration-300">
@@ -80,7 +80,7 @@
 
                 <!-- Recycle Bin Card -->
                 <a href="{{ route('room.recycle-bin') }}"
-                    class="group card-shadow-hover shadow-primary-hover p-6">
+                    class="group card-shadow-hover shadow-primary-hover p-6 border-2 border-primary">
                     <div class="flex flex-col items-center text-center space-y-4">
                         <div class="bg-primary-10 hover:bg-primary-20 p-4 rounded-full transition-all duration-300">
                             <img src="{{ asset('icons/recycle-bin.png') }}" alt="Recycle Bin"
@@ -98,12 +98,12 @@
             </div>
 
             <!-- Quick Stats Section (Optional) -->
-            <div class="bg-white rounded-xl shadow-md p-6">
+            <div class="bg-white rounded-xl shadow-md p-6 border-2 border-primary">
                 <h2 class="text-2xl text-gray-800 mb-6 text-center">Quick Overview</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
                     <!-- Total Staff -->
-                    <div class="text-center p-4 bg-blue-50 rounded-lg">
+                    <div class="text-center p-4 bg-blue-50 rounded-lg border-2 border-primary">
                         <div class="text-3xl font-bold text-blue-600 mb-2">
                             {{ \App\Models\Staff::count() }}
                         </div>
@@ -111,7 +111,7 @@
                     </div>
 
                     <!-- Total Rooms -->
-                    <div class="text-center p-4 bg-green-50 rounded-lg">
+                    <div class="text-center p-4 bg-green-50 rounded-lg border-2 border-green-600">
                         <div class="text-3xl font-bold text-green-600 mb-2">
                             {{ \App\Models\Room::count() }}
                         </div>
@@ -119,7 +119,7 @@
                     </div>
 
                     <!-- Assignments -->
-                    <div class="text-center p-4 bg-purple-50 rounded-lg">
+                    <div class="text-center p-4 bg-purple-50 rounded-lg border-2 border-purple-600">
                         <div class="text-3xl font-bold text-purple-600 mb-2">
                             {{ \App\Models\Staff::whereNotNull('room_id')->count() }}
                         </div>

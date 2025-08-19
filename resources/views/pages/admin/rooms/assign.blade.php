@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="max-w-2xl mx-auto p-6">
+    <div class="max-w-2xl mx-auto p-6 border border-primary rounded-lg">
         <x-floating-actions />
 
-        <h1 class="text-3xl font-bold mb-6 text-gray-800"><span class="text-primary">Assign</span> Staff to Room</h1>
+        <h1 class="text-3xl text-center font-bold mb-6 text-gray-800"><span class="text-primary">Assign</span> Staff to Room</h1>
 
         {{-- Room selection GET form --}}
         <div class="mb-6">
@@ -51,9 +51,9 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end">
+                <div class="flex justify-start">
                     <button type="submit"
-                        class="bg-primary text-white px-6 py-3 rounded-lg hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer font-medium">
+                        class="w-full bg-primary text-white px-6 py-3 rounded-xl hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer">
                         Assign
                     </button>
                 </div>

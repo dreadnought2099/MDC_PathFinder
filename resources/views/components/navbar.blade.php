@@ -24,9 +24,9 @@
 
                 <!-- Dropdown -->
                 <div x-show="open" x-cloak x-transition @click.away="open = false"
-                    class="absolute right-0 mt-2 w-48 bg-white border border-[#157ee1] rounded shadow-lg z-50">
+                    class="absolute right-0 mt-2 w-48 bg-white border-2 border-primary rounded shadow-lg z-50">
                     <a href="{{ route('admin.profile') }}"
-                        class="block px-4 py-2 text-sm text-[#157ee1] hover:bg-gray-100">Profile</a>
+                        class="block px-4 py-2 text-sm text-primary hover:bg-gray-100">Profile</a>
 
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf

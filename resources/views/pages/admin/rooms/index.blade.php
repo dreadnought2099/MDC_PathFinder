@@ -16,7 +16,7 @@
         </div>
 
         <!-- Room Table Container -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-primary">
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead>
