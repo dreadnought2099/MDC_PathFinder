@@ -22,9 +22,9 @@
 @layer base {
     :root {
         --color-primary: #157ee1;
-        --color-secondary: #FB4141;
+        --color-secondary: #fb4141;
         --color-edit: #e1a224;
-        --color-tertiary: #16C47F;
+        --color-tertiary: #16c47f;
     }
 
     ::selection {
@@ -223,6 +223,19 @@
 
     .hover\:bg-primary-20:hover {
         background-color: rgba(21, 126, 225, 0.2);
+    }
+
+    /* Secondary background with opacity */
+    .bg-secondary-10 {
+        background-color: rgba(251, 65, 65, 0.1);
+    }
+
+    .bg-secondary-20 {
+        background-color: rgba(251, 65, 65, 0.2);
+    }
+
+    .hover\:bg-secondary-20:hover {
+        background-color: rgba(251, 65, 65, 0.2);
     }
 
     /* Box shadow variations for different intensities */

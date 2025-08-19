@@ -1,7 +1,7 @@
 @props(['staff'])
 
 
-<div class="min-h-screen bg-white py-8 px-4">
+<div class="min-h-screen bg-red-200 py-8 px-4">
     <div class="max-w-2xl mx-auto">
 
         <!-- Floating Actions for admin access only -->
@@ -15,7 +15,7 @@
 
 
         <!-- Profile Card -->
-        <div class="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-primary">
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden border-b-2 border-l-2 border-r-2 border-primary">
 
             <!-- Header -->
             <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6">

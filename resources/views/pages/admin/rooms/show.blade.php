@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div class="min-h-screen">
         <div class="container mx-auto p-8 max-w-6xl">
             <x-floating-actions />
 
@@ -136,7 +136,7 @@
                                     </div>
                                     <div class="p-6 text-center">
                                         <a href="{{ route('staff.show', $member->id) }}"
-                                            class="block text-xl font-bold text-slate-800 hover:text-blue-600 transition-colors duration-300 mb-2">
+                                            class="block text-xl font-bold text-slate-800 hover:text-primary transition-colors duration-300 mb-2">
                                             {{ $member->full_name }}
                                         </a>
                                         <p class="text-slate-600 font-medium">
