@@ -18,9 +18,6 @@ class Room extends Model
         'marker_id',
         'image_path',
         'video_path',
-        'office_days',
-        'office_hours_start',
-        'office_hours_end',
     ];
 
 
@@ -35,14 +32,34 @@ class Room extends Model
         return $this->hasMany(RoomImage::class);
     }
 
-    public function getOfficeHoursFormattedAttribute()
+    public function officeHours() 
     {
-        if ($this->office_days && $this->office_hours_start && $this->office_hours_end) {
-            $days = str_replace(',', ', ', $this->office_days);
-            $start = date('H:i', strtotime($this->office_hours_start));
-            $end = date('H:i', strtotime($this->office_hours_end));
-            return "{$days} {$start} - {$end}";
+        return $this->hasMany(OfficeHour::class);
+    }
+
+    public function getFormattedOfficeHoursAttribute()
+    {
+        if ($this->officeHours->isEmpty()) {
+            return 'No office hours set';
         }
-        return null;
+
+        $output = [];
+
+        // Days in order
+        $daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+        foreach ($daysOfWeek as $day) {
+            $record = $this->officeHours->firstWhere('day', $day);
+
+            if ($record && $record->start_time && $record->end_time) {
+                $start = \Carbon\Carbon::parse($record->start_time)->format('g:i A'); // 8:00 AM
+                $end   = \Carbon\Carbon::parse($record->end_time)->format('g:i A');   // 5:00 PM
+                $output[] = "{$day}: {$start} - {$end}";
+            } else {
+                $output[] = "{$day}: Closed";
+            }
+        }
+
+        return implode("\n", $output); // line break per day
     }
 }

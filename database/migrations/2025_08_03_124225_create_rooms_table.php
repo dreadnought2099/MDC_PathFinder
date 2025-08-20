@@ -19,9 +19,6 @@ return new class extends Migration
             $table->string('marker_id')->unique()->nullable();
             $table->string('image_path')->nullable();
             $table->string('video_path')->nullable();
-            $table->string('office_days')->nullable();      // e.g. "Mon,Tue,Wed"
-            $table->time('office_hours_start')->nullable(); // e.g. "09:00:00"
-            $table->time('office_hours_end')->nullable();   // e.g. "17:00:00"
             $table->softDeletes();
             $table->timestamps();
         });

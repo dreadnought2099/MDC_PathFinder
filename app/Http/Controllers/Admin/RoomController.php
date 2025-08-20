@@ -32,33 +32,28 @@ class RoomController extends Controller
             'description' => 'nullable|string',
             'image_path' => 'nullable|image|max:51200',
             'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:102400',
-            'office_days' => 'nullable|array',
-            'office_days.*' => 'string|in:Mon,Tue,Wed,Thu,Fri,Sat,Sun',
-            'office_hours_start' => ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/'],
-            'office_hours_end' => ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/', 'after:office_hours_start'],
             'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:102400',
+
+            // Office hours
+            'office_hours' => 'nullable|array',
         ]);
 
-        if (!empty($validated['office_hours_start'])) {
-            $validated['office_hours_start'] = date('H:i', strtotime($validated['office_hours_start']));
-        }
-        if (!empty($validated['office_hours_end'])) {
-            $validated['office_hours_end'] = date('H:i', strtotime($validated['office_hours_end']));
-        }
+        $roomData = collect($validated)->except('office_hours')->toArray();
+        $room = Room::create($roomData);
 
-        if (!empty($validated['office_hours_start']) && !empty($validated['office_hours_end'])) {
-            if (strtotime($validated['office_hours_end']) <= strtotime($validated['office_hours_start'])) {
-                return back()->withErrors(['office_hours_end' => 'End time must be after start time'])->withInput();
+        if ($request->has('office_hours')) {
+            foreach ($request->office_hours as $day => $ranges) {
+                foreach ($ranges as $range) {
+                    if (!empty($range['start']) && !empty($range['end'])) {
+                        $room->officeHours()->create([
+                            'day'        => $day,
+                            'start_time' => $range['start'],
+                            'end_time'   => $range['end'],
+                        ]);
+                    }
+                }
             }
         }
-
-        // Save the room first to get its ID
-        $room = Room::create($validated);
-
-        $room->office_days = !empty($request->office_days) ? implode(',', $request->office_days) : null;
-        $room->office_hours_start = $validated['office_hours_start'] ?? null;
-        $room->office_hours_end = $validated['office_hours_end'] ?? null;
-        $room->save();
 
         // Cover image
         if ($request->hasFile('image_path')) {
@@ -113,6 +108,8 @@ class RoomController extends Controller
         }, 'staff']);
         $images = $room->images;
 
+        $room->load('officeHours'); // eager load
+
         if (!$room->qr_code_path || !Storage::disk('public')->exists($room->qr_code_path)) {
             $marker_id = 'room_' . $room->id;
             $qrImage = QrCode::format('svg')->size(300)->generate($room->id);
@@ -143,38 +140,30 @@ class RoomController extends Controller
             'description' => 'nullable|string',
             'image_path' => 'nullable|image|max:51200',
             'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:102400',
-            'office_days' => 'nullable|array',
-            'office_days.*' => 'string|in:Mon,Tue,Wed,Thu,Fri,Sat,Sun',
-            'office_hours_start' => ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/'],
-            'office_hours_end' => ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/', 'after:office_hours_start'],
             'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:102400',
-            'remove_images' => 'nullable|array',
-            'remove_image_path' => 'nullable|boolean',
-            'remove_video_path' => 'nullable|boolean',
+
+            'office_hours' => 'nullable|array',
         ]);
 
-        if (!empty($validated['office_hours_start'])) {
-            $validated['office_hours_start'] = date('H:i', strtotime($validated['office_hours_start']));
-        }
-        if (!empty($validated['office_hours_end'])) {
-            $validated['office_hours_end'] = date('H:i', strtotime($validated['office_hours_end']));
-        }
+        $roomData = collect($validated)->except('office_hours')->toArray();
+        $room->update($roomData);
 
-        if (!empty($validated['office_hours_start']) && !empty($validated['office_hours_end'])) {
-            if (strtotime($validated['office_hours_end']) <= strtotime($validated['office_hours_start'])) {
-                return back()->withErrors(['office_hours_end' => 'End time must be after start time'])->withInput();
+        // Remove old hours
+        $room->officeHours()->delete();
+
+        if ($request->has('office_hours')) {
+            foreach ($request->office_hours as $day => $ranges) {
+                foreach ($ranges as $range) {
+                    if (!empty($range['start']) && !empty($range['end'])) {
+                        $room->officeHours()->create([
+                            'day'        => $day,
+                            'start_time' => $range['start'],
+                            'end_time'   => $range['end'],
+                        ]);
+                    }
+                }
             }
         }
-
-        $room->office_days = !empty($request->office_days) ? implode(',', $request->office_days) : null;
-        $room->office_hours_start = $validated['office_hours_start'] ?? null;
-        $room->office_hours_end = $validated['office_hours_end'] ?? null;
-
-        unset($validated['office_days'], $validated['office_hours_start'], $validated['office_hours_end']);
-        unset($validated['image_path'], $validated['video_path'], $validated['carousel_images'], $validated['remove_images']);
-
-        // Update basic room data first
-        $room->update($validated);
 
         // Handle main image removal
         if ($request->input('remove_image_path') && $room->image_path) {
@@ -344,7 +333,7 @@ class RoomController extends Controller
     public function assign(Request $request, $roomId = null)
     {
         $rooms = Room::all();
-        
+
         // Use route parameter first, then query parameter, then default
         $roomId = $roomId ?? $request->query('roomId') ?? ($rooms->first()->id ?? null);
         $selectedRoom = $roomId ? Room::find($roomId) : null;

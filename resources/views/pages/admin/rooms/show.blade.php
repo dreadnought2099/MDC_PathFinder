@@ -22,35 +22,15 @@
                 @endif
             </div>
 
-            {{-- Office Hours Card --}}
-            @if ($room->office_days && $room->office_hours_start && $room->office_hours_end)
-                @php
-                    $daysFormatted = str_replace(',', ', ', $room->office_days);
-                    $start = \Carbon\Carbon::parse($room->office_hours_start)->format('H:i');
-                    $end = \Carbon\Carbon::parse($room->office_hours_end)->format('H:i');
-                @endphp
-                <div class="mb-10 flex justify-center">
-                    <div
-                        class="bg-gradient-to-br from-emerald-400 via-teal-400 to-cyan-400 p-6 rounded-2xl shadow-xl max-w-md w-full border-2 border-white/20 backdrop-blur-sm">
-                        <div class="flex items-center justify-center mb-4">
-                            <div class="bg-white/20 p-3 rounded-xl mr-3 backdrop-blur-sm">
-                                <img src="{{ asset('icons/calendar.png') }}" alt="Calendar" class="h-8 w-8 object-contain">
-                            </div>
-                            <h4 class="text-xl font-bold text-white">Office Hours</h4>
-                        </div>
-                        <div class="space-y-3">
-                            <div class="bg-white/10 p-3 rounded-xl backdrop-blur-sm">
-                                <p class="text-white/90 text-sm font-medium mb-1">Days</p>
-                                <p class="text-white font-semibold">{{ $daysFormatted }}</p>
-                            </div>
-                            <div class="bg-white/10 p-3 rounded-xl backdrop-blur-sm">
-                                <p class="text-white/90 text-sm font-medium mb-1">Time</p>
-                                <p class="text-white font-semibold">{{ $start }} - {{ $end }}</p>
-                            </div>
-                        </div>
-                    </div>
+            <pre>{{ $room->formatted_office_hours }}</pre>
+            {{-- Office Hours --}}
+            <div class="mt-6">
+                {{-- Office Hours --}}
+                <h3 class="text-lg font-semibold mb-2">Office Hours</h3>
+                <div class="whitespace-pre-line bg-gray-50 p-4 rounded border">
+                    {!! nl2br(e($room->formatted_office_hours)) !!}
                 </div>
-            @endif
+            </div>
 
             {{-- Cover Image Section --}}
             @if ($room->image_path && Storage::disk('public')->exists($room->image_path))

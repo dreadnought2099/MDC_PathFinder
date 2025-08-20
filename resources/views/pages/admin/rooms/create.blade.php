@@ -81,55 +81,33 @@
                 </div>
             </div>
 
-            <div class="mb-4 max-w-sm">
-                <label class="block mb-1">Office Hours</label>
+            <div class="mb-6">
+                <label class="block font-semibold mb-2">Office Hours</label>
 
-                <div class="flex flex-wrap gap-4 mb-4">
-                    @php
-                        $days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                        // Get previously selected days, fallback empty array
-                        $selectedDays = old(
-                            'office_days',
-                            isset($room) && $room->office_days ? explode(',', $room->office_days) : [],
-                        );
-                    @endphp
+                @php
+                    $daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                @endphp
 
-                    @foreach ($days as $day)
-                        <label class="inline-flex items-center cursor-pointer select-none gap-3">
-                            <input type="checkbox" name="office_days[]" value="{{ $day }}" class="peer sr-only"
-                                {{ in_array($day, $selectedDays) ? 'checked' : '' }} />
+                @foreach ($daysOfWeek as $day)
+                    <div class="mb-4 p-4 border rounded bg-gray-50">
+                        <p class="font-semibold mb-2">{{ $day }}</p>
 
-                            <div
-                                class="w-6 h-6 border-2 rounded-md
-           bg-white border-gray-400
-           peer-checked:bg-primary
-           peer-checked:border-blue-600
-           peer-focus:ring-4 peer-focus:ring-blue-400
-           transition-colors duration-300 ease-in-out
-           relative flex items-center justify-center">
-                                <!-- Checkmark -->
-                                <svg class="w-5 h-5 text-white opacity-0 scale-75 peer-checked:opacity-100 peer-checked:scale-100 transition-all duration-300 ease-in-out"
-                                    fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                </svg>
+                        <div class="ranges" data-day="{{ $day }}">
+                            {{-- Initial row --}}
+                            <div class="flex gap-2 mb-2 range-row">
+                                <input type="time" name="office_hours[{{ $day }}][0][start]"
+                                    class="border rounded p-2">
+                                <input type="time" name="office_hours[{{ $day }}][0][end]"
+                                    class="border rounded p-2">
                             </div>
+                        </div>
 
-                            <span
-                                class="peer-focus:text-blue-600 peer-checked:text-blue-600 transition-colors duration-200">
-                                {{ $day }}
-                            </span>
-                        </label>
-                    @endforeach
-                </div>
-
-                {{-- Time inputs --}}
-                <div class="flex gap-2 items-center">
-                    <input type="time" name="office_hours_start" class="flex-1 border p-2 rounded"
-                        placeholder="Start time" />
-                    <span class="self-center">to</span>
-                    <input type="time" name="office_hours_end" class="flex-1 border p-2 rounded"
-                        placeholder="End time" />
-                </div>
+                        <button type="button" data-day="{{ $day }}"
+                            class="add-range bg-blue-500 text-white px-3 py-1 rounded text-sm">
+                            + Add Range
+                        </button>
+                    </div>
+                @endforeach
             </div>
 
             <div>
@@ -292,6 +270,30 @@
                 videoPreview.src = '';
                 videoPreviewContainer.classList.add('hidden');
             }
+
+            document.addEventListener('click', function(e) {
+                // Add new range
+                if (e.target.matches('.add-range')) {
+                    const day = e.target.dataset.day;
+                    const container = document.querySelector(`.ranges[data-day="${day}"]`);
+                    const index = container.querySelectorAll('.range-row').length;
+
+                    const html = `
+                <div class="flex gap-2 mb-2 range-row">
+                    <input type="time" name="office_hours[${day}][${index}][start]" class="border rounded p-2">
+                    <input type="time" name="office_hours[${day}][${index}][end]" class="border rounded p-2">
+                    <button type="button" class="remove-range text-red-600 text-sm">Remove</button>
+                </div>
+            `;
+
+                    container.insertAdjacentHTML('beforeend', html);
+                }
+
+                // Remove range
+                if (e.target.matches('.remove-range')) {
+                    e.target.closest('.range-row').remove();
+                }
+            });
         });
     </script>
 @endsection

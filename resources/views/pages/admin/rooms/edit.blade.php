@@ -5,7 +5,8 @@
 
     <div class="max-w-4xl mx-auto mt-10 p-10 bg-white border-1 border-primary rounded-lg shadow">
 
-        <h2 class="text-3xl font-bold text-center text-gray-800 mb-2"><span class="text-primary">Edit</span> {{ $room->name }}</h2>
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-2"><span class="text-primary">Edit</span>
+            {{ $room->name }}</h2>
 
         @if ($errors->any())
             <div class="mb-4 p-4 bg-red-100 text-red-700 rounded">
@@ -48,7 +49,8 @@
                     <label class="block font-semibold mb-1">Current Cover Image</label>
                     <img src="{{ Storage::url($room->image_path) }}" alt="Cover Image" class="w-48 rounded mb-2 border" />
                     <label class="inline-flex items-center space-x-2">
-                        <input type="checkbox" name="remove_image_path" value="1" id="remove_image_path" class="form-checkbox" />
+                        <input type="checkbox" name="remove_image_path" value="1" id="remove_image_path"
+                            class="form-checkbox" />
                         <span>Remove Cover Image</span>
                     </label>
                 </div>
@@ -69,7 +71,8 @@
                         Your browser does not support the video tag.
                     </video>
                     <label class="inline-flex items-center space-x-2">
-                        <input type="checkbox" name="remove_video_path" value="1" id="remove_video_path" class="form-checkbox" />
+                        <input type="checkbox" name="remove_video_path" value="1" id="remove_video_path"
+                            class="form-checkbox" />
                         <span>Remove Video</span>
                     </label>
                 </div>
@@ -82,37 +85,42 @@
                     class="block" />
             </div>
 
-            @php
-                $officeDays = old('office_days', $room->office_days ? explode(',', $room->office_days) : []);
-            @endphp
-
-            <div>
-                <label class="block font-semibold mb-1">Office Days</label>
-                <div class="flex flex-wrap gap-4">
-                    @foreach (['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as $day)
-                        @php $inputId = "office_days_{$day}" @endphp
-                        <label for="{{ $inputId }}" class="inline-flex items-center space-x-2">
-                            <input type="checkbox" id="{{ $inputId }}" name="office_days[]"
-                                value="{{ $day }}" {{ in_array($day, $officeDays) ? 'checked' : '' }}
-                                class="form-checkbox" />
-                            <span>{{ $day }}</span>
-                        </label>
-                    @endforeach
-                </div>
-            </div>
-
-            <div>
-                <label for="office_hours_start" class="block font-semibold mb-1">Office Hours Start</label>
-                <input type="time" name="office_hours_start" id="office_hours_start"
-                    value="{{ old('office_hours_start', $room->office_hours_start ? date('H:i', strtotime($room->office_hours_start)) : '') }}"
-                    class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200">
-            </div>
-
-            <div>
-                <label for="office_hours_end" class="block font-semibold mb-1">Office Hours End</label>
-                <input type="time" name="office_hours_end" id="office_hours_end"
-                    value="{{ old('office_hours_end', $room->office_hours_end ? date('H:i', strtotime($room->office_hours_end)) : '') }}"
-                    class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200">
+            <div class="mb-4">
+                {{-- Office Hours --}}
+                <h3 class="text-lg font-semibold mt-6 mb-3">Office Hours</h3>
+                @foreach (['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as $day)
+                    <div class="mb-4">
+                        <label class="block font-semibold mb-2">{{ $day }}</label>
+                        <div class="ranges" data-day="{{ $day }}">
+                            @php
+                                $ranges = $room->officeHours->where('day', $day);
+                                $index = 0;
+                            @endphp
+                            @forelse ($ranges as $range)
+                                <div class="flex gap-2 mb-2">
+                                    <input type="time"
+                                        name="office_hours[{{ $day }}][{{ $index }}][start]"
+                                        value="{{ $range->start_time }}" class="border rounded p-2">
+                                    <input type="time"
+                                        name="office_hours[{{ $day }}][{{ $index }}][end]"
+                                        value="{{ $range->end_time }}" class="border rounded p-2">
+                                </div>
+                                @php $index++; @endphp
+                            @empty
+                                <div class="flex gap-2 mb-2">
+                                    <input type="time" name="office_hours[{{ $day }}][0][start]"
+                                        class="border rounded p-2">
+                                    <input type="time" name="office_hours[{{ $day }}][0][end]"
+                                        class="border rounded p-2">
+                                </div>
+                            @endforelse
+                        </div>
+                        <button type="button" onclick="addRange('{{ $day }}')"
+                            class="bg-blue-500 text-white px-3 py-1 rounded text-sm">
+                            + Add Range
+                        </button>
+                    </div>
+                @endforeach
             </div>
 
             {{-- Current Carousel Images --}}
@@ -147,8 +155,8 @@
                                             <label
                                                 class="absolute top-1 right-1 bg-red-600 text-white rounded px-1 text-xs cursor-pointer opacity-0 hover:opacity-100 transition-opacity"
                                                 title="Remove this image">
-                                                <input type="checkbox" name="remove_images[]" value="{{ $image->id }}"
-                                                    class="hidden" />
+                                                <input type="checkbox" name="remove_images[]"
+                                                    value="{{ $image->id }}" class="hidden" />
                                                 ✕
                                             </label>
                                         @endif
@@ -242,5 +250,16 @@
                 updateUploadIconVisibility();
             }
         });
+
+        function addRange(day) {
+            const container = document.querySelector(`.ranges[data-day="${day}"]`);
+            const index = container.querySelectorAll('div').length;
+            const html = `
+        <div class="flex gap-2 mb-2">
+            <input type="time" name="office_hours[${day}][${index}][start]" class="border rounded p-2">
+            <input type="time" name="office_hours[${day}][${index}][end]" class="border rounded p-2">
+        </div>`;
+            container.insertAdjacentHTML('beforeend', html);
+        }
     });
 </script>
