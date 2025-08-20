@@ -120,9 +120,9 @@
             class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
             <div class="absolute top-5 right-5 flex items-center space-x-8">
                 <!-- Download button -->
-                <a id="downloadBtn" href="#" download title="Download Now"
+                <a id="downloadBtn" href="#" download title="Download Image"
                     class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6">
-                    <img src="{{ asset('icons/download-button.png') }}" alt="Download" class="w-10 h-10">
+                    <img src="{{ asset('icons/download-button.png') }}" alt="Download Image" class="w-10 h-10">
                 </a>
 
                 <!-- Close button -->

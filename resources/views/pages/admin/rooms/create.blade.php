@@ -67,7 +67,7 @@
                             d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14m-6 6v-6m0 0l-4.553 2.276A1 1 0 014 13.382V6.618a1 1 0 011.447-.894L9 8" />
                     </svg>
                     <p class="mb-2">Drag & drop a video file here or click to select</p>
-                    <p class="text-xs text-gray-400">(mp4, avi, mpeg | max 50MB)</p>
+                    <p class="text-xs text-gray-400">(mp4, avi, mpeg | max 100MB)</p>
 
                     <input type="file" id="video_path" name="video_path" accept="video/mp4,video/avi,video/mpeg"
                         class="hidden" />

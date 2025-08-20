@@ -126,7 +126,7 @@
                         fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                     </svg>
-                    <span id="carouselUploadText" class="text-gray-500 mb-4">Click to upload images (max 10)</span>
+                    <span id="carouselUploadText" class="text-gray-500 mb-4">Click to upload images</span>
 
                     <input type="file" name="carousel_images[]" id="carousel_images" class="hidden" accept="image/*"
                         multiple />
