@@ -44,7 +44,7 @@
                                         </div>
                                         <div>
                                             <div class="text-sm font-medium text-gray-900">
-                                                {{ $staff->first_name }}    {{ $staff->last_name }}
+                                                {{ $staff->full_name }}
                                             </div>
                                         </div>
                                     </div>
