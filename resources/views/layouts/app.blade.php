@@ -30,7 +30,7 @@
         @if (session('success') || session('error') || session('info') || $errors->any())
             <div id="message"
                 class="p-3 rounded-md shadow-lg border-l-4
-                    {{ session('success') ? 'bg-green-100 text-green-700' : '' }}
+                    {{ session('success') ? 'bg-white border border-primary text-primary' : '' }}
                     {{ session('error') ? 'bg-red-100 text-red-700' : '' }}
                     {{ session('info') ? 'bg-yellow-100 text-yellow-700' : '' }}
                     {{ $errors->any() ? 'bg-red-100 text-red-700' : '' }}">

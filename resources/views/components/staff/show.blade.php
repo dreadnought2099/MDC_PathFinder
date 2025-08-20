@@ -39,6 +39,24 @@
                     <!-- Information Section -->
                     <div class="flex-1 space-y-6">
 
+                        <!-- Bio -->
+                        <div
+                            class="border border-gray-200 rounded-xl p-4 hover:border-primary hover:bg-primary-10 transition-all duration-300">
+                            <div class="flex items-start space-x-3">
+                                <div class="bg-orange-100 p-2 rounded-lg">
+                                    <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-800 mb-1">Bio</p>
+                                    <p class="text-gray-600 leading-relaxed">{{ $staff->bio ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Email -->
                         <div
                             class="border border-gray-200 rounded-xl p-4 hover:border-primary hover:bg-primary-10 transition-all duration-300">
@@ -89,24 +107,6 @@
                                 <div>
                                     <p class="font-semibold text-gray-800">Phone</p>
                                     <p class="text-gray-600">{{ $staff->phone_num ?? 'N/A' }}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Bio -->
-                        <div
-                            class="border border-gray-200 rounded-xl p-4 hover:border-primary hover:bg-primary-10 transition-all duration-300">
-                            <div class="flex items-start space-x-3">
-                                <div class="bg-orange-100 p-2 rounded-lg">
-                                    <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                </div>
-                                <div>
-                                    <p class="font-semibold text-gray-800 mb-1">Bio</p>
-                                    <p class="text-gray-600 leading-relaxed">{{ $staff->bio ?? 'N/A' }}</p>
                                 </div>
                             </div>
                         </div>
