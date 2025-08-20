@@ -99,7 +99,8 @@
                         </div>
                         <div class="p-6 text-center">
                             <a href="{{ route('staff.client-show', $member->id) }}"
-                                class="block text-lg font-bold text-slate-800 hover:text-primary transition-colors mb-1" target="_blank" rel="noopener noreferrer">
+                                class="block text-lg font-bold text-slate-800 hover:text-primary transition-colors mb-1"
+                                target="_blank" rel="noopener noreferrer">
                                 {{ $member->full_name }}
                             </a>
                             <p class="text-slate-600 text-sm">
@@ -127,10 +128,25 @@
 
 <!-- Reusable Image Modal Markup -->
 <div id="imageModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
-    <button onclick="closeModal()"
-        class="absolute top-5 right-5 text-gray-300 text-8xl hover:text-secondary cursor-pointer">&times;</button>
+
+    <!-- Top-right controls -->
+    <div class="absolute top-5 right-5 flex items-center space-x-8">
+        <!-- Download button -->
+        <a id="downloadBtn" href="#" download title="Download Now"
+            class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6">
+            <img src="{{ asset('icons/download-button.png') }}" alt="Download" class="w-12 h-12">
+        </a>
+
+        <!-- Close button -->
+        <button onclick="closeModal()" class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6 cursor-pointer" title="Close Modal">
+            <img src="{{ asset('icons/exit.png') }}" alt="Close Modal" class="w-11 h-11">
+        </button>
+    </div>
+
+    <!-- Image -->
     <img id="modalImage" src="" alt="Full Image" class="max-w-full max-h-full rounded shadow-lg" />
 </div>
+
 
 <!-- Modal Script -->
 <script>
@@ -138,8 +154,11 @@
         function openModal(src) {
             const modal = document.getElementById('imageModal');
             const modalImage = document.getElementById('modalImage');
+            const downloadBtn = document.getElementById('downloadBtn');
             modalImage.src = src;
             modal.classList.remove('hidden');
+
+            downloadBtn.href = src; // set download link to the image
         }
 
         function closeModal() {

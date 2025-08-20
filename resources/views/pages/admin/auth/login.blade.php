@@ -47,7 +47,7 @@
         <div
             class="w-full md:w-1/2 bg-gradient-to-tr from-blue-400 to-white text-white p-6 flex flex-col items-center justify-center">
             <img src="{{ asset('images/mdc-logo.png') }}" class="w-36 h-36 rounded-full" />
-            <h3 class="text-lg text-center">MDC CampusLens<br>Management System</h3>
+            <h3 class="text-lg text-center">{{ config('app.name') }} <br>Management System</h3>
         </div>
     </div>
 @endsection
