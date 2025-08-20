@@ -24,27 +24,6 @@
         </p>
     @endif
 
-    <!-- Office Hours -->
-    @if ($room->office_days && $room->office_hours_start && $room->office_hours_end)
-        @php
-            $daysFormatted = str_replace(',', ', ', $room->office_days);
-            $start = \Carbon\Carbon::parse($room->office_hours_start)->format('H:i');
-            $end = \Carbon\Carbon::parse($room->office_hours_end)->format('H:i');
-        @endphp
-        <div class="bg-gradient-to-tr from-blue-400 to-white rounded-lg p-6 shadow-md max-w-md">
-            <h2 class="text-xl font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <img src="{{ asset('icons/calendar.png') }}" alt="Calendar" class="h-6 w-6 object-contain">
-                Office Hours
-            </h2>
-            <p class="text-gray-700 mb-1">
-                <span class="font-medium text-gray-900">Days:</span> {{ $daysFormatted }}
-            </p>
-            <p class="text-gray-700">
-                <span class="font-medium text-gray-900">Time:</span> {{ $start }} - {{ $end }}
-            </p>
-        </div>
-    @endif
-
     <!-- Cover Image -->
     @if ($room->image_path)
         <div>
@@ -115,6 +94,14 @@
         <p class="text-gray-500">No staff assigned to this room.</p>
     @endif
 
+    <!-- Office Hours -->
+    <div class="mt-6">
+        <h3 class="text-lg font-semibold mb-2">Office Hours</h3>
+        <div class="whitespace-pre-line bg-gray-50 p-4 rounded border">
+            {!! nl2br(e($room->formatted_office_hours)) !!}
+        </div>
+    </div>
+
     <!-- Scan Another QR Code Button -->
     <div class="text-center pt-8 border-t border-gray-200">
         <p class="text-sm text-gray-500 mb-3">Want to explore another room?</p>
@@ -138,7 +125,9 @@
         </a>
 
         <!-- Close button -->
-        <button onclick="closeModal()" class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6 cursor-pointer" title="Close Modal">
+        <button onclick="closeModal()"
+            class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6 cursor-pointer"
+            title="Close Modal">
             <img src="{{ asset('icons/exit.png') }}" alt="Close Modal" class="w-10 h-10">
         </button>
     </div>

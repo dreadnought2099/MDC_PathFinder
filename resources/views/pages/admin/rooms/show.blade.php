@@ -21,11 +21,12 @@
                     </div>
                 @endif
             </div>
+            
+            {{-- For Debugging purposes --}}
+            {{-- <pre>{{ $room->formatted_office_hours }}</pre>  --}}
 
-            <pre>{{ $room->formatted_office_hours }}</pre>
             {{-- Office Hours --}}
             <div class="mt-6">
-                {{-- Office Hours --}}
                 <h3 class="text-lg font-semibold mb-2">Office Hours</h3>
                 <div class="whitespace-pre-line bg-gray-50 p-4 rounded border">
                     {!! nl2br(e($room->formatted_office_hours)) !!}
