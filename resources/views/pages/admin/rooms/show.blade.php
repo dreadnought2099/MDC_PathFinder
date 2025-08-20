@@ -21,17 +21,6 @@
                     </div>
                 @endif
             </div>
-            
-            {{-- For Debugging purposes --}}
-            {{-- <pre>{{ $room->formatted_office_hours }}</pre>  --}}
-
-            {{-- Office Hours --}}
-            <div class="mt-6">
-                <h3 class="text-lg font-semibold mb-2">Office Hours</h3>
-                <div class="whitespace-pre-line bg-gray-50 p-4 rounded border">
-                    {!! nl2br(e($room->formatted_office_hours)) !!}
-                </div>
-            </div>
 
             {{-- Cover Image Section --}}
             @if ($room->image_path && Storage::disk('public')->exists($room->image_path))
@@ -142,6 +131,17 @@
                     </div>
                 </div>
             @endif
+
+            {{-- For Debugging purposes --}}
+            {{-- <pre>{{ $room->formatted_office_hours }}</pre>  --}}
+
+            {{-- Office Hours --}}
+            <div class="mt-6">
+                <h3 class="text-lg font-semibold mb-2">Office Hours</h3>
+                <div class="whitespace-pre-line bg-gray-50 p-4 rounded border">
+                    {!! nl2br(e($room->formatted_office_hours)) !!}
+                </div>
+            </div>
 
             {{-- QR Code Section --}}
             @if ($room->qr_code_path && Storage::disk('public')->exists($room->qr_code_path))

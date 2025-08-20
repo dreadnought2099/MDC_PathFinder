@@ -88,35 +88,45 @@
             <div class="mb-4">
                 {{-- Office Hours --}}
                 <h3 class="text-lg font-semibold mt-6 mb-3">Office Hours</h3>
-                @foreach (['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as $day)
+                @php
+                    $daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                @endphp
+
+                @foreach ($daysOfWeek as $day)
                     <div class="mb-4">
                         <label class="block font-semibold mb-2">{{ $day }}</label>
+
                         <div class="ranges" data-day="{{ $day }}">
                             @php
-                                $ranges = $room->officeHours->where('day', $day);
-                                $index = 0;
+                                $ranges = $room->officeHours->where('day', $day)->values();
                             @endphp
-                            @forelse ($ranges as $range)
-                                <div class="flex gap-2 mb-2">
-                                    <input type="time"
-                                        name="office_hours[{{ $day }}][{{ $index }}][start]"
-                                        value="{{ $range->start_time }}" class="border rounded p-2">
-                                    <input type="time"
-                                        name="office_hours[{{ $day }}][{{ $index }}][end]"
-                                        value="{{ $range->end_time }}" class="border rounded p-2">
-                                </div>
-                                @php $index++; @endphp
-                            @empty
-                                <div class="flex gap-2 mb-2">
+
+                            @if ($ranges->isNotEmpty())
+                                @foreach ($ranges as $i => $range)
+                                    <div class="flex gap-2 mb-2 range-row">
+                                        <input type="time"
+                                            name="office_hours[{{ $day }}][{{ $i }}][start]"
+                                            value="{{ $range->start_time }}" class="border rounded p-2">
+                                        <input type="time"
+                                            name="office_hours[{{ $day }}][{{ $i }}][end]"
+                                            value="{{ $range->end_time }}" class="border rounded p-2">
+                                        <button type="button" class="remove-range text-red-600 text-sm">Remove</button>
+                                    </div>
+                                @endforeach
+                            @else
+                                {{-- Show one empty row if none saved yet --}}
+                                <div class="flex gap-2 mb-2 range-row">
                                     <input type="time" name="office_hours[{{ $day }}][0][start]"
                                         class="border rounded p-2">
                                     <input type="time" name="office_hours[{{ $day }}][0][end]"
                                         class="border rounded p-2">
+                                    <button type="button" class="remove-range text-red-600 text-sm">Remove</button>
                                 </div>
-                            @endforelse
+                            @endif
                         </div>
-                        <button type="button" onclick="addRange('{{ $day }}')"
-                            class="bg-blue-500 text-white px-3 py-1 rounded text-sm">
+
+                        <button type="button" data-day="{{ $day }}"
+                            class="add-range bg-blue-500 text-white px-3 py-1 rounded text-sm">
                             + Add Range
                         </button>
                     </div>
@@ -187,7 +197,6 @@
         const carouselUploadText = document.getElementById('carouselUploadText');
 
         function updateUploadIconVisibility() {
-            // Count existing images NOT marked for removal
             const visiblePreviews = [...carouselPreviewContainer.children].filter(div => {
                 const checkbox = div.querySelector('input[type="checkbox"]');
                 return !checkbox || !checkbox.checked;
@@ -198,30 +207,25 @@
 
         updateUploadIconVisibility();
 
-        carouselInput.addEventListener('change', () => {
-            // Remove previews of newly added files only (no checkbox means new)
+        carouselInput?.addEventListener('change', () => {
             [...carouselPreviewContainer.children].forEach(div => {
                 if (!div.querySelector('input[type="checkbox"]')) {
                     div.remove();
                 }
             });
 
-            // Get selected files from input
             const newFiles = Array.from(carouselInput.files);
 
-            // Count existing images NOT marked for removal
             const existingCount = [...carouselPreviewContainer.children].filter(div => {
                 const checkbox = div.querySelector('input[type="checkbox"]');
                 return checkbox && !checkbox.checked;
             }).length;
 
-            // Enforce max total images limit
             if (existingCount + newFiles.length > 50) {
                 alert('You can upload max 50 images in total.');
                 return;
             }
 
-            // Show previews for new files
             newFiles.forEach(file => {
                 const reader = new FileReader();
                 reader.onload = e => {
@@ -242,8 +246,7 @@
             });
         });
 
-        // Toggle opacity on old images when their checkbox is toggled
-        carouselPreviewContainer.addEventListener('change', e => {
+        carouselPreviewContainer?.addEventListener('change', e => {
             if (e.target.matches('input[type="checkbox"]')) {
                 const parentDiv = e.target.closest('div');
                 parentDiv.style.opacity = e.target.checked ? '0.4' : '1';
@@ -251,15 +254,17 @@
             }
         });
 
-        function addRange(day) {
+        // ✅ Expose addRange globally so inline onclick works
+        window.addRange = function(day) {
             const container = document.querySelector(`.ranges[data-day="${day}"]`);
             const index = container.querySelectorAll('div').length;
             const html = `
-        <div class="flex gap-2 mb-2">
-            <input type="time" name="office_hours[${day}][${index}][start]" class="border rounded p-2">
-            <input type="time" name="office_hours[${day}][${index}][end]" class="border rounded p-2">
-        </div>`;
+                <div class="flex gap-2 mb-2">
+                    <input type="time" name="office_hours[${day}][${index}][start]" class="border rounded p-2">
+                    <input type="time" name="office_hours[${day}][${index}][end]" class="border rounded p-2">
+                </div>`;
             container.insertAdjacentHTML('beforeend', html);
-        }
+        };
     });
 </script>
+
