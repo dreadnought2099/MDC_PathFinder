@@ -62,7 +62,7 @@
                                             Edit
                                         </a>
 
-                                        <button onclick="openModal('{{ $staff->id }}', '{{ $staff->name }}')"
+                                        <button onclick="openModal('{{ $staff->id }}', '{{ $staff->full_name }}')"
                                             class="text-secondary hover-underline-delete hover:scale-105 transform transition duration-200 cursor-pointer">
                                             Delete
                                         </button>
