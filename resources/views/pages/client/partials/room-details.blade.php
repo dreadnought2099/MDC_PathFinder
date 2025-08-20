@@ -134,12 +134,12 @@
         <!-- Download button -->
         <a id="downloadBtn" href="#" download title="Download Now"
             class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6">
-            <img src="{{ asset('icons/download-button.png') }}" alt="Download" class="w-12 h-12">
+            <img src="{{ asset('icons/download-button.png') }}" alt="Download" class="w-10 h-10">
         </a>
 
         <!-- Close button -->
         <button onclick="closeModal()" class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6 cursor-pointer" title="Close Modal">
-            <img src="{{ asset('icons/exit.png') }}" alt="Close Modal" class="w-11 h-11">
+            <img src="{{ asset('icons/exit.png') }}" alt="Close Modal" class="w-10 h-10">
         </button>
     </div>
 

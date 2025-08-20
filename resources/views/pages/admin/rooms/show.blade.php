@@ -190,9 +190,23 @@
         {{-- Modal Markup (unchanged functionality) --}}
         <div id="imageModal"
             class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-            <button onclick="closeModal()"
-                class="absolute top-5 right-5 text-white/80 text-8xl hover:text-secondary cursor-pointer transition-colors duration-300 z-10">&times;</button>
-            <img id="modalImage" src="" alt="Full Image" class="max-w-full max-h-full rounded-xl shadow-2xl" />
+            <div class="absolute top-5 right-5 flex items-center space-x-8">
+                <!-- Download button -->
+                <a id="downloadBtn" href="#" download title="Download Now"
+                    class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6">
+                    <img src="{{ asset('icons/download-button.png') }}" alt="Download" class="w-10 h-10">
+                </a>
+
+                <!-- Close button -->
+                <button onclick="closeModal()"
+                    class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6 cursor-pointer"
+                    title="Close Modal">
+                    <img src="{{ asset('icons/exit.png') }}" alt="Close Modal" class="w-10 h-10">
+                </button>
+            </div>
+
+            <!-- Image -->
+            <img id="modalImage" src="" alt="Full Image" class="max-w-full max-h-full rounded shadow-lg" />
         </div>
     </div>
 @endsection
