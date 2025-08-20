@@ -3,16 +3,6 @@
 <div class="min-h-screen bg-white py-8 px-4">
     <div class="max-w-2xl mx-auto">
 
-        <!-- Floating Actions for admin access only -->
-        @auth
-            @if (auth()->user()->is_admin)
-                <div class="mb-8">
-                    <x-floating-actions />
-                </div>
-            @endif
-        @endauth
-
-
         <!-- Profile Card -->
         <div class="bg-white rounded-2xl shadow-lg overflow-hidden border-b-2 border-l-2 border-r-2 border-primary">
 
