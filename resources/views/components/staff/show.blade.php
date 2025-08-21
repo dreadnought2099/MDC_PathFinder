@@ -43,12 +43,8 @@
                         <div
                             class="border border-gray-200 rounded-xl p-4 hover:border-primary hover:bg-primary-10 transition-all duration-300">
                             <div class="flex items-start space-x-3">
-                                <div class="bg-orange-100 p-2 rounded-lg">
-                                    <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
+                                <div class="bg-blue-100 p-2 rounded-lg">
+                                    <img src="{{ asset('icons/user.png') }}" alt="User" class="h-6 w-6">
                                 </div>
                                 <div>
                                     <p class="font-semibold text-gray-800 mb-1">Bio</p>
@@ -61,12 +57,8 @@
                         <div
                             class="border border-gray-200 rounded-xl p-4 hover:border-primary hover:bg-primary-10 transition-all duration-300">
                             <div class="flex items-center space-x-3">
-                                <div class="bg-blue-100 p-2 rounded-lg">
-                                    <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M3 8l7.89 7.89a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                    </svg>
+                                <div class="bg-orange-100 p-2 rounded-lg">
+                                    <img src="{{ asset('icons/email.png') }}" alt="User" class="h-6 w-6">
                                 </div>
                                 <div>
                                     <p class="font-semibold text-gray-800">Email</p>
@@ -79,12 +71,8 @@
                         <div
                             class="border border-gray-200 rounded-xl p-4 hover:border-primary hover:bg-primary-10 transition-all duration-300">
                             <div class="flex items-center space-x-3">
-                                <div class="bg-purple-100 p-2 rounded-lg">
-                                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 00-2 2H10a2 2 0 00-2-2V6m8 0h2a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h2" />
-                                    </svg>
+                                <div class="bg-purple-200 p-2 rounded-lg">
+                                    <img src="{{ asset('icons/hierarchy.png') }}" alt="User" class="h-6 w-6">
                                 </div>
                                 <div>
                                     <p class="font-semibold text-gray-800">Position</p>
@@ -98,11 +86,7 @@
                             class="border border-gray-200 rounded-xl p-4 hover:border-primary hover:bg-primary-10 transition-all duration-300">
                             <div class="flex items-center space-x-3">
                                 <div class="bg-green-100 p-2 rounded-lg">
-                                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                    </svg>
+                                    <img src="{{ asset('icons/phone.png') }}" alt="User" class="h-6 w-6">
                                 </div>
                                 <div>
                                     <p class="font-semibold text-gray-800">Phone</p>
