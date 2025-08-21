@@ -106,6 +106,7 @@ class RoomController extends Controller
         $room->load(['images' => function ($query) {
             $query->withTrashed(); // Include soft-deleted images
         }, 'staff']);
+
         $images = $room->images;
 
         $room->load('officeHours'); // eager load

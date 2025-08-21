@@ -102,6 +102,11 @@
         </div>
     </div>
 
+    <div class="mt-6 text-center">
+        <h2 class="text-lg">Did you know?</h2>
+        <p class="text-sm text-gray-500 italic">{{ $fact }}</p>
+    </div>
+
     <!-- Scan Another QR Code Button -->
     <div class="text-center pt-8 border-t border-gray-200">
         <p class="text-sm text-gray-500 mb-3">Want to explore another room?</p>
