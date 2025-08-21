@@ -147,7 +147,7 @@
             @if ($room->qr_code_path && Storage::disk('public')->exists($room->qr_code_path))
                 <div class="mt-12">
                     <div class="bg-white rounded-2xl shadow-lg p-8 text-center border border-slate-200">
-                        <h3 class="text-2xl font-bold text-slate-800 mb-6">Office QR Code</h3>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-6">{{ $room->name }} QR Code</h3>
                         <div class="inline-block bg-slate-50 p-6 rounded-xl border-2 border-slate-200 mb-6">
                             <img src="{{ Storage::url($room->qr_code_path) }}" alt="QR Code for {{ $room->name }}"
                                 class="max-w-[200px] mx-auto" />

@@ -25,6 +25,10 @@ Route::get('/scan-marker', [TourController::class, 'index'])->name('ar.view');
 // Client-facing staff profile
 Route::get('/staffs/{staff}', [StaffController::class, 'clientShow'])->name('staff.client-show');
 
+Route::get('/api/rooms/{id}/exists', function ($id) {
+    $exists = \App\Models\Room::where('id', $id)->exists();
+    return response()->json(['exists' => $exists]);
+});
 /*
 |--------------------------------------------------------------------------
 | Admin Authentication Routes
@@ -44,19 +48,19 @@ Route::post('/admin', [LogInController::class, 'login']);
 */
 
 Route::middleware('auth')->group(function () {
-    
+
     /*
     |----------------------------------------------------------------------
     | Core Admin Routes
     |----------------------------------------------------------------------
     */
-    
+
     // Logout - destroys admin session
     Route::post('/logout', [LogInController::class, 'logout'])->name('logout');
-    
+
     // Admin dashboard - main landing page after login
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-    
+
     // Admin profile management
     Route::get('/admin/profile', [ProfileController::class, 'index'])->name('admin.profile');
     Route::post('/admin/profile/update-image', [ProfileController::class, 'updateImage'])->name('admin.profile.updateImage');
@@ -67,37 +71,37 @@ Route::middleware('auth')->group(function () {
     |----------------------------------------------------------------------
     | IMPORTANT: Specific routes MUST come before parameterized routes
     */
-    
+
     Route::prefix('admin')->name('room.')->group(function () {
-        
+
         // List all rooms
         Route::get('/rooms', [RoomController::class, 'index'])->name('index');
-        
+
         // SPECIFIC ROUTES - These MUST come before {room} routes
         Route::get('/rooms/create', [RoomController::class, 'create'])->name('create');
         Route::get('/rooms/recycle-bin', [RoomController::class, 'recycleBin'])->name('recycle-bin');
-        
+
         // Staff assignment routes (also specific)
         Route::get('/rooms/assign/{roomId?}', [RoomController::class, 'assign'])->name('assign');
         Route::put('/rooms/assign', [RoomController::class, 'assignStaff'])->name('assign.update');
-        
+
         // PARAMETERIZED ROUTES - These come after specific routes
         Route::get('/rooms/{room}', [RoomController::class, 'show'])->name('show');
         Route::get('/rooms/{room}/edit', [RoomController::class, 'edit'])->name('edit');
         Route::get('/rooms/{room}/print-qrcode', [RoomController::class, 'printQRCode'])->name('print-qrcode');
-        
+
         // Form submission routes
         Route::post('/rooms', [RoomController::class, 'store'])->name('store');
         Route::put('/rooms/{room}', [RoomController::class, 'update'])->name('update');
         Route::delete('/rooms/{room}', [RoomController::class, 'destroy'])->name('destroy');
-        
+
         // Soft delete management (using IDs, not models)
         Route::post('/rooms/{id}/restore', [RoomController::class, 'restore'])->name('restore');
         Route::delete('/rooms/{id}/force-delete', [RoomController::class, 'forceDelete'])->name('forceDelete');
-        
+
         // Media management
         Route::delete('/rooms/{room}/carousel/{image}', [RoomController::class, 'removeCarouselImage'])->name('carousel.remove');
-        
+
         // Staff removal from room
         Route::patch('/rooms/staff/{id}/remove', [RoomController::class, 'removeFromRoom'])->name('staff.remove');
     });
@@ -108,25 +112,25 @@ Route::middleware('auth')->group(function () {
     |----------------------------------------------------------------------
     | Same principle: specific routes before parameterized routes
     */
-    
+
     Route::prefix('admin')->name('staff.')->group(function () {
-        
+
         // List all staff
         Route::get('/staff', [StaffController::class, 'index'])->name('index');
-        
+
         // SPECIFIC ROUTES - These MUST come before {staff} routes
         Route::get('/staff/create', [StaffController::class, 'create'])->name('create');
         Route::get('/staff/recycle-bin', [RoomController::class, 'recycleBin'])->name('recycle-bin');
-        
+
         // PARAMETERIZED ROUTES - These come after specific routes
         Route::get('/staff/{staff}', [StaffController::class, 'show'])->name('show');
         Route::get('/staff/{staff}/edit', [StaffController::class, 'edit'])->name('edit');
-        
+
         // Form submission routes
         Route::post('/staff', [StaffController::class, 'store'])->name('store');
         Route::put('/staff/{staff}', [StaffController::class, 'update'])->name('update');
         Route::delete('/staff/{staff}', [StaffController::class, 'destroy'])->name('destroy');
-        
+
         // Soft delete management (using IDs, not models)
         Route::post('/staff/{id}/restore', [StaffController::class, 'restore'])->name('restore');
         Route::delete('/staff/{id}/force-delete', [StaffController::class, 'forceDelete'])->name('forceDelete');

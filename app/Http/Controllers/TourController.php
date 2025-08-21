@@ -16,16 +16,16 @@ class TourController extends Controller
         }
 
         // Load JSON
-        $fact = null;
+        $fact = "No history facts available at the moment.";
         $filePath = storage_path('app/facts.json');
 
         if (file_exists($filePath)) {
             $facts = json_decode(file_get_contents($filePath), true);
 
-            // Use office name instead of room id
-            $officeName = $room->name; // assuming $room->name matches the JSON key
+            // Use office name if $room exists
+            $officeName = $room ? $room->name : null;
 
-            if (isset($facts['offices'][$officeName]) && count($facts['offices'][$officeName]) > 0) {
+            if ($officeName && isset($facts['offices'][$officeName]) && count($facts['offices'][$officeName]) > 0) {
                 // Random fact for this office
                 $officeFacts = $facts['offices'][$officeName];
                 $fact = $officeFacts[array_rand($officeFacts)];
@@ -33,13 +33,8 @@ class TourController extends Controller
                 // Random general campus fact
                 $generalFacts = $facts['general'];
                 $fact = $generalFacts[array_rand($generalFacts)];
-            } else {
-                $fact = "No history facts available at the moment.";
             }
-        } else {
-            $fact = "No history facts available at the moment.";
         }
-
 
         return view('pages.client.scan', compact('room', 'fact'));
     }
