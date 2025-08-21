@@ -16,11 +16,13 @@
 
         function showMessage(message, type = 'info') {
             const resultsDiv = document.getElementById('qr-reader-results');
+
+            // Custom PNG icons - placed in public/icons folder
             const icons = {
-                success: '✓',
-                error: '✗',
-                info: 'ℹ️',
-                warning: '⚠️'
+                success: '/icons/success.png',
+                error: '/icons/error.png',
+                info: '/icons/information.png',
+                warning: '/icons/warning.png'
             };
 
             const colors = {
@@ -30,7 +32,12 @@
                 warning: 'text-yellow-600'
             };
 
-            resultsDiv.innerHTML = `<span class="${colors[type]}">${icons[type]} ${message}</span>`;
+            // Create icon image element with proper img tag
+            const iconImg =
+                `<img src="${icons[type]}" alt="${type}" class="inline-block w-5 h-5 mr-2" style="vertical-align: middle;">`;
+
+            resultsDiv.innerHTML =
+                `<div class="flex items-center justify-center"><span class="${colors[type]} flex items-center">${iconImg}${message}</span></div>`;
         }
 
         function checkRoomExists(roomId) {
