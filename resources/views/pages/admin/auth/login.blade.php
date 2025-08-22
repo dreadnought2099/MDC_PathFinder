@@ -8,7 +8,7 @@
 
         {{-- Left - Login --}}
         <div class="w-full md:w-1/2 p-8 space-y-6 flex flex-col justify-center">
-            <h2 class="text-2xl text-center font-semibold">Log In</h2>
+            <h2 class="text-2xl text-center font-semibold">Log <span class="text-primary">In</span></h2>
 
             <form action="{{ route('login') }}" method="POST" class="space-y-6">
                 @csrf
