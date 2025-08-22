@@ -85,52 +85,84 @@
                     class="block" />
             </div>
 
-            <div class="mb-4">
-                {{-- Office Hours --}}
-                <h3 class="text-lg font-semibold mt-6 mb-3">Office Hours</h3>
-                @php
-                    $daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                @endphp
+            {{-- Enhanced Office Hours Section --}}
+            <div class="mb-6">
+                <label class="block font-semibold mb-2">Office Hours</label>
 
-                @foreach ($daysOfWeek as $day)
+                {{-- Bulk Day Selection Section --}}
+                <div class="mb-6 p-4 border rounded bg-blue-50">
+                    <p class="font-semibold mb-3">Set Time Range for Multiple Days</p>
+
+                    {{-- Day Selection --}}
                     <div class="mb-4">
-                        <label class="block font-semibold mb-2">{{ $day }}</label>
-
-                        <div class="ranges" data-day="{{ $day }}">
+                        <label class="block text-sm font-medium mb-2">Select Days:</label>
+                        <div class="flex gap-2 flex-wrap">
                             @php
-                                $ranges = $room->officeHours->where('day', $day)->values();
+                                $daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
                             @endphp
-
-                            @if ($ranges->isNotEmpty())
-                                @foreach ($ranges as $i => $range)
-                                    <div class="flex gap-2 mb-2 range-row">
-                                        <input type="time"
-                                            name="office_hours[{{ $day }}][{{ $i }}][start]"
-                                            value="{{ $range->start_time }}" class="border rounded p-2">
-                                        <input type="time"
-                                            name="office_hours[{{ $day }}][{{ $i }}][end]"
-                                            value="{{ $range->end_time }}" class="border rounded p-2">
-                                        <button type="button" class="remove-range text-red-600 text-sm">Remove</button>
-                                    </div>
-                                @endforeach
-                            @else
-                                {{-- Show one empty row if none saved yet --}}
-                                <div class="flex gap-2 mb-2 range-row">
-                                    <input type="time" name="office_hours[{{ $day }}][0][start]"
-                                        class="border rounded p-2">
-                                    <input type="time" name="office_hours[{{ $day }}][0][end]"
-                                        class="border rounded p-2">
-                                    <button type="button" class="remove-range text-red-600 text-sm">Remove</button>
-                                </div>
-                            @endif
+                            @foreach ($daysOfWeek as $day)
+                                <label
+                                    class="flex items-center bg-white border rounded px-3 py-2 cursor-pointer hover:bg-gray-50">
+                                    <input type="checkbox" class="bulk-day-checkbox mr-2" value="{{ $day }}">
+                                    <span class="text-sm">{{ $day }}</span>
+                                </label>
+                            @endforeach
                         </div>
 
-                        <button type="button" data-day="{{ $day }}"
-                            class="add-range bg-blue-500 text-white px-3 py-1 rounded text-sm">
-                            + Add Range
-                        </button>
+                        {{-- Quick Select Buttons --}}
+                        <div class="mt-2 flex gap-2 flex-wrap">
+                            <button type="button" class="quick-select bg-gray-500 text-white px-3 py-1 rounded text-sm cursor-pointer"
+                                data-days="Mon,Tue,Wed,Thu,Fri">Weekdays</button>
+                            <button type="button" class="quick-select bg-gray-500 text-white px-3 py-1 rounded text-sm cursor-pointer"
+                                data-days="Sat,Sun">Weekends</button>
+                            <button type="button" class="quick-select bg-gray-500 text-white px-3 py-1 rounded text-sm cursor-pointer"
+                                data-days="Mon,Tue,Wed,Thu,Fri,Sat,Sun">All Days</button>
+                            <button type="button"
+                                class="clear-select bg-gray-300 text-gray-700 px-3 py-1 rounded text-sm cursor-pointer">Clear All</button>
+                        </div>
                     </div>
-                @endforeach
+
+                    {{-- Time Range Input (Single Row Only) --}}
+                    <div class="bulk-time-ranges mb-4">
+                        <label class="block text-sm font-medium mb-2">Time Range:</label>
+                        <div class="bulk-ranges-container">
+                            <div class="flex gap-2 mb-2 bulk-range-row">
+                                <div class="relative flex-1">
+                                    <input type="time" class="bulk-start-time border rounded p-2 w-full pr-8">
+                                    <button type="button"
+                                        class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500"
+                                        title="Clear">
+                                        <img src="{{ asset('icons/exit.png') }}"
+                                            class="w-3 h-3 cursor-pointer hover:scale-120 transition-all duration-300 ease-in-out"
+                                            alt="Clear">
+                                    </button>
+                                </div>
+                                <div class="relative flex-1">
+                                    <input type="time" class="bulk-end-time border rounded p-2 w-full pr-8">
+                                    <button type="button"
+                                        class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500"
+                                        title="Clear">
+                                        <img src="{{ asset('icons/exit.png') }}"
+                                            class="w-3 h-3 cursor-pointer hover:scale-120 transition-all duration-300 ease-in-out"
+                                            alt="Clear">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Apply Button --}}
+                    <button type="button"
+                        class="apply-bulk bg-primary text-center text-white px-4 py-2 rounded hover:text-primary border-2 border-primary hover:bg-white duration-300 ease-in-out transition-all cursor-pointer">
+                        Apply to Selected Days
+                    </button>
+                </div>
+
+                {{-- Display Saved Hours --}}
+                <div class="p-4 border rounded bg-gray-50">
+                    <p class="font-semibold mb-3">Saved Office Hours</p>
+                    <ul id="officeHoursDisplay" class="space-y-2 text-sm text-gray-700"></ul>
+                </div>
             </div>
 
             {{-- Current Carousel Images --}}
@@ -191,6 +223,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        // Carousel image handling (existing code)
         const carouselInput = document.getElementById('carousel_images');
         const carouselPreviewContainer = document.getElementById('carouselPreviewContainer');
         const carouselUploadIcon = document.getElementById('carouselUploadIcon');
@@ -254,17 +287,251 @@
             }
         });
 
-        // ✅ Expose addRange globally so inline onclick works
-        window.addRange = function(day) {
-            const container = document.querySelector(`.ranges[data-day="${day}"]`);
-            const index = container.querySelectorAll('div').length;
-            const html = `
-                <div class="flex gap-2 mb-2">
-                    <input type="time" name="office_hours[${day}][${index}][start]" class="border rounded p-2">
-                    <input type="time" name="office_hours[${day}][${index}][end]" class="border rounded p-2">
-                </div>`;
-            container.insertAdjacentHTML('beforeend', html);
-        };
+        // Enhanced Office Hours Management
+        const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+        // Initialize with existing office hours data
+        let officeHoursData = {};
+
+        // Populate existing data from the room model
+        @php
+            $existingOfficeHours = [];
+            foreach ($daysOfWeek as $day) {
+                $ranges = $room->officeHours->where('day', $day)->values();
+                if ($ranges->isNotEmpty()) {
+                    $existingOfficeHours[$day] = $ranges
+                        ->map(function ($range) {
+                            return [
+                                'start' => $range->start_time,
+                                'end' => $range->end_time,
+                            ];
+                        })
+                        ->toArray();
+                }
+            }
+        @endphp
+
+        officeHoursData = @json($existingOfficeHours);
+
+        // Quick select functionality
+        document.querySelectorAll('.quick-select').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const days = btn.dataset.days.split(',');
+                document.querySelectorAll('.bulk-day-checkbox').forEach(cb => cb.checked =
+                    false);
+                days.forEach(day => {
+                    const cb = document.querySelector(
+                        `.bulk-day-checkbox[value="${day}"]`);
+                    if (cb) cb.checked = true;
+                });
+            });
+        });
+
+        // Clear all selection
+        document.querySelector('.clear-select').addEventListener('click', () => {
+            document.querySelectorAll('.bulk-day-checkbox').forEach(cb => cb.checked = false);
+        });
+
+        // Apply bulk changes
+        document.querySelector('.apply-bulk').addEventListener('click', function() {
+            const selectedDays = Array.from(document.querySelectorAll('.bulk-day-checkbox:checked'))
+                .map(cb => cb.value);
+            if (!selectedDays.length) return alert("Please select at least one day.");
+
+            const ranges = collectBulkRanges();
+            if (!ranges) return;
+
+            selectedDays.forEach(day => {
+                officeHoursData[day] = ranges;
+            });
+
+            renderOfficeHours();
+            showTemporaryFeedback(this, "Applied Successfully!");
+        });
+
+        // Helper functions
+        function collectBulkRanges() {
+            const ranges = [];
+            let valid = true;
+
+            document.querySelectorAll('.bulk-range-row').forEach(row => {
+                const start = row.querySelector('.bulk-start-time').value;
+                const end = row.querySelector('.bulk-end-time').value;
+                clearError(row);
+
+                if (start && end) {
+                    if (start >= end) {
+                        showError(row, "End must be later than start");
+                        valid = false;
+                        return;
+                    }
+                    ranges.push({
+                        start,
+                        end
+                    });
+                }
+            });
+
+            if (!valid) return null;
+            if (!ranges.length) {
+                alert("Please enter at least one valid time range.");
+                return null;
+            }
+            if (hasOverlap(ranges)) {
+                alert("Time ranges overlap. Fix them first.");
+                return null;
+            }
+
+            return ranges;
+        }
+
+        // Clear time input when X is clicked
+        document.addEventListener('click', e => {
+            if (e.target.classList.contains('clear-time') || e.target.closest('.clear-time')) {
+                const button = e.target.classList.contains('clear-time') ? e.target : e.target.closest(
+                    '.clear-time');
+                const input = button.previousElementSibling;
+                if (input && input.type === "time") {
+                    input.value = "";
+                }
+            }
+        });
+
+        // Convert 24-hour time to 12-hour format
+        function formatTime12Hour(time24) {
+            const [hours, minutes] = time24.split(':');
+            const hour = parseInt(hours);
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+            return `${hour12}:${minutes} ${ampm}`;
+        }
+
+        function renderOfficeHours() {
+            const container = document.getElementById("officeHoursDisplay");
+            container.innerHTML = "";
+
+            // Group days by their time ranges
+            const groupedSchedule = {};
+
+            daysOfWeek.forEach(day => {
+                const ranges = officeHoursData[day] || [];
+                const rangeKey = ranges.length ?
+                    ranges.map(r => `${r.start}-${r.end}`).join(",") :
+                    "closed";
+
+                if (!groupedSchedule[rangeKey]) {
+                    groupedSchedule[rangeKey] = {
+                        days: [],
+                        ranges: ranges
+                    };
+                }
+                groupedSchedule[rangeKey].days.push(day);
+            });
+
+            // Render grouped schedule
+            Object.entries(groupedSchedule).forEach(([rangeKey, group]) => {
+                const li = document.createElement("li");
+                li.className = "mb-3 p-3 bg-white rounded border";
+
+                const daysText = formatDaysGroup(group.days);
+                let timeText;
+
+                if (rangeKey === "closed") {
+                    timeText = "Closed";
+                } else {
+                    timeText = group.ranges.map(r =>
+                        `${formatTime12Hour(r.start)} - ${formatTime12Hour(r.end)}`).join(", ");
+                }
+
+                li.innerHTML = `
+                    <div class="font-medium text-gray-800">${daysText}</div>
+                    <div class="text-sm text-gray-600 mt-1">${timeText}</div>
+                `;
+
+                // Add hidden inputs for form submission
+                group.days.forEach(day => {
+                    group.ranges.forEach((range, idx) => {
+                        const startInput = document.createElement("input");
+                        startInput.type = "hidden";
+                        startInput.name = `office_hours[${day}][${idx}][start]`;
+                        startInput.value = range.start;
+
+                        const endInput = document.createElement("input");
+                        endInput.type = "hidden";
+                        endInput.name = `office_hours[${day}][${idx}][end]`;
+                        endInput.value = range.end;
+
+                        li.appendChild(startInput);
+                        li.appendChild(endInput);
+                    });
+                });
+
+                container.appendChild(li);
+            });
+        }
+
+        // Format consecutive days into ranges (e.g., "Mon - Wed" or "Mon, Wed, Fri")
+        function formatDaysGroup(days) {
+            if (days.length === 0) return "";
+            if (days.length === 1) return days[0];
+
+            // Sort days by their order in the week
+            const sortedDays = days.sort((a, b) => daysOfWeek.indexOf(a) - daysOfWeek.indexOf(b));
+
+            // Check if days are consecutive
+            const isConsecutive = () => {
+                for (let i = 0; i < sortedDays.length - 1; i++) {
+                    const currentIndex = daysOfWeek.indexOf(sortedDays[i]);
+                    const nextIndex = daysOfWeek.indexOf(sortedDays[i + 1]);
+                    if (nextIndex !== currentIndex + 1) return false;
+                }
+                return true;
+            };
+
+            if (isConsecutive() && sortedDays.length > 2) {
+                return `${sortedDays[0]} - ${sortedDays[sortedDays.length - 1]}`;
+            }
+
+            return sortedDays.join(", ");
+        }
+
+        function hasOverlap(ranges) {
+            const sorted = ranges.slice().sort((a, b) => a.start.localeCompare(b.start));
+            for (let i = 0; i < sorted.length - 1; i++) {
+                if (sorted[i].end > sorted[i + 1].start) return true;
+            }
+            return false;
+        }
+
+        function showTemporaryFeedback(button, text) {
+            const old = button.textContent;
+            button.textContent = text;
+            button.classList.add('bg-green-500');
+            button.classList.remove('bg-primary');
+            setTimeout(() => {
+                button.textContent = old;
+                button.classList.remove('bg-green-500');
+                button.classList.add('bg-primary');
+            }, 2000);
+        }
+
+        function showError(row, msg) {
+            row.classList.add("bg-red-50", "border", "border-red-400");
+            if (!row.querySelector(".error-msg")) {
+                const p = document.createElement("p");
+                p.className = "error-msg text-red-600 text-xs mt-1";
+                p.textContent = msg;
+                row.appendChild(p);
+            }
+        }
+
+        function clearError(row) {
+            row.classList.remove("bg-red-50", "border", "border-red-400");
+            const msg = row.querySelector(".error-msg");
+            if (msg) msg.remove();
+        }
+
+        // Initial render to show existing office hours
+        renderOfficeHours();
     });
 </script>
-

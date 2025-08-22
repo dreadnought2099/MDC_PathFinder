@@ -131,7 +131,18 @@ class RoomController extends Controller
         $room->load(['images' => function ($query) {
             $query->withTrashed(); // Include soft-deleted images
         }]);
-        return view('pages.admin.rooms.edit', compact('room', 'staffs'));
+
+        // Transform officeHours relation to JSON structure expected by JS
+        $officeHours = [];
+        foreach ($room->officeHours as $hour) {
+            $officeHours[$hour->day][] = [
+                'start' => \Carbon\Carbon::parse($hour->start_time)->format('H:i'),
+                'end'   => \Carbon\Carbon::parse($hour->end_time)->format('H:i'),
+            ];
+        }
+
+
+        return view('pages.admin.rooms.edit', compact('room', 'staffs', 'officeHours'));
     }
 
     public function update(Request $request, Room $room)
