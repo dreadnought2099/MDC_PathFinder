@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container mx-auto p-6">
-        
+
         <x-floating-actions />
 
         <div class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg border-2 border-primary">
@@ -10,7 +10,8 @@
 
             <!-- Profile Image Wrapper -->
             <div class="relative w-40 h-40 mx-auto mb-16">
-                <img src="{{ $user->profile_photo_path ? asset('storage/' . $user->profile_photo_path) . '?v=' . time() : asset('images/profile.jpeg') }}"
+                <img id="profile-page-image"
+                    src="{{ $user->profile_photo_path ? asset('storage/' . $user->profile_photo_path) . '?v=' . time() : asset('images/profile.jpeg') }}"
                     alt="Profile" class="w-full h-full rounded-full object-cover border">
 
                 <!-- Overlay Button -->
@@ -43,7 +44,7 @@
             <button type="button" onclick="closeModal()"
                 class="absolute top-2 right-4 text-6xl text-gray-500 hover:text-red-600 focus:outline-none cursor-pointer"
                 aria-label="Close">
-                &times;
+                <img src="{{ asset('icons/exit.png') }}" alt="Close Modal" class="w-6 h-6 hover:scale-120 duration-300 transition-all ease-in-out">
             </button>
 
             <h3 class="text-xl mb-4">Crop Image</h3>
@@ -142,9 +143,14 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success && data.imageUrl) {
-                            // ✅ This is where you paste it
                             document.querySelector('[x-ref="navbarProfile"]').src = data.imageUrl +
                                 '?v=' + new Date().getTime();
+                        }
+
+                        // Update profile page image
+                        const profilePageImage = document.querySelector('#profile-page-image');
+                        if (profilePageImage) {
+                            profilePageImage.src = data.imageUrl + '?v=' + new Date().getTime();
                         }
 
                         closeModal();
