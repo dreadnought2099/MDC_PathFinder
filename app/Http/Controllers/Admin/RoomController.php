@@ -354,7 +354,7 @@ class RoomController extends Controller
         return view('pages.admin.rooms.assign', compact('rooms', 'staff', 'selectedRoom'));
     }
 
-    public function assignStaff(Request $request)
+    public function assignStaff(Request $request, Room $room)
     {
         //For Debugging
         Log::info('Room ID received: ' . $request->room_id);
@@ -368,8 +368,10 @@ class RoomController extends Controller
         $roomId = $request->room_id;
         $staffIds = $request->staff_ids ?? [];
 
+        // Get currently assigned staff
         $currentlyAssigned = Staff::where('room_id', $roomId)->pluck('id')->toArray();
 
+        // Determine who to unassign and assign
         $toUnassign = array_diff($currentlyAssigned, $staffIds);
         $toAssign = array_diff($staffIds, $currentlyAssigned);
 
@@ -380,11 +382,26 @@ class RoomController extends Controller
             Staff::whereIn('id', $toAssign)->update(['room_id' => $roomId]);
         }
 
+        // Re-fetch the correct room by ID to guarantee we have the name
+        $room = Room::findOrFail($roomId);
+
+        // Get all staff models that were just assigned
+        // Eloquent won’t let you pluck('full_name') because it’s an accessor, not a real DB column.
+        // So instead, fetch and map.
+        // That way it uses your accessor properly.
+        $assignedStaff = Staff::whereIn('id', $toAssign)
+            ->get()
+            ->map(fn($s) => $s->full_name)
+            ->toArray();
+
+        // Build message
+        $staffNames = !empty($assignedStaff) ? implode(', ', $assignedStaff) : 'No staff';
+
         //For Debugging
         Log::info('Redirecting to room: ' . $request->room_id);
 
         // Change this redirect to use route parameter instead of query parameter
-        return redirect()->route('room.assign', $request->room_id);
+        return redirect()->route('room.assign', $room->id)->with('success', "{$staffNames} was successfully assigned to {$room->name}.");
     }
 
     public function removeFromRoom($id)

@@ -62,7 +62,7 @@
                                             <!-- Modal Header -->
                                             <div class="px-6 py-4 border-b border-gray-200">
                                                 <div class="flex items-center justify-between">
-                                                    <h2 class="text-xl font-semibold text-gray-900">Confirm <span
+                                                    <h2 class="text-xl text-gray-900">Confirm <span
                                                             class="text-primary">Restore</span></h2>
                                                     <button
                                                         onclick="hideModal('restoreModal-{{ $routePrefix }}-{{ $item->id }}')"
@@ -81,13 +81,8 @@
                                                     <div class="flex-shrink-0">
                                                         <div
                                                             class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                                                            <svg class="w-6 h-6 text-blue-600" fill="none"
-                                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
-                                                                </path>
-                                                            </svg>
+                                                            <img src="{{ asset('icons/restore.png') }}" class="h-8 w-8"
+                                                                alt="Restore">
                                                         </div>
                                                     </div>
                                                     <div>
@@ -149,13 +144,8 @@
                                                     <div class="flex-shrink-0">
                                                         <div
                                                             class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                                                            <svg class="w-6 h-6 text-red-600" fill="none"
-                                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
-                                                                </path>
-                                                            </svg>
+                                                            <img src="{{ asset('icons/warning-red.png') }}"
+                                                                class="w-8 h-8" alt="Warning">
                                                         </div>
                                                     </div>
                                                     <div class="text-sm">
@@ -174,8 +164,7 @@
                                                     method="POST">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <input type="hidden" name="tab"
-                                                        value="{{ $tab }}">
+                                                    <input type="hidden" name="tab" value="{{ $tab }}">
                                                     <div class="flex justify-end space-x-3">
                                                         <button type="button"
                                                             onclick="hideModal('deleteModal-{{ $routePrefix }}-{{ $item->id }}')"
