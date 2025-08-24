@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Room;
+use App\Models\Staff;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -13,8 +15,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-       $this->call([
+        $this->call([
             AdminSeeder::class,
-       ]);
+        ]);
+
+        if (!app()->environment('production')) {
+            $this->call(FakeDataSeeder::class);
+        }
     }
 }
