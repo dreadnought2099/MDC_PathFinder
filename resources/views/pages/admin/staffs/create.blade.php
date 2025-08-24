@@ -21,7 +21,7 @@
 
             <div class="mb-4">
                 <label class="block">Middle Name</label>
-                <input type="text" name="middle_name" class="w-full border p-2 rounded" required>
+                <input type="text" name="middle_name" class="w-full border p-2 rounded">
             </div>
 
             <div class="mb-4">

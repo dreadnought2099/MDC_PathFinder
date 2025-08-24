@@ -1,4 +1,4 @@
-<nav class="bg-white">
+<nav class="bg-white sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 items-center">
             <!-- Left side (back button) -->
