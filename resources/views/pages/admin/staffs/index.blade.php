@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container mx-auto px-4 py-8 max-w-6xl">
+    <div class="container mx-auto max-w-6xl overflow-y-auto h-[80vh]">
         <!-- Header Section -->
-        <div class="mb-8 text-center">
+        <div class="bg-white mb-8 text-center sticky top-0 z-48">
             <h1 class="text-3xl font-bold text-gray-800 mb-2">
                 <span class="text-primary">Staff</span> Management
             </h1>

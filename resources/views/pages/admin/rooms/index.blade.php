@@ -1,28 +1,28 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container mx-auto px-4 py-8 max-w-6xl">
+    <div class="container mx-auto max-w-6xl overflow-y-auto h-[80vh]">
         <!-- Header Section -->
-        <div class="mb-8 text-center">
+        <div class="bg-white mb-8 text-center sticky top-0 z-48">
             <h1 class="text-3xl font-bold text-gray-800 mb-2">
-                <span class="text-primary">Room</span> Management
+                <span class="text-primary">Office</span> Management
             </h1>
             <p class="text-gray-600">Manage rooms and assign staff members</p>
         </div>
-
+        
         <!-- Floating Actions -->
         <div class="mb-6">
             <x-floating-actions />
         </div>
 
         <!-- Room Table Container -->
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-primary">
+        <div class="bg-white rounded-xl shadow-sm border-2 border-primary overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead>
                         <tr class="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
                             <th class="px-6 py-4 text-left text-sm text-gray-700 uppercase tracking-wide">
-                                Room Name
+                                Office Name
                             </th>
                             <th class="px-6 py-4 text-right text-sm text-gray-700 uppercase tracking-wide">
                                 Actions
