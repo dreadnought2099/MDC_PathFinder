@@ -1,25 +1,29 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="max-w-2xl mx-auto p-6 border border-primary rounded-lg">
+    <div class="container max-w-6xl mx-auto overflow-y-auto h-[80vh]">
         <x-floating-actions />
 
-        <h1 class="text-3xl text-center font-bold mb-6 text-gray-800"><span class="text-primary">Assign</span> Staff to Room</h1>
+        <div class="bg-white sticky top-0 z-50">
+            <h1 class="text-3xl text-center font-bold mb-8 text-gray-800">
+                <span class="text-primary">Assign</span> Staff to Room
+            </h1>
 
-        {{-- Room selection GET form --}}
-        <div class="mb-6">
-            <form method="GET" action="{{ route('room.assign') }}">
-                <select name="roomId" onchange="this.form.submit()"
-                    class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200">
-                    @foreach ($rooms as $room)
-                        <option value="{{ $room->id }}"
-                            {{ isset($selectedRoom) && $selectedRoom->id == $room->id ? 'selected' : '' }}>
-                            {{ $room->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </form>
+            <div class="mb-8">
+                <form method="GET" action="{{ route('room.assign') }}">
+                    <select name="roomId" onchange="this.form.submit()"
+                        class="w-full max-w-md mx-auto block border border-gray-300 rounded-lg px-4 py-3 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200">
+                        @foreach ($rooms as $room)
+                            <option value="{{ $room->id }}"
+                                {{ isset($selectedRoom) && $selectedRoom->id == $room->id ? 'selected' : '' }}>
+                                {{ $room->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+            </div>
         </div>
+
 
         {{-- Staff assignment POST form --}}
         @if (isset($selectedRoom))
@@ -28,33 +32,87 @@
                 @method('PUT')
                 <input type="hidden" name="room_id" value="{{ $selectedRoom->id }}">
 
-                <div class="mb-6">
-                    <label class="block font-semibold text-gray-800 mb-4">Select Staff:</label>
-                    <div id="staffCheckboxes" class="space-y-3">
+                <div class="mb-8">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-6 text-center">Select Staff Members</h2>
+
+                    <div id="staffCards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         @foreach ($staff as $member)
                             @php
                                 $assignedRoomId = $member->room_id;
                                 $isSelectedRoom = isset($selectedRoom) && $assignedRoomId == $selectedRoom->id;
                                 $isAssignedOtherRoom = $assignedRoomId && !$isSelectedRoom;
-                                $textClass = $isAssignedOtherRoom ? 'text-gray-400' : 'text-gray-800';
                             @endphp
-                            <label
-                                class="flex items-center space-x-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all duration-200 cursor-pointer">
-                                <input type="checkbox" data-staff-id="{{ $member->id }}" name="staff_ids[]"
-                                    value="{{ $member->id }}"
-                                    class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary focus:ring-2"
-                                    @if ($isSelectedRoom) checked @endif
-                                    @if ($isAssignedOtherRoom) disabled @endif>
-                                <span class="{{ $textClass }} font-medium">{{ $member->first_name }} {{ $member->last_name }}</span>
-                            </label>
+
+                            <div
+                                class="staff-card {{ $isAssignedOtherRoom ? 'opacity-50' : '' }} bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border-2 border-primary {{ $isSelectedRoom ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary/50' }}">
+                                <div class="p-6">
+                                    <div class="flex flex-col items-center text-center">
+                                        <!-- Avatar placeholder -->
+                                        <div
+                                            class="w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/40 rounded-full flex items-center justify-center mb-4">
+                                            <span class="text-primary font-bold text-lg">
+                                                {{-- {{ strtoupper(substr($member->first_name, 0, 1) . substr($member->last_name, 0, 1)) }} --}}
+                                                <img src="{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/mdc-logo.png') }}"
+                                                    alt="Profile Image">
+                                            </span>
+                                        </div>
+
+                                        <!-- Staff name -->
+                                        <h3
+                                            class="font-semibold text-gray-800 mb-2 {{ $isAssignedOtherRoom ? 'text-gray-400' : '' }}">
+                                            {{ $member->first_name }} {{ $member->last_name }}
+                                        </h3>
+
+                                        <!-- Status badge -->
+                                        @if ($isSelectedRoom)
+                                            <span
+                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mb-3">
+                                                <img src="{{ asset('icons/success.png') }}" class="w-4 h-4 mr-2"
+                                                    alt="Assigned">
+                                                Assigned
+                                            </span>
+                                        @elseif ($isAssignedOtherRoom)
+                                            <span
+                                                class="inline-flex items-center px-4 py-2 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 mb-3">
+                                                <img src="{{ asset('icons/warning.png') }}" class="w-4 h-4 mr-2"
+                                                    alt="Warning">
+                                                Other Room
+                                            </span>
+                                        @else
+                                            <span
+                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 mb-3">
+                                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd"
+                                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                        clip-rule="evenodd" />
+                                                </svg>
+                                                Unassigned
+                                            </span>
+                                        @endif
+
+                                        <!-- Checkbox -->
+                                        <label class="flex items-center justify-center w-full cursor-pointer">
+                                            <input type="checkbox" data-staff-id="{{ $member->id }}" name="staff_ids[]"
+                                                value="{{ $member->id }}"
+                                                class="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary focus:ring-2 transition-all duration-200"
+                                                @if ($isSelectedRoom) checked @endif
+                                                @if ($isAssignedOtherRoom) disabled @endif>
+                                            <span
+                                                class="ml-2 text-sm {{ $isAssignedOtherRoom ? 'text-gray-400' : 'text-gray-600' }}">
+                                                {{ $isSelectedRoom ? 'Assigned' : ($isAssignedOtherRoom ? 'Unavailable' : 'Available') }}
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
                         @endforeach
                     </div>
                 </div>
 
-                <div class="flex justify-start">
+                <div class="flex justify-center">
                     <button type="submit"
-                        class="w-full bg-primary text-white px-6 py-3 rounded-xl hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer">
-                        Assign
+                        class="bg-primary text-white px-8 py-4 rounded-lg hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer min-w-[200px]">
+                        Update Assignments
                     </button>
                 </div>
             </form>
@@ -93,8 +151,9 @@
                         </div>
                         <div>
                             <p class="text-gray-700 text-sm leading-relaxed">
-                                Are you sure you want to unassign <span id="modalMessage" class="text-secondary"></span>?
-                                This will remove from the current room.
+                                Are you sure you want to unassign <span id="modalMessage"
+                                    class="text-secondary font-semibold"></span>?
+                                This will remove them from the current room.
                             </p>
                         </div>
                     </div>
@@ -151,17 +210,25 @@
             }
 
             document.addEventListener('DOMContentLoaded', function() {
-                document.querySelectorAll('#staffCheckboxes input[type="checkbox"]').forEach(cb => {
+                // Add click handlers for checkboxes
+                document.querySelectorAll('#staffCards input[type="checkbox"]').forEach(cb => {
                     cb.addEventListener('click', function(e) {
                         if (!this.checked) { // only trigger on uncheck
                             e.preventDefault();
                             this.checked = true; // keep checked until confirmed
-                            const staffName = this.nextElementSibling.innerText;
+                            const staffCard = this.closest('.staff-card');
+                            const staffName = staffCard.querySelector('h3').textContent.trim();
                             openModal(this.dataset.staffId, staffName);
+                        } else {
+                            // Add visual feedback for assignment
+                            const staffCard = this.closest('.staff-card');
+                            staffCard.classList.add('border-primary', 'bg-primary/5');
+                            staffCard.classList.remove('border-gray-200');
                         }
                     });
                 });
 
+                // Confirmation button handler
                 document.getElementById('confirmBtn').addEventListener('click', () => {
                     if (!currentStaffId) return;
 
@@ -180,7 +247,7 @@
                                 // Refresh the page to stay on current room after unassignment
                                 const currentRoomId = document.querySelector('input[name="room_id"]').value;
                                 window.location.href =
-                                `{{ route('room.assign') }}?roomId=${currentRoomId}`;
+                                    `{{ route('room.assign') }}?roomId=${currentRoomId}`;
                             } else {
                                 alert(data.message || 'Failed to unassign staff.');
                             }
