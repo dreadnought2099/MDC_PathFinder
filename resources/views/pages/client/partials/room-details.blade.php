@@ -71,8 +71,8 @@
                     <div
                         class="bg-gradient-to-br from-slate-50 to-white rounded-xl shadow-md hover:shadow-lg border border-slate-200 overflow-hidden group hover:scale-105 transition-all duration-300">
                         <div class="cursor-pointer overflow-hidden"
-                            onclick="openModal('{{ Storage::url($member->photo_path ?? 'images/profile.jpeg') }}')">
-                            <img src="{{ Storage::url($member->photo_path ?? 'images/default.jpg') }}"
+                            onclick="openModal('{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/mdc-logo.png') }}')">
+                            <img src="{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/mdc-logo.png') }}"
                                 alt="{{ $member->full_name }}"
                                 class="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500">
                         </div>
