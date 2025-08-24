@@ -4,7 +4,7 @@
     <div class="container max-w-6xl mx-auto overflow-y-auto h-[80vh]">
         <x-floating-actions />
 
-        <div class="bg-white sticky top-0 z-50">
+        <div class="bg-white sticky top-0 z-48">
             <h1 class="text-3xl text-center font-bold mb-8 text-gray-800">
                 <span class="text-primary">Assign</span> Staff to Room
             </h1>
@@ -48,13 +48,10 @@
                                 <div class="p-6">
                                     <div class="flex flex-col items-center text-center">
                                         <!-- Avatar placeholder -->
-                                        <div
-                                            class="w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/40 rounded-full flex items-center justify-center mb-4">
-                                            <span class="text-primary font-bold text-lg">
-                                                {{-- {{ strtoupper(substr($member->first_name, 0, 1) . substr($member->last_name, 0, 1)) }} --}}
-                                                <img src="{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/mdc-logo.png') }}"
-                                                    alt="Profile Image">
-                                            </span>
+                                        <div class="w-16 h-16 mb-4">
+                                            <img src="{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/mdc-logo.png') }}"
+                                                alt="{{ $member->first_name }} {{ $member->last_name }}"
+                                                class="w-16 h-16 rounded-full object-cover">
                                         </div>
 
                                         <!-- Staff name -->
@@ -75,17 +72,14 @@
                                             <span
                                                 class="inline-flex items-center px-4 py-2 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 mb-3">
                                                 <img src="{{ asset('icons/warning.png') }}" class="w-4 h-4 mr-2"
-                                                    alt="Warning">
+                                                    alt="Other Room">
                                                 Other Room
                                             </span>
                                         @else
                                             <span
                                                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 mb-3">
-                                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd"
-                                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                                        clip-rule="evenodd" />
-                                                </svg>
+                                                <img src="{{ asset('icons/error-gray.png') }}" class="w-4 h-4 mr-2"
+                                                    alt="Unassigned">
                                                 Unassigned
                                             </span>
                                         @endif
