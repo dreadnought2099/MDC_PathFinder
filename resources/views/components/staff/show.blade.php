@@ -27,14 +27,14 @@
             <div class="p-8">
                 <div class="flex flex-col lg:flex-row gap-8">
 
-                    @if ($staff->photo_path)
+                    {{-- @if ($staff->photo_path) --}}
                         <div class="mt-4">
                             <img src="{{ $staff->photo_path ? Storage::url($staff->photo_path) : asset('images/mdc-logo.png') }}"
                                 alt="Photo of {{ $staff->name }}" title="Click image to expand"
                                 class="w-full h-40 object-cover rounded hover:scale-110 transition-transform duration-300 cursor-pointer"
-                                onclick="openModal('{{ Storage::url($staff->photo_path) }}')">
+                                onclick="openModal('{{ $staff->photo_path ? Storage::url($staff->photo_path) : asset('images/mdc-logo.png') }}')">
                         </div>
-                    @endif
+                    {{-- @endif --}}
 
                     <!-- Information Section -->
                     <div class="flex-1 space-y-6">
