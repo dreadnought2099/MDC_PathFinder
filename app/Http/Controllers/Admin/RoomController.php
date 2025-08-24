@@ -354,7 +354,7 @@ class RoomController extends Controller
         return view('pages.admin.rooms.assign', compact('rooms', 'staff', 'selectedRoom'));
     }
 
-    public function assignStaff(Request $request, Room $room)
+    public function assignStaff(Request $request)
     {
         //For Debugging
         Log::info('Room ID received: ' . $request->room_id);
@@ -407,11 +407,15 @@ class RoomController extends Controller
     public function removeFromRoom($id)
     {
         $staff = Staff::findOrFail($id);
+        $room = $staff->room; // assumes Staff has a belongsTo(Room::class) relationship
+
+        $name = $staff->full_name;
+
         $staff->room_id = null;
         $staff->save();
 
-        return response()->json([
-            'success' => true,
-        ]);
+        return redirect()
+            ->route('room.assign', ['roomId' => $room->id])
+            ->with('success', "{$name} was successfully removed from {$room->name}.");
     }
 }

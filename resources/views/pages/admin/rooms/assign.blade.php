@@ -102,14 +102,14 @@
                         @endforeach
                     </div>
                 </div>
-    </div>
-    <div class="flex justify-center">
-        <button type="submit"
-            class="bg-primary text-white px-8 py-4 rounded-lg hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer min-w-[200px]">
-            Update Assignments
-        </button>
-    </div>
-    </form>
+            </div>
+            <div class="flex justify-center">
+                <button type="submit"
+                    class="bg-primary text-white px-8 py-4 rounded-lg hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer min-w-[200px]">
+                    Update Assignments
+                </button>
+            </div>
+        </form>
     @endif
 
     <!-- Confirmation Modal -->
@@ -140,8 +140,7 @@
                     </div>
                     <div>
                         <p class="text-gray-700 text-sm leading-relaxed">
-                            Are you sure you want to unassign <span id="modalMessage"
-                                class="text-secondary"></span>?
+                            Are you sure you want to unassign <span id="modalMessage" class="text-secondary"></span>?
                             This will remove them from the current room.
                         </p>
                     </div>
@@ -154,10 +153,14 @@
                         class="px-4 py-2 text-sm font-medium border border-gray-400 hover:text-white hover:bg-gray-400 rounded-lg transition-all duration-300 cursor-pointer">
                         Cancel
                     </button>
-                    <button type="button" id="confirmBtn"
-                        class="px-4 py-2 text-sm font-medium text-white bg-secondary border border-secondary rounded-lg hover:bg-white hover:text-secondary focus:ring-2 focus:ring-secondary focus:ring-offset-2 transition-all duration-300 cursor-pointer">
-                        Unassign Staff
-                    </button>
+                    <form id="unassignForm" method="POST" style="display: inline;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit"
+                            class="px-4 py-2 text-sm font-medium text-white bg-secondary border border-secondary rounded-lg hover:bg-white hover:text-secondary focus:ring-2 focus:ring-secondary focus:ring-offset-2 transition-all duration-300 cursor-pointer">
+                            Unassign Staff
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -171,9 +174,13 @@
         function openModal(staffId, staffName) {
             const modal = document.getElementById('confirmModal');
             const nameSpan = document.getElementById('modalMessage');
+            const unassignForm = document.getElementById('unassignForm');
 
             currentStaffId = staffId;
             nameSpan.textContent = staffName;
+
+            // Set the form action to the correct route
+            unassignForm.action = `/admin/rooms/staff/${staffId}/remove`;
 
             modal.classList.remove('hidden');
             setTimeout(() => {
@@ -217,37 +224,6 @@
                         staffCard.classList.remove('border-gray-200');
                     }
                 });
-            });
-
-            // Confirmation button handler
-            document.getElementById('confirmBtn').addEventListener('click', () => {
-                if (!currentStaffId) return;
-
-                fetch(`/admin/rooms/staff/${currentStaffId}/remove`, {
-                        method: 'PATCH',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        closeModal();
-                        if (data.success) {
-                            // Refresh the page to stay on current room after unassignment
-                            const currentRoomId = document.querySelector('input[name="room_id"]').value;
-                            window.location.href =
-                                `{{ route('room.assign') }}?roomId=${currentRoomId}`;
-                        } else {
-                            alert(data.message || 'Failed to unassign staff.');
-                        }
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        alert('Server error.');
-                        closeModal();
-                    });
             });
 
             // Close modal on Escape key

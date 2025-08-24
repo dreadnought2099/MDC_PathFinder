@@ -103,7 +103,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/rooms/{room}/carousel/{image}', [RoomController::class, 'removeCarouselImage'])->name('carousel.remove');
 
         // Staff removal from room
-        Route::patch('/rooms/staff/{id}/remove', [RoomController::class, 'removeFromRoom'])->name('staff.remove');
+        Route::delete('/rooms/staff/{id}/remove', [RoomController::class, 'removeFromRoom'])->name('staff.remove');
     });
 
     /*
