@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="min-h-screen py-8 px-4">
-        <div class="max-w-2xl mx-auto">
+        <div class="max-w-2xl mx-auto border-2 border-primary rounded-lg p-4">
 
             <!-- Header -->
             <div class="text-center mb-8">
@@ -16,7 +16,7 @@
             </div>
 
             <!-- Form Card -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div class="bg-white overflow-hidden">
                 <div class="p-8">
                     <form method="POST" action="{{ route('staff.update', $staff->id) }}" enctype="multipart/form-data"
                         class="space-y-6" data-upload>
@@ -25,7 +25,7 @@
 
                         <!-- First Name Field -->
                         <div>
-                            <label class="block text-sm font-semibold text-gray-800 mb-2">First Name</label>
+                            <label class="block text-sm text-gray-800 mb-2">First Name</label>
                             <input type="text" name="first_name" value="{{ old('name', $staff->first_name) }}"
                                 class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300">
                             @error('name')
@@ -35,7 +35,7 @@
 
                         <!-- Middle Name Field -->
                         <div>
-                            <label class="block text-sm font-semibold text-gray-800 mb-2">Middle Name</label>
+                            <label class="block text-sm text-gray-800 mb-2">Middle Name</label>
                             <input type="text" name="middle_name" value="{{ old('name', $staff->middle_name) }}"
                                 class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300">
                             @error('name')
@@ -45,7 +45,7 @@
 
                         <!-- Last Name Field -->
                         <div>
-                            <label class="block text-sm font-semibold text-gray-800 mb-2">Last Name</label>
+                            <label class="block text-sm text-gray-800 mb-2">Last Name</label>
                             <input type="text" name="last_name" value="{{ old('name', $staff->last_name) }}"
                                 class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300">
                             @error('name')
@@ -55,7 +55,7 @@
 
                         <!-- Suffix Field -->
                         <div>
-                            <label class="block text-sm font-semibold text-gray-800 mb-2">Suffix</label>
+                            <label class="block text-sm text-gray-800 mb-2">Suffix</label>
                             <select name="suffix"
                                 class="w-full border border-gray-300 rounded-xl px-4 py-3 
                    focus:border-primary focus:ring-1 focus:ring-primary 
@@ -93,7 +93,7 @@
 
                         <!-- Credentials Field -->
                         <div>
-                            <label class="block text-sm font-semibold text-gray-800 mb-2">Credentials</label>
+                            <label class="block text-sm text-gray-800 mb-2">Credentials</label>
                             <input type="text" name="credentials" value="{{ old('credentials', $staff->credentials) }}"
                                 class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300">
                             @error('name')
@@ -102,7 +102,7 @@
                         </div>
                         <!-- Email Field -->
                         <div>
-                            <label class="block text-sm font-semibold text-gray-800 mb-2">Email</label>
+                            <label class="block text-sm text-gray-800 mb-2">Email</label>
                             <input type="email" name="email" value="{{ old('email', $staff->email) }}"
                                 class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300">
                             @error('email')
@@ -112,14 +112,14 @@
 
                         <!-- Position Field -->
                         <div>
-                            <label class="block text-sm font-semibold text-gray-800 mb-2">Position</label>
+                            <label class="block text-sm text-gray-800 mb-2">Position</label>
                             <input type="text" name="position" value="{{ old('position', $staff->position) }}"
                                 class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300">
                         </div>
 
                         <!-- Phone Number Field -->
                         <div>
-                            <label class="block text-sm font-semibold text-gray-800 mb-2">Phone Number</label>
+                            <label class="block text-sm text-gray-800 mb-2">Phone Number</label>
                             <input type="text" name="phone_num" value="{{ old('phone_num', $staff->phone_num) }}"
                                 class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300">
                             @error('phone_num')
@@ -129,14 +129,14 @@
 
                         <!-- Bio Field -->
                         <div>
-                            <label class="block text-sm font-semibold text-gray-800 mb-2">Bio</label>
+                            <label class="block text-sm text-gray-800 mb-2">Bio</label>
                             <textarea name="bio" rows="4"
                                 class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300 resize-none">{{ old('bio', $staff->bio) }}</textarea>
                         </div>
 
                         <!-- Photo Upload Field -->
                         <div>
-                            <label class="block text-sm font-semibold text-gray-800 mb-2">Photo</label>
+                            <label class="block text-sm text-gray-800 mb-2">Photo</label>
                             <div class="space-y-4">
                                 <input type="file" name="photo_path" accept="image/*"
                                     class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary file:text-white file:cursor-pointer hover:file:bg-blue-500">
