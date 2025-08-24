@@ -169,7 +169,7 @@
     </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Cover image upload preview
@@ -550,4 +550,4 @@
             renderOfficeHours();
         });
     </script>
-@endsection
+@endpush

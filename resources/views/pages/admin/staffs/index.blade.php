@@ -157,7 +157,9 @@
             </div>
         </div>
     </div>
+@endsection
 
+@push('scripts')
     <script>
         function openModal(id, name) {
             const modal = document.getElementById('deleteModal');
@@ -205,4 +207,4 @@
             if (e.target === modal) closeModal();
         });
     </script>
-@endsection
+@endpush

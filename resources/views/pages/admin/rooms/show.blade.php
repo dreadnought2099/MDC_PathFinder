@@ -213,30 +213,32 @@
     </div>
 @endsection
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        function openModal(src) {
-            const modal = document.getElementById('imageModal');
-            const modalImage = document.getElementById('modalImage');
-            modalImage.src = src;
-            modal.classList.remove('hidden');
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('imageModal');
-            const modalImage = document.getElementById('modalImage');
-            modalImage.src = '';
-            modal.classList.add('hidden');
-        }
-
-        window.openModal = openModal;
-        window.closeModal = closeModal;
-
-        const modal = document.getElementById('imageModal');
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeModal();
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            function openModal(src) {
+                const modal = document.getElementById('imageModal');
+                const modalImage = document.getElementById('modalImage');
+                modalImage.src = src;
+                modal.classList.remove('hidden');
             }
+
+            function closeModal() {
+                const modal = document.getElementById('imageModal');
+                const modalImage = document.getElementById('modalImage');
+                modalImage.src = '';
+                modal.classList.add('hidden');
+            }
+
+            window.openModal = openModal;
+            window.closeModal = closeModal;
+
+            const modal = document.getElementById('imageModal');
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
         });
-    });
-</script>
+    </script>
+@endpush

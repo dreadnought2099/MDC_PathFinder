@@ -28,12 +28,12 @@
                 <div class="flex flex-col lg:flex-row gap-8">
 
                     {{-- @if ($staff->photo_path) --}}
-                        <div class="mt-4">
-                            <img src="{{ $staff->photo_path ? Storage::url($staff->photo_path) : asset('images/mdc-logo.png') }}"
-                                alt="Photo of {{ $staff->name }}" title="Click image to expand"
-                                class="w-full h-40 object-cover rounded hover:scale-110 transition-transform duration-300 cursor-pointer"
-                                onclick="openModal('{{ $staff->photo_path ? Storage::url($staff->photo_path) : asset('images/mdc-logo.png') }}')">
-                        </div>
+                    <div class="mt-4">
+                        <img src="{{ $staff->photo_path ? Storage::url($staff->photo_path) : asset('images/mdc-logo.png') }}"
+                            alt="Photo of {{ $staff->name }}" title="Click image to expand"
+                            class="w-full h-40 object-cover rounded hover:scale-110 transition-transform duration-300 cursor-pointer"
+                            onclick="openModal('{{ $staff->photo_path ? Storage::url($staff->photo_path) : asset('images/mdc-logo.png') }}')">
+                    </div>
                     {{-- @endif --}}
 
                     <!-- Information Section -->
@@ -123,36 +123,38 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const modal = document.getElementById('imageModal');
-        const modalImage = document.getElementById('modalImage');
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
 
-        if (!modal || !modalImage) return;
+            if (!modal || !modalImage) return;
 
-        window.openModal = function(src) {
-            modalImage.src = src;
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        };
+            window.openModal = function(src) {
+                modalImage.src = src;
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            };
 
-        window.closeModal = function() {
-            modal.classList.add('hidden');
-            modalImage.src = '';
-            document.body.style.overflow = 'auto';
-        };
+            window.closeModal = function() {
+                modal.classList.add('hidden');
+                modalImage.src = '';
+                document.body.style.overflow = 'auto';
+            };
 
 
-        // Close by clicking outside the image
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
+            // Close by clicking outside the image
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+
+            // Close with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                    closeModal();
+                }
+            });
         });
-
-        // Close with Escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-                closeModal();
-            }
-        });
-    });
-</script>
+    </script>
+@endpush

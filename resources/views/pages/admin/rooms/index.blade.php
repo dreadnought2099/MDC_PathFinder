@@ -9,7 +9,7 @@
             </h1>
             <p class="text-gray-600">Manage rooms and assign staff members</p>
         </div>
-        
+
         <!-- Floating Actions -->
         <div class="mb-6">
             <x-floating-actions />
@@ -150,7 +150,9 @@
             </div>
         </div>
     </div>
+@endsection
 
+@push('scripts')
     <script>
         function openRoomModal(id, name) {
             const modal = document.getElementById('roomDeleteModal');
@@ -195,4 +197,4 @@
             if (e.target === modal) closeRoomModal();
         });
     </script>
-@endsection
+@endpush

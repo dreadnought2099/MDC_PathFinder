@@ -202,7 +202,7 @@
     </script>
 
     <!-- Yield additional scripts from child views (e.g., Cropper.js in profile.blade.php) -->
-    @yield('scripts')
+    @stack('scripts')
 
     <!-- Upload Progress Modal: Used for forms with data-upload attribute -->
     <x-upload-progress-modal />
