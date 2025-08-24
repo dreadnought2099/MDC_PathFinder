@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container max-w-6xl mx-auto overflow-y-auto h-[80vh]">
+    <div id="scrollContainer" class="container max-w-6xl mx-auto overflow-y-auto h-[80vh]">
         <x-floating-actions />
 
         <div class="bg-white sticky top-0 z-48">
@@ -102,14 +102,14 @@
                         @endforeach
                     </div>
                 </div>
-            </div>
-            <div class="flex justify-center">
-                <button type="submit"
-                    class="bg-primary text-white px-8 py-4 rounded-lg hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer min-w-[200px]">
-                    Update Assignments
-                </button>
-            </div>
-        </form>
+    </div>
+    <div class="flex justify-center">
+        <button type="submit"
+            class="bg-primary text-white px-8 py-4 rounded-lg hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer min-w-[200px]">
+            Update Assignment
+        </button>
+    </div>
+    </form>
     @endif
 
     <!-- Confirmation Modal -->
@@ -171,54 +171,63 @@
     <script>
         let currentStaffId = null;
 
-        function openModal(staffId, staffName) {
-            const modal = document.getElementById('confirmModal');
-            const nameSpan = document.getElementById('modalMessage');
-            const unassignForm = document.getElementById('unassignForm');
-
-            currentStaffId = staffId;
-            nameSpan.textContent = staffName;
-
-            // Set the form action to the correct route
-            unassignForm.action = `/admin/rooms/staff/${staffId}/remove`;
-
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                modal.querySelector('.bg-white').classList.remove('scale-95');
-                modal.querySelector('.bg-white').classList.add('scale-100');
-            }, 10);
-
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('confirmModal');
-            const modalContent = modal.querySelector('.bg-white');
-
-            modal.classList.add('opacity-0');
-            modalContent.classList.remove('scale-100');
-            modalContent.classList.add('scale-95');
-
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                document.body.style.overflow = 'auto';
-                currentStaffId = null;
-            }, 300);
-        }
-
         document.addEventListener('DOMContentLoaded', function() {
-            // Add click handlers for checkboxes
+            const container = document.getElementById('scrollContainer');
+            if (!container) return;
+
+            // Restore scroll
+            const savedPos = sessionStorage.getItem('scrollContainerPos');
+            if (savedPos !== null) container.scrollTop = parseInt(savedPos, 10);
+
+            // Save on scroll
+            container.addEventListener('scroll', () => {
+                sessionStorage.setItem('scrollContainerPos', container.scrollTop);
+            });
+
+            function openModal(staffId, staffName) {
+                const modal = document.getElementById('confirmModal');
+                const nameSpan = document.getElementById('modalMessage');
+                const unassignForm = document.getElementById('unassignForm');
+
+                currentStaffId = staffId;
+                nameSpan.textContent = staffName;
+                unassignForm.action = `/admin/rooms/staff/${staffId}/remove`;
+
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    modal.querySelector('.bg-white').classList.remove('scale-95');
+                    modal.querySelector('.bg-white').classList.add('scale-100');
+                }, 10);
+
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal() {
+                const modal = document.getElementById('confirmModal');
+                const modalContent = modal.querySelector('.bg-white');
+
+                modal.classList.add('opacity-0');
+                modalContent.classList.remove('scale-100');
+                modalContent.classList.add('scale-95');
+
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+                    currentStaffId = null;
+                }, 300);
+            }
+
+            // Checkbox handlers
             document.querySelectorAll('#staffCards input[type="checkbox"]').forEach(cb => {
                 cb.addEventListener('click', function(e) {
-                    if (!this.checked) { // only trigger on uncheck
+                    if (!this.checked) {
                         e.preventDefault();
-                        this.checked = true; // keep checked until confirmed
+                        this.checked = true;
                         const staffCard = this.closest('.staff-card');
                         const staffName = staffCard.querySelector('h3').textContent.trim();
                         openModal(this.dataset.staffId, staffName);
                     } else {
-                        // Add visual feedback for assignment
                         const staffCard = this.closest('.staff-card');
                         staffCard.classList.add('border-primary', 'bg-primary/5');
                         staffCard.classList.remove('border-gray-200');
@@ -226,10 +235,11 @@
                 });
             });
 
-            // Close modal on Escape key
+            // Escape key closes modal
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') closeModal();
             });
         });
+    </script>
     </script>
 @endpush

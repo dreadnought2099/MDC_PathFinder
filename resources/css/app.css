@@ -31,7 +31,7 @@
         background-color: var(--color-primary);
         color: white;
     }
-    
+
     html {
         scroll-behavior: smooth;
         overflow-y: scroll;
