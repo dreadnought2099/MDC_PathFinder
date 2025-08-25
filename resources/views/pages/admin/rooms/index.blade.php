@@ -8,7 +8,7 @@
                 <span class="text-primary">Office</span> Management
             </h1>
             <p class="text-gray-600">Manage rooms and assign staff members</p>
-            <div class="mt-4 flex justify-end">
+            <div class="mt-4 flex justify-center">
                 {{ $rooms->appends(request()->query())->links('pagination::tailwind') }}
             </div>
         </div>

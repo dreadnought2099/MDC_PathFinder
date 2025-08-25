@@ -8,7 +8,7 @@
                 <span class="text-primary">Staff</span> Management
             </h1>
             <p class="text-gray-600">Manage your team members and their information</p>
-            <div class="mt-4 flex justify-end">
+            <div class="mt-4 flex justify-center">
                 {{ $staffs->appends(request()->query())->links('pagination::tailwind') }}
             </div>
         </div>

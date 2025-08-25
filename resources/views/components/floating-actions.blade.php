@@ -1,7 +1,7 @@
 <div>
     <!-- It is never too late to be what you might have been. - George Eliot -->
      <div x-data="{ open: false }" @click.away="open = false"
-            class="fixed bottom-6 right-6 flex flex-col items-end space-y-2">
+            class="fixed bottom-6 right-6 flex flex-col items-end space-y-2 z-50">
             <!-- Buttons -->
             <template x-if="open">
                 <div class="flex flex-col space-y-2 mb-2">
