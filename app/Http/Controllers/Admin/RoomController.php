@@ -361,6 +361,7 @@ class RoomController extends Controller
     {
         //For Debugging
         Log::info('Room ID received: ' . $request->room_id);
+        Log::info('Current page: ' . $request->input('page', 1));
 
         $request->validate([
             'room_id' => 'required|exists:rooms,id',
@@ -400,14 +401,20 @@ class RoomController extends Controller
         // Build message
         $staffNames = !empty($assignedStaff) ? implode(', ', $assignedStaff) : 'No staff';
 
-        //For Debugging
-        Log::info('Redirecting to room: ' . $request->room_id);
+        // Get current page from request
+        $page = $request->input('page', 1);
 
-        // Change this redirect to use route parameter instead of query parameter
-        return redirect()->route('room.assign', $room->id)->with('success', "{$staffNames} was successfully assigned to {$room->name}.");
+        //For Debugging
+        Log::info('Redirecting to room: ' . $request->room_id . ' with page: ' . $page);
+
+        // Redirect with both roomId and page parameters
+        return redirect()
+            ->route('room.assign', ['roomId' => $room->id])
+            ->with('success', "{$staffNames} was successfully assigned to {$room->name}.")
+            ->withInput(['roomId' => $room->id, 'page' => $page]);
     }
 
-    public function removeFromRoom($id)
+    public function removeFromRoom(Request $request, $id)
     {
         $staff = Staff::findOrFail($id);
         $room = $staff->room; // assumes Staff has a belongsTo(Room::class) relationship
@@ -417,8 +424,15 @@ class RoomController extends Controller
         $staff->room_id = null;
         $staff->save();
 
+        // Preserve pagination page after the page reload
+        // Get page from request or session
+        $page = $request->input('page') ?? session('current_page', 1);
+
+        Log::info('Removing staff, current page: ' . $page);
+
         return redirect()
             ->route('room.assign', ['roomId' => $room->id])
-            ->with('success', "{$name} was successfully removed from {$room->name}.");
+            ->with('success', "{$name} was successfully removed from {$room->name}.")
+            ->withInput(['roomId' => $room->id, 'page' => $page]);
     }
 }

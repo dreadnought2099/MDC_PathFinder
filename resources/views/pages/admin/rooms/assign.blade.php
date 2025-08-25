@@ -34,15 +34,16 @@
                 @csrf
                 @method('PUT')
                 <input type="hidden" name="room_id" value="{{ $selectedRoom->id }}">
+                <input type="hidden" name="page" value="{{ request('page', 1) }}">
 
                 <div class="mb-8">
                     <!-- Pagination with proper alignment -->
-                    <div class="flex justify-center mb-8 sticky top-0">
+                    <div class="flex justify-center mb-8">
                         <div class="w-full max-w-lg">
                             {{ $staff->appends(['roomId' => $selectedRoom->id ?? null])->links('pagination::tailwind') }}
                         </div>
                     </div>
-
+                    
                     <div id="staffCards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         @foreach ($staff as $member)
                             @php
@@ -112,9 +113,9 @@
                 </div>
 
                 <!-- Submit Button with proper spacing -->
-                <div class="flex justify-center pt-4 pb-4 sticky bottom-0">
+                <div class="flex justify-center pt-8 pb-8 sticky bottom-0">
                     <button type="submit"
-                        class="bg-primary text-white px-4 py-3 rounded-lg hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer font-medium">
+                        class="bg-primary text-white px-8 py-4 rounded-lg hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer min-w-[200px] font-medium">
                         Update Assignment
                     </button>
                 </div>
@@ -198,10 +199,11 @@
                 const modal = document.getElementById('confirmModal');
                 const nameSpan = document.getElementById('modalMessage');
                 const unassignForm = document.getElementById('unassignForm');
+                const currentPage = new URLSearchParams(window.location.search).get('page') || '1';
 
                 currentStaffId = staffId;
                 nameSpan.textContent = staffName;
-                unassignForm.action = `/admin/rooms/staff/${staffId}/remove`;
+                unassignForm.action = `/admin/rooms/staff/${staffId}/remove?page=${currentPage}`;
 
                 modal.classList.remove('hidden');
                 setTimeout(() => {
