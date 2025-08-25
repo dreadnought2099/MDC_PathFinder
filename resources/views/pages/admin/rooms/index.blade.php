@@ -8,6 +8,9 @@
                 <span class="text-primary">Office</span> Management
             </h1>
             <p class="text-gray-600">Manage rooms and assign staff members</p>
+            <div class="mt-4 flex justify-end">
+                {{ $rooms->appends(request()->query())->links('pagination::tailwind') }}
+            </div>
         </div>
 
         <!-- Floating Actions -->
@@ -116,7 +119,7 @@
                 <div class="flex items-center space-x-3 mb-4">
                     <div class="flex-shrink-0">
                         <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                            <img src="{{ asset('icons/warning-red.png')}}" class="w-8 h-8" alt="Warning">
+                            <img src="{{ asset('icons/warning-red.png') }}" class="w-8 h-8" alt="Warning">
                         </div>
                     </div>
                     <div>
