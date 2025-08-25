@@ -1,18 +1,22 @@
 @extends('layouts.app')
 
 @section('content')
-    <div id="scrollContainer" class="container max-w-6xl mx-auto overflow-y-auto h-[80vh]">
+    <div id="scrollContainer" class="container max-w-6xl mx-auto overflow-y-auto h-[90vh]">
         <x-floating-actions />
 
-        <div class="bg-white sticky top-0 z-48">
-            <h1 class="text-3xl text-center font-bold mb-8 text-gray-800">
-                <span class="text-primary">Assign</span> Staff to Room
-            </h1>
+        <div class="bg-white sticky top-0 z-48 pb-6">
+            <!-- Main Title with improved spacing -->
+            <div class="text-center pt-8 pb-6">
+                <h1 class="text-4xl font-bold text-gray-800 mb-2">
+                    <span class="text-primary">Assign</span> Staff to Room
+                </h1>
+            </div>
 
-            <div class="mb-8">
-                <form method="GET" action="{{ route('room.assign') }}">
+            <!-- Room Selection Dropdown with better alignment -->
+            <div class="flex justify-center px-4 pb-8">
+                <form method="GET" action="{{ route('room.assign') }}" class="w-full max-w-md">
                     <select name="roomId" onchange="this.form.submit()"
-                        class="w-full max-w-md mx-auto block border border-gray-300 rounded-lg px-4 py-3 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200">
+                        class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200">
                         @foreach ($rooms as $room)
                             <option value="{{ $room->id }}"
                                 {{ isset($selectedRoom) && $selectedRoom->id == $room->id ? 'selected' : '' }}>
@@ -24,7 +28,6 @@
             </div>
         </div>
 
-
         {{-- Staff assignment POST form --}}
         @if (isset($selectedRoom))
             <form action="{{ route('room.assign.update') }}" method="POST" id="assignForm">
@@ -33,7 +36,12 @@
                 <input type="hidden" name="room_id" value="{{ $selectedRoom->id }}">
 
                 <div class="mb-8">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-6 text-center">Select Staff Members</h2>
+                    <!-- Pagination with proper alignment -->
+                    <div class="flex justify-center mb-8 sticky top-0">
+                        <div class="w-full max-w-lg">
+                            {{ $staff->appends(['roomId' => $selectedRoom->id ?? null])->links('pagination::tailwind') }}
+                        </div>
+                    </div>
 
                     <div id="staffCards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         @foreach ($staff as $member)
@@ -102,15 +110,17 @@
                         @endforeach
                     </div>
                 </div>
+
+                <!-- Submit Button with proper spacing -->
+                <div class="flex justify-center pt-4 pb-4 sticky bottom-0">
+                    <button type="submit"
+                        class="bg-primary text-white px-4 py-3 rounded-lg hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer font-medium">
+                        Update Assignment
+                    </button>
+                </div>
+            </form>
+        @endif
     </div>
-    <div class="flex justify-center">
-        <button type="submit"
-            class="bg-primary text-white px-8 py-4 rounded-lg hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer min-w-[200px]">
-            Update Assignment
-        </button>
-    </div>
-    </form>
-    @endif
 
     <!-- Confirmation Modal -->
     <div id="confirmModal"
@@ -218,6 +228,10 @@
                 }, 300);
             }
 
+            // Make functions globally available
+            window.openModal = openModal;
+            window.closeModal = closeModal;
+
             // Checkbox handlers
             document.querySelectorAll('#staffCards input[type="checkbox"]').forEach(cb => {
                 cb.addEventListener('click', function(e) {
@@ -240,6 +254,5 @@
                 if (e.key === 'Escape') closeModal();
             });
         });
-    </script>
     </script>
 @endpush

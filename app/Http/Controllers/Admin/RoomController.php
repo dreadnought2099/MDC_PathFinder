@@ -351,6 +351,9 @@ class RoomController extends Controller
         $selectedRoom = $roomId ? Room::find($roomId) : null;
         $staff = Staff::with('room')->get();
 
+        // Paginate staff
+        $staff = Staff::with('room')->paginate(12);
+
         return view('pages.admin.rooms.assign', compact('rooms', 'staff', 'selectedRoom'));
     }
 
