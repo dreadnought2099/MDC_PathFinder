@@ -299,26 +299,108 @@
             let officeHoursData = {};
 
             // Populate existing data from the room model
-            @php
-                $existingOfficeHours = [];
-                foreach ($daysOfWeek as $day) {
-                    $ranges = $room->officeHours->where('day', $day)->values();
-                    if ($ranges->isNotEmpty()) {
-                        $existingOfficeHours[$day] = $ranges
-                            ->map(function ($range) {
-                                return [
-                                    'start' => $range->start_time,
-                                    'end' => $range->end_time,
-                                ];
-                            })
-                            ->toArray();
-                    }
-                }
-            @endphp
-
             officeHoursData = @json($existingOfficeHours);
 
-            // Quick select functionality
+            // Function to find the most common time range across all days
+            function getMostCommonTimeRange() {
+                const timeRangeCount = {};
+                let mostCommon = null;
+                let maxCount = 0;
+
+                // Count occurrences of each time range
+                Object.values(officeHoursData).forEach(dayRanges => {
+                    if (dayRanges && dayRanges.length > 0) {
+                        // For simplicity, we'll use the first range of each day
+                        const range = dayRanges[0];
+                        const key = `${range.start}-${range.end}`;
+                        timeRangeCount[key] = (timeRangeCount[key] || 0) + 1;
+
+                        if (timeRangeCount[key] > maxCount) {
+                            maxCount = timeRangeCount[key];
+                            mostCommon = range;
+                        }
+                    }
+                });
+
+                return mostCommon;
+            }
+
+            // Function to pre-populate bulk time inputs with existing data
+            function prePopulateBulkTimeInputs() {
+                const commonRange = getMostCommonTimeRange();
+
+                if (commonRange) {
+                    const startInput = document.querySelector('.bulk-start-time');
+                    const endInput = document.querySelector('.bulk-end-time');
+
+                    if (startInput && endInput) {
+                        startInput.value = commonRange.start;
+                        endInput.value = commonRange.end;
+                    }
+                }
+            }
+
+            // Function to update bulk inputs when days are selected
+            function updateBulkInputsForSelectedDays() {
+                const selectedDays = Array.from(document.querySelectorAll('.bulk-day-checkbox:checked'))
+                    .map(cb => cb.value);
+
+                if (selectedDays.length === 0) {
+                    // Clear inputs if no days selected
+                    document.querySelector('.bulk-start-time').value = '';
+                    document.querySelector('.bulk-end-time').value = '';
+                    return;
+                }
+
+                // Find common time range among selected days
+                let commonRange = null;
+
+                if (selectedDays.length === 1) {
+                    // Single day selected - use its first time range
+                    const dayRanges = officeHoursData[selectedDays[0]];
+                    if (dayRanges && dayRanges.length > 0) {
+                        commonRange = dayRanges[0];
+                    }
+                } else {
+                    // Multiple days - find common time range
+                    const firstDayRanges = officeHoursData[selectedDays[0]];
+                    if (firstDayRanges && firstDayRanges.length > 0) {
+                        const candidateRange = firstDayRanges[0];
+
+                        // Check if all selected days have this same time range
+                        const allHaveSameRange = selectedDays.every(day => {
+                            const dayRanges = officeHoursData[day];
+                            return dayRanges && dayRanges.length > 0 &&
+                                dayRanges[0].start === candidateRange.start &&
+                                dayRanges[0].end === candidateRange.end;
+                        });
+
+                        if (allHaveSameRange) {
+                            commonRange = candidateRange;
+                        }
+                    }
+                }
+
+                // Update the bulk input fields
+                const startInput = document.querySelector('.bulk-start-time');
+                const endInput = document.querySelector('.bulk-end-time');
+
+                if (commonRange) {
+                    startInput.value = commonRange.start;
+                    endInput.value = commonRange.end;
+                } else {
+                    // No common range found, clear inputs
+                    startInput.value = '';
+                    endInput.value = '';
+                }
+            }
+
+            // Add event listeners for day checkbox changes
+            document.querySelectorAll('.bulk-day-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', updateBulkInputsForSelectedDays);
+            });
+
+            // Quick select functionality with updated bulk inputs
             document.querySelectorAll('.quick-select').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const days = btn.dataset.days.split(',');
@@ -329,15 +411,19 @@
                             `.bulk-day-checkbox[value="${day}"]`);
                         if (cb) cb.checked = true;
                     });
+
+                    // Update bulk inputs after selection
+                    updateBulkInputsForSelectedDays();
                 });
             });
 
             // Clear all selection
             document.querySelector('.clear-select').addEventListener('click', () => {
                 document.querySelectorAll('.bulk-day-checkbox').forEach(cb => cb.checked = false);
+                updateBulkInputsForSelectedDays();
             });
 
-            // Apply bulk changes
+            // Apply bulk changes (existing code)
             document.querySelector('.apply-bulk').addEventListener('click', function() {
                 const selectedDays = Array.from(document.querySelectorAll('.bulk-day-checkbox:checked'))
                     .map(cb => cb.value);
@@ -411,6 +497,7 @@
                 return `${hour12}:${minutes} ${ampm}`;
             }
 
+            // Enhanced renderOfficeHours with delete functionality
             function renderOfficeHours() {
                 const container = document.getElementById("officeHoursDisplay");
                 container.innerHTML = "";
@@ -436,7 +523,7 @@
                 // Render grouped schedule
                 Object.entries(groupedSchedule).forEach(([rangeKey, group]) => {
                     const li = document.createElement("li");
-                    li.className = "mb-3 p-3 bg-white rounded border";
+                    li.className = "mb-3 p-3 bg-white rounded border relative";
 
                     const daysText = formatDaysGroup(group.days);
                     let timeText;
@@ -449,9 +536,25 @@
                     }
 
                     li.innerHTML = `
-                    <div class="font-medium text-gray-800">${daysText}</div>
-                    <div class="text-sm text-gray-600 mt-1">${timeText}</div>
-                `;
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="font-medium text-gray-800">${daysText}</div>
+                                <div class="text-sm text-gray-600 mt-1">${timeText}</div>
+                            </div>
+                            ${rangeKey !== "closed" ? `
+                                <div class="flex gap-2 ml-4">
+                                    <button type="button" class="edit-schedule-btn text-blue-600 hover:text-blue-800 text-sm px-2 py-1 rounded border border-blue-300 hover:bg-blue-50 transition-colors" 
+                                            data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                        Edit
+                                    </button>
+                                    <button type="button" class="delete-schedule-btn text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded border border-red-300 hover:bg-red-50 transition-colors" 
+                                            data-days='${JSON.stringify(group.days)}'>
+                                        Delete
+                                    </button>
+                                </div>
+                                ` : ''}
+                        </div>
+                    `;
 
                     // Add hidden inputs for form submission
                     group.days.forEach(day => {
@@ -472,6 +575,88 @@
                     });
 
                     container.appendChild(li);
+                });
+
+                // Add event listeners for edit and delete buttons
+                attachScheduleActionListeners();
+
+                // Update day statuses if function exists
+                if (typeof updateDayStatuses === 'function') {
+                    updateDayStatuses();
+                }
+            }
+
+            // Function to attach event listeners to edit and delete buttons
+            function attachScheduleActionListeners() {
+                // Delete functionality
+                document.querySelectorAll('.delete-schedule-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const days = JSON.parse(this.dataset.days);
+                        const daysText = formatDaysGroup(days);
+
+                        if (confirm(
+                            `Are you sure you want to remove office hours for ${daysText}?`)) {
+                            days.forEach(day => {
+                                delete officeHoursData[day];
+                            });
+                            renderOfficeHours();
+                            showTemporaryMessage("Office hours deleted successfully!", "success");
+                        }
+                    });
+                });
+
+                // Edit functionality
+                document.querySelectorAll('.edit-schedule-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const days = JSON.parse(this.dataset.days);
+                        const ranges = JSON.parse(this.dataset.ranges);
+
+                        // Pre-select the days
+                        document.querySelectorAll('.bulk-day-checkbox').forEach(cb => {
+                            cb.checked = days.includes(cb.value);
+                        });
+
+                        // Pre-fill the time inputs with the first range
+                        if (ranges.length > 0) {
+                            document.querySelector('.bulk-start-time').value = ranges[0].start;
+                            document.querySelector('.bulk-end-time').value = ranges[0].end;
+                        }
+
+                        // Scroll to the bulk edit section
+                        document.querySelector('.bulk-time-ranges').scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+
+                        // Add visual highlight
+                        const bulkSection = document.querySelector(
+                            '.mb-6.p-4.border.rounded.bg-blue-50');
+                        bulkSection.classList.add('ring-2', 'ring-blue-400');
+                        setTimeout(() => {
+                            bulkSection.classList.remove('ring-2', 'ring-blue-400');
+                        }, 2000);
+
+                        showTemporaryMessage(
+                            "Schedule loaded for editing. Modify time and click 'Apply'.",
+                            "info");
+                    });
+                });
+            }
+
+            // Function to update individual day status displays
+            function updateDayStatuses() {
+                document.querySelectorAll('.day-status').forEach(statusDiv => {
+                    const day = statusDiv.dataset.day;
+                    const ranges = officeHoursData[day];
+
+                    if (ranges && ranges.length > 0) {
+                        const timeText = ranges.map(r => `${r.start}-${r.end}`).join(', ');
+                        statusDiv.textContent = timeText;
+                        statusDiv.className = 'day-status text-xs mb-2 text-green-600';
+                    } else {
+                        statusDiv.textContent = 'Closed';
+                        statusDiv.className = 'day-status text-xs mb-2 text-gray-500';
+                    }
                 });
             }
 
@@ -536,7 +721,8 @@
                 if (msg) msg.remove();
             }
 
-            // Initial render to show existing office hours
+            // Initialize all functionality
+            prePopulateBulkTimeInputs();
             renderOfficeHours();
         });
     </script>

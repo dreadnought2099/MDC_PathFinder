@@ -134,6 +134,8 @@ class RoomController extends Controller
 
         // Transform officeHours relation to JSON structure expected by JS
         $officeHours = [];
+        $existingOfficeHours = []; // Add this variable
+
         foreach ($room->officeHours as $hour) {
             $officeHours[$hour->day][] = [
                 'start' => \Carbon\Carbon::parse($hour->start_time)->format('H:i'),
@@ -141,8 +143,10 @@ class RoomController extends Controller
             ];
         }
 
+        // Create the existingOfficeHours array (same as officeHours for consistency)
+        $existingOfficeHours = $officeHours;
 
-        return view('pages.admin.rooms.edit', compact('room', 'staffs', 'officeHours'));
+        return view('pages.admin.rooms.edit', compact('room', 'staffs', 'officeHours', 'existingOfficeHours'));
     }
 
     public function update(Request $request, Room $room)
