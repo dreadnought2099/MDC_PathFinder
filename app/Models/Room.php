@@ -35,6 +35,19 @@ class Room extends Model
         return $this->hasMany(OfficeHour::class);
     }
 
+    // Paths that start from this room
+    public function outgoingPaths()
+    {
+
+        return $this->hasMany(Path::class, 'from_room_id');
+    }
+
+    // Paths that lead to this room
+    public function incomingPaths()
+    {
+        return $this->hasMany(Path::class, 'to_room_id');
+    }
+    
     /**
      *  Accessor: Full office hours by day (Mon - Sun)
      */
