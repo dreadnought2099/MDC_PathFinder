@@ -8,22 +8,6 @@
         <h2 class="text-3xl font-bold text-center text-gray-800 mb-2"><span class="text-primary">Edit</span>
             {{ $room->name }}</h2>
 
-        @if ($errors->any())
-            <div class="mb-4 p-4 bg-red-100 text-red-700 rounded">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>• {{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        @if (session('success'))
-            <div class="mb-4 p-4 bg-green-100 text-green-700 rounded">
-                {{ session('success') }}
-            </div>
-        @endif
-
         <form action="{{ route('room.update', $room->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6"
             data-upload>
             @csrf
@@ -542,17 +526,17 @@
                                 <div class="text-sm text-gray-600 mt-1">${timeText}</div>
                             </div>
                             ${rangeKey !== "closed" ? `
-                                <div class="flex gap-2 ml-4">
-                                    <button type="button" class="edit-schedule-btn text-blue-600 hover:text-blue-800 text-sm px-2 py-1 rounded border border-blue-300 hover:bg-blue-50 transition-colors" 
-                                            data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                        Edit
-                                    </button>
-                                    <button type="button" class="delete-schedule-btn text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded border border-red-300 hover:bg-red-50 transition-colors" 
-                                            data-days='${JSON.stringify(group.days)}'>
-                                        Delete
-                                    </button>
-                                </div>
-                                ` : ''}
+                                            <div class="flex gap-2 ml-4">
+                                                <button type="button" class="edit-schedule-btn text-blue-600 hover:text-blue-800 text-sm px-2 py-1 rounded border border-blue-300 hover:bg-blue-50 transition-colors" 
+                                                        data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                    Edit
+                                                </button>
+                                                <button type="button" class="delete-schedule-btn text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded border border-red-300 hover:bg-red-50 transition-colors" 
+                                                        data-days='${JSON.stringify(group.days)}'>
+                                                    Delete
+                                                </button>
+                                            </div>
+                                            ` : ''}
                         </div>
                     `;
 
@@ -586,6 +570,48 @@
                 }
             }
 
+            function showTemporaryMessage(message, type = "info") {
+                const existing = document.getElementById("temp-message");
+                if (existing) existing.remove();
+
+                const div = document.createElement("div");
+                div.id = "temp-message";
+                div.textContent = message;
+
+                const base = "fixed top-24 right-4 p-3 rounded shadow-lg z-49 transition-opacity duration-500 p-3 rounded-md shadow-lg border-l-4";
+                const colors = {
+                    success: "bg-white border border-primary text-primary",
+                    error: "bg-red-100 text-red-700",
+                    info: "bg-yellow-100 text-yellow-700"
+                };
+
+                div.className = `${base} ${colors[type] || colors.info}`;
+                document.body.appendChild(div);
+
+                setTimeout(() => {
+                    div.style.opacity = "0";
+                    setTimeout(() => div.remove(), 500);
+                }, 5000);
+            }
+
+            // Apply bulk changes
+            document.querySelector('.apply-bulk').addEventListener('click', function() {
+                const selectedDays = Array.from(document.querySelectorAll('.bulk-day-checkbox:checked'))
+                    .map(cb => cb.value);
+                if (!selectedDays.length) return alert("Please select at least one day.");
+
+                const ranges = collectBulkRanges();
+                if (!ranges) return;
+
+                selectedDays.forEach(day => {
+                    officeHoursData[day] = ranges;
+                });
+
+                renderOfficeHours();
+                showTemporaryFeedback(this, "Applied Successfully!");
+                showTemporaryMessage("Office hours updated for selected days!", "success"); 
+            });
+
             // Function to attach event listeners to edit and delete buttons
             function attachScheduleActionListeners() {
                 // Delete functionality
@@ -595,7 +621,7 @@
                         const daysText = formatDaysGroup(days);
 
                         if (confirm(
-                            `Are you sure you want to remove office hours for ${daysText}?`)) {
+                                `Are you sure you want to remove office hours for ${daysText}?`)) {
                             days.forEach(day => {
                                 delete officeHoursData[day];
                             });

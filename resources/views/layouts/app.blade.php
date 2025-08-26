@@ -136,7 +136,9 @@
                         if (ev.lengthComputable) {
                             const percent = Math.round((ev.loaded / ev.total) * 100);
                             window.dispatchEvent(new CustomEvent('upload-progress', {
-                                detail: { progress: percent }
+                                detail: {
+                                    progress: percent
+                                }
                             }));
                         }
                     });
