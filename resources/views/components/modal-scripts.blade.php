@@ -1,4 +1,4 @@
-<script>
+{{-- <script>
     function showModal(id) {
         document.getElementById(id).classList.remove('hidden');
     }
@@ -12,4 +12,4 @@
             modal.classList.add('hidden');
         }
     }
-</script>
+</script> --}}

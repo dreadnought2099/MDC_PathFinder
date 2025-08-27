@@ -156,7 +156,7 @@
 
 @if ($backUrl)
     <a href="{{ $backUrl }}"
-        class="flex items-center text-black hover:text-[#157ee1] focus:outline-none cursor-pointer transition-colors duration-200"
+        class="flex items-center text-black hover:text-[#157ee1] focus:outline-none cursor-pointer transition-colors duration-200 dark:text-white"
         title="Go back">
         <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
