@@ -6,33 +6,33 @@
     @if ($items->isEmpty())
         <div class="text-center text-gray-600 py-12">{{ $emptyMessage }}</div>
     @else
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="bg-white dark:bg-gray-800  rounded-lg shadow-md overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="min-w-full table-auto">
-                    <thead class="bg-gray-100">
+                    <thead class="bg-gray-100 dark:bg-gray-700">
                         <tr>
-                            <th class="px-6 py-4 text-left text-sm font-medium text-gray-700">ID</th>
-                            <th class="px-6 py-4 text-left text-sm font-medium text-gray-700">Name</th>
-                            <th class="px-6 py-4 text-left text-sm font-medium text-gray-700">Deleted At</th>
-                            <th class="px-6 py-4 text-left text-sm font-medium text-gray-700">Actions</th>
+                            <th class="px-6 py-4 text-left text-sm font-medium text-gray-700 dark:text-gray-300">ID</th>
+                            <th class="px-6 py-4 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Name</th>
+                            <th class="px-6 py-4 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Deleted At</th>
+                            <th class="px-6 py-4 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200">
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-600">
                         @foreach ($items as $item)
                             {{-- Fallback for Staff Name --}}
                             @php
                                 $displayName = $item->name ?? trim($item->first_name . ' ' . $item->last_name);
                             @endphp
 
-                            <tr class="hover:bg-gray-50 transition-colors duration-200">
+                            <tr class="hover:bg-gray-50 transition-colors duration-200 dark:hover:bg-gray-700">
                                 <td class="px-6 py-4">
-                                    <div class="text-sm font-medium text-gray-900">{{ $item->id }}</div>
+                                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $item->id }}</div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <div class="text-sm font-medium text-gray-900">{{ $displayName }}</div>
+                                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $displayName }}</div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <div class="text-sm text-gray-600">
+                                    <div class="text-sm text-gray-600 dark:text-gray-300">
                                         {{ $item->deleted_at->diffForHumans() }}
                                     </div>
                                 </td>
@@ -57,12 +57,12 @@
                                     <div id="restoreModal-{{ $routePrefix }}-{{ $item->id }}"
                                         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden transition-all duration-300 opacity-0"
                                         onclick="closeModal(event, this)">
-                                        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform transition-all duration-300 scale-95"
+                                        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform transition-all duration-300 scale-95 dark:bg-gray-800"
                                             onclick="event.stopPropagation()">
                                             <!-- Modal Header -->
-                                            <div class="px-6 py-4 border-b border-gray-200">
+                                            <div class="px-6 py-4 border-b border-gray-200 dark-border-b-primary">
                                                 <div class="flex items-center justify-between">
-                                                    <h2 class="text-xl text-gray-900">Confirm <span
+                                                    <h2 class="text-xl text-gray-900 dark:text-gray-300">Confirm <span
                                                             class="text-primary">Restore</span></h2>
                                                     <button
                                                         onclick="hideModal('restoreModal-{{ $routePrefix }}-{{ $item->id }}')"
@@ -86,7 +86,7 @@
                                                         </div>
                                                     </div>
                                                     <div>
-                                                        <p class="text-gray-700 leading-relaxed">
+                                                        <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
                                                             Are you sure you want to restore
                                                             <span
                                                                 class="font-medium text-blue-600">{{ $displayName }}</span>?
@@ -95,7 +95,7 @@
                                                 </div>
                                             </div>
                                             <!-- Modal Footer -->
-                                            <div class="px-6 py-4 bg-gray-50 rounded-b-2xl">
+                                            <div class="px-6 py-4 bg-gray-50 rounded-b-2xl dark:bg-gray-800">
                                                 <form action="{{ route("{$routePrefix}.restore", $item->id) }}"
                                                     method="POST">
                                                     @csrf
@@ -103,11 +103,11 @@
                                                     <div class="flex justify-end space-x-3">
                                                         <button type="button"
                                                             onclick="hideModal('restoreModal-{{ $routePrefix }}-{{ $item->id }}')"
-                                                            class="px-4 py-2 text-sm font-medium border border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-lg transition-all duration-300 cursor-pointer">
+                                                            class="px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-lg transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300">
                                                             Cancel
                                                         </button>
                                                         <button type="submit"
-                                                            class="bg-primary text-white text-sm font-medium px-4 py-2 bg-primary rounded-lg hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer">
+                                                            class="bg-primary text-white text-sm font-medium px-4 py-2 bg-primary rounded-lg hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800">
                                                             Restore
                                                         </button>
                                                     </div>
@@ -120,12 +120,12 @@
                                     <div id="deleteModal-{{ $routePrefix }}-{{ $item->id }}"
                                         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden transition-all duration-300 opacity-0"
                                         onclick="closeModal(event, this)">
-                                        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform transition-all duration-300 scale-95"
+                                        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform transition-all duration-300 scale-95 dark:bg-gray-800"
                                             onclick="event.stopPropagation()">
                                             <!-- Modal Header -->
                                             <div class="px-6 py-4 border-b border-gray-200">
                                                 <div class="flex items-center justify-between">
-                                                    <h2 class="text-xl text-gray-900">Confirm <span
+                                                    <h2 class="text-xl text-gray-900 dark:text-gray-300">Confirm <span
                                                             class="text-secondary">Permanent Deletion</span></h2>
                                                     <button
                                                         onclick="hideModal('deleteModal-{{ $routePrefix }}-{{ $item->id }}')"
@@ -149,7 +149,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="text-sm">
-                                                        <p class="text-gray-700 leading-relaxed">
+                                                        <p class="text-gray-700 leading-relaxed dark:text-gray-300">
                                                             Are you sure you want to permanently delete
                                                             <span
                                                                 class="font-medium text-red-600">{{ $displayName }}</span>?
@@ -159,7 +159,7 @@
                                                 </div>
                                             </div>
                                             <!-- Modal Footer -->
-                                            <div class="px-6 py-4 bg-gray-50 rounded-b-2xl">
+                                            <div class="px-6 py-4 bg-gray-50 rounded-b-2xl dark:bg-gray-800">
                                                 <form action="{{ route("{$routePrefix}.forceDelete", $item->id) }}"
                                                     method="POST">
                                                     @csrf
@@ -168,11 +168,11 @@
                                                     <div class="flex justify-end space-x-3">
                                                         <button type="button"
                                                             onclick="hideModal('deleteModal-{{ $routePrefix }}-{{ $item->id }}')"
-                                                            class="px-4 py-2 text-sm font-medium border border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-lg transition-all duration-300 cursor-pointer">
+                                                            class="px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-lg transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300">
                                                             Cancel
                                                         </button>
                                                         <button type="submit"
-                                                            class="px-4 py-2 text-sm font-medium text-white bg-secondary border border-red-600 rounded-lg hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer">
+                                                            class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-red-600 rounded-lg hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800">
                                                             Delete
                                                         </button>
                                                     </div>
