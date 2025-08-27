@@ -8,17 +8,19 @@ use App\Models\Room;
 use Illuminate\Http\Request;
 
 class PathController extends Controller
-{   
+{
     // Show all paths
-    public function index() {
-        
+    public function index()
+    {
+
         $paths = Path::with(['fromRoom', 'toRoom'])->get();
-        
+
         return view('pages.admin.paths.index', compact('paths'));
     }
 
     // Show forms to create new path
-    public function create() {
+    public function create()
+    {
 
         $rooms = Room::all();
 
@@ -26,19 +28,20 @@ class PathController extends Controller
     }
 
     // Store new path   
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
 
         $data = $request->validate([
             'from_room_id' => 'required|exists:rooms,id',
             'to_room_id' => 'required|exists:rooms,id',
-            'angle' => 'nullable|numeric',
         ]);
 
         Path::create($data);
         return redirect()->route('paths.index')->with('success', 'Path created successfully.');
     }
 
-    public function destroy(Path $path) {
+    public function destroy(Path $path)
+    {
 
         $path->delete();
         return redirect()->route('paths.index')->with('success', 'Path deleted successfully.');

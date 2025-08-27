@@ -20,6 +20,26 @@
             <!-- Main Actions Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
+                <!-- Manage Path Card -->
+                <a href="{{ route('paths.index') }}" class="group card-shadow-hover shadow-primary-hover p-6 border-2 border-primary">
+
+                    <div class="flex flex-col items-center text-center space-y-4">
+                        <div class="bg-primary-10 hover:bg-primary-20 p-4 rounded-full transition-all duration-300">
+                            <img src="{{ asset('images/mdc-logo.png') }}" alt="Manage Staff"
+                                class="h-12 w-12 object-contain" />
+                        </div>
+                        <div>
+                            <h3
+                                class="text-lg text-gray-800 group-hover:text-primary transition-colors duration-300">
+                                Manage Path
+                            </h3>
+                            <p class="text-sm text-gray-600 mt-1 group-hover:text-gray-700 transition-colors duration-300">
+                                Organize Path directions
+                            </p>
+                        </div>
+                    </div>
+                </a>
+
                 <!-- Manage Staff Card -->
                 <a href="{{ route('staff.index') }}" class="group card-shadow-hover shadow-primary-hover p-6 border-2 border-primary">
 
