@@ -13,7 +13,7 @@ class PathController extends Controller
     public function index()
     {
 
-        $paths = Path::with(['fromRoom', 'toRoom'])->get();
+        $paths = Path::with(['fromRoom', 'toRoom'])->paginate(10);
 
         return view('pages.admin.paths.index', compact('paths'));
     }
@@ -37,13 +37,13 @@ class PathController extends Controller
         ]);
 
         Path::create($data);
-        return redirect()->route('paths.index')->with('success', 'Path created successfully.');
+        return redirect()->route('path.index')->with('success', 'Path created successfully.');
     }
 
     public function destroy(Path $path)
     {
 
         $path->delete();
-        return redirect()->route('paths.index')->with('success', 'Path deleted successfully.');
+        return redirect()->route('path.index')->with('success', 'Path deleted successfully.');
     }
 }

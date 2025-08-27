@@ -24,17 +24,40 @@ class PathImageController extends Controller
 
     public function store(Request $request)
     {
+        // Validate multiple files
         $data = $request->validate([
             'path_id' => 'required|exists:paths,id',
-            'file'    => 'required|image|max:2048',
+            'file.*'    => 'required|image|max:51200',
         ]);
 
-        $path = $request->file('file')->store('path_images', 'public');
+        $pathModel = Path::findOrFail($data['path_id']);
+        $files = $request->file('files');
 
-        PathImage::create([
-            'path_id'   => $data['path_id'],
-            'file_path' => $path,
-        ]);
+        if (!$files) {
+            return redirect()->back()->withErrors(['files' => 'Please select at least one image.']);
+        }
+
+        // Get the next image order for this path
+        $nextOrder = PathImage::where('path_id', $data['path_id'])->max('image_order') ?? 0;
+
+        foreach ($files as $file) {
+            $path = $file->store('path_images', 'public');
+
+            PathImage::create([
+                'path_id'     => $data['path_id'],
+                'image_file'  => $path,
+                'image_order' => ++$nextOrder, // increment order for each image
+            ]);
+        }
+
+        session()->flash('success', "Images for Path {$pathModel->fromRoom->name} → {$pathModel->toRoom->name} uploaded successfully.");
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'redirect' => route('path_images.index'),
+                'flash' => session('success'),
+            ], 200);
+        }
 
         return redirect()->route('path_images.index')->with('success', 'Image uploaded successfully.');
     }

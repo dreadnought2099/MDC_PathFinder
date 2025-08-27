@@ -6,7 +6,7 @@
     <div class="container mx-auto p-6">
         <h1 class="text-2xl font-bold mb-4">Create Path</h1>
 
-        <form action="{{ route('paths.store') }}" method="POST" class="space-y-4">
+        <form action="{{ route('path.store') }}" method="POST" class="space-y-4">
             @csrf
 
             <div>
@@ -33,15 +33,9 @@
                 </select>
             </div>
 
-            <div>
-                <label class="block font-medium">Angle (optional)</label>
-                <input type="number" step="0.01" name="angle" value="{{ old('angle') }}"
-                    class="border rounded w-full p-2">
-            </div>
-
             <div class="flex gap-2">
                 <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">Save</button>
-                <a href="{{ route('paths.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</a>
+                <a href="{{ route('path.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</a>
             </div>
         </form>
     </div>

@@ -145,7 +145,7 @@ Route::middleware('auth')->group(function () {
     | Same principle: specific routes before parameterized routes
     */
 
-    Route::prefix('admin')->name('paths.')->group(function () {
+    Route::prefix('admin')->name('path.')->group(function () {
         Route::get('/paths', [PathController::class, 'index'])->name('index');
 
         Route::get('/paths/create', [PathController::class, 'create'])->name('create');

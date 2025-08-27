@@ -1,8 +1,10 @@
 @props([
     'roomFallback' => 'room.index',
     'staffFallback' => 'staff.index',
+    'pathFallback' => 'path.index',
     'trashedRoomFallback' => 'room.recycle-bin',
     'trashedStaffFallback' => 'staff.recycle-bin',
+    'trashedPathFallback' => 'path.recycle-bin',
     'landing' => 'admin.dashboard',
 ])
 
@@ -11,7 +13,7 @@
     $previous = url()->previous();
     $currentRouteName = Route::currentRouteName();
 
-    // Define route patterns based on your actual routes
+    // Define route patterns
     $routePatterns = [
         'room_routes' => [
             'room.index',
@@ -37,96 +39,116 @@
             'staff.restore',
             'staff.forceDelete',
         ],
+        'path_routes' => [
+            'path.index',
+            'path.create',
+            'path.store',
+            'path.show',
+            'path.edit',
+            'path.update',
+            'path.destroy',
+            'path.restore',
+            'path.forceDelete',
+        ],
         'room_assignment_routes' => ['room.assign', 'room.assign.update', 'room.staff.remove'],
-        'recycle_bin_routes' => ['room.recycle-bin', 'staff.recycle-bin'],
-        'index_routes' => ['room.index', 'staff.index'],
-        'show_routes' => ['room.show', 'staff.show'],
-        'edit_routes' => ['room.edit', 'staff.edit'],
-        'create_routes' => ['room.create', 'staff.create'],
+        'recycle_bin_routes' => ['room.recycle-bin', 'staff.recycle-bin', 'path.recycle-bin'],
+        'index_routes' => ['room.index', 'staff.index', 'path.index'],
+        'show_routes' => ['room.show', 'staff.show', 'path.show'],
+        'edit_routes' => ['room.edit', 'staff.edit', 'path.edit'],
+        'create_routes' => ['room.create', 'staff.create', 'path.create'],
     ];
 
-    // Helper function to check if current route matches any pattern
-    $isCurrentRoute = function ($routes) use ($currentRouteName) {
-        return in_array($currentRouteName, $routes);
-    };
+    // Helper: check if current route matches list
+    $isCurrentRoute = fn($routes) => in_array($currentRouteName, $routes);
 
-    // Helper function to check if previous URL contains problematic patterns
-    $previousContains = function ($patterns) use ($previous) {
-        foreach ($patterns as $pattern) {
-            if (strpos($previous, $pattern) !== false) {
-                return true;
-            }
-        }
-        return false;
-    };
+    // Helper: check if previous URL contains problematic patterns
+    $previousContains = fn($patterns) => collect($patterns)->contains(
+        fn($pattern) => strpos($previous, $pattern) !== false,
+    );
 
-    // Determine the correct back URL based on current route
     $backUrl = null;
 
-    // Dashboard - hide back button
+    // Dashboard page: hide back button
     if ($currentRouteName === 'admin.dashboard') {
         $backUrl = null;
     }
-    // Profile page - go to dashboard
+    // Profile page: always go to dashboard
     elseif ($currentRouteName === 'admin.profile') {
         $backUrl = route($landing);
     }
-    // Index pages and recycle bin - always go to dashboard
+    // Index pages and recycle bin: always go to dashboard
     elseif ($isCurrentRoute($routePatterns['index_routes']) || $isCurrentRoute($routePatterns['recycle_bin_routes'])) {
         $backUrl = route($landing);
     }
-    // Room assignment pages - go to room index
+    // Room assignment pages: go to room index
     elseif ($isCurrentRoute($routePatterns['room_assignment_routes'])) {
         $backUrl = route($roomFallback);
     }
-    // Create pages - go to respective index
-    elseif ($currentRouteName === 'room.create') {
-        $backUrl = route($roomFallback);
-    } elseif ($currentRouteName === 'staff.create') {
-        $backUrl = route($staffFallback);
+    // Create pages: go back to respective index
+    elseif (str_ends_with($currentRouteName, '.create')) {
+        if (str_starts_with($currentRouteName, 'room.')) {
+            $backUrl = route($roomFallback);
+        } elseif (str_starts_with($currentRouteName, 'staff.')) {
+            $backUrl = route($staffFallback);
+        } elseif (str_starts_with($currentRouteName, 'path.')) {
+            $backUrl = route($pathFallback);
+        }
     }
-    // Edit pages - go to show page if we have the model, otherwise index
-    elseif ($currentRouteName === 'room.edit') {
+    // Edit pages: go to show page if model exists, otherwise index
+    elseif (str_ends_with($currentRouteName, '.edit')) {
+        if (isset($room) && $currentRouteName === 'room.edit') {
+            $backUrl = route('room.show', $room);
+        } elseif (isset($staff) && $currentRouteName === 'staff.edit') {
+            $backUrl = route('staff.show', $staff);
+        } elseif (isset($path) && $currentRouteName === 'path.edit') {
+            $backUrl = route('path.show', $path);
+        } else {
+            $backUrl = $roomFallback;
+        } // fallback if model not set
+    }
+    // Show pages: go to respective index
+    elseif (str_ends_with($currentRouteName, '.show')) {
+        if (str_starts_with($currentRouteName, 'room.')) {
+            $backUrl = route($roomFallback);
+        } elseif (str_starts_with($currentRouteName, 'staff.')) {
+            $backUrl = route($staffFallback);
+        } elseif (str_starts_with($currentRouteName, 'path.')) {
+            $backUrl = route($pathFallback);
+        }
+    }
+    // Print QR code page: go back to room show page
+    elseif (str_ends_with($currentRouteName, '.print-qrcode')) {
         $backUrl = isset($room) ? route('room.show', $room) : route($roomFallback);
-    } elseif ($currentRouteName === 'staff.edit') {
-        $backUrl = isset($staff) ? route('staff.show', $staff) : route($staffFallback);
     }
-    // Show pages - go to index
-    elseif ($currentRouteName === 'room.show') {
-        $backUrl = route($roomFallback);
-    } elseif ($currentRouteName === 'staff.show') {
-        $backUrl = route($staffFallback);
+    // Restore or force delete actions: go back to recycle bin
+    elseif (str_ends_with($currentRouteName, '.restore') || str_ends_with($currentRouteName, '.forceDelete')) {
+        if (str_starts_with($currentRouteName, 'room.')) {
+            $backUrl = route($trashedRoomFallback);
+        } elseif (str_starts_with($currentRouteName, 'staff.')) {
+            $backUrl = route($trashedStaffFallback);
+        } elseif (str_starts_with($currentRouteName, 'path.')) {
+            $backUrl = route($trashedPathFallback);
+        }
     }
-    // Print QR Code - go to room show page
-    elseif ($currentRouteName === 'room.print-qrcode') {
-        $backUrl = isset($room) ? route('room.show', $room) : route($roomFallback);
-    }
-    // Restore and force delete actions - go back to recycle bin
-    elseif ($currentRouteName === 'room.restore' || $currentRouteName === 'room.forceDelete') {
-        $backUrl = route($trashedRoomFallback);
-    } elseif ($currentRouteName === 'staff.restore' || $currentRouteName === 'staff.forceDelete') {
-        $backUrl = route($trashedStaffFallback);
-    }
-    // Carousel image removal - go back to room show
+    // Carousel image removal: go back to room show
     elseif ($currentRouteName === 'room.carousel.remove') {
         $backUrl = isset($room) ? route('room.show', $room) : route($roomFallback);
     }
     // Fallback logic for edge cases
     else {
-        // Prevent loops and problematic previous URLs
         $problematicPatterns = ['/create', '/edit', '/store', '/update', '/delete', '/restore'];
 
         if ($previous === $current || $previousContains($problematicPatterns)) {
-            // Determine fallback based on current route context
-            if (strpos($currentRouteName, 'room.') === 0) {
+            if (str_starts_with($currentRouteName, 'room.')) {
                 $backUrl = route($roomFallback);
-            } elseif (strpos($currentRouteName, 'staff.') === 0) {
+            } elseif (str_starts_with($currentRouteName, 'staff.')) {
                 $backUrl = route($staffFallback);
+            } elseif (str_starts_with($currentRouteName, 'path.')) {
+                $backUrl = route($pathFallback);
             } else {
                 $backUrl = route($landing);
             }
         } else {
-            // Use previous URL if it's safe
             $backUrl = $previous;
         }
     }
