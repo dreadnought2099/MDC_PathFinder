@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\LogInController;
+use App\Http\Controllers\Admin\PathController;
+use App\Http\Controllers\Admin\PathImageController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\StaffController;
@@ -134,6 +136,41 @@ Route::middleware('auth')->group(function () {
         // Soft delete management (using IDs, not models)
         Route::post('/staff/{id}/restore', [StaffController::class, 'restore'])->name('restore');
         Route::delete('/staff/{id}/force-delete', [StaffController::class, 'forceDelete'])->name('forceDelete');
+    });
+
+    /*
+    |----------------------------------------------------------------------
+    | Path Management Routes
+    |----------------------------------------------------------------------
+    | Same principle: specific routes before parameterized routes
+    */
+
+    Route::prefix('admin')->name('paths.')->group(function () {
+        Route::get('/paths', [PathController::class, 'index'])->name('index');
+
+        Route::get('/paths/create', [PathController::class, 'create'])->name('create');
+
+        Route::post('/paths', [PathController::class, 'store'])->name('store');
+
+        Route::delete('/paths/{path}', [PathController::class, 'destroy'])->name('destroy');
+
+    });
+
+     /*
+    |----------------------------------------------------------------------
+    | Path Images Management Routes
+    |----------------------------------------------------------------------
+    | Same principle: specific routes before parameterized routes
+    */
+
+    Route::prefix('admin/path-images')->name('path_images.')->group(function () {
+        Route::get('/', [PathImageController::class, 'index'])->name('index');
+        
+        Route::get('/create', [PathImageController::class, 'create'])->name('create');
+
+        Route::post('/', [PathImageController::class, 'store'])->name('store');
+
+        Route::delete('/{pathImage}', [PathImageController::class, 'destroy'])->name('destroy');
     });
 });
 
