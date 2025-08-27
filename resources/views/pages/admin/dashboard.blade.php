@@ -60,6 +60,23 @@
                     </div>
                 </a>
 
+                <!-- Manage Rooms Card -->
+                <a href="{{ route('room.index') }}"
+                    class="group card-shadow-hover shadow-primary-hover p-6 border-2 border-primary">
+                    <div class="flex flex-col items-center text-center space-y-4">
+                        <div class="bg-primary-10 hover:bg-primary-20 p-4 rounded-full transition-all duration-300">
+                            <img src="{{ asset('icons/manage-office1.png') }}" alt="Manage Room/Office"
+                                class="h-12 w-12 object-contain" />
+                        </div>
+                        <div>
+                            <h3 class="text-lg text-gray-800 group-hover:text-primary transition-colors duration-300">
+                                Manage Rooms/Offices
+                            </h3>
+                            <p class="text-sm text-gray-600 mt-1">Configure office spaces and rooms</p>
+                        </div>
+                    </div>
+                </a>
+
                 <!-- Manage Staff Card -->
                 <a href="{{ route('staff.index') }}"
                     class="group card-shadow-hover shadow-primary-hover p-6 border-2 border-primary">
@@ -76,23 +93,6 @@
                             <p class="text-sm text-gray-600 mt-1 group-hover:text-gray-700 transition-colors duration-300">
                                 Organize staff members
                             </p>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Manage Rooms Card -->
-                <a href="{{ route('room.index') }}"
-                    class="group card-shadow-hover shadow-primary-hover p-6 border-2 border-primary">
-                    <div class="flex flex-col items-center text-center space-y-4">
-                        <div class="bg-primary-10 hover:bg-primary-20 p-4 rounded-full transition-all duration-300">
-                            <img src="{{ asset('icons/manage-office1.png') }}" alt="Manage Room/Office"
-                                class="h-12 w-12 object-contain" />
-                        </div>
-                        <div>
-                            <h3 class="text-lg text-gray-800 group-hover:text-primary transition-colors duration-300">
-                                Manage Rooms/Offices
-                            </h3>
-                            <p class="text-sm text-gray-600 mt-1">Configure office spaces and rooms</p>
                         </div>
                     </div>
                 </a>
