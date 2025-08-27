@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 {{-- Added x-data x-cloak to hide the jitter --}}
-<html lang="en" class="bg-white dark:bg-stone-900" x-data x-cloak> 
+<html lang="en" class="bg-white dark:bg-gray-900" x-data x-cloak> 
 
 <head>
     <meta charset="UTF-8">

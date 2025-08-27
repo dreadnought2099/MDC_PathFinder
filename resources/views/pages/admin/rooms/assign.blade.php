@@ -4,10 +4,10 @@
     <div id="scrollContainer" class="container max-w-6xl mx-auto overflow-y-auto h-[90vh]">
         <x-floating-actions />
 
-        <div class="bg-white sticky top-0 z-48 pb-6">
+        <div class="bg-white sticky top-0 z-48 pb-6 dark:bg-gray-900">
             <!-- Main Title with improved spacing -->
             <div class="text-center pt-8 pb-6">
-                <h1 class="text-4xl font-bold text-gray-800 mb-2">
+                <h1 class="text-4xl font-bold text-gray-800 mb-2 dark:text-gray-100">
                     <span class="text-primary">Assign</span> Staff to Room
                 </h1>
             </div>
@@ -16,7 +16,7 @@
             <div class="flex justify-center px-4 pb-8">
                 <form method="GET" action="{{ route('room.assign') }}" class="w-full max-w-md">
                     <select name="roomId" onchange="this.form.submit()"
-                        class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200">
+                        class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200">
                         @foreach ($rooms as $room)
                             <option value="{{ $room->id }}"
                                 {{ isset($selectedRoom) && $selectedRoom->id == $room->id ? 'selected' : '' }}>
@@ -53,7 +53,7 @@
                             @endphp
 
                             <div
-                                class="staff-card {{ $isAssignedOtherRoom ? 'opacity-50' : '' }} bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border-2 border-primary {{ $isSelectedRoom ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary/50' }}">
+                                class="staff-card {{ $isAssignedOtherRoom ? 'opacity-50' : '' }} bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border-2 border-primary {{ $isSelectedRoom ? 'border-primary bg-primary/5 dark:bg-primary/10' : 'border-gray-200 dark:border-gray-700 hover:border-primary/50' }}">
                                 <div class="p-6">
                                     <div class="flex flex-col items-center text-center">
                                         <!-- Avatar placeholder -->
@@ -65,28 +65,28 @@
 
                                         <!-- Staff name -->
                                         <h3
-                                            class="font-semibold text-gray-800 mb-2 {{ $isAssignedOtherRoom ? 'text-gray-400' : '' }}">
+                                            class="text-gray-800 dark:text-gray-100 mb-2 {{ $isAssignedOtherRoom ? 'text-gray-400 dark:text-gray-500' : '' }}">
                                             {{ $member->first_name }} {{ $member->last_name }}
                                         </h3>
 
                                         <!-- Status badge -->
                                         @if ($isSelectedRoom)
                                             <span
-                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mb-3">
+                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 mb-3 dark:text-green-200">
                                                 <img src="{{ asset('icons/success.png') }}" class="w-4 h-4 mr-2"
                                                     alt="Assigned">
                                                 Assigned
                                             </span>
                                         @elseif ($isAssignedOtherRoom)
                                             <span
-                                                class="inline-flex items-center px-4 py-2 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 mb-3">
+                                                class="inline-flex items-center px-4 py-2 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 mb-3 dark:text-yellow-200">
                                                 <img src="{{ asset('icons/warning.png') }}" class="w-4 h-4 mr-2"
                                                     alt="Other Room">
                                                 Other Room
                                             </span>
                                         @else
                                             <span
-                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 mb-3">
+                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 mb-3 dark:text-gray-300">
                                                 <img src="{{ asset('icons/error-gray.png') }}" class="w-4 h-4 mr-2"
                                                     alt="Unassigned">
                                                 Unassigned
@@ -97,11 +97,11 @@
                                         <label class="flex items-center justify-center w-full cursor-pointer">
                                             <input type="checkbox" data-staff-id="{{ $member->id }}" name="staff_ids[]"
                                                 value="{{ $member->id }}"
-                                                class="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary focus:ring-2 transition-all duration-200"
+                                                class="h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary focus:ring-2 transition-all duration-200"
                                                 @if ($isSelectedRoom) checked @endif
                                                 @if ($isAssignedOtherRoom) disabled @endif>
                                             <span
-                                                class="ml-2 text-sm {{ $isAssignedOtherRoom ? 'text-gray-400' : 'text-gray-600' }}">
+                                                class="ml-2 text-sm {{ $isAssignedOtherRoom ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600 dark:text-gray-300' }}">
                                                 {{ $isSelectedRoom ? 'Assigned' : ($isAssignedOtherRoom ? 'Unavailable' : 'Available') }}
                                             </span>
                                         </label>
@@ -115,7 +115,7 @@
                 <!-- Submit Button with proper spacing -->
                 <div class="flex justify-center pt-8 pb-8 sticky bottom-0">
                     <button type="submit"
-                        class="bg-primary text-white px-8 py-4 rounded-lg hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer min-w-[200px] font-medium">
+                        class="bg-primary text-white px-8 py-4 rounded-lg hover:text-primary border-2 border-primary hover:bg-white dark:hover:bg-gray-800 transition-all duration-300 cursor-pointer min-w-[200px] font-medium">
                         Update Assignment
                     </button>
                 </div>
@@ -127,11 +127,11 @@
     <div id="confirmModal"
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden transition-all duration-300 opacity-0"
         onclick="closeModal()">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform transition-all duration-300 scale-95"
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform transition-all duration-300 scale-95 dark:bg-gray-800"
             onclick="event.stopPropagation()">
             <div class="px-6 py-4 border-b border-gray-200">
                 <div class="flex items-center justify-between">
-                    <h2 class="text-xl text-gray-900">Confirm <span class="text-secondary">Unassignment</span></h2>
+                    <h2 class="text-xl text-gray-900 dark:text-gray-300">Confirm <span class="text-secondary">Unassignment</span></h2>
                     <button onclick="closeModal()"
                         class="text-gray-400 hover:text-secondary transition-colors duration-200 cursor-pointer">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,7 +150,7 @@
                         </div>
                     </div>
                     <div>
-                        <p class="text-gray-700 text-sm leading-relaxed">
+                        <p class="text-gray-700 text-sm leading-relaxed dark:text-gray-300">
                             Are you sure you want to unassign <span id="modalMessage" class="text-secondary"></span>?
                             This will remove them from the current room.
                         </p>
@@ -158,17 +158,17 @@
                 </div>
             </div>
 
-            <div class="px-6 py-4 bg-gray-50 rounded-b-2xl">
+            <div class="px-6 py-4 bg-gray-50 rounded-b-2xl dark:bg-gray-800">
                 <div class="flex justify-end space-x-3">
                     <button type="button" onclick="closeModal()"
-                        class="px-4 py-2 text-sm font-medium border border-gray-400 hover:text-white hover:bg-gray-400 rounded-lg transition-all duration-300 cursor-pointer">
+                        class="px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-lg transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300">
                         Cancel
                     </button>
                     <form id="unassignForm" method="POST" style="display: inline;">
                         @csrf
                         @method('DELETE')
                         <button type="submit"
-                            class="px-4 py-2 text-sm font-medium text-white bg-secondary border border-secondary rounded-lg hover:bg-white hover:text-secondary focus:ring-2 focus:ring-secondary focus:ring-offset-2 transition-all duration-300 cursor-pointer">
+                            class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-red-600 rounded-lg hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800">
                             Unassign Staff
                         </button>
                     </form>
