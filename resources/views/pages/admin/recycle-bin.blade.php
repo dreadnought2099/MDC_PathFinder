@@ -6,14 +6,14 @@
     <div x-data="{ tab: sessionStorage.getItem('activeTab') || 'rooms' }" x-init="sessionStorage.setItem('activeTab', tab);
     $watch('tab', value => sessionStorage.setItem('activeTab', value))" class="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <!-- Navigation -->
-        <nav class="mb-6 flex justify-center space-x-6 border-b border-gray-200">
+        <nav class="mb-6 flex justify-center space-x-6">
             <button @click="tab = 'rooms'"
-                :class="{ 'text-primary border-b-2': tab === 'rooms', 'text-gray-600 hover:text-primary': tab !== 'rooms' }"
+                :class="{ 'text-primary border-b-2': tab === 'rooms', 'text-gray-600 dark:text-gray-100 hover:text-primary': tab !== 'rooms' }"
                 class="px-4 py-2 text-sm font-medium transition-all duration-300 ease-in-out hover-underline cursor-pointer transform hover:scale-105 active:scale-95">
                 Trashed Rooms
             </button>
             <button @click="tab = 'staff'"
-                :class="{ 'text-primary border-b-2': tab === 'staff', 'text-gray-600 hover:text-primary': tab !== 'staff' }"
+                :class="{ 'text-primary border-b-2': tab === 'staff', 'text-gray-600 dark:text-gray-100 hover:text-primary': tab !== 'staff' }"
                 class="px-4 py-2 text-sm font-medium transition-all duration-300 ease-in-out hover-underline cursor-pointer transform hover:scale-105 active:scale-95">
                 Trashed Staff
             </button>

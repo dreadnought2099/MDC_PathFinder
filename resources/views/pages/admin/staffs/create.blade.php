@@ -3,30 +3,30 @@
 @section('content')
     <x-floating-actions />
 
-    <div class="max-w-xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-6">
-        <h2 class="text-2xl text-center mb-6"><span class="text-primary">Add</span> Staff Member</h2>
+    <div class="max-w-xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-6 dark:bg-gray-800">
+        <h2 class="text-2xl text-center mb-6"><span class="text-primary">Add</span> <span class="dark:text-gray-300">Staff Member</span></h2>
 
         <form action="{{ route('staff.store') }}" method="POST" enctype="multipart/form-data" data-upload>
             @csrf
 
             <div class="mb-4">
-                <label class="block">First Name</label>
-                <input type="text" name="first_name" class="w-full border p-2 rounded" required>
+                <label class="block dark:text-gray-300">First Name</label>
+                <input type="text" name="first_name" class="w-full border p-2 rounded dark:border-gray-300" required>
             </div>
 
             <div class="mb-4">
-                <label class="block">Last Name</label>
-                <input type="text" name="last_name" class="w-full border p-2 rounded" required>
+                <label class="block dark:text-gray-300">Last Name</label>
+                <input type="text" name="last_name" class="w-full border p-2 rounded dark:border-gray-300" required>
             </div>
 
             <div class="mb-4">
-                <label class="block">Middle Name</label>
-                <input type="text" name="middle_name" class="w-full border p-2 rounded">
+                <label class="block dark:text-gray-300">Middle Name</label>
+                <input type="text" name="middle_name" class="w-full border p-2 rounded dark:border-gray-300">
             </div>
 
             <div class="mb-4">
-                <label class="block font-medium">Suffix (Optional)</label>
-                <select name="suffix" class="w-full border p-2 rounded">
+                <label class="block font-medium dark:text-gray-300">Suffix (Optional)</label>
+                <select name="suffix" class="w-full border p-2 rounded dark:border-gray-300">
                     <option value="">None</option>
                     <option value="Jr.">Jr.</option>
                     <option value="Sr.">Sr.</option>
@@ -42,33 +42,33 @@
             </div>
 
             <div class="mb-4">
-                <label class="block font-medium">Professional Credentials (Optional)</label>
-                <input type="text" name="credentials" class="w-full border p-2 rounded" placeholder="e.g. MD, CPA, RN">
+                <label class="block font-medium dark:text-gray-300">Professional Credentials (Optional)</label>
+                <input type="text" name="credentials" class="w-full border p-2 rounded dark:border-gray-300" placeholder="e.g. MD, CPA, RN">
             </div>
 
             <div class="mb-4">
-                <label class="block">Position</label>
-                <input type="text" name="position" class="w-full border p-2 rounded">
+                <label class="block dark:text-gray-300">Position</label>
+                <input type="text" name="position" class="w-full border p-2 rounded dark:border-gray-300">
             </div>
 
             <div class="mb-4">
-                <label class="block">Bio</label>
-                <textarea name="bio" class="w-full border p-2 rounded"></textarea>
+                <label class="block dark:text-gray-300">Bio</label>
+                <textarea name="bio" class="w-full border p-2 rounded dark:border-gray-300"></textarea>
             </div>
 
             <div class="mb-4">
-                <label class="block">Email</label>
-                <input type="email" name="email" class="w-full border p-2 rounded">
+                <label class="block dark:text-gray-300">Email</label>
+                <input type="email" name="email" class="w-full border p-2 rounded dark:border-gray-300">
             </div>
 
             <div class="mb-4">
-                <label class="block">Phone Number</label>
-                <input type="text" name="phone_num" class="w-full border p-2 rounded" placeholder="0900 000 0000">
+                <label class="block dark:text-gray-300">Phone Number</label>
+                <input type="text" name="phone_num" class="w-full border p-2 rounded dark:border-gray-300" placeholder="0900 000 0000">
             </div>
 
             <div class="mb-4">
-                <label class="block">Photo</label>
-                <input type="file" name="photo_path" class="w-full border p-2 rounded">
+                <label class="block dark:text-gray-300">Photo</label>
+                <input type="file" name="photo_path" class="w-full border p-2 rounded dark:border-gray-300">
             </div>
 
             <div>

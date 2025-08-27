@@ -5,8 +5,8 @@
 
         <x-floating-actions />
 
-        <div class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg border-2 border-primary">
-            <h2 class="text-2xl text-center mb-6">Profile</h2>
+        <div class="max-w-lg mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border-2 border-primary">
+            <h2 class="text-2xl text-center mb-6 dark:text-gray-300">Profile</h2>
 
             <!-- Profile Image Wrapper -->
             <div class="relative w-40 h-40 mx-auto mb-16">
@@ -23,8 +23,8 @@
 
             <!-- User Info -->
             <div class="space-y-2 text-center">
-                <p><span class="text-primary">Name:</span> {{ $user->name }}</p>
-                <p><span class="text-primary">Email:</span> {{ $user->email }}</p>
+                <p><span class="text-primary">Name:</span> <span class="dark:text-gray-300">{{ $user->name }}</span></p>
+                <p><span class="text-primary">Email:</span> <span class="dark:text-gray-300">{{ $user->email }}</span></p>
             </div>
         </div>
     </div>

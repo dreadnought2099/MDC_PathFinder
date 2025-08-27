@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+{{-- Added x-data x-cloak to hide the jitter --}}
+<html lang="en" class="bg-white dark:bg-stone-900" x-data x-cloak> 
 
 <head>
     <meta charset="UTF-8">
@@ -7,6 +8,20 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name') }}</title>
+    <!-- Theme script runs before CSS -->
+    <script>
+        (function() {
+            const theme = localStorage.getItem("theme");
+            const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+            if (theme === "dark" || (!theme && prefersDark)) {
+                document.documentElement.classList.add("dark");
+            } else {
+                document.documentElement.classList.remove("dark");
+            }
+        })();
+    </script>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="icon" href="{{ asset('images/mdc-logo.png') }}">
 

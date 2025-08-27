@@ -1,7 +1,7 @@
 @props(['items', 'routePrefix', 'title', 'emptyMessage', 'tab'])
 
 <div class="mb-12">
-    <h2 class="text-2xl font-semibold text-center mb-8">{{ $title }}</h2>
+    <h2 class="text-2xl text-center mb-8 dark:text-gray-100">{{ $title }}</h2>
 
     @if ($items->isEmpty())
         <div class="text-center text-gray-600 py-12">{{ $emptyMessage }}</div>
