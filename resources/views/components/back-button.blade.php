@@ -9,23 +9,15 @@
 ])
 
 @php
-    // Get current route name
     $currentRouteName = Route::currentRouteName();
-
-    // Fallback route names
-    $roomFallback = 'room.index';
-    $staffFallback = 'staff.index';
-    $pathFallback = 'path.index';
-
-    // Back URL default
     $backUrl = url()->previous();
 
-    // Index pages: go back to dashboard
+    // Index pages → dashboard
     if (str_ends_with($currentRouteName, '.index')) {
         $backUrl = route('admin.dashboard');
     }
 
-    // Create pages: go back to index
+    // Create pages → index
     elseif (str_ends_with($currentRouteName, '.create')) {
         if ($currentRouteName === 'room.create') {
             $backUrl = route('room.index');
@@ -36,7 +28,7 @@
         }
     }
 
-    // Edit pages...
+    // Edit pages
     elseif (str_ends_with($currentRouteName, '.edit')) {
         if (isset($room) && $currentRouteName === 'room.edit') {
             $backUrl = route('room.show', $room);
@@ -49,7 +41,7 @@
         }
     }
 
-    // Show pages: go back to index
+    // Show pages → index
     elseif (str_ends_with($currentRouteName, '.show')) {
         if ($currentRouteName === 'room.show') {
             $backUrl = route('room.index');
@@ -60,7 +52,18 @@
         }
     }
 
-    // Assign pages: avoid loop
+    // Recycle bin pages → index (prevent loop)
+    elseif (str_contains($currentRouteName, 'recycle-bin')) {
+        if ($currentRouteName === 'room.recycle-bin') {
+            $backUrl = route('room.index');
+        } elseif ($currentRouteName === 'staff.recycle-bin') {
+            $backUrl = route('staff.index');
+        } elseif ($currentRouteName === 'path.recycle-bin') {
+            $backUrl = route('path.index');
+        }
+    }
+
+    // Assign pages → index
     elseif (str_contains($currentRouteName, 'assign')) {
         $backUrl = route('room.index'); // or dashboard
     }

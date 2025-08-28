@@ -526,17 +526,17 @@
                                 <div class="text-sm text-gray-600 mt-1">${timeText}</div>
                             </div>
                             ${rangeKey !== "closed" ? `
-                                            <div class="flex gap-2 ml-4">
-                                                <button type="button" class="edit-schedule-btn text-blue-600 hover:text-blue-800 text-sm px-2 py-1 rounded border border-blue-300 hover:bg-blue-50 transition-colors" 
-                                                        data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                                    Edit
-                                                </button>
-                                                <button type="button" class="delete-schedule-btn text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded border border-red-300 hover:bg-red-50 transition-colors" 
-                                                        data-days='${JSON.stringify(group.days)}'>
-                                                    Delete
-                                                </button>
-                                            </div>
-                                            ` : ''}
+                                                <div class="flex gap-2 ml-4">
+                                                    <button type="button" class="edit-schedule-btn text-blue-600 hover:text-blue-800 text-sm px-2 py-1 rounded border border-blue-300 hover:bg-blue-50 transition-colors" 
+                                                            data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                        Edit
+                                                    </button>
+                                                    <button type="button" class="delete-schedule-btn text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded border border-red-300 hover:bg-red-50 transition-colors" 
+                                                            data-days='${JSON.stringify(group.days)}'>
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                                ` : ''}
                         </div>
                     `;
 
@@ -578,11 +578,12 @@
                 div.id = "temp-message";
                 div.textContent = message;
 
-                const base = "fixed top-24 right-4 p-3 rounded shadow-lg z-49 transition-opacity duration-500 p-3 rounded-md shadow-lg border-l-4";
+                const base =
+                    "fixed top-24 right-4 p-3 rounded shadow-lg z-49 transition-opacity duration-500 p-3 rounded-md shadow-lg border-l-4";
                 const colors = {
-                    success: "bg-white border border-primary text-primary",
-                    error: "bg-red-100 text-red-700",
-                    info: "bg-yellow-100 text-yellow-700"
+                    success: "bg-green-100 text-green-700 border border-green-300 dark:bg-green-800 dark:text-green-200 dark:border-green-600",
+                    error: "bg-red-100 text-red-700 border border-red-300 dark:bg-red-800 dark:text-red-200 dark:border-red-600",
+                    info: "bg-yellow-100 text-yellow-700 border border-yellow-300 dark:bg-yellow-700 dark:text-yellow-200 dark:border-yellow-500"
                 };
 
                 div.className = `${base} ${colors[type] || colors.info}`;
@@ -609,7 +610,7 @@
 
                 renderOfficeHours();
                 showTemporaryFeedback(this, "Applied Successfully!");
-                showTemporaryMessage("Office hours updated for selected days!", "success"); 
+                showTemporaryMessage("Office hours updated for selected days!", "success");
             });
 
             // Function to attach event listeners to edit and delete buttons

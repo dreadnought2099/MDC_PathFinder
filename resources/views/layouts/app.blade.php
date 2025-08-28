@@ -45,10 +45,10 @@
         @if (session('success') || session('error') || session('info') || $errors->any())
             <div id="message"
                 class="p-3 rounded-md shadow-lg border-l-4
-                    {{ session('success') ? 'bg-white border border-primary text-primary' : '' }}
-                    {{ session('error') ? 'bg-red-100 text-red-700' : '' }}
-                    {{ session('info') ? 'bg-yellow-100 text-yellow-700' : '' }}
-                    {{ $errors->any() ? 'bg-red-100 text-red-700' : '' }}">
+                    {{ session('success') ? 'bg-green-100 text-green-700 border border-green-300 dark:bg-green-800 dark:text-green-200 dark:border-green-600' : '' }}
+                    {{ session('error') ? 'bg-red-100 text-red-700 border border-red-300 dark:bg-red-800 dark:text-red-200 dark:border-red-600' : '' }}
+                    {{ session('info') ? 'bg-yellow-100 text-yellow-700 border border-yellow-300 dark:bg-yellow-700 dark:text-yellow-200 dark:border-yellow-500' : '' }}
+                    {{ $errors->any() ? 'bg-red-100 text-red-700 border border-red-300 dark:bg-red-800 dark:text-red-200 dark:border-red-600' : '' }}">
 
                 {{-- Display session messages --}}
                 @if (session('success'))
