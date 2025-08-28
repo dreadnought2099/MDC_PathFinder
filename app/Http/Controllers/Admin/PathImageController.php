@@ -10,63 +10,118 @@ use Illuminate\Support\Facades\Storage;
 
 class PathImageController extends Controller
 {
-    public function index()
+    // Show form to upload images for a specific path
+    public function create(Path $path)
     {
-        $images = PathImage::with('path')->get();
-        return view('pages.admin.path_images.index', compact('images'));
+        return view('pages.admin.path_images.create', compact('path'));
     }
 
-    public function create()
-    {
-        $paths = Path::with(['fromRoom', 'toRoom'])->get();
-        return view('pages.admin.path_images.create', compact('paths'));
-    }
-
-    public function store(Request $request)
+    // Store multiple images for a path
+    public function store(Request $request, Path $path)
     {
         // Validate multiple files
-        $data = $request->validate([
-            'path_id' => 'required|exists:paths,id',
-            'file.*'    => 'required|image|max:51200',
+        $request->validate([
+            'files'    => 'required|array|min:1',
+            'files.*'  => 'required|image|max:51200', // 50MB max per image
         ]);
 
-        $pathModel = Path::findOrFail($data['path_id']);
         $files = $request->file('files');
 
-        if (!$files) {
-            return redirect()->back()->withErrors(['files' => 'Please select at least one image.']);
-        }
-
         // Get the next image order for this path
-        $nextOrder = PathImage::where('path_id', $data['path_id'])->max('image_order') ?? 0;
+        $nextOrder = PathImage::where('path_id', $path->id)->max('image_order') ?? 0;
 
         foreach ($files as $file) {
-            $path = $file->store('path_images', 'public');
+            $imagePath = $file->store('path_images', 'public');
 
             PathImage::create([
-                'path_id'     => $data['path_id'],
-                'image_file'  => $path,
+                'path_id'     => $path->id,
+                'image_file'  => $imagePath,
                 'image_order' => ++$nextOrder, // increment order for each image
             ]);
         }
 
-        session()->flash('success', "Images for Path {$pathModel->fromRoom->name} → {$pathModel->toRoom->name} uploaded successfully.");
+        $successMessage = "Images for Path {$path->fromRoom->name} → {$path->toRoom->name} uploaded successfully.";
 
         if ($request->expectsJson()) {
             return response()->json([
-                'redirect' => route('path_images.index'),
-                'flash' => session('success'),
+                'redirect' => route('path.show', $path),
+                'message' => $successMessage,
             ], 200);
         }
 
-        return redirect()->route('path_images.index')->with('success', 'Image uploaded successfully.');
+        return redirect()->route('path.show', $path)->with('success', $successMessage);
     }
 
+    // Show form to edit/update an image
+    public function edit(PathImage $pathImage)
+    {
+        return view('pages.admin.path_images.edit', compact('pathImage'));
+    }
+
+    // Update image order or replace image file
+    public function update(Request $request, PathImage $pathImage)
+    {
+        $data = $request->validate([
+            'image_order' => 'nullable|integer|min:1',
+            'image_file'  => 'nullable|image|max:51200',
+        ]);
+
+        // Update image order if provided
+        if (isset($data['image_order'])) {
+            $pathImage->update(['image_order' => $data['image_order']]);
+        }
+
+        // Replace image file if new one is uploaded
+        if ($request->hasFile('image_file')) {
+            // Delete old image
+            Storage::disk('public')->delete($pathImage->image_file);
+
+            // Store new image
+            $newImagePath = $request->file('image_file')->store('path_images', 'public');
+            $pathImage->update(['image_file' => $newImagePath]);
+        }
+
+        $path = $pathImage->path;
+        return redirect()->route('path.show', $path)->with('success', 'Image updated successfully.');
+    }
+
+    // Delete a specific image
     public function destroy(PathImage $pathImage)
     {
+        $path = $pathImage->path;
+
+        // Delete the file from storage
         Storage::disk('public')->delete($pathImage->image_file);
+
+        // Delete the database record
         $pathImage->delete();
 
-        return redirect()->route('path_images.index')->with('success', 'Image deleted successfully.');
+        if (request()->expectsJson()) {
+            return response()->json(['message' => 'Image deleted successfully.'], 200);
+        }
+
+        return redirect()->route('path.show', $path)->with('success', 'Image deleted successfully.');
+    }
+
+    // Bulk update image orders (for drag-and-drop reordering)
+    public function updateOrder(Request $request, Path $path)
+    {
+        $request->validate([
+            'image_orders' => 'required|array',
+            'image_orders.*.id' => 'required|exists:path_images,id',
+            'image_orders.*.order' => 'required|integer|min:1',
+        ]);
+
+        foreach ($request->image_orders as $imageData) {
+            PathImage::where('id', $imageData['id'])
+                ->where('path_id', $path->id)
+                ->update(['image_order' => $imageData['order']]);
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Image order updated successfully.'], 200);
+        }
+
+        return redirect()->route('path.show', $path)->with('success', 'Image order updated successfully.');
     }
 }

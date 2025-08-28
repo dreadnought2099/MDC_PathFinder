@@ -140,38 +140,41 @@ Route::middleware('auth')->group(function () {
         Route::delete('/staff/{id}/force-delete', [StaffController::class, 'forceDelete'])->name('forceDelete');
     });
 
-    /*
-    |----------------------------------------------------------------------
-    | Path Management Routes
-    |----------------------------------------------------------------------
-    | Same principle: specific routes before parameterized routes
-    */
-
     Route::prefix('admin')->name('path.')->group(function () {
+
+        // List all paths
         Route::get('/paths', [PathController::class, 'index'])->name('index');
 
-        Route::get('/paths/create', [PathController::class, 'create'])->name('create');
+        // SPECIFIC ROUTES - These MUST come before {path} routes
+        // (Add any specific routes here if needed in the future)
 
-        Route::post('/paths', [PathController::class, 'store'])->name('store');
+        // PARAMETERIZED ROUTES - These come after specific routes
+        Route::get('/paths/{path}', [PathController::class, 'show'])->name('show');
 
+        // Form submission routes
         Route::delete('/paths/{path}', [PathController::class, 'destroy'])->name('destroy');
     });
 
     /*
     |----------------------------------------------------------------------
-    | Path Images Management Routes
+    | Path Image Management Routes
     |----------------------------------------------------------------------
-    | Same principle: specific routes before parameterized routes
+    | These are nested under paths but follow similar naming conventions
     */
 
-    Route::prefix('admin/path-images')->name('path_images.')->group(function () {
-        Route::get('/', [PathImageController::class, 'index'])->name('index');
+    Route::prefix('admin')->name('path-image.')->group(function () {
 
-        Route::get('/create', [PathImageController::class, 'create'])->name('create');
+        // SPECIFIC ROUTES - These MUST come before parameterized routes
+        Route::get('/paths/{path}/images/create', [PathImageController::class, 'create'])->name('create');
 
-        Route::post('/', [PathImageController::class, 'store'])->name('store');
+        // Form submission routes for path images
+        Route::post('/paths/{path}/images', [PathImageController::class, 'store'])->name('store');
+        Route::put('/paths/{path}/images/order', [PathImageController::class, 'updateOrder'])->name('update-order');
 
-        Route::delete('/{pathImage}', [PathImageController::class, 'destroy'])->name('destroy');
+        // PARAMETERIZED ROUTES - These come after specific routes
+        Route::get('/path-images/{pathImage}/edit', [PathImageController::class, 'edit'])->name('edit');
+        Route::put('/path-images/{pathImage}', [PathImageController::class, 'update'])->name('update');
+        Route::delete('/path-images/{pathImage}', [PathImageController::class, 'destroy'])->name('destroy');
     });
 });
 

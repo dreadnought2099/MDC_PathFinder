@@ -9,44 +9,37 @@ use Illuminate\Http\Request;
 
 class PathController extends Controller
 {
-    // Show all paths
+    // Show all paths with their images
     public function index(Request $request)
     {
         $sort = $request->get('sort', 'id');
         $direction = $request->get('direction', 'asc');
 
         $paths = Path::with(['fromRoom', 'toRoom'])
-                    ->orderBy($sort, $direction)
-                    ->paginate(10)
-                    ->appends(['sort' => $sort, 'direction' => $direction]);
+            ->orderBy($sort, $direction)
+            ->paginate(10)
+            ->appends(['sort' => $sort, 'direction' => $direction]);
 
         return view('pages.admin.paths.index', compact('paths', 'sort', 'direction'));
     }
 
-    // Show forms to create new path
-    public function create()
+    // Show images for a specific path
+    public function show(Path $path)
     {
+        $path->load(['fromRoom', 'toRoom', 'images' => function ($query) {
+            $query->orderBy('image_order');
+        }]);
 
-        $rooms = Room::all();
-
-        return view('pages.admin.paths.create', compact('rooms'));
-    }
-
-    // Store new path   
-    public function store(Request $request)
-    {
-        $data = $request->validate([
-            'from_room_id' => 'required|exists:rooms,id',
-            'to_room_id'   => 'required|exists:rooms,id',
-        ]);
-
-        Path::create($data);
-
-        return redirect()->route('path.index')->with('success', 'Path created successfully.');
+        return view('pages.admin.paths.show', compact('path'));
     }
 
     public function destroy(Path $path)
     {
+        // Optional: manually delete associated images if not using cascade delete
+        // foreach ($path->images as $image) {
+        //     Storage::disk('public')->delete($image->image_file);
+        // }
+        // $path->images()->delete();
 
         $path->delete();
         return redirect()->route('path.index')->with('success', 'Path deleted successfully.');

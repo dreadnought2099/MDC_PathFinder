@@ -12,21 +12,7 @@
                     </div>
                     <span class="text-sm text-gray-700 hover-underline dark:text-gray-300">Add Room/Office</span>
                 </a>
-
-                <a href="{{ route('path.create') }}" class="group flex items-center space-x-2">
-                    <div class="flex items-center justify-center w-12 h-12 hover:scale-120 transition-all duration-300">
-                        <img src="{{ asset('images/mdc-logo.png') }}" alt="Add Room/Office" />
-                    </div>
-                    <span class="text-sm text-gray-700 hover-underline dark:text-gray-300">Add Path</span>
-                </a>
-
-                <a href="{{ route('path_images.create') }}" class="group flex items-center space-x-2">
-                    <div class="flex items-center justify-center w-12 h-12 hover:scale-120 transition-all duration-300">
-                        <img src="{{ asset('images/mdc-logo.png') }}" alt="Add Room/Office" />
-                    </div>
-                    <span class="text-sm text-gray-700 hover-underline dark:text-gray-300">Add Path Images</span>
-                </a>
-
+                
                 <a href="{{ route('staff.create') }}" class="group flex items-center space-x-2">
                     <div class="flex items-center justify-center w-12 h-12 hover:scale-120 transition-all duration-300">
                         <img src="{{ asset('icons/user.png') }}" alt="Add Staff Member" />

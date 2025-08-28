@@ -20,42 +20,18 @@
             <!-- Main Actions Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
-                <!-- Manage Path Card -->
                 <a href="{{ route('path.index') }}"
                     class="group card-shadow-hover shadow-primary-hover p-6 border-2 border-primary bg-white dark:bg-gray-800 dark:border-gray-700 rounded-lg">
-
                     <div class="flex flex-col items-center text-center space-y-4">
                         <div class="bg-primary-10 hover:bg-primary-20 p-4 rounded-full transition-all duration-300">
-                            <img src="{{ asset('images/mdc-logo.png') }}" alt="Manage Path"
+                            <img src="{{ asset('icons/manage-office1.png') }}" alt="Manage Room/Office"
                                 class="h-12 w-12 object-contain" />
                         </div>
                         <div>
                             <h3 class="text-lg text-gray-800 dark:text-white group-hover:text-primary transition-colors">
-                                Manage Path
+                                Manage Rooms/Offices
                             </h3>
-                            <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
-                                Organize Path directions
-                            </p>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Manage Path Navigation Images Card -->
-                <a href="{{ route('path_images.index') }}"
-                    class="group card-shadow-hover shadow-primary-hover p-6 border-2 border-primary bg-white dark:bg-gray-800 dark:border-gray-700 rounded-lg">
-
-                    <div class="flex flex-col items-center text-center space-y-4">
-                        <div class="bg-primary-10 hover:bg-primary-20 p-4 rounded-full transition-all duration-300">
-                            <img src="{{ asset('images/mdc-logo.png') }}" alt="Manage Path Images"
-                                class="h-12 w-12 object-contain" />
-                        </div>
-                        <div>
-                            <h3 class="text-lg text-gray-800 dark:text-white group-hover:text-primary transition-colors">
-                                Manage Path Navigation Images
-                            </h3>
-                            <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">
-                                Organize Path Navigation Images
-                            </p>
+                            <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">Configure office spaces and rooms</p>
                         </div>
                     </div>
                 </a>
@@ -138,7 +114,8 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
                     <!-- Total Staff -->
-                    <div class="text-center p-4 bg-blue-50 dark:bg-blue-900 rounded-lg border-2 border-primary dark:border-gray-700">
+                    <div
+                        class="text-center p-4 bg-blue-50 dark:bg-blue-900 rounded-lg border-2 border-primary dark:border-gray-700">
                         <div class="text-3xl font-bold text-blue-600 mb-2 dark:text-blue-400">
                             {{ \App\Models\Staff::count() }}
                         </div>
@@ -146,7 +123,8 @@
                     </div>
 
                     <!-- Total Rooms -->
-                    <div class="text-center p-4 bg-green-50 dark:bg-green-900 rounded-lg border-2 border-green-600 dark:border-green-400">
+                    <div
+                        class="text-center p-4 bg-green-50 dark:bg-green-900 rounded-lg border-2 border-green-600 dark:border-green-400">
                         <div class="text-3xl font-bold text-green-600 mb-2 dark:text-green-400">
                             {{ \App\Models\Room::count() }}
                         </div>
@@ -154,7 +132,8 @@
                     </div>
 
                     <!-- Assignments -->
-                    <div class="text-center p-4 bg-purple-50 dark:bg-purple-900 rounded-lg border-2 border-purple-600 dark:border-purple-900-">
+                    <div
+                        class="text-center p-4 bg-purple-50 dark:bg-purple-900 rounded-lg border-2 border-purple-600 dark:border-purple-900-">
                         <div class="text-3xl font-bold text-purple-600 mb-2 dark:text-purple-400">
                             {{ \App\Models\Staff::whereNotNull('room_id')->count() }}
                         </div>
