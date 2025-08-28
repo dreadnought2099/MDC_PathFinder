@@ -30,13 +30,13 @@ class PathController extends Controller
     // Store new path   
     public function store(Request $request)
     {
-
         $data = $request->validate([
             'from_room_id' => 'required|exists:rooms,id',
-            'to_room_id' => 'required|exists:rooms,id',
+            'to_room_id'   => 'required|exists:rooms,id',
         ]);
 
         Path::create($data);
+
         return redirect()->route('path.index')->with('success', 'Path created successfully.');
     }
 
