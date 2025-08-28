@@ -16,9 +16,9 @@
 
 @font-face {
     font-family: "Anton";
-    src: url("/build/fonts/Anton-Regular.woff2") format("woff2"),
-        url("/build/fonts/Anton-Regular.woff") format("woff"),
-        url("/build/fonts/Anton-Regular.ttf") format("truetype");
+    src: url("../fonts/Anton-Regular.woff2") format("woff2"),
+        url("../fonts/Anton-Regular.woff") format("woff"),
+        url("../fonts/Anton-Regular.ttf") format("truetype");
     font-weight: normal;
     font-style: normal;
 }
