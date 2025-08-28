@@ -3,17 +3,10 @@
 @section('content')
     <x-floating-actions />
 
-    <x-sort-by 
-        :route="route('path.index')"
-        :fields="['id' => 'ID', 'from_room_id' => 'From Room', 'to_room_id' => 'To Room']"
-        :current-sort="$sort"
-        :current-direction="$direction"
-    />
-
     <div class="container mx-auto max-w-6xl overflow-y-auto h-[80vh]">
         <!-- Header Section -->
-        <div class="bg-white mb-8 text-center sticky top-0 z-48">
-            <h1 class="text-3xl font-bold text-gray-800 mb-2">
+        <div class="bg-white mb-8 text-center sticky top-0 z-48 dark:bg-gray-900">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2 dark:text-gray-100">
                 <span class="text-primary">Path</span> Management
             </h1>
             <p class="text-gray-600">Manage paths between rooms</p>
@@ -22,6 +15,13 @@
             </div>
         </div>
 
+         <x-sort-by 
+            :route="route('path.index')"
+            :fields="['id' => 'ID', 'from_room_id' => 'From Room', 'to_room_id' => 'To Room']"
+            :current-sort="$sort"
+            :current-direction="$direction"
+        />
+        
         <!-- Path Table -->
         <div class="bg-white rounded-xl shadow-sm border-2 border-primary overflow-hidden">
             <div class="overflow-x-auto">
