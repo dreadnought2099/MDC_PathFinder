@@ -47,7 +47,7 @@ class Room extends Model
     {
         return $this->hasMany(Path::class, 'to_room_id');
     }
-    
+
     /**
      *  Accessor: Full office hours by day (Mon - Sun)
      */
@@ -138,5 +138,27 @@ class Room extends Model
         return ($isConsecutive && count($days) > 2)
             ? $days[0] . ' - ' . end($days)
             : implode(', ', $days);
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($room) {
+            // Get all other rooms
+            $otherRooms = Room::where('id', '!=', $room->id)->get();
+
+            foreach ($otherRooms as $other) {
+                // Create path: new → other
+                Path::firstOrCreate([
+                    'from_room_id' => $room->id,
+                    'to_room_id'   => $other->id,
+                ]);
+
+                // Create path: other → new
+                Path::firstOrCreate([
+                    'from_room_id' => $other->id,
+                    'to_room_id'   => $room->id,
+                ]);
+            }
+        });
     }
 }

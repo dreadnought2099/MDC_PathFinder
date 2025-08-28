@@ -9,6 +9,8 @@ use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TourController;
+use App\Models\Path;
+use App\Models\Room;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -153,10 +155,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/paths', [PathController::class, 'store'])->name('store');
 
         Route::delete('/paths/{path}', [PathController::class, 'destroy'])->name('destroy');
-
     });
 
-     /*
+    /*
     |----------------------------------------------------------------------
     | Path Images Management Routes
     |----------------------------------------------------------------------
@@ -165,7 +166,7 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('admin/path-images')->name('path_images.')->group(function () {
         Route::get('/', [PathImageController::class, 'index'])->name('index');
-        
+
         Route::get('/create', [PathImageController::class, 'create'])->name('create');
 
         Route::post('/', [PathImageController::class, 'store'])->name('store');

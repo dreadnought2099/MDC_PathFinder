@@ -14,17 +14,20 @@ return new class extends Migration
         Schema::create('paths', function (Blueprint $table) {
             $table->id();
 
-            #Referencing to starting room
+            // Referencing to starting room
             $table->foreignId('from_room_id')
                 ->constrained('rooms')
                 ->onDelete('cascade');
 
-            #Referencing to destination room
+            // Referencing to destination room
             $table->foreignId('to_room_id')
                 ->constrained('rooms')
                 ->onDelete('cascade');
-                
+
             $table->timestamps();
+
+            // Unique index ensures no duplicates
+            $table->unique(['from_room_id', 'to_room_id']);
         });
     }
 
