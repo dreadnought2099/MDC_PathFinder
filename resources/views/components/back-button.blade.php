@@ -36,7 +36,7 @@
         }
     }
 
-    // Edit pages: go to show page if model exists, otherwise index
+    // Edit pages...
     elseif (str_ends_with($currentRouteName, '.edit')) {
         if (isset($room) && $currentRouteName === 'room.edit') {
             $backUrl = route('room.show', $room);
@@ -45,7 +45,6 @@
         } elseif (isset($path) && $currentRouteName === 'path.edit') {
             $backUrl = route('path.show', $path);
         } else {
-            // FIX applied (was $backUrl = $roomFallback;)
             $backUrl = route($roomFallback);
         }
     }
@@ -59,6 +58,11 @@
         } elseif ($currentRouteName === 'path.show') {
             $backUrl = route('path.index');
         }
+    }
+
+    // Assign pages: avoid loop
+    elseif (str_contains($currentRouteName, 'assign')) {
+        $backUrl = route('room.index'); // or dashboard
     }
 @endphp
 
