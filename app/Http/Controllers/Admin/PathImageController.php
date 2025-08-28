@@ -64,9 +64,9 @@ class PathImageController extends Controller
 
     public function destroy(PathImage $pathImage)
     {
-        Storage::disk('public')->delete($pathImage->file_path);
+        Storage::disk('public')->delete($pathImage->image_file);
         $pathImage->delete();
 
-        return redirect()->route('path_images.index')->with('success', 'Image deleted.');
+        return redirect()->route('path_images.index')->with('success', 'Image deleted successfully.');
     }
 }
