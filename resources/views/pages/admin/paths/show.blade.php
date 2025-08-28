@@ -17,10 +17,12 @@
             <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-5">
                 <h2 class="text-lg font-semibold mb-4"><i class="fas fa-info-circle mr-2"></i> Path Info</h2>
                 <dl class="space-y-3 text-sm text-gray-700 dark:text-gray-300">
+                    <!-- Path ID -->
                     <div class="flex justify-between">
                         <dt class="font-medium text-gray-500">Path ID:</dt>
                         <dd>{{ $path->id }}</dd>
                     </div>
+                    <!-- From Room -->
                     <div class="flex justify-between items-center">
                         <dt class="font-medium text-gray-500">From Room:</dt>
                         <dd>
@@ -32,6 +34,7 @@
                             @endif
                         </dd>
                     </div>
+                    <!-- To Room -->
                     <div class="flex justify-between items-center">
                         <dt class="font-medium text-gray-500">To Room:</dt>
                         <dd>
@@ -43,10 +46,12 @@
                             @endif
                         </dd>
                     </div>
+                    <!-- Created At -->
                     <div class="flex justify-between">
                         <dt class="font-medium text-gray-500">Created:</dt>
                         <dd>{{ $path->created_at?->format('M d, Y H:i') }}</dd>
                     </div>
+                    <!-- Number of Images -->
                     <div class="flex justify-between">
                         <dt class="font-medium text-gray-500">Images:</dt>
                         <dd>
@@ -79,22 +84,28 @@
             @if ($path->images->count() > 0)
                 <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     @foreach ($path->images as $image)
-                        <div class="relative group overflow-hidden rounded shadow hover:shadow-lg transition">
-                            <img src="{{ asset('storage/' . $image->image_file) }}"
-                                class="w-full h-48 object-cover transform group-hover:scale-105 transition"
-                                alt="Path Image {{ $image->image_order }}">
-                            @if ($image->description)
-                                <div
-                                    class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-sm p-2 truncate">
-                                    {{ Str::limit($image->description, 40) }}
-                                </div>
-                            @else
-                                <div
-                                    class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-sm p-2 text-center">
-                                    Order {{ $image->image_order }}
-                                </div>
-                            @endif
-                        </div>
+                        <!-- GLightbox Wrapper -->
+                        <a href="{{ asset('storage/' . $image->image_file) }}" class="glightbox"
+                            data-gallery="path-{{ $path->id }}"
+                            data-title="{{ $image->description ?? 'Order ' . $image->image_order }}">
+                            <div class="relative group overflow-hidden rounded shadow hover:shadow-lg transition">
+                                <img src="{{ asset('storage/' . $image->image_file) }}"
+                                    class="w-full h-48 object-cover transform group-hover:scale-105 transition"
+                                    alt="Path Image {{ $image->image_order }}">
+                                @if ($image->description)
+                                    <div
+                                        class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-sm p-2 truncate">
+                                        {{ Str::limit($image->description, 40) }}
+                                    </div>
+                                @else
+                                    <div
+                                        class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-sm p-2 text-center">
+                                        Order {{ $image->image_order }}
+                                    </div>
+                                @endif
+                            </div>
+                        </a>
+                        <!-- End GLightbox Wrapper -->
                     @endforeach
                 </div>
             @else
@@ -107,3 +118,16 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        window.glightboxInstance = window.glightboxInstance || GLightbox({
+            selector: '.glightbox',
+            touchNavigation: true,
+            loop: true,
+            zoomable: true,
+            autoplayVideos: false,
+            moreText: 'View Image'
+        });
+    </script>
+@endpush

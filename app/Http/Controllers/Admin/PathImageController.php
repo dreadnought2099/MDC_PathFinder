@@ -10,33 +10,40 @@ use Illuminate\Support\Facades\Storage;
 
 class PathImageController extends Controller
 {
-    // Show form to upload images for a specific path
-    public function create(Path $path)
+    // Show form to upload images
+    public function create()
     {
-        return view('pages.admin.path_images.create', compact('path'));
+        // Get all automated paths for the dropdown
+        $paths = Path::with(['fromRoom', 'toRoom'])->get();
+
+        // Optionally, pick the first path as a default if you want a "Path Info" card
+        $defaultPath = $paths->first(); // can be null if no paths exist
+
+        return view('pages.admin.path_images.create', compact('paths', 'defaultPath'));
     }
 
+
     // Store multiple images for a path
-    public function store(Request $request, Path $path)
+    public function store(Request $request)
     {
-        // Validate multiple files
         $request->validate([
-            'files'    => 'required|array|min:1',
-            'files.*'  => 'required|image|max:51200', // 50MB max per image
+            'path_id' => 'required|exists:paths,id',
+            'files'   => 'required|array|min:1',
+            'files.*' => 'required|image|max:51200',
         ]);
 
+        $path = Path::findOrFail($request->path_id);
         $files = $request->file('files');
 
-        // Get the next image order for this path
         $nextOrder = PathImage::where('path_id', $path->id)->max('image_order') ?? 0;
 
         foreach ($files as $file) {
             $imagePath = $file->store('path_images', 'public');
 
             PathImage::create([
-                'path_id'     => $path->id,
-                'image_file'  => $imagePath,
-                'image_order' => ++$nextOrder, // increment order for each image
+                'path_id' => $path->id,
+                'image_file' => $imagePath,
+                'image_order' => ++$nextOrder,
             ]);
         }
 

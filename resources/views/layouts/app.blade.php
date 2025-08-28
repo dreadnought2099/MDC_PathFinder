@@ -31,12 +31,17 @@
     <!-- FilePond CSS: Moved to <head> for proper rendering, pinned to v4.31.1 for stability -->
     <link href="https://unpkg.com/filepond@4.31.1/dist/filepond.min.css" rel="stylesheet">
 
+    <!-- GLightbox CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet">
+
     <!-- x-cloak CSS: Ensures Alpine.js components (e.g., navbar dropdown) are hidden until initialized -->
     <style>
         [x-cloak] {
             display: none !important;
         }
     </style>
+
+    @stack('styles')
 </head>
 
 <body>
@@ -218,12 +223,16 @@
         });
     </script>
 
+    <!-- GLightbox JS -->
+    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+
     <!-- Yield additional scripts from child views (e.g., Cropper.js in profile.blade.php) -->
     @stack('scripts')
 
     <!-- Upload Progress Modal: Used for forms with data-upload attribute -->
     <x-upload-progress-modal />
 
+    {{-- Spinner --}}
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             // Helper function to show spinner
