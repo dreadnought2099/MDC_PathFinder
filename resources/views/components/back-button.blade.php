@@ -65,7 +65,7 @@
 {{-- In your back-button.blade.php component --}}
 @if ($backUrl)
     <a href="{{ $backUrl }}"
-        class="flex items-center space-x-2 focus:outline-none cursor-pointer hover:text-primary transition-colors duration-200"
+        class="flex items-center space-x-2 focus:outline-none cursor-pointer hover:text-primary transition-colors duration-200 dark:text-gray-300"
         title="Go back">
         <div class="flex items-center justify-center h-8 w-8 rounded-full bg-gray-100 dark:bg-gray-800">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
