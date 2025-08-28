@@ -13,6 +13,13 @@
             </div>
         </div>
 
+        <x-sort-by 
+            :route="route('room.index')"
+            :fields="['name' => 'Name', 'created_at' => 'Created At']"
+            :current-sort="$sort"
+            :current-direction="$direction"
+        />
+
         <!-- Floating Actions -->
         <div class="mb-6">
             <x-floating-actions />

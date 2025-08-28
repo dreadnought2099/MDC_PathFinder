@@ -13,6 +13,12 @@
             </div>
         </div>
 
+        <x-sort-by 
+            :route="route('staff.index')"
+            :fields="['first_name' => 'First Name', 'last_name' => 'Last Name', 'email' => 'Email']"
+            :current-sort="$sort"
+            :current-direction="$direction"
+        />
 
         <!-- Floating Actions -->
         <div class="mb-6">

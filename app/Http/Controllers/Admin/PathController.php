@@ -10,12 +10,17 @@ use Illuminate\Http\Request;
 class PathController extends Controller
 {
     // Show all paths
-    public function index()
+    public function index(Request $request)
     {
+        $sort = $request->get('sort', 'id');
+        $direction = $request->get('direction', 'asc');
 
-        $paths = Path::with(['fromRoom', 'toRoom'])->paginate(10);
+        $paths = Path::with(['fromRoom', 'toRoom'])
+                    ->orderBy($sort, $direction)
+                    ->paginate(10)
+                    ->appends(['sort' => $sort, 'direction' => $direction]);
 
-        return view('pages.admin.paths.index', compact('paths'));
+        return view('pages.admin.paths.index', compact('paths', 'sort', 'direction'));
     }
 
     // Show forms to create new path

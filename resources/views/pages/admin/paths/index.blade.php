@@ -3,6 +3,13 @@
 @section('content')
     <x-floating-actions />
 
+    <x-sort-by 
+        :route="route('path.index')"
+        :fields="['id' => 'ID', 'from_room_id' => 'From Room', 'to_room_id' => 'To Room']"
+        :current-sort="$sort"
+        :current-direction="$direction"
+    />
+
     <div class="container mx-auto max-w-6xl overflow-y-auto h-[80vh]">
         <!-- Header Section -->
         <div class="bg-white mb-8 text-center sticky top-0 z-48">

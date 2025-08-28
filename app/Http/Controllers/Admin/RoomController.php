@@ -13,10 +13,16 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class RoomController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $rooms = Room::paginate(10);
-        return view('pages.admin.rooms.index', compact('rooms'));
+        $sort = $request->get('sort', 'name');
+        $direction = $request->get('direction', 'asc');
+
+        $rooms = Room::orderBy($sort, $direction)
+            ->paginate(10)
+            ->appends(['sort' => $sort, 'direction' => $direction]);
+
+        return view('pages.admin.rooms.index', compact('rooms', 'sort', 'direction'));
     }
 
     public function create()

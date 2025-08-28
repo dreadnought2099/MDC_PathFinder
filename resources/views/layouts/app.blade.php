@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 {{-- Added x-data x-cloak to hide the jitter --}}
-<html lang="en" class="bg-white dark:bg-gray-900" x-data x-cloak> 
+<html lang="en" class="bg-white dark:bg-gray-900" x-data x-cloak>
 
 <head>
     <meta charset="UTF-8">
@@ -223,6 +223,50 @@
 
     <!-- Upload Progress Modal: Used for forms with data-upload attribute -->
     <x-upload-progress-modal />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Helper function to show spinner
+            function showSpinner() {
+                if (!document.getElementById("loading")) {
+                    document.body.insertAdjacentHTML("beforeend",
+                        '<div id="loading" class="fixed inset-0 flex items-center justify-center z-50">' +
+                        '<div class="animate-spin border-4 border-blue-200 border-t-blue-600 rounded-full w-10 h-10"></div>' +
+                        '</div>'
+                    );
+                }
+            }
+
+            // Sort dropdowns
+            document.querySelectorAll('#sort-form select').forEach(select => {
+                select.addEventListener('change', showSpinner);
+            });
+
+            // Assign staff room dropdown
+            const assignRoomForm = document.getElementById("assign-staff-form");
+            if (assignRoomForm) {
+                const select = assignRoomForm.querySelector("select");
+                if (select) {
+                    select.addEventListener("change", function() {
+                        showSpinner();
+                        assignRoomForm.submit();
+                    });
+                }
+            }
+
+            // Assign staff update form
+            const assignUpdateForm = document.getElementById("assignForm");
+            if (assignUpdateForm) {
+                assignUpdateForm.addEventListener("submit", showSpinner);
+            }
+
+            // Unassign confirmation form
+            const unassignForm = document.getElementById("unassignForm");
+            if (unassignForm) {
+                unassignForm.addEventListener("submit", showSpinner);
+            }
+        });
+    </script>
 </body>
 
 </html>

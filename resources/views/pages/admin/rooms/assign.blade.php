@@ -14,8 +14,8 @@
 
             <!-- Room Selection Dropdown with better alignment -->
             <div class="flex justify-center px-4 pb-8">
-                <form method="GET" action="{{ route('room.assign') }}" class="w-full max-w-md">
-                    <select name="roomId" onchange="this.form.submit()"
+                <form id="assign-staff-form" method="GET" action="{{ route('room.assign') }}" class="w-full max-w-md">
+                    <select name="roomId"
                         class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200">
                         @foreach ($rooms as $room)
                             <option value="{{ $room->id }}"
@@ -25,6 +25,7 @@
                         @endforeach
                     </select>
                 </form>
+
             </div>
         </div>
 
@@ -43,7 +44,7 @@
                             {{ $staff->appends(['roomId' => $selectedRoom->id ?? null])->links('pagination::tailwind') }}
                         </div>
                     </div>
-                    
+
                     <div id="staffCards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         @foreach ($staff as $member)
                             @php
@@ -131,7 +132,8 @@
             onclick="event.stopPropagation()">
             <div class="px-6 py-4 border-b border-gray-200">
                 <div class="flex items-center justify-between">
-                    <h2 class="text-xl text-gray-900 dark:text-gray-300">Confirm <span class="text-secondary">Unassignment</span></h2>
+                    <h2 class="text-xl text-gray-900 dark:text-gray-300">Confirm <span
+                            class="text-secondary">Unassignment</span></h2>
                     <button onclick="closeModal()"
                         class="text-gray-400 hover:text-secondary transition-colors duration-200 cursor-pointer">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

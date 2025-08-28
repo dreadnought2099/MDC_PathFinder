@@ -11,10 +11,17 @@ use Illuminate\Validation\Rule;
 
 class StaffController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $staffs = Staff::with('room')->paginate(10);
-        return view('pages.admin.staffs.index', compact('staffs'));
+        $sort = $request->get('sort', 'last_name');   // default sort column
+        $direction = $request->get('direction', 'asc'); // default direction
+
+        $staffs = Staff::with('room')
+            ->orderBy($sort, $direction)
+            ->paginate(10)
+            ->appends(['sort' => $sort, 'direction' => $direction]); // keep params in pagination links
+
+        return view('pages.admin.staffs.index', compact('staffs', 'sort', 'direction'));
     }
 
     public function create()
