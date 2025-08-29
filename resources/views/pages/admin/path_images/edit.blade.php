@@ -1,337 +1,231 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Path Image')
-
 @section('content')
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-                <!-- Path Information Card -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h4 class="card-title">
-                            <i class="fas fa-route"></i> Path Information
-                        </h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-center py-2">
-                            <div class="text-center p-2 bg-primary text-white rounded mr-3">
-                                <i class="fas fa-door-open fa-lg mb-1"></i>
-                                <br>
-                                <small><strong>{{ $pathImage->path->fromRoom->name ?? 'Room #' . $pathImage->path->from_room_id }}</strong></small>
-                            </div>
-                            <div class="mx-3">
-                                <i class="fas fa-arrow-right fa-lg text-muted"></i>
-                            </div>
-                            <div class="text-center p-2 bg-success text-white rounded ml-3">
-                                <i class="fas fa-door-open fa-lg mb-1"></i>
-                                <br>
-                                <small><strong>{{ $pathImage->path->toRoom->name ?? 'Room #' . $pathImage->path->to_room_id }}</strong></small>
-                            </div>
-                        </div>
-                        <div class="text-center mt-2">
-                            <small class="text-muted">Path ID: {{ $pathImage->path->id }} | Image Order:
-                                {{ $pathImage->image_order }}</small>
-                        </div>
-                    </div>
-                </div>
+    <div class="min-h-screen py-8 px-4">
+        <div class="max-w-5xl mx-auto space-y-8">
 
-                <div class="row">
-                    <!-- Current Image Display -->
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0">
-                                    <i class="fas fa-image"></i> Current Image
-                                </h5>
-                            </div>
-                            <div class="card-body text-center">
-                                <div class="current-image-container mb-3">
-                                    <img src="{{ asset('storage/' . $pathImage->image_file) }}"
-                                        alt="Path Image {{ $pathImage->image_order }}" class="img-fluid rounded shadow"
-                                        style="max-height: 400px; cursor: pointer;" data-bs-toggle="modal"
-                                        data-bs-target="#imageModal">
-
-                                    <div class="mt-2">
-                                        <span class="badge badge-primary">Order: {{ $pathImage->image_order }}</span>
-                                    </div>
-                                </div>
-
-                                <div class="image-info">
-                                    <div class="row text-left">
-                                        <div class="col-6">
-                                            <small class="text-muted">
-                                                <strong>File:</strong><br>
-                                                {{ basename($pathImage->image_file) }}
-                                            </small>
-                                        </div>
-                                        <div class="col-6">
-                                            <small class="text-muted">
-                                                <strong>Uploaded:</strong><br>
-                                                {{ $pathImage->created_at->format('M d, Y H:i') }}
-                                            </small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Quick Actions -->
-                        <div class="card mt-3">
-                            <div class="card-header">
-                                <h6 class="card-title mb-0">
-                                    <i class="fas fa-bolt"></i> Quick Actions
-                                </h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-6">
-                                        <a href="{{ route('path.show', $pathImage->path) }}"
-                                            class="btn btn-outline-secondary btn-block">
-                                            <i class="fas fa-arrow-left"></i> Back to Path
-                                        </a>
-                                    </div>
-                                    <div class="col-6">
-                                        <button type="button" class="btn btn-outline-danger btn-block"
-                                            data-bs-toggle="modal" data-bs-target="#deleteModal">
-                                            <i class="fas fa-trash"></i> Delete Image
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Edit Form -->
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="card-title mb-0">
-                                    <i class="fas fa-edit"></i> Edit Image
-                                </h5>
-                            </div>
-
-                            <div class="card-body">
-                                @if ($errors->any())
-                                    <div class="alert alert-danger">
-                                        <h6><i class="fas fa-exclamation-triangle"></i> Please fix the following errors:
-                                        </h6>
-                                        <ul class="mb-0">
-                                            @foreach ($errors->all() as $error)
-                                                <li>{{ $error }}</li>
-                                            @endforeach
-                                        </ul>
-                                    </div>
-                                @endif
-
-                                <form action="{{ route('path_images.update', $pathImage) }}" method="POST"
-                                    enctype="multipart/form-data">
-                                    @csrf
-                                    @method('PUT')
-
-                                    <!-- Image Order -->
-                                    <div class="form-group mb-4">
-                                        <label for="image_order" class="form-label">
-                                            <i class="fas fa-sort-numeric-down"></i> Image Order
-                                        </label>
-                                        <input type="number"
-                                            class="form-control @error('image_order') is-invalid @enderror" id="image_order"
-                                            name="image_order" value="{{ old('image_order', $pathImage->image_order) }}"
-                                            min="1" placeholder="Enter display order">
-                                        <small class="form-text text-muted">
-                                            Lower numbers appear first. Leave empty to keep current order.
-                                        </small>
-                                        @error('image_order')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-
-                                    <!-- Replace Image File -->
-                                    <div class="form-group mb-4">
-                                        <label for="image_file" class="form-label">
-                                            <i class="fas fa-image"></i> Replace Image File
-                                        </label>
-                                        <div class="upload-area">
-                                            <input type="file"
-                                                class="form-control @error('image_file') is-invalid @enderror"
-                                                id="image_file" name="image_file" accept="image/*"
-                                                onchange="previewNewImage(this)">
-                                            <small class="form-text text-muted">
-                                                Leave empty to keep current image. Max size: 50MB<br>
-                                                Supported formats: JPG, JPEG, PNG, GIF, BMP, SVG, WEBP
-                                            </small>
-                                            @error('image_file')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-
-                                        <!-- New Image Preview -->
-                                        <div id="newImagePreview" class="mt-3" style="display: none;">
-                                            <label class="form-label text-success">
-                                                <i class="fas fa-eye"></i> New Image Preview:
-                                            </label>
-                                            <div class="text-center">
-                                                <img id="previewImage" src="" alt="New Image Preview"
-                                                    class="img-fluid rounded border border-success"
-                                                    style="max-height: 200px;">
-                                                <div class="mt-2">
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary"
-                                                        onclick="clearImagePreview()">
-                                                        <i class="fas fa-times"></i> Clear Selection
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Action Buttons -->
-                                    <div class="form-group">
-                                        <button type="submit" class="btn btn-primary btn-block">
-                                            <i class="fas fa-save"></i> Update Image
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-
-                        <!-- Additional Options -->
-                        <div class="card mt-3">
-                            <div class="card-header">
-                                <h6 class="card-title mb-0">
-                                    <i class="fas fa-info-circle"></i> Update Information
-                                </h6>
-                            </div>
-                            <div class="card-body">
-                                <ul class="list-unstyled mb-0 small text-muted">
-                                    <li><i class="fas fa-check text-success"></i> You can update the image order without
-                                        replacing the file</li>
-                                    <li><i class="fas fa-check text-success"></i> You can replace the image file without
-                                        changing the order</li>
-                                    <li><i class="fas fa-check text-success"></i> Both fields are optional - update only
-                                        what you need</li>
-                                    <li><i class="fas fa-exclamation text-warning"></i> Replacing the image will
-                                        permanently delete the old file</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <!-- Header -->
+            <div class="text-center">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">
+                    Edit <span class="text-primary">Path Image</span>
+                </h1>
+                <p class="text-gray-600">Update path image details or replace the file</p>
             </div>
-        </div>
-    </div>
 
-    <!-- Full Size Image Modal -->
-    <div class="modal fade" id="imageModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        Path Image - Order {{ $pathImage->image_order }}
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <img src="{{ asset('storage/' . $pathImage->image_file) }}"
-                        alt="Path Image {{ $pathImage->image_order }}" class="img-fluid rounded">
-
-                    <div class="mt-3 text-muted">
-                        <small>
-                            <strong>File:</strong> {{ basename($pathImage->image_file) }}<br>
-                            <strong>Order:</strong> {{ $pathImage->image_order }}<br>
-                            <strong>Uploaded:</strong> {{ $pathImage->created_at->format('M d, Y H:i:s') }}
-                        </small>
+            <!-- Path Information -->
+            <div class="bg-white border-2 border-primary rounded-xl shadow-sm p-6">
+                <div class="flex items-center justify-center space-x-6">
+                    <div class="text-center p-3 bg-primary text-white rounded-xl">
+                        <i class="fas fa-door-open fa-lg mb-1"></i>
+                        <p class="text-sm font-bold">
+                            {{ $pathImage->path->fromRoom->name ?? 'Room #' . $pathImage->path->from_room_id }}
+                        </p>
+                    </div>
+                    <i class="fas fa-arrow-right fa-lg text-gray-500"></i>
+                    <div class="text-center p-3 bg-green-600 text-white rounded-xl">
+                        <i class="fas fa-door-open fa-lg mb-1"></i>
+                        <p class="text-sm font-bold">
+                            {{ $pathImage->path->toRoom->name ?? 'Room #' . $pathImage->path->to_room_id }}
+                        </p>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
+                <p class="text-gray-500 text-sm mt-4 text-center">
+                    Path ID: {{ $pathImage->path->id }} | Image Order: {{ $pathImage->image_order }}
+                </p>
             </div>
-        </div>
-    </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div class="modal fade" id="deleteModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title text-danger">
-                        <i class="fas fa-exclamation-triangle"></i> Confirm Deletion
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to delete this image?</p>
-                    <div class="alert alert-warning">
-                        <strong>Image:</strong> {{ basename($pathImage->image_file) }}<br>
-                        <strong>Order:</strong> {{ $pathImage->image_order }}<br>
-                        <strong>Path:</strong>
-                        {{ $pathImage->path->fromRoom->name ?? 'Room #' . $pathImage->path->from_room_id }}
-                        →
-                        {{ $pathImage->path->toRoom->name ?? 'Room #' . $pathImage->path->to_room_id }}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Current Image -->
+                <div class="bg-white rounded-xl shadow-sm border p-6">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-4">
+                        <i class="fas fa-image text-primary"></i> Current Image
+                    </h2>
+                    <div class="bg-gray-50 border-2 border-dashed rounded-xl p-4 text-center">
+                        <img src="{{ asset('storage/' . $pathImage->image_file) }}"
+                            alt="Path Image {{ $pathImage->image_order }}"
+                            class="mx-auto rounded-lg shadow max-h-80 cursor-pointer"
+                            onclick="document.getElementById('imageModal').showModal()">
+                        <p class="mt-3 inline-block bg-primary text-white text-xs px-3 py-1 rounded-full">
+                            Order: {{ $pathImage->image_order }}
+                        </p>
                     </div>
-                    <small class="text-danger">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        This action cannot be undone and will permanently delete the image file.
-                    </small>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <form action="{{ route('path_images.destroy', $pathImage) }}" method="POST" class="d-inline">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">
+                    <div class="mt-4 grid grid-cols-2 gap-4 text-sm text-gray-600">
+                        <div>
+                            <strong>File:</strong><br>
+                            {{ basename($pathImage->image_file) }}
+                        </div>
+                        <div>
+                            <strong>Uploaded:</strong><br>
+                            {{ $pathImage->created_at->format('M d, Y H:i') }}
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="mt-6 flex space-x-4">
+                        <a href="{{ route('path.show', $pathImage->path) }}"
+                            class="flex-1 border border-gray-300 rounded-xl px-4 py-2 text-center hover:bg-gray-100 transition">
+                            <i class="fas fa-arrow-left"></i> Back to Path
+                        </a>
+                        <button type="button" onclick="document.getElementById('deleteModal').showModal()"
+                            class="flex-1 border border-red-500 text-red-500 rounded-xl px-4 py-2 hover:bg-red-50 transition">
                             <i class="fas fa-trash"></i> Delete Image
                         </button>
+                    </div>
+                </div>
+
+                <!-- Edit Form -->
+                <div class="bg-white rounded-xl shadow-sm border p-6">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-4">
+                        <i class="fas fa-edit text-primary"></i> Edit Image
+                    </h2>
+
+                    @if ($errors->any())
+                        <div class="mb-4 p-4 border border-red-300 bg-red-50 text-red-700 rounded-xl">
+                            <p class="font-semibold"><i class="fas fa-exclamation-triangle"></i> Please fix the following:
+                            </p>
+                            <ul class="list-disc pl-5 mt-2 space-y-1">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <form action="{{ route('path-image.update', $pathImage->id) }}" method="POST"
+                        enctype="multipart/form-data" class="space-y-6">
+                        @csrf
+                        @method('PUT')
+
+                        <!-- Image Order -->
+                        <div>
+                            <label class="block text-sm text-gray-800 mb-2">Image Order</label>
+                            <input type="number" name="image_order"
+                                value="{{ old('image_order', $pathImage->image_order) }}" min="1"
+                                class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:border-primary focus:ring focus:ring-primary focus:outline-none transition">
+                            <p class="text-xs text-gray-500 mt-1">Lower numbers appear first. Leave empty to keep current
+                                order.</p>
+                        </div>
+
+                        <!-- Replace Image File -->
+                        <div>
+                            <label class="block text-sm text-gray-800 mb-2">Replace Image File</label>
+                            <input type="file" name="image_file" accept="image/*" onchange="previewNewImage(this)"
+                                class="w-full border border-gray-300 rounded-xl px-4 py-2 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary file:text-white file:cursor-pointer hover:file:bg-blue-500">
+
+                            <p class="text-xs text-gray-500 mt-2">
+                                Leave empty to keep current image. Max 50MB. Supported: JPG, PNG, GIF, SVG, WEBP.
+                            </p>
+
+                            <!-- New Image Preview -->
+                            <div id="newImagePreview" class="hidden mt-4 text-center">
+                                <p class="text-green-600 text-sm mb-2"><i class="fas fa-eye"></i> New Image Preview:</p>
+                                <img id="previewImage" class="mx-auto rounded-xl border border-green-400 max-h-52">
+                                <button type="button" onclick="clearImagePreview()"
+                                    class="mt-2 border border-gray-300 rounded-lg px-3 py-1 text-sm hover:bg-gray-100">
+                                    <i class="fas fa-times"></i> Clear Selection
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Submit -->
+                        <div>
+                            <button type="submit"
+                                class="w-full bg-primary text-white rounded-xl px-6 py-3 shadow hover:bg-white hover:text-primary border-2 border-primary transition">
+                                <i class="fas fa-save"></i> Update Image
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
+
+            <!-- Additional Info -->
+            <div class="bg-white rounded-xl shadow-sm border p-6">
+                <h3 class="text-md font-semibold text-gray-700 mb-3">
+                    <i class="fas fa-info-circle text-primary"></i> Update Information
+                </h3>
+                <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                    <li>You can update the image order without replacing the file</li>
+                    <li>You can replace the image file without changing the order</li>
+                    <li>Both fields are optional - update only what you need</li>
+                    <li class="text-red-600"><i class="fas fa-exclamation-triangle"></i> Replacing the image will delete the
+                        old file permanently</li>
+                </ul>
+            </div>
         </div>
     </div>
+
+    <!-- Image Modal -->
+    <dialog id="imageModal" class="p-0 rounded-xl w-full max-w-3xl">
+        <div class="bg-white rounded-xl p-6">
+            <h2 class="text-lg font-semibold mb-4">Path Image - Order {{ $pathImage->image_order }}</h2>
+            <div class="text-center">
+                <img src="{{ asset('storage/' . $pathImage->image_file) }}" class="mx-auto rounded-lg max-h-[600px]">
+                <div class="mt-3 text-sm text-gray-600">
+                    <p><strong>File:</strong> {{ basename($pathImage->image_file) }}</p>
+                    <p><strong>Order:</strong> {{ $pathImage->image_order }}</p>
+                    <p><strong>Uploaded:</strong> {{ $pathImage->created_at->format('M d, Y H:i') }}</p>
+                </div>
+            </div>
+            <div class="mt-6 text-right">
+                <button onclick="document.getElementById('imageModal').close()"
+                    class="border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100">
+                    Close
+                </button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Delete Modal -->
+    <dialog id="deleteModal" class="p-0 rounded-xl w-full max-w-lg">
+        <div class="bg-white rounded-xl p-6">
+            <h2 class="text-lg font-semibold text-red-600 mb-3">
+                <i class="fas fa-exclamation-triangle"></i> Confirm Deletion
+            </h2>
+            <p class="text-sm mb-3">Are you sure you want to delete this image?</p>
+            <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-3 text-sm mb-3">
+                <p><strong>Image:</strong> {{ basename($pathImage->image_file) }}</p>
+                <p><strong>Order:</strong> {{ $pathImage->image_order }}</p>
+                <p><strong>Path:</strong>
+                    {{ $pathImage->path->fromRoom->name ?? 'Room #' . $pathImage->path->from_room_id }}
+                    →
+                    {{ $pathImage->path->toRoom->name ?? 'Room #' . $pathImage->path->to_room_id }}
+                </p>
+            </div>
+            <p class="text-xs text-red-600"><i class="fas fa-exclamation-triangle"></i> This action cannot be undone.</p>
+
+            <div class="mt-6 flex justify-end space-x-4">
+                <button onclick="document.getElementById('deleteModal').close()"
+                    class="border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100">
+                    Cancel
+                </button>
+                <form action="{{ route('path-image.destroy', $pathImage) }}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+                        <i class="fas fa-trash"></i> Delete Image
+                    </button>
+                </form>
+            </div>
+        </div>
+    </dialog>
+
+    <script>
+        function previewNewImage(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    document.getElementById('newImagePreview').classList.remove('hidden');
+                    document.getElementById('previewImage').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function clearImagePreview() {
+            document.getElementById('image_file').value = '';
+            document.getElementById('newImagePreview').classList.add('hidden');
+            document.getElementById('previewImage').src = '';
+        }
+    </script>
 @endsection
-
-@push('styles')
-    <style>
-        .current-image-container {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            border: 2px dashed #dee2e6;
-        }
-
-        .current-image-container img {
-            transition: transform 0.3s ease;
-        }
-
-        .current-image-container img:hover {
-            transform: scale(1.05);
-        }
-
-        .upload-area {
-            position: relative;
-        }
-
-        .upload-area input[type="file"] {
-            padding: 10px;
-            border: 2px dashed #ddd;
-            border-radius: 8px;
-            background-color: #fafafa;
-            transition: border-color 0.3s ease;
-        }
-
-        .upload-area input[type="file"]:focus,
-        .upload-area input[type="file"]:hover {
-            border-color: #007bff;
-            background-color: #f8f9ff;
-            outline: none;
-        }
-
-        .image-info {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-
-        .modal-lg {
-            max-width: 800px;
-        }

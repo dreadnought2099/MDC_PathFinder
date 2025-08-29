@@ -54,7 +54,7 @@
                             <tr
                                 class="hover:bg-gray-50 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-800">
                                 <td class="px-6 py-4">
-                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                                    <span class="px-2 py-1 bg-blue-100 text-primary rounded-full text-sm">
                                         {{ $path->fromRoom->name ?? 'Room #' . $path->from_room_id }}
                                     </span>
                                 </td>
@@ -78,6 +78,10 @@
                                         <a href="{{ route('path.show', $path->id) }}"
                                             class="hover-underline text-primary hover:scale-105 transform transition duration-200">
                                             View
+                                        </a>
+                                        <a href="{{ route('path-image.edit', $path->id) }}"
+                                            class="hover-underline-edit text-edit hover:scale-105 transform transition duration-200">
+                                            Edit
                                         </a>
                                     </div>
                                 </td>

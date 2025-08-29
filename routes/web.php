@@ -145,9 +145,6 @@ Route::middleware('auth')->group(function () {
         // List all paths
         Route::get('/paths', [PathController::class, 'index'])->name('index');
 
-        // SPECIFIC ROUTES - These MUST come before {path} routes
-        // (Add any specific routes here if needed in the future)
-
         // PARAMETERIZED ROUTES - These come after specific routes
         Route::get('/paths/{path}', [PathController::class, 'show'])->name('show');
     });
