@@ -19,6 +19,10 @@ class PathImageController extends Controller
         // Optionally, pick the first path as a default if you want a "Path Info" card
         $defaultPath = $paths->first(); // can be null if no paths exist
 
+        if (!$defaultPath) {
+            return redirect()->route('path.index')->with('warning', 'No paths available. Please create a path first.');
+        }
+
         return view('pages.admin.path_images.create', compact('paths', 'defaultPath'));
     }
 
@@ -267,7 +271,7 @@ class PathImageController extends Controller
 
         return redirect()->route('path.show', $path)->with('success', $successMessage);
     }
-    
+
     // Bulk update image orders (for drag-and-drop reordering)
     public function updateOrder(Request $request, Path $path)
     {

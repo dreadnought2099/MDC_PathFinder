@@ -23,7 +23,6 @@ use Illuminate\Support\Facades\Route;
 // Home page - displays main landing page
 Route::get('/', [HomeController::class, 'index'])->name('index');
 
-// AR Tour page - scan QR codes to view room information
 Route::get('/scan-marker', [TourController::class, 'index'])->name('ar.view');
 
 // Client-facing staff profile
@@ -33,33 +32,14 @@ Route::get('/api/rooms/{id}/exists', function ($id) {
     $exists = \App\Models\Room::where('id', $id)->exists();
     return response()->json(['exists' => $exists]);
 });
-/*
-|--------------------------------------------------------------------------
-| Admin Authentication Routes
-|--------------------------------------------------------------------------
-| Login and logout functionality for admin users
-*/
 
 // Admin login form (GET) and login processing (POST)
 Route::get('/admin', [LogInController::class, 'showLoginForm'])->name('login');
 Route::post('/admin', [LogInController::class, 'login']);
 
-/*
-|--------------------------------------------------------------------------
-| Authenticated Admin Routes
-|--------------------------------------------------------------------------
-| All routes below require admin authentication
-*/
 
 Route::middleware('auth')->group(function () {
 
-    /*
-    |----------------------------------------------------------------------
-    | Core Admin Routes
-    |----------------------------------------------------------------------
-    */
-
-    // Logout - destroys admin session
     Route::post('/logout', [LogInController::class, 'logout'])->name('logout');
 
     // Admin dashboard - main landing page after login

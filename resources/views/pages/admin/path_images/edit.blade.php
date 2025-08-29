@@ -4,6 +4,8 @@
     <div class="min-h-screen py-8 px-4">
         <div class="max-w-7xl mx-auto space-y-8">
 
+            <x-floating-actions />
+
             <!-- Header -->
             <div class="text-center">
                 <h1 class="text-3xl font-bold text-gray-800 mb-2">
@@ -500,7 +502,7 @@
                 bulkDeleteBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     const selectedCount = document.querySelectorAll('.delete-image-checkbox:checked')
-                    .length;
+                        .length;
 
                     document.getElementById('deleteContent').innerHTML = `
                     <p class="text-sm mb-3">Are you sure you want to delete <strong>${selectedCount}</strong> selected image(s)?</p>

@@ -6,64 +6,59 @@
     <x-floating-actions />
 
     <div class="max-w-xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-6">
-
         <h2 class="text-2xl text-center mb-6"><span class="text-primary">Upload</span> Path Images</h2>
 
-        {{-- Upload Form + Alpine Modal --}}
-        <div x-data="{ uploading: false, progress: 0 }" x-on:upload-start.window="uploading = true; progress = 0"
-            x-on:upload-progress.window="progress = $event.detail.progress" x-on:upload-finish.window="uploading = false">
+        <form id="uploadForm" action="{{ route('path-image.store', $defaultPath) }}" method="POST"
+            enctype="multipart/form-data" class="space-y-6" data-upload onsubmit="return false;">
+            @csrf
 
-            <form id="uploadForm" action="{{ route('path-image.store', $defaultPath) }}" method="POST"
-                enctype="multipart/form-data" class="space-y-6">
-                @csrf
+            {{-- Path Selector --}}
+            <div class="mb-4">
+                <label for="path_id" class="block text-gray-700 font-semibold mb-2">Select Path</label>
+                <select name="path_id" id="path_id" required class="w-full border rounded px-3 py-2">
+                    <option value="" disabled selected>-- Choose a path --</option>
+                    @foreach ($paths as $path)
+                        <option value="{{ $path->id }}">
+                            {{ $path->fromRoom->name ?? 'Room #' . $path->from_room_id }} →
+                            {{ $path->toRoom->name ?? 'Room #' . $path->to_room_id }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
-                {{-- Path Selector --}}
-                <div class="mb-4">
-                    <label for="path_id" class="block text-gray-700 font-semibold mb-2">Select Path</label>
-                    <select name="path_id" id="path_id" required class="w-full border rounded px-3 py-2">
-                        <option value="" disabled selected>-- Choose a path --</option>
-                        @foreach ($paths as $path)
-                            <option value="{{ $path->id }}">
-                                {{ $path->fromRoom->name ?? 'Room #' . $path->from_room_id }} →
-                                {{ $path->toRoom->name ?? 'Room #' . $path->to_room_id }}
-                            </option>
-                        @endforeach
-                    </select>
+            {{-- Dropzone --}}
+            <label for="fileInput"
+                class="flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors p-4 overflow-auto relative">
+                <i class="fas fa-cloud-upload-alt fa-4x text-gray-400 mb-2"></i>
+                <span class="text-gray-500 mb-2">Drop images here or click to browse</span>
+                <span class="text-xs text-gray-400">
+                    JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 50MB each | multiple allowed
+                </span>
+                <input type="file" name="files[]" id="fileInput" multiple accept="image/*" class="hidden">
+            </label>
+
+            <div id="fileError" class="text-red-500 text-sm mt-2 hidden"></div>
+
+            {{-- Selected Files Preview --}}
+            <div id="selectedFiles" class="grid grid-cols-2 md:grid-cols-3 gap-4" style="display:none;"></div>
+
+            {{-- Submit Button --}}
+            <button type="submit" id="submitBtn"
+                class="w-full bg-primary text-white px-4 py-2 rounded hover:bg-white hover:text-primary border-2 border-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled>
+                <i class="fas fa-upload mr-2"></i> Upload Images
+            </button>
+        </form>
+
+        {{-- Upload Modal --}}
+        <div id="uploadModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded p-6 w-96 shadow-lg">
+                <h2 class="text-lg mb-4">Uploading...</h2>
+                <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden relative">
+                    <div id="progressBar" class="h-4 rounded-full bg-primary transition-all duration-300 ease-out"
+                        style="width: 0%"></div>
                 </div>
-
-                {{-- Dropzone --}}
-                <label for="fileInput"
-                    class="flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors p-4 overflow-auto relative">
-                    <i class="fas fa-cloud-upload-alt fa-4x text-gray-400 mb-2"></i>
-                    <span class="text-gray-500 mb-2">Drop images here or click to browse</span>
-                    <span class="text-xs text-gray-400">
-                        JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 50MB each | multiple allowed
-                    </span>
-                    <input type="file" name="files[]" id="fileInput" multiple accept="image/*" class="hidden">
-                </label>
-
-                {{-- Selected Files Preview --}}
-                <div id="selectedFiles" class="grid grid-cols-2 md:grid-cols-3 gap-4" style="display:none;"></div>
-
-                {{-- Submit Button --}}
-                <button type="submit" id="submitBtn"
-                    class="w-full bg-primary text-white px-4 py-2 rounded hover:bg-white hover:text-primary border-2 border-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled>
-                    <i class="fas fa-upload mr-2"></i> Upload Images
-                </button>
-            </form>
-
-            {{-- Upload Modal --}}
-            <div x-show="uploading" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-                style="display:none;">
-                <div class="bg-white rounded p-6 w-96 shadow-lg">
-                    <h2 class="text-lg mb-4">{{ $title ?? 'Uploading...' }}</h2>
-                    <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden relative">
-                        <div class="h-4 rounded-full bg-primary progress-bar transition-all duration-300 ease-out"
-                            :style="'width:' + progress + '%'"></div>
-                    </div>
-                    <p class="mt-2 text-sm text-gray-600" x-text="progress + '%'"></p>
-                </div>
+                <p id="progressText" class="mt-2 text-sm text-gray-600">0%</p>
             </div>
         </div>
     </div>
@@ -77,7 +72,9 @@
             const submitBtn = document.getElementById('submitBtn');
             const uploadForm = document.getElementById('uploadForm');
             const pathSelect = document.getElementById('path_id');
-            const uploadEventTarget = document;
+            const uploadModal = document.getElementById('uploadModal');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
 
             let files = [];
 
@@ -95,13 +92,33 @@
             pathSelect.addEventListener('change', updateSubmitButton);
 
             function addFiles(newFiles) {
+                const fileError = document.getElementById('fileError');
+                fileError.classList.add('hidden');
+                let errorMessages = [];
+
                 newFiles.forEach(file => {
                     if (file.type.startsWith('image/') && file.size <= 50 * 1024 * 1024) { // 50MB
                         files.push(file);
+                        console.log(
+                            `Added file: ${file.name}, Type: ${file.type}, Size: ${(file.size / (1024 * 1024)).toFixed(2)}MB`
+                            );
                     } else {
-                        console.warn(`File ${file.name} ignored: Invalid type or size exceeds 50MB`);
+                        let error = `File ${file.name}: `;
+                        if (!file.type.startsWith('image/')) {
+                            error += 'Must be an image (JPG, PNG, etc.).';
+                        } else {
+                            error += 'Size exceeds 50MB.';
+                        }
+                        errorMessages.push(error);
+                        console.warn(error);
                     }
                 });
+
+                if (errorMessages.length > 0) {
+                    fileError.textContent = errorMessages.join(' ');
+                    fileError.classList.remove('hidden');
+                }
+
                 renderPreviews();
                 updateSubmitButton();
             }
@@ -125,9 +142,9 @@
                     div.className = 'relative rounded overflow-hidden border shadow-sm';
                     reader.onload = e => {
                         div.innerHTML = `
-                    <img src="${e.target.result}" class="w-full h-24 object-cover">
-                    <button type="button" class="absolute top-1 right-1 bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs" onclick="removeFile(${index})">&times;</button>
-                `;
+                            <img src="${e.target.result}" class="w-full h-24 object-cover">
+                            <button type="button" class="absolute top-1 right-1 bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs" onclick="removeFile(${index})">&times;</button>
+                        `;
                     };
                     reader.readAsDataURL(file);
                     selectedFilesContainer.appendChild(div);
@@ -145,35 +162,56 @@
                 formData.append('path_id', pathSelect.value);
                 files.forEach(file => formData.append('files[]', file));
 
-                uploadEventTarget.dispatchEvent(new CustomEvent('upload-start'));
+                // Show modal
+                uploadModal.classList.remove('hidden');
+                progressBar.style.width = '0%';
+                progressText.textContent = '0%';
 
-                try {
-                    const response = await fetch(uploadForm.action, {
-                        method: 'POST',
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                        },
-                        body: formData,
-                    });
+                const xhr = new XMLHttpRequest();
 
-                    const data = await response.json();
-                    console.log('Response:', data);
-
-                    if (response.ok) {
-                        if (data.redirect) window.location.href = data.redirect;
-                        else location.reload();
-                    } else if (response.status === 422) {
-                        alert('Validation error: ' + (data.errors ? Object.values(data.errors).join(
-                            ', ') : data.message));
-                    } else {
-                        alert('Upload failed. Status: ' + response.status);
+                // Track upload progress
+                xhr.upload.addEventListener('progress', e => {
+                    if (e.lengthComputable) {
+                        const percent = Math.round((e.loaded / e.total) * 100);
+                        progressBar.style.width = `${percent}%`;
+                        progressText.textContent = `${percent}%`;
                     }
-                } catch (err) {
-                    console.error('Upload error:', err);
+                });
+
+                // Handle completion
+                xhr.addEventListener('load', () => {
+                    uploadModal.classList.add('hidden');
+                    try {
+                        const data = JSON.parse(xhr.responseText);
+                        if (xhr.status === 200) {
+                            if (data.redirect) {
+                                window.location.href = data.redirect;
+                            } else {
+                                location.reload();
+                            }
+                        } else if (xhr.status === 422) {
+                            alert('Validation error: ' + (data.errors ? Object.values(data
+                                .errors).join(', ') : data.message));
+                        } else {
+                            alert('Upload failed. Status: ' + xhr.status);
+                        }
+                    } catch (err) {
+                        console.error('Response parse error:', err);
+                        alert('Upload failed. Check the console for details.');
+                    }
+                });
+
+                // Handle errors
+                xhr.addEventListener('error', () => {
+                    uploadModal.classList.add('hidden');
+                    console.error('Upload error:', xhr.statusText);
                     alert('Upload failed. Check the console for details.');
-                } finally {
-                    uploadEventTarget.dispatchEvent(new CustomEvent('upload-finish'));
-                }
+                });
+
+                // Send request
+                xhr.open('POST', uploadForm.action);
+                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                xhr.send(formData);
             });
         });
     </script>
