@@ -7,7 +7,7 @@
             <h1 class="text-3xl font-bold text-gray-800 mb-2 dark:text-gray-100">
                 <span class="text-primary">Paths</span> Management
             </h1>
-            <p class="text-gray-600 dark:text-gray-300">Manage paths between rooms</p>
+            <p class="text-gray-600 dark:text-gray-300">Manage paths between offices</p>
             <div class="mt-4 flex justify-center">
                 {{ $paths->appends(request()->query())->links('pagination::tailwind') }}
             </div>

@@ -29,17 +29,11 @@
         </div>
     </div>
 
-    <style>
-        .modal {
-            background-color: rgba(0, 0, 0, 0.4);
-        }
-    </style>
-
     <!-- Modal -->
     <div id="cropperModal"
-        class="modal fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex justify-center items-center cursor-pointer"
+        class="modal fixed inset-0 z-50 hidden bg-black/50  backdrop-blur-sm flex justify-center items-center cursor-pointer"
         onclick="handleOutsideClick(event)">
-        <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative dark:bg-gray-800">
 
             <button type="button" onclick="closeModal()"
                 class="absolute top-2 right-4 text-6xl text-gray-500 hover:text-red-600 focus:outline-none cursor-pointer"
@@ -47,14 +41,14 @@
                 <img src="{{ asset('icons/exit.png') }}" alt="Close Modal" class="w-6 h-6 hover:scale-120 duration-300 transition-all ease-in-out">
             </button>
 
-            <h3 class="text-xl mb-4">Crop Image</h3>
+            <h3 class="text-xl mb-4 dark:text-gray-300">Crop Image</h3>
 
             <div class="flex flex-col md:flex-row gap-4">
                 <div class="flex-1">
                     <img id="image-to-crop" class="max-w-full max-h-[400px] mx-auto rounded">
                 </div>
                 <div>
-                    <p class="text-sm text-gray-500 mb-2">Preview</p>
+                    <p class="text-sm text-gray-500 mb-2 dark:text-gray-300">Preview</p>
                     <div id="preview" class="w-32 h-32 border overflow-hidden rounded-full"></div>
                 </div>
             </div>
@@ -66,7 +60,7 @@
                 <input type="file" id="profile_image" accept="image/*" class="hidden">
                 <div class="flex justify-end mt-4">
                     <button type="submit"
-                        class="px-4 py-2 bg-primary hover:bg-white hover:text-primary border border-primary duration-300 ease-in-out text-white rounded cursor-pointer">
+                        class="bg-primary text-white text-sm font-medium px-4 py-2 bg-primary rounded-lg hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800">
                         Crop & Upload
                     </button>
                 </div>

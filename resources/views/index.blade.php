@@ -9,9 +9,8 @@
         </div>
 
         <!-- Button at the bottom -->
-        <a href="{{ route('ar.view') }}"
-            class="bg-primary hover:bg-white hover:text-primary text-white py-4 text-xl px-6 rounded-2xl shadow-lg border border-primary transition-all duration-300">
-            Start Campus Tour
+        <a href="{{ route('ar.view') }}">
+            <img src="{{ asset('icons/qr-code.png') }}" alt="Scan Office" class="w-10 h-10 hover:scale-110 transition-all duration-300 ease-in-out" title="Scan Office">
         </a>
     </div>
 @endsection

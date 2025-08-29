@@ -24,14 +24,14 @@
                     class="group card-shadow-hover shadow-primary-hover p-6 border-2 border-primary bg-white dark:bg-gray-800 dark:border-gray-700 rounded-lg">
                     <div class="flex flex-col items-center text-center space-y-4">
                         <div class="bg-primary-10 hover:bg-primary-20 p-4 rounded-full transition-all duration-300">
-                            <img src="{{ asset('icons/manage-office1.png') }}" alt="Manage Room/Office"
+                            <img src="{{ asset('icons/navigation.png') }}" alt="Manage Room/Office"
                                 class="h-12 w-12 object-contain" />
                         </div>
                         <div>
                             <h3 class="text-lg text-gray-800 dark:text-white group-hover:text-primary transition-colors">
-                                Manage Rooms/Offices
+                                Manage Path Navigations
                             </h3>
-                            <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">Configure office spaces and rooms</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">Manage paths between offices</p>
                         </div>
                     </div>
                 </a>

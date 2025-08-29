@@ -9,7 +9,7 @@
         </a>
     </div>
 
-    <h1 class="text-3xl font-bold text-gray-800 mb-4"><span class="text-primary">{{ config('app.name') }}</span> Scanner</h1>
+    <h1 class="text-3xl font-bold text-gray-800 mb-4 text-primary">{{ config('app.name') }}</h1>
     <p class="text-gray-600 mb-6">Point your camera at a QR code to start exploring campus rooms.</p>
 
     <!-- Camera scanner -->
