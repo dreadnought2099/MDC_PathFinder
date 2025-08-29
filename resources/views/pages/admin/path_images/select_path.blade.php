@@ -500,7 +500,7 @@
                 bulkDeleteBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     const selectedCount = document.querySelectorAll('.delete-image-checkbox:checked')
-                    .length;
+                        .length;
 
                     document.getElementById('deleteContent').innerHTML = `
                     <p class="text-sm mb-3">Are you sure you want to delete <strong>${selectedCount}</strong> selected image(s)?</p>
