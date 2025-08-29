@@ -17,7 +17,7 @@
 
                 <!-- Right side (profile) -->
                 <div class="relative" x-data="{ open: false }" x-cloak>
-                    <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none cursor-pointer">
+                    <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none cursor-pointer dark:text-gray-300">
                         <img x-ref="navbarProfile"
                             src="{{ Auth::user()->profile_photo_path ? Storage::url(Auth::user()->profile_photo_path) : asset('images/mdc-logo.png') }}"
                             alt="Profile" class="h-8 w-8 rounded-full">

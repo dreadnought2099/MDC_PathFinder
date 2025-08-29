@@ -32,16 +32,4 @@ class PathController extends Controller
 
         return view('pages.admin.paths.show', compact('path'));
     }
-
-    public function destroy(Path $path)
-    {
-        // Optional: manually delete associated images if not using cascade delete
-        // foreach ($path->images as $image) {
-        //     Storage::disk('public')->delete($image->image_file);
-        // }
-        // $path->images()->delete();
-
-        $path->delete();
-        return redirect()->route('path.index')->with('success', 'Path deleted successfully.');
-    }
 }

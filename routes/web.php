@@ -150,9 +150,6 @@ Route::middleware('auth')->group(function () {
 
         // PARAMETERIZED ROUTES - These come after specific routes
         Route::get('/paths/{path}', [PathController::class, 'show'])->name('show');
-
-        // Form submission routes
-        Route::delete('/paths/{path}', [PathController::class, 'destroy'])->name('destroy');
     });
 
     /*
