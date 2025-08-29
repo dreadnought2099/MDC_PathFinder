@@ -4,7 +4,7 @@
 
 @section('content')
     <x-floating-actions />
-    
+
     <div class="container mx-auto max-w-6xl px-4 py-6">
         <!-- Header -->
         <div class="mb-6 flex items-center justify-between">
@@ -129,7 +129,12 @@
             loop: true,
             zoomable: true,
             autoplayVideos: false,
-            moreText: 'View Image'
+            moreText: 'View Image',
+            svg: {
+                close: '<img src="/icons/exit.png"/>',
+                next: '<img src="/icons/next.png"/>',
+                prev: '<img src="/icons/prev.png"/>'
+            }
         });
     </script>
 @endpush
