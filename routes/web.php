@@ -138,7 +138,7 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('admin')->name('path-image.')->group(function () {
         // GENERIC ROUTES (no path parameter needed)
-        Route::get('/path-images/create', [PathImageController::class, 'create'])->name('create');
+        Route::get('/path-images/create/{path?}', [PathImageController::class, 'create'])->name('create');
         Route::post('/path-images', [PathImageController::class, 'store'])->name('store');
 
         // PATH-SPECIFIC ROUTES

@@ -11,21 +11,21 @@ use Illuminate\Support\Facades\Storage;
 class PathImageController extends Controller
 {
     // Show form to upload images
-    public function create()
+    public function create(Path $path = null)
     {
-        // Get all automated paths for the dropdown
+        // Get all paths for the dropdown
         $paths = Path::with(['fromRoom', 'toRoom'])->get();
 
-        // Optionally, pick the first path as a default if you want a "Path Info" card
-        $defaultPath = $paths->first(); // can be null if no paths exist
-
-        if (!$defaultPath) {
-            return redirect()->route('path.index')->with('warning', 'No paths available. Please create a path first.');
+        if ($paths->isEmpty()) {
+            return redirect()->route('path.index')
+                ->with('warning', 'No paths available. Please create a path first.');
         }
+
+        // Default: use route param if provided, otherwise first path
+        $defaultPath = $path && $path->exists ? $path : $paths->first();
 
         return view('pages.admin.path_images.create', compact('paths', 'defaultPath'));
     }
-
 
     // Store multiple images for a path
     public function store(Request $request)

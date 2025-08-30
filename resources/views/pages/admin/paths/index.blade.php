@@ -79,6 +79,10 @@
                                             class="hover-underline text-primary hover:scale-105 transform transition duration-200">
                                             View
                                         </a>
+                                         <a href="{{ route('path-image.create', $path->id) }}"
+                                            class="hover-underline-tertiary text-tertiary hover:scale-105 transform transition duration-200">
+                                            Add Path Images
+                                        </a>
                                         <a href="{{ route('path-image.edit', $path->id) }}"
                                             class="hover-underline-edit text-edit hover:scale-105 transform transition duration-200">
                                             Edit

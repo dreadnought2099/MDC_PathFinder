@@ -6,7 +6,9 @@
     <x-floating-actions />
 
     <div class="max-w-xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-6">
-        <h2 class="text-2xl text-center mb-6"><span class="text-primary">Upload</span> Path Images</h2>
+        <h2 class="text-2xl text-center mb-6">
+            <span class="text-primary">Upload</span> Path Images
+        </h2>
 
         <form id="uploadForm" action="{{ route('path-image.store') }}" method="POST" enctype="multipart/form-data"
             class="space-y-6" data-upload onsubmit="return false;">
@@ -16,11 +18,10 @@
             <div class="mb-4">
                 <label for="path_id" class="block text-gray-700 font-semibold mb-2">Select Path</label>
                 <select name="path_id" id="path_id" required class="w-full border rounded px-3 py-2">
-                    <option value="" disabled selected>-- Choose a path --</option>
-                    @foreach ($paths as $path)
-                        <option value="{{ $path->id }}">
-                            {{ $path->fromRoom->name ?? 'Room #' . $path->from_room_id }} →
-                            {{ $path->toRoom->name ?? 'Room #' . $path->to_room_id }}
+                    @foreach ($paths as $p)
+                        <option value="{{ $p->id }}" {{ $p->id == $defaultPath->id ? 'selected' : '' }}>
+                            {{ $p->fromRoom->name ?? 'Room #' . $p->from_room_id }} →
+                            {{ $p->toRoom->name ?? 'Room #' . $p->to_room_id }}
                         </option>
                     @endforeach
                 </select>
@@ -79,8 +80,7 @@
             let files = [];
 
             function updateSubmitButton() {
-                const pathSelected = pathSelect.value !== '';
-                submitBtn.disabled = files.length === 0 || !pathSelected;
+                submitBtn.disabled = files.length === 0 || pathSelect.value === '';
             }
 
             fileInput.addEventListener('change', () => {
@@ -89,7 +89,14 @@
                 updateSubmitButton();
             });
 
-            pathSelect.addEventListener('change', updateSubmitButton);
+            // Change dropdown → reload with new default path
+            pathSelect.addEventListener('change', function() {
+                const selectedId = this.value;
+                if (selectedId) {
+                    let baseUrl = "{{ route('path-image.create', ':id') }}".replace(':id', selectedId);
+                    window.location.href = baseUrl;
+                }
+            });
 
             function addFiles(newFiles) {
                 const fileError = document.getElementById('fileError');
@@ -97,20 +104,13 @@
                 let errorMessages = [];
 
                 newFiles.forEach(file => {
-                    if (file.type.startsWith('image/') && file.size <= 50 * 1024 * 1024) { // 50MB
+                    if (file.type.startsWith('image/') && file.size <= 50 * 1024 * 1024) {
                         files.push(file);
-                        console.log(
-                            `Added file: ${file.name}, Type: ${file.type}, Size: ${(file.size / (1024 * 1024)).toFixed(2)}MB`
-                        );
                     } else {
                         let error = `File ${file.name}: `;
-                        if (!file.type.startsWith('image/')) {
-                            error += 'Must be an image (JPG, PNG, etc.).';
-                        } else {
-                            error += 'Size exceeds 50MB.';
-                        }
+                        if (!file.type.startsWith('image/')) error += 'Must be an image.';
+                        else error += 'Size exceeds 50MB.';
                         errorMessages.push(error);
-                        console.warn(error);
                     }
                 });
 
@@ -143,8 +143,10 @@
                     reader.onload = e => {
                         div.innerHTML = `
                     <img src="${e.target.result}" class="w-full h-24 object-cover">
-                    <button type="button" class="absolute top-1 right-1 bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs" onclick="removeFile(${index})">&times;</button>
-                `;
+                    <button type="button"
+                        class="absolute top-1 right-1 bg-red-500 text-white w-5 h-5 rounded-full
+                        flex items-center justify-center text-xs"
+                        onclick="removeFile(${index})">&times;</button>`;
                     };
                     reader.readAsDataURL(file);
                     selectedFilesContainer.appendChild(div);
@@ -169,7 +171,6 @@
 
                 const xhr = new XMLHttpRequest();
 
-                // Track upload progress
                 xhr.upload.addEventListener('progress', e => {
                     if (e.lengthComputable) {
                         const percent = Math.round((e.loaded / e.total) * 100);
@@ -178,17 +179,13 @@
                     }
                 });
 
-                // Handle completion
                 xhr.addEventListener('load', () => {
                     uploadModal.classList.add('hidden');
                     try {
                         const data = JSON.parse(xhr.responseText);
                         if (xhr.status === 200) {
-                            if (data.redirect) {
-                                window.location.href = data.redirect;
-                            } else {
-                                location.reload();
-                            }
+                            if (data.redirect) window.location.href = data.redirect;
+                            else location.reload();
                         } else if (xhr.status === 422) {
                             alert('Validation error: ' + (data.errors ? Object.values(data
                                 .errors).join(', ') : data.message));
@@ -197,18 +194,15 @@
                         }
                     } catch (err) {
                         console.error('Response parse error:', err);
-                        alert('Upload failed. Check the console for details.');
+                        alert('Upload failed. Check console for details.');
                     }
                 });
 
-                // Handle errors
                 xhr.addEventListener('error', () => {
                     uploadModal.classList.add('hidden');
-                    console.error('Upload error:', xhr.statusText);
-                    alert('Upload failed. Check the console for details.');
+                    alert('Upload failed. Check console for details.');
                 });
 
-                // Send request - form action is already set correctly
                 xhr.open('POST', uploadForm.action);
                 xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
                 xhr.send(formData);
