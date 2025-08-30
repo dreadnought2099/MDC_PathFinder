@@ -13,12 +13,7 @@
             </div>
         </div>
 
-        <x-sort-by 
-            :route="route('staff.index')"
-            :fields="['first_name' => 'First Name', 'last_name' => 'Last Name', 'email' => 'Email']"
-            :current-sort="$sort"
-            :current-direction="$direction"
-        />
+        <x-sort-by :route="route('staff.index')" :fields="['first_name' => 'First Name', 'last_name' => 'Last Name', 'email' => 'Email']" :current-sort="$sort" :current-direction="$direction" />
 
         <!-- Floating Actions -->
         <div class="mb-6">
@@ -30,35 +25,55 @@
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead>
-                        <tr class="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 dark:from-gray-800 dark:to-gray-700 dark:border-gray-600">
-                            <th class="px-6 py-4 text-left text-sm text-gray-700 uppercase tracking-wide dark:text-gray-300">
-                                Staff Member
+                        <tr
+                            class="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 dark:from-gray-800 dark:to-gray-700 dark:border-gray-600">
+                            <th
+                                class="px-6 py-4 text-left text-sm text-gray-700 uppercase tracking-wide dark:text-gray-300">
+                                Staff ID
                             </th>
-                            <th class="px-6 py-4 text-right text-sm text-gray-700 uppercase tracking-wide dark:text-gray-300">
+                            <th
+                                class="px-6 py-4 text-left text-sm text-gray-700 uppercase tracking-wide dark:text-gray-300">
+                                Full Name
+                            </th>
+                            <th
+                                class="px-6 py-4 text-left text-sm text-gray-700 uppercase tracking-wide dark:text-gray-300">
+                                Room ID
+                            </th>
+                            <th
+                                class="px-6 py-4 text-left text-sm text-gray-700 uppercase tracking-wide dark:text-gray-300">
+                                Office Name
+                            </th>
+                            <th
+                                class="px-6 py-4 text-right text-sm text-gray-700 uppercase tracking-wide dark:text-gray-300">
                                 Actions
                             </th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
                         @forelse($staffs as $staff)
-                            <tr class="hover:bg-gray-50 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-800">
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="flex-shrink-0">
-                                            <div
-                                                class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                                                <span class="text-primary font-medium text-sm">
-                                                    {{ $staff->id }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="text-sm font-medium text-gray-900 dark:text-gray-300">
-                                                {{ $staff->full_name }}
-                                            </div>
-                                        </div>
-                                    </div>
+                            <tr
+                                class="hover:bg-gray-50 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-800">
+                                <!-- Staff ID -->
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                    {{ $staff->id }}
                                 </td>
+
+                                <!-- Staff Name -->
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                    {{ $staff->full_name }}
+                                </td>
+
+                                <!-- Room ID -->
+                                <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-400">
+                                    {{ $staff->room_id ?? 'N/A' }}
+                                </td>
+
+                                <!-- Office Name -->
+                                <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-400">
+                                    {{ $staff->office->name ?? 'N/A' }}
+                                </td>
+
+                                <!-- Actions -->
                                 <td class="px-6 py-4">
                                     <div class="flex items-center justify-end space-x-3">
                                         <a href="{{ route('staff.show', $staff->id) }}"
@@ -68,7 +83,6 @@
 
                                         <a href="{{ route('staff.edit', $staff->id) }}"
                                             class="text-edit hover-underline-edit hover:scale-105 transform transition duration-200">
-
                                             Edit
                                         </a>
 
@@ -81,9 +95,10 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="2" class="px-6 py-16 text-center">
+                                <td colspan="5" class="px-6 py-16 text-center">
                                     <div class="flex flex-col items-center justify-center space-y-4">
-                                        <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                                        <div
+                                            class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
                                             <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -92,9 +107,10 @@
                                             </svg>
                                         </div>
                                         <div class="text-center">
-                                            <h3 class="text-lg font-medium dark:text-gray-300 text-gray-700 mb-2">No staff members found</h3>
-                                            <p class="text-gray-500 text-sm dark:text-gray-400">Get started by adding your first team member.
-                                            </p>
+                                            <h3 class="text-lg font-medium dark:text-gray-300 text-gray-700 mb-2">No staff
+                                                members found</h3>
+                                            <p class="text-gray-500 text-sm dark:text-gray-400">Get started by adding your
+                                                first team member.</p>
                                         </div>
                                     </div>
                                 </td>
@@ -115,7 +131,8 @@
             <!-- Modal Header -->
             <div class="px-6 py-4 border-b border-gray-200">
                 <div class="flex items-center justify-between">
-                    <h2 class="text-xl text-gray-900 dark:text-gray-300">Confirm <span class="text-secondary">Deletion</span></h2>
+                    <h2 class="text-xl text-gray-900 dark:text-gray-300">Confirm <span
+                            class="text-secondary">Deletion</span></h2>
                     <button onclick="closeModal()"
                         class="text-gray-400 hover:text-red-600 transition-colors duration-200 cursor-pointer">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

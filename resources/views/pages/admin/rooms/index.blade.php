@@ -7,18 +7,13 @@
             <h1 class="text-3xl font-bold text-gray-800 mb-2 dark:text-gray-100">
                 <span class="text-primary">Office</span> Management
             </h1>
-            <p class="text-gray-600 dark:text-gray-300">Manage rooms and assign staff members</p>
+            <p class="text-gray-600 dark:text-gray-300">Manage offices and assign staff members</p>
             <div class="mt-4 flex justify-center">
                 {{ $rooms->appends(request()->query())->links('pagination::tailwind') }}
             </div>
         </div>
 
-        <x-sort-by 
-            :route="route('room.index')"
-            :fields="['name' => 'Name', 'created_at' => 'Created At']"
-            :current-sort="$sort"
-            :current-direction="$direction"
-        />
+        <x-sort-by :route="route('room.index')" :fields="['name' => 'Name', 'created_at' => 'Created At']" :current-sort="$sort" :current-direction="$direction" />
 
         <!-- Floating Actions -->
         <div class="mb-6">
@@ -30,31 +25,38 @@
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead>
-                        <tr class="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 dark:from-gray-800 dark:to-gray-700 dark:border-gray-600">
-                            <th class="px-6 py-4 text-left text-sm text-gray-700 uppercase tracking-wide dark:text-gray-300">
+                        <tr
+                            class="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 dark:from-gray-800 dark:to-gray-700 dark:border-gray-600">
+                            <th
+                                class="px-6 py-4 text-left text-sm text-gray-700 uppercase tracking-wide dark:text-gray-300">
+                                ID
+                            </th>
+                            <th
+                                class="px-6 py-4 text-left text-sm text-gray-700 uppercase tracking-wide dark:text-gray-300">
                                 Office Name
                             </th>
-                            <th class="px-6 py-4 text-right text-sm text-gray-700 uppercase tracking-wide dark:text-gray-300">
+                            <th
+                                class="px-6 py-4 text-right text-sm text-gray-700 uppercase tracking-wide dark:text-gray-300">
                                 Actions
                             </th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
                         @forelse($rooms as $room)
-                            <tr class="hover:bg-gray-50 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-800">
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="flex-shrink-0">
-                                            <div
-                                                class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                                                <span class="text-primary font-medium text-sm">{{ $room->id }}</span>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="text-sm font-medium text-gray-900 dark:text-gray-300">{{ $room->name }}</div>
-                                        </div>
-                                    </div>
+                            <tr
+                                class="hover:bg-gray-50 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-800">
+
+                                <!-- ID Column -->
+                                <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">
+                                    {{ $room->id }}
                                 </td>
+
+                                <!-- Office Name Column -->
+                                <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">
+                                    {{ $room->name }}
+                                </td>
+
+                                <!-- Actions Column -->
                                 <td class="px-6 py-4">
                                     <div class="flex items-center justify-end space-x-3">
                                         <a href="{{ route('room.show', $room->id) }}"
@@ -79,9 +81,10 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="2" class="px-6 py-16 text-center">
+                                <td colspan="3" class="px-6 py-16 text-center">
                                     <div class="flex flex-col items-center justify-center space-y-4">
-                                        <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                                        <div
+                                            class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
                                             <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -90,8 +93,10 @@
                                             </svg>
                                         </div>
                                         <div class="text-center">
-                                            <h3 class="text-lg font-medium dark:text-gray-300 text-gray-700 mb-2">No rooms found</h3>
-                                            <p class="text-gray-500 text-sm dark:text-gray-400">Add your first room to get started.</p>
+                                            <h3 class="text-lg font-medium dark:text-gray-300 text-gray-700 mb-2">No rooms
+                                                found</h3>
+                                            <p class="text-gray-500 text-sm dark:text-gray-400">Add your first room to get
+                                                started.</p>
                                         </div>
                                     </div>
                                 </td>
@@ -101,106 +106,107 @@
                 </table>
             </div>
         </div>
-    </div>
 
-    <!-- Room Delete Modal (animated, same style as Staff modal) -->
-    <div id="roomDeleteModal"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden transition-all duration-300 opacity-0"
-        onclick="closeRoomModal()">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform transition-all duration-300 scale-95 dark:bg-gray-800"
-            onclick="event.stopPropagation()">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-xl text-gray-900 dark:text-gray-300">Confirm <span class="text-secondary">Deletion</span></h2>
-                    <button onclick="closeRoomModal()"
-                        class="text-gray-400 hover:text-red-600 transition-colors duration-200 cursor-pointer">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                            </path>
-                        </svg>
-                    </button>
+        <!-- Room Delete Modal (animated, same style as Staff modal) -->
+        <div id="roomDeleteModal"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden transition-all duration-300 opacity-0"
+            onclick="closeRoomModal()">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform transition-all duration-300 scale-95 dark:bg-gray-800"
+                onclick="event.stopPropagation()">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xl text-gray-900 dark:text-gray-300">Confirm <span
+                                class="text-secondary">Deletion</span></h2>
+                        <button onclick="closeRoomModal()"
+                            class="text-gray-400 hover:text-red-600 transition-colors duration-200 cursor-pointer">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12">
+                                </path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <div class="px-6 py-4">
-                <div class="flex items-center space-x-3 mb-4">
-                    <div class="flex-shrink-0">
-                        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                            <img src="{{ asset('icons/warning-red.png') }}" class="w-8 h-8" alt="Warning">
+                <div class="px-6 py-4">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                                <img src="{{ asset('icons/warning-red.png') }}" class="w-8 h-8" alt="Warning">
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-gray-700 text-sm leading-relaxed dark:text-gray-300">
+                                Are you sure you want to delete <span id="roomName" class="text-red-600"></span>?
+                                This action cannot be undone.
+                            </p>
                         </div>
                     </div>
-                    <div>
-                        <p class="text-gray-700 text-sm leading-relaxed dark:text-gray-300">
-                            Are you sure you want to delete <span id="roomName" class="text-red-600"></span>?
-                            This action cannot be undone.
-                        </p>
-                    </div>
+                </div>
+
+                <div class="px-6 py-4 bg-gray-50 rounded-b-2xl dark:bg-gray-800">
+                    <form id="roomDeleteForm" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <div class="flex justify-end space-x-3">
+                            <button type="button" onclick="closeRoomModal()"
+                                class="px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-lg transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300">
+                                Cancel
+                            </button>
+                            <button type="submit"
+                                class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-red-600 rounded-lg hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800">
+                                Delete Room
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
-
-            <div class="px-6 py-4 bg-gray-50 rounded-b-2xl dark:bg-gray-800">
-                <form id="roomDeleteForm" method="POST">
-                    @csrf
-                    @method('DELETE')
-                    <div class="flex justify-end space-x-3">
-                        <button type="button" onclick="closeRoomModal()"
-                            class="px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-lg transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300">
-                            Cancel
-                        </button>
-                        <button type="submit"
-                            class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-red-600 rounded-lg hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800">
-                            Delete Room
-                        </button>
-                    </div>
-                </form>
-            </div>
         </div>
-    </div>
-@endsection
+    @endsection
 
-@push('scripts')
-    <script>
-        function openRoomModal(id, name) {
-            const modal = document.getElementById('roomDeleteModal');
-            const nameSpan = document.getElementById('roomName');
-            const form = document.getElementById('roomDeleteForm');
+    @push('scripts')
+        <script>
+            function openRoomModal(id, name) {
+                const modal = document.getElementById('roomDeleteModal');
+                const nameSpan = document.getElementById('roomName');
+                const form = document.getElementById('roomDeleteForm');
 
-            nameSpan.textContent = name;
-            form.action = `/admin/rooms/${id}`;
+                nameSpan.textContent = name;
+                form.action = `/admin/rooms/${id}`;
 
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                modal.querySelector('.bg-white').classList.remove('scale-95');
-                modal.querySelector('.bg-white').classList.add('scale-100');
-            }, 10);
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    modal.querySelector('.bg-white').classList.remove('scale-95');
+                    modal.querySelector('.bg-white').classList.add('scale-100');
+                }, 10);
 
-            document.body.style.overflow = 'hidden';
-        }
+                document.body.style.overflow = 'hidden';
+            }
 
-        function closeRoomModal() {
-            const modal = document.getElementById('roomDeleteModal');
-            const modalContent = modal.querySelector('.bg-white');
+            function closeRoomModal() {
+                const modal = document.getElementById('roomDeleteModal');
+                const modalContent = modal.querySelector('.bg-white');
 
-            modal.classList.add('opacity-0');
-            modalContent.classList.remove('scale-100');
-            modalContent.classList.add('scale-95');
+                modal.classList.add('opacity-0');
+                modalContent.classList.remove('scale-100');
+                modalContent.classList.add('scale-95');
 
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                document.body.style.overflow = 'auto';
-            }, 300);
-        }
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+                }, 300);
+            }
 
-        // Close modal on Escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closeRoomModal();
-        });
+            // Close modal on Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') closeRoomModal();
+            });
 
-        // Close modal when clicking outside
-        document.addEventListener('click', function(e) {
-            const modal = document.getElementById('roomDeleteModal');
-            if (e.target === modal) closeRoomModal();
-        });
-    </script>
-@endpush
+            // Close modal when clicking outside
+            document.addEventListener('click', function(e) {
+                const modal = document.getElementById('roomDeleteModal');
+                if (e.target === modal) closeRoomModal();
+            });
+        </script>
+    @endpush
