@@ -2,19 +2,16 @@
     'roomFallback' => 'room.index',
     'staffFallback' => 'staff.index',
     'pathFallback' => 'path.index',
-    'trashedRoomFallback' => 'room.recycle-bin',
-    'trashedStaffFallback' => 'staff.recycle-bin',
-    'trashedPathFallback' => 'path.recycle-bin',
     'landing' => 'admin.dashboard',
 ])
 
 @php
     $currentRouteName = Route::currentRouteName();
-    $backUrl = url()->previous();
+    $backUrl = null;
 
     // Index pages → dashboard
     if (str_ends_with($currentRouteName, '.index')) {
-        $backUrl = route('admin.dashboard');
+        $backUrl = route($landing);
     }
 
     // Create pages → index
@@ -23,7 +20,7 @@
             $backUrl = route('room.index');
         } elseif ($currentRouteName === 'staff.create') {
             $backUrl = route('staff.index');
-        } elseif ($currentRouteName === 'path.create') {
+        } elseif ($currentRouteName === 'path-image.create' || $currentRouteName === 'path-image.edit-multiple') {
             $backUrl = route('path.index');
         }
     }
@@ -34,10 +31,8 @@
             $backUrl = route('room.show', $room);
         } elseif (isset($staff) && $currentRouteName === 'staff.edit') {
             $backUrl = route('staff.show', $staff);
-        } elseif (isset($path) && $currentRouteName === 'path.edit') {
-            $backUrl = route('path.show', $path);
-        } else {
-            $backUrl = route($roomFallback);
+        } elseif ($currentRouteName === 'path-image.edit') {
+            $backUrl = route('path.index'); // no path.show in edit mode
         }
     }
 
@@ -52,24 +47,26 @@
         }
     }
 
-    // Recycle bin pages → index (prevent loop)
+    // Recycle bin pages → index
     elseif (str_contains($currentRouteName, 'recycle-bin')) {
         if ($currentRouteName === 'room.recycle-bin') {
             $backUrl = route('room.index');
         } elseif ($currentRouteName === 'staff.recycle-bin') {
             $backUrl = route('staff.index');
-        } elseif ($currentRouteName === 'path.recycle-bin') {
-            $backUrl = route('path.index');
         }
     }
 
-    // Assign pages → index
+    // Assign pages → room.index
     elseif (str_contains($currentRouteName, 'assign')) {
-        $backUrl = route('room.index'); // or dashboard
+        $backUrl = route('room.index');
+    }
+
+    // Profile → dashboard
+    elseif ($currentRouteName === 'admin.profile') {
+        $backUrl = route($landing);
     }
 @endphp
 
-{{-- In your back-button.blade.php component --}}
 @if ($backUrl)
     <a href="{{ $backUrl }}"
         class="flex items-center space-x-2 focus:outline-none cursor-pointer hover:text-primary transition-colors duration-200 dark:text-gray-300"

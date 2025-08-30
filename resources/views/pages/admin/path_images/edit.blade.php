@@ -5,7 +5,7 @@
         <div class="max-w-7xl mx-auto space-y-8">
 
             <x-floating-actions />
-
+            
             <!-- Header -->
             <div class="text-center">
                 <h1 class="text-3xl font-bold text-gray-800 mb-2">

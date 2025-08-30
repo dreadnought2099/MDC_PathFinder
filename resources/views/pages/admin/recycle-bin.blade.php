@@ -2,7 +2,6 @@
 
 @section('content')
     <x-floating-actions />
-    <x-modal-scripts />
     <div x-data="{ tab: sessionStorage.getItem('activeTab') || 'rooms' }" x-init="sessionStorage.setItem('activeTab', tab);
     $watch('tab', value => sessionStorage.setItem('activeTab', value))" class="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <!-- Navigation -->
@@ -45,3 +44,21 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        function showModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function hideModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function closeModal(event, modal) {
+            if (event.target === modal) {
+                modal.classList.add('hidden');
+            }
+        }
+    </script>
+@endpush

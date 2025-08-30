@@ -28,21 +28,18 @@ class PathImageController extends Controller
 
 
     // Store multiple images for a path
-    public function store(Request $request)
+    public function store(Request $request, Path $path)
     {
         $request->validate([
-            'path_id' => 'required|exists:paths,id',
             'files'   => 'required|array|min:1',
             'files.*' => 'required|image|max:51200',
         ]);
 
-        $path = Path::findOrFail($request->path_id);
         $files = $request->file('files');
-
         $nextOrder = PathImage::where('path_id', $path->id)->max('image_order') ?? 0;
 
         foreach ($files as $file) {
-            $imagePath = $file->store('path_images', 'public');
+            $imagePath = $file->store('path_images/'. $path->id , 'public');
 
             PathImage::create([
                 'path_id' => $path->id,
@@ -87,9 +84,11 @@ class PathImageController extends Controller
                 ->orderBy('image_order')
                 ->get();
 
+            // Kung walay path images assigned to that specific path
+            // It will redirect to showing the path navigation — path.show
             if ($pathImages->isEmpty()) {
                 return redirect()->route('path.show', $path)
-                    ->with('warning', 'No images found for this path.');
+                    ->with('warning', 'No images found for this path. Redirected to Path Details.');
             }
         }
 

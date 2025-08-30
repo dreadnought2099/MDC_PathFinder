@@ -159,7 +159,6 @@
 
                 const formData = new FormData();
                 formData.append('_token', document.querySelector('input[name="_token"]').value);
-                formData.append('path_id', pathSelect.value);
                 files.forEach(file => formData.append('files[]', file));
 
                 // Show modal

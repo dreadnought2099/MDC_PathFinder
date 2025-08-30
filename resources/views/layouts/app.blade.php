@@ -47,12 +47,13 @@
 <body>
     <!-- Success/Error Message Container: Displays session messages or validation errors -->
     <div id="success-message-container" class="absolute top-24 right-4 z-49">
-        @if (session('success') || session('error') || session('info') || $errors->any())
+        @if (session('success') || session('error') || session('info') || session('warning') || $errors->any())
             <div id="message"
                 class="p-3 rounded-md shadow-lg border-l-4
                     {{ session('success') ? 'bg-green-100 text-green-700 border border-green-300 dark:bg-green-800 dark:text-green-200 dark:border-green-600' : '' }}
                     {{ session('error') ? 'bg-red-100 text-red-700 border border-red-300 dark:bg-red-800 dark:text-red-200 dark:border-red-600' : '' }}
                     {{ session('info') ? 'bg-yellow-100 text-yellow-700 border border-yellow-300 dark:bg-yellow-700 dark:text-yellow-200 dark:border-yellow-500' : '' }}
+                    {{ session('warning') ? 'bg-orange-100 text-orange-700 border border-orange-300 dark:bg-orange-800 dark:text-orange-200 dark:border-orange-600' : '' }}
                     {{ $errors->any() ? 'bg-red-100 text-red-700 border border-red-300 dark:bg-red-800 dark:text-red-200 dark:border-red-600' : '' }}">
 
                 {{-- Display session messages --}}
@@ -65,7 +66,10 @@
                 @if (session('info'))
                     <p>{{ session('info') }}</p>
                 @endif
-
+                @if (session('warning'))
+                    <p>{{ session('warning') }}</p>
+                @endif
+                
                 {{-- Display validation errors --}}
                 @foreach ($errors->all() as $error)
                     <p>{{ $error }}</p>

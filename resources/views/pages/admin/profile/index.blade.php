@@ -33,7 +33,7 @@
     <div id="cropperModal"
         class="modal fixed inset-0 z-50 hidden bg-black/50  backdrop-blur-sm flex justify-center items-center cursor-pointer"
         onclick="handleOutsideClick(event)">
-        <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative dark:bg-gray-800">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative dark:bg-gray-800 border-2 border-primary">
 
             <button type="button" onclick="closeModal()"
                 class="absolute top-2 right-4 text-6xl text-gray-500 hover:text-red-600 focus:outline-none cursor-pointer"
