@@ -28,18 +28,22 @@ class PathImageController extends Controller
 
 
     // Store multiple images for a path
-    public function store(Request $request, Path $path)
+    public function store(Request $request)
     {
         $request->validate([
+            'path_id' => 'required|exists:paths,id',
             'files'   => 'required|array|min:1',
             'files.*' => 'required|image|max:51200',
         ]);
 
+        $path = Path::findOrFail($request->path_id);
+
+        // Rest of your existing logic stays the same
         $files = $request->file('files');
         $nextOrder = PathImage::where('path_id', $path->id)->max('image_order') ?? 0;
 
         foreach ($files as $file) {
-            $imagePath = $file->store('path_images/'. $path->id , 'public');
+            $imagePath = $file->store('path_images/' . $path->id, 'public');
 
             PathImage::create([
                 'path_id' => $path->id,

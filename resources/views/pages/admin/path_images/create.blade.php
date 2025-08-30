@@ -8,8 +8,8 @@
     <div class="max-w-xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-6">
         <h2 class="text-2xl text-center mb-6"><span class="text-primary">Upload</span> Path Images</h2>
 
-        <form id="uploadForm" action="{{ route('path-image.store', $defaultPath) }}" method="POST"
-            enctype="multipart/form-data" class="space-y-6" data-upload onsubmit="return false;">
+        <form id="uploadForm" action="{{ route('path-image.store') }}" method="POST" enctype="multipart/form-data"
+            class="space-y-6" data-upload onsubmit="return false;">
             @csrf
 
             {{-- Path Selector --}}
@@ -101,7 +101,7 @@
                         files.push(file);
                         console.log(
                             `Added file: ${file.name}, Type: ${file.type}, Size: ${(file.size / (1024 * 1024)).toFixed(2)}MB`
-                            );
+                        );
                     } else {
                         let error = `File ${file.name}: `;
                         if (!file.type.startsWith('image/')) {
@@ -142,9 +142,9 @@
                     div.className = 'relative rounded overflow-hidden border shadow-sm';
                     reader.onload = e => {
                         div.innerHTML = `
-                            <img src="${e.target.result}" class="w-full h-24 object-cover">
-                            <button type="button" class="absolute top-1 right-1 bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs" onclick="removeFile(${index})">&times;</button>
-                        `;
+                    <img src="${e.target.result}" class="w-full h-24 object-cover">
+                    <button type="button" class="absolute top-1 right-1 bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs" onclick="removeFile(${index})">&times;</button>
+                `;
                     };
                     reader.readAsDataURL(file);
                     selectedFilesContainer.appendChild(div);
@@ -159,6 +159,7 @@
 
                 const formData = new FormData();
                 formData.append('_token', document.querySelector('input[name="_token"]').value);
+                formData.append('path_id', pathSelect.value);
                 files.forEach(file => formData.append('files[]', file));
 
                 // Show modal
@@ -207,7 +208,7 @@
                     alert('Upload failed. Check the console for details.');
                 });
 
-                // Send request
+                // Send request - form action is already set correctly
                 xhr.open('POST', uploadForm.action);
                 xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
                 xhr.send(formData);

@@ -137,22 +137,17 @@ Route::middleware('auth')->group(function () {
     */
 
     Route::prefix('admin')->name('path-image.')->group(function () {
+        // GENERIC ROUTES (no path parameter needed)
+        Route::get('/path-images/create', [PathImageController::class, 'create'])->name('create');
+        Route::post('/path-images', [PathImageController::class, 'store'])->name('store');
 
-        // SPECIFIC ROUTES - These MUST come before parameterized routes
-        Route::get('/paths/{path}/images/create', [PathImageController::class, 'create'])->name('create');
-
-        // NEW: Multiple image edit routes
+        // PATH-SPECIFIC ROUTES
         Route::get('/paths/{path}/images/edit', [PathImageController::class, 'edit'])->name('edit-multiple');
-
-        // Form submission routes for path images
-        Route::post('/paths/{path}/images', [PathImageController::class, 'store'])->name('store');
         Route::put('/paths/{path}/images/order', [PathImageController::class, 'updateOrder'])->name('update-order');
-
-        // NEW: Multiple image update and bulk delete routes
         Route::patch('/paths/{path}/images', [PathImageController::class, 'update'])->name('update-multiple');
         Route::delete('/paths/{path}/images/bulk', [PathImageController::class, 'destroyMultiple'])->name('destroy-multiple');
 
-        // PARAMETERIZED ROUTES - These come after specific routes
+        // INDIVIDUAL IMAGE ROUTES
         Route::get('/path-images/{pathImage}/edit', [PathImageController::class, 'edit'])->name('edit');
         Route::put('/path-images/{pathImage}', [PathImageController::class, 'update'])->name('update');
         Route::delete('/path-images/{pathImage}', [PathImageController::class, 'destroy'])->name('destroy');
