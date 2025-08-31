@@ -3,10 +3,11 @@
 @section('content')
     <div class="min-h-screen dark:bg-gray-900 mb-8">
         <!-- Top navigation bar with back button and dark mode toggle -->
-        <div class="flex justify-between items-center p-4 mb-6 sticky top-0 z-50
+        <div
+            class="flex justify-between items-center p-4 mb-6 sticky top-0 z-50
             bg-white dark:bg-gray-900 
             border-b-2 border-b-primary dark:border-b-primary">
-            
+
             <!-- Back button - conditional logic -->
             @if ($room)
                 <!-- If viewing room details, go back to QR scanner -->
@@ -36,293 +37,247 @@
         @if ($room)
             @include('pages.client.partials.room-details', ['room' => $room])
         @else
-            @include('pages.client.partials.qr-scanner')
+            <!-- QR Scanner Content -->
+            <div class="w-full min-h-screen flex flex-col justify-center items-center text-center px-4 py-6">
+                <!-- Main content -->
+                <div
+                    class="flex-grow flex flex-col justify-center items-center border-2 border-primary p-6 rounded-2xl max-w-2xl w-full">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-4 text-primary dark:text-gray-100">
+                        {{ config('app.name') }}
+                    </h1>
+                    <p class="text-gray-600 mb-6 dark:text-gray-300">
+                        Point your camera at a QR code to start exploring campus rooms.
+                    </p>
+
+                    <!-- Camera scanner -->
+                    <div class="max-w-lg w-full mx-auto">
+                        <div id="qr-reader" class="relative mx-auto mb-4 rounded-lg overflow-hidden border-2 border-primary"
+                            style="max-width: 350px;">
+                        </div>
+
+                        <!-- Control buttons -->
+                        <div class="flex flex-col gap-3 items-center">
+                            <!-- Stop button -->
+                            <button id="stopBtn"
+                                class="w-full max-w-xs bg-secondary hover:text-secondary hover:bg-white text-white border-2 border-secondary dark:hover:bg-gray-800 text-sm py-2 px-4 rounded-lg transition-all duration-300 ease-in-out cursor-pointer">
+                                Stop Scanning
+                            </button>
+
+                            <!-- Manual restart button -->
+                            <button id="restartBtn"
+                                class="w-full max-w-xs bg-primary hover:bg-white hover:text-primary border-2 border-primary text-white dark:hover:bg-gray-800 py-2 px-4 rounded-lg transition-all duration-300 cursor-pointer">
+                                Restart Camera
+                            </button>
+                        </div>
+
+                        <!-- Results and status messages -->
+                        <div id="qr-reader-results"
+                            class="mt-4 text-sm text-gray-600 text-center dark:text-gray-300 min-h-[24px]"></div>
+                    </div>
+                </div>
+            </div>
         @endif
     </div>
 
     <!-- QR Scanner JavaScript (only load when needed) -->
     @if (!$room)
+        <!-- Include Html5Qrcode library -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+
         <script>
-            let html5QrcodeScanner = null;
-            let scanAttempts = 0;
-            const maxScanAttempts = 3;
+            class QRScanner {
+                constructor() {
+                    this.html5QrCode = null;
+                    this.scanAttempts = 0;
+                    this.maxScanAttempts = 3;
+                    this.isScanning = false;
+                    this.init();
+                }
 
-            function showMessage(message, type = 'info') {
-                const resultsDiv = document.getElementById('qr-reader-results');
+                init() {
+                    document.addEventListener("DOMContentLoaded", () => {
+                        this.bindEvents();
+                        this.startScanner();
+                    });
+                }
 
-                // Custom PNG icons - placed in public/icons folder
-                const icons = {
-                    success: '/icons/success.png',
-                    error: '/icons/error.png',
-                    info: '/icons/information.png',
-                    warning: '/icons/warning.png'
-                };
+                bindEvents() {
+                    const stopBtn = document.getElementById("stopBtn");
+                    const restartBtn = document.getElementById("restartBtn");
 
-                const colors = {
-                    success: 'text-green-600',
-                    error: 'text-red-600',
-                    info: 'text-blue-600',
-                    warning: 'text-yellow-600'
-                };
+                    if (stopBtn) {
+                        stopBtn.addEventListener("click", () => this.stopScanner());
+                    }
 
-                // Create icon image element with proper img tag
-                const iconImg =
-                    `<img src="${icons[type]}" alt="${type}" class="inline-block w-5 h-5 mr-2" style="vertical-align: middle;">`;
+                    if (restartBtn) {
+                        restartBtn.addEventListener("click", () => this.restartScanner());
+                    }
+                }
 
-                resultsDiv.innerHTML =
-                    `<div class="flex items-center justify-center"><span class="${colors[type]} flex items-center">${iconImg}${message}</span></div>`;
-            }
+                showMessage(message, type = 'info') {
+                    const resultsDiv = document.getElementById('qr-reader-results');
+                    if (!resultsDiv) return;
 
-            function checkRoomExists(roomId) {
-                // Show checking message
-                showMessage(`Checking if room ${roomId} exists...`, 'info');
+                    const colors = {
+                        success: 'text-green-600 dark:text-green-400',
+                        error: 'text-red-600 dark:text-red-400',
+                        info: 'text-blue-600 dark:text-blue-400',
+                        warning: 'text-yellow-600 dark:text-yellow-400'
+                    };
 
-                // Make API call to check room existence
-                fetch(`/api/rooms/${roomId}/exists`, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    })
-                    .then(response => {
+                    const icons = {
+                        success: '/icons/success.png',
+                        error: '/icons/error.png',
+                        info: '/icons/information.png',
+                        warning: '/icons/warning.png'
+                    };
+
+                    resultsDiv.innerHTML = `
+                        <div class="${colors[type]} flex items-center justify-center gap-2">
+                            <img src="${icons[type]}" alt="${type}" class="h-4 w-4" />
+                            <span>${message}</span>
+                        </div>
+                    `;
+                }
+
+                async checkRoomExists(roomId) {
+                    try {
+                        this.showMessage(`Checking if room ${roomId} exists...`, 'info');
+
+                        const response = await fetch(`/api/rooms/${roomId}/exists`);
+
                         if (!response.ok) {
                             throw new Error(`HTTP error! status: ${response.status}`);
                         }
-                        return response.json();
-                    })
-                    .then(data => {
+
+                        const data = await response.json();
+
                         if (data.exists) {
-                            // Room exists, proceed with redirect
-                            showMessage(`Room ${roomId} found! Redirecting...`, 'success');
+                            this.showMessage(`Room ${roomId} found! Redirecting...`, 'success');
+                            // Add a slight delay for better UX
                             setTimeout(() => {
                                 window.location.href = `{{ route('ar.view') }}?room=${roomId}`;
                             }, 1000);
                         } else {
-                            // Room doesn't exist - show error and restart scanner
-                            showMessage(`Room ${roomId} does not exist. Please try another QR code.`, 'error');
-                            setTimeout(() => {
-                                restartScanner();
-                            }, 1000);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error checking room existence:', error);
-
-                        // If API fails, show error and restart scanner
-                        showMessage(`Unable to verify room ${roomId}. Connection error. Please try again.`, 'error');
-                        setTimeout(() => {
-                            restartScanner();
-                        }, 1000);
-                    });
-            }
-
-            function onScanSuccess(decodedText, decodedResult) {
-                console.log('QR Code scanned:', decodedText);
-
-                // Stop scanning immediately to prevent multiple scans
-                if (html5QrcodeScanner) {
-                    html5QrcodeScanner.clear();
-                    html5QrcodeScanner = null;
-                }
-
-                let roomId = null;
-                let errorMessage = null;
-
-                // Validate and extract room ID
-                if (!decodedText || decodedText.trim() === '') {
-                    errorMessage = 'Empty QR code detected';
-                } else if (decodedText.startsWith('room_')) {
-                    // Old format: room_13
-                    const extractedId = decodedText.replace('room_', '');
-                    if (extractedId.match(/^\d+$/)) {
-                        roomId = extractedId;
-                        console.log('Room ID from old format:', roomId);
-                    } else {
-                        errorMessage = 'Invalid room format. Expected: room_[number]';
-                    }
-                } else if (decodedText.match(/^\d+$/)) {
-                    // New format: just the number (13)
-                    roomId = decodedText;
-                    console.log('Room ID from new format:', roomId);
-                } else if (decodedText.startsWith('http://') || decodedText.startsWith('https://')) {
-                    // Try URL format
-                    try {
-                        const url = new URL(decodedText);
-                        const extractedId = url.searchParams.get('room');
-                        if (extractedId && extractedId.match(/^\d+$/)) {
-                            roomId = extractedId;
-                            console.log('Room ID from URL:', roomId);
-                        } else {
-                            errorMessage = 'URL does not contain valid room parameter';
+                            this.showMessage(`Room ${roomId} does not exist.`, 'error');
+                            setTimeout(() => this.restartScanner(), 2000);
                         }
                     } catch (error) {
-                        errorMessage = 'Invalid URL format in QR code';
+                        console.error('Room check error:', error);
+                        this.showMessage(`Connection error. Please try again.`, 'error');
+                        setTimeout(() => this.restartScanner(), 2000);
                     }
-                } else {
-                    // Unknown format
-                    errorMessage =
-                        `Unrecognized QR code format. Expected room number, room_[number], or valid URL. Got: "${decodedText.substring(0, 50)}${decodedText.length > 50 ? '...' : ''}"`;
                 }
 
-                // Validate room ID if extracted
-                if (roomId && !isValidRoomId(roomId)) {
-                    errorMessage = `Invalid room ID: ${roomId}. Room ID must be a positive number.`;
-                    roomId = null;
+                onScanSuccess(decodedText) {
+                    if (!this.isScanning) return;
+
+                    // Stop scanning immediately
+                    this.stopScanner();
+
+                    let roomId = null;
+
+                    // Parse QR code content
+                    if (decodedText.startsWith("room_")) {
+                        roomId = decodedText.replace("room_", "");
+                    } else if (/^\d+$/.test(decodedText)) {
+                        roomId = decodedText;
+                    } else {
+                        this.showMessage("Invalid QR code format. Expected room ID.", "error");
+                        setTimeout(() => this.restartScanner(), 2000);
+                        return;
+                    }
+
+                    this.checkRoomExists(roomId);
                 }
 
-                if (roomId) {
-                    // Success - valid room ID found, now check if room exists
-                    showMessage(`QR Code detected! Checking room ${roomId}...`, 'info');
-                    checkRoomExists(roomId);
-                } else {
-                    // Error - invalid QR code format
-                    showMessage(errorMessage || 'Invalid QR code format', 'error');
+                onScanFailure(error) {
+                    // Only increment attempts for actual scan failures, not permission issues
+                    if (this.isScanning && error.includes('NotFoundException')) {
+                        this.scanAttempts++;
 
-                    // Restart scanner after showing error
+                        if (this.scanAttempts >= this.maxScanAttempts) {
+                            this.showMessage("Having trouble scanning? Make sure the QR code is clear and well-lit.",
+                                "warning");
+                            this.scanAttempts = 0;
+                        }
+                    }
+                }
+
+                async startScanner() {
+                    try {
+                        if (!this.html5QrCode) {
+                            this.html5QrCode = new Html5Qrcode("qr-reader");
+                        }
+
+                        this.showMessage("Initializing camera...", 'info');
+
+                        await this.html5QrCode.start({
+                                facingMode: "environment"
+                            }, {
+                                fps: 10,
+                                qrbox: {
+                                    width: 300,
+                                    height: 300
+                                },
+                                aspectRatio: 1.0
+                            },
+                            (decodedText) => this.onScanSuccess(decodedText),
+                            (error) => this.onScanFailure(error)
+                        );
+
+                        this.isScanning = true;
+                        this.scanAttempts = 0;
+                        this.showMessage("Point your camera at a QR code", 'info');
+
+                    } catch (error) {
+                        console.error("Failed to start scanner:", error);
+
+                        let errorMessage = "Camera initialization failed.";
+                        if (error.name === 'NotAllowedError') {
+                            errorMessage = "Camera permission denied. Please enable camera access.";
+                        } else if (error.name === 'NotFoundError') {
+                            errorMessage = "No camera found. Please check your device.";
+                        }
+
+                        this.showMessage(errorMessage, "error");
+                        this.isScanning = false;
+                    }
+                }
+
+                async stopScanner() {
+                    if (this.html5QrCode && this.isScanning) {
+                        try {
+                            await this.html5QrCode.stop();
+                            this.html5QrCode.clear();
+                            this.isScanning = false;
+                            this.showMessage("Scanner stopped.", "warning");
+                        } catch (error) {
+                            console.error("Error stopping scanner:", error);
+                        }
+                    }
+                }
+
+                async restartScanner() {
+                    await this.stopScanner();
+
+                    // Add a brief delay before restarting
                     setTimeout(() => {
-                        restartScanner();
+                        this.startScanner();
                     }, 1000);
                 }
             }
 
-            function isValidRoomId(roomId) {
-                const num = parseInt(roomId, 10);
-                return !isNaN(num) && num > 0 && num.toString() === roomId;
-            }
+            // Initialize the QR scanner
+            new QRScanner();
+        </script>
+    @endif
 
-            function showRetryOptions() {
-                const resultsDiv = document.getElementById('qr-reader-results');
-                resultsDiv.innerHTML = `
-            <div class="space-y-2">
-                <span class="text-gray-600">Scan failed. What would you like to do?</span>
-                <div class="flex gap-2">
-                    <button onclick="restartScanner()" class="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600">
-                        Try Again
-                    </button>
-                    <button onclick="showManualInput()" class="px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600">
-                        Enter Room ID
-                    </button>
-                </div>
-            </div>
-        `;
-            }
-
-            function showManualInput() {
-                const resultsDiv = document.getElementById('qr-reader-results');
-                resultsDiv.innerHTML = `
-            <div class="space-y-2">
-                <span class="text-gray-600">Enter room ID manually:</span>
-                <div class="flex gap-2">
-                    <input type="number" id="manual-room-id" placeholder="Room ID" class="px-2 py-1 border rounded text-sm" min="1">
-                    <button onclick="goToRoom()" class="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600">
-                        Go
-                    </button>
-                    <button onclick="restartScanner()" class="px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600">
-                        Scan QR
-                    </button>
-                </div>
-            </div>
-        `;
-
-                // Focus on input field
-                setTimeout(() => {
-                    document.getElementById('manual-room-id')?.focus();
-                }, 100);
-            }
-
-            function onScanFailure(error) {
-                // Don't count every failure, only log for debugging
-                console.log('Scan attempt failed:', error);
-
-                // Increment scan attempts for persistent failures
-                scanAttempts++;
-
-                // If too many failures, show helpful message
-                if (scanAttempts >= maxScanAttempts) {
-                    showMessage('Having trouble scanning? Make sure QR code is clear and well-lit', 'warning');
-                    scanAttempts = 0; // Reset counter
-                }
-            }
-
-            function restartScanner() {
-                // Clear existing scanner
-                if (html5QrcodeScanner) {
-                    html5QrcodeScanner.clear();
-                    html5QrcodeScanner = null;
-                }
-
-                // Reset initialization flag and attempts
-                const qrReader = document.querySelector('#qr-reader');
-                if (qrReader) {
-                    qrReader.removeAttribute('data-initialized');
-                }
-                scanAttempts = 0;
-
-                // Show restarting message
-                showMessage('Restarting camera...', 'info');
-
-                // Restart after a short delay
-                setTimeout(() => {
-                    initializeScanner();
-                }, 1000);
-            }
-
-            function initializeScanner() {
-                const qrReader = document.querySelector('#qr-reader');
-                if (qrReader && !qrReader.hasAttribute('data-initialized')) {
-                    try {
-                        // Show ready message
-                        showMessage('Camera ready. Point at QR code...', 'info');
-
-                        html5QrcodeScanner = new Html5QrcodeScanner(
-                            "qr-reader", {
-                                fps: 10, // faster scan attempts
-                                qrbox: {
-                                    width: 350,
-                                    height: 350
-                                }, // slightly bigger scan area
-                                rememberLastUsedCamera: true,
-                                showTorchButtonIfSupported: true,
-                                disableFlip: false,
-                                verbose: false
-                            },
-                            false
-                        );
-
-                        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-                        qrReader.setAttribute('data-initialized', 'true');
-                    } catch (error) {
-                        console.error('Scanner initialization error:', error);
-                        showMessage('Camera initialization failed. Please refresh the page or check camera permissions.',
-                            'error');
-                    }
-                }
-            }
-
-            // Initialize scanner when page loads
-            document.addEventListener('DOMContentLoaded', function() {
-                initializeScanner();
-            });
-
-            function goToRoom() {
-                const roomId = document.getElementById('manual-room-id')?.value?.trim();
-                if (roomId && isValidRoomId(roomId)) {
-                    // Also check room existence for manual input
-                    checkRoomExists(roomId);
-                } else if (roomId) {
-                    showMessage('Please enter a valid room ID (positive number)', 'error');
-                } else {
-                    showMessage('Please enter a room ID', 'warning');
-                }
-            }
-
-            // Add Enter key support for manual input
-            document.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter' && document.getElementById('manual-room-id')) {
-                    goToRoom();
-                }
-            });
+    @if ($room)
+        <!-- Add any room-specific JavaScript here if needed -->
+        <script>
+            // Room details specific functionality can go here
+            console.log('Room details loaded for room:', @json($room->id ?? null));
         </script>
     @endif
 @endsection
