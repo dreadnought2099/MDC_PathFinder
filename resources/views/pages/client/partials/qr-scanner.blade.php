@@ -1,33 +1,16 @@
-<div class="text-center">
-    <div>
-        <a href="{{ route('index') }}"
-            class="flex items-center text-black hover:text-[#157ee1] focus:outline-none cursor-pointer">
-            <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-            <span class="ml-1">Back</span>
-        </a>
-    </div>
+<!-- QR Scanner Partial -->
+<div class="w-full min-h-screen flex flex-col justify-center items-center text-center px-4 py-6">
+    <!-- Main content -->
+    <div class="flex-grow flex flex-col justify-center items-center">
+        <h1 class="text-3xl font-bold text-gray-800 mb-4 text-primary dark:text-gray-100">{{ config('app.name') }}</h1>
+        <p class="text-gray-600 mb-6 dark:text-gray-300">Point your camera at a QR code to start exploring campus rooms.
+        </p>
 
-    <h1 class="text-3xl font-bold text-gray-800 mb-4 text-primary">{{ config('app.name') }}</h1>
-    <p class="text-gray-600 mb-6">Point your camera at a QR code to start exploring campus rooms.</p>
-
-    <!-- Camera scanner -->
-    <div class="max-w-lg mx-auto">
-        <div id="qr-reader" class="mx-auto mb-4 border border-gray-300 rounded-lg overflow-hidden"
-            style="max-width: 350px;"></div>
-        <div id="qr-reader-results" class="text-sm text-gray-600 text-center"></div>
-
-
-        {{-- <!-- Manual input fallback -->
-        <div class="mt-4">
-            <p class="text-sm text-gray-500 mb-2">Or enter room ID manually:</p>
-            <input type="number" id="manual-room-id" placeholder="Enter room ID"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
-            <button onclick="goToRoom()"
-                class="mt-2 w-full bg-primary hover:bg-white hover:text-primary text-white py-2 px-4 rounded-lg border border-primary transition-all duration-300 cursor-pointer">
-                View Room
-            </button> --}}
+        <!-- Camera scanner -->
+        <div class="max-w-lg w-full mx-auto">
+            <div id="qr-reader" class="mx-auto mb-4 border border-gray-300 rounded-lg overflow-hidden"
+                style="max-width: 350px;"></div>
+            <div id="qr-reader-results" class="text-sm text-gray-600 text-center dark:text-gray-300"></div>
 
             <!-- Manual restart button -->
             <button onclick="restartScanner()"
@@ -36,5 +19,4 @@
             </button>
         </div>
     </div>
-
 </div>

@@ -58,6 +58,8 @@
     }
 
     .sun-icon {
+        background-color: #EFB31D;
+        border-radius: 20px;
         opacity: 1;
         transition: opacity 0.2s ease;
     }
