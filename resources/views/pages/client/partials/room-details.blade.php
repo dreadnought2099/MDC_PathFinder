@@ -1,7 +1,7 @@
 <!-- Room Details Partial -->
 <div class="min-h-screen p-8 rounded-xl shadow-lg container mx-auto max-w-4xl space-y-12 border-2 border-primary">
     <!-- Room Title -->
-    <h1 class="text-4xl font-extrabold text-gray-900 dark:text-gray-100 border-b-2 border-primary pb-3">
+    <h1 class="text-4xl font-extrabold text-gray-900 border-b-2 border-primary dark:text-gray-100 pb-3">
         {{ $room->name }}
     </h1>
 
@@ -26,7 +26,7 @@
     @if ($room->video_path)
         <div>
             <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Room Video</h2>
-            <video controls class="w-full rounded-lg shadow-md border border-gray-200 max-h-[400px]">
+            <video controls class="w-full rounded-lg shadow-md border-2 border-primary max-h-[400px]">
                 <source src="{{ asset('storage/' . $room->video_path) }}" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
@@ -40,7 +40,7 @@
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
                 @foreach ($room->images as $image)
                     <div
-                        class="overflow-hidden rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer border border-gray-200">
+                        class="overflow-hidden rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer border-2 border-primary">
                         <img src="{{ asset('storage/' . $image->image_path) }}" alt="Gallery Image"
                             class="w-full h-40 object-cover"
                             onclick="openModal('{{ asset('storage/' . $image->image_path) }}')" />

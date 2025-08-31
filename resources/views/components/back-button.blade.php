@@ -25,12 +25,12 @@
         }
     }
 
-    // Edit pages
+    // Edit pages → fallback to index
     elseif (str_ends_with($currentRouteName, '.edit')) {
-        if (isset($room) && $currentRouteName === 'room.edit') {
-            $backUrl = route('room.show', $room);
-        } elseif (isset($staff) && $currentRouteName === 'staff.edit') {
-            $backUrl = route('staff.show', $staff);
+        if ($currentRouteName === 'room.edit') {
+            $backUrl = route('room.index'); // safer fallback
+        } elseif ($currentRouteName === 'staff.edit') {
+            $backUrl = route('staff.index');
         } elseif ($currentRouteName === 'path-image.edit') {
             $backUrl = route('path.index'); // no path.show in edit mode
         }

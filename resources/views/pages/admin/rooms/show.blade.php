@@ -169,7 +169,7 @@
                 <div class="mt-12">
                     <div class="bg-white rounded-2xl shadow-lg p-8 text-center border-2 border-primary dark:bg-gray-800">
                         <h3 class="text-2xl font-bold text-slate-800 mb-6 dark:text-gray-300">{{ $room->name }} QR Code</h3>
-                        <div class="inline-block bg-slate-50 p-6 rounded-xl border-2 border-primary mb-6 dark:bg-gray-800">
+                        <div class="inline-block bg-slate-50 p-6 rounded-xl border-2 border-primary mb-6">
                             <img src="{{ Storage::url($room->qr_code_path) }}" alt="QR Code for {{ $room->name }}"
                                 class="max-w-[200px] mx-auto" />
                         </div>
