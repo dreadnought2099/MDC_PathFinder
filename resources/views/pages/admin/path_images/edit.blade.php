@@ -27,7 +27,7 @@
             </div>
 
             <!-- Path Information -->
-            <div class="bg-white border-2 border-primary rounded-xl shadow-sm p-6">
+            <div class="bg-white border-2 border-primary rounded-xl shadow-sm p-6 dark:bg-gray-800">
                 <div class="flex items-center justify-center space-x-6">
                     <div class="text-center p-3 bg-primary text-white rounded-xl">
                         <i class="fas fa-door-open fa-lg mb-1"></i>
@@ -53,10 +53,6 @@
                         @endif
                     </p>
                     <div class="flex space-x-2">
-                        <a href="{{ route('path.show', $path) }}"
-                            class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-lg text-sm transition">
-                            <i class="fas fa-arrow-left mr-1"></i> Back to Path
-                        </a>
                         @if (isset($pathImages) && $pathImages->count() === 1)
                             <a href="{{ route('path-image.edit-multiple', $path) }}"
                                 class="bg-primary hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm transition">
@@ -76,7 +72,7 @@
                     <input type="hidden" name="path_id" value="{{ $path->id }}">
 
                     <!-- Bulk Actions -->
-                    <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
+                    <div class="bg-white rounded-xl shadow-sm border p-6 mb-6 dark:bg-gray-800 border-2 border-primary">
                         <div class="flex justify-between items-center">
                             <div class="flex items-center space-x-4">
                                 <label class="flex items-center space-x-2">
@@ -103,7 +99,7 @@
                     <!-- Images Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="imagesContainer">
                         @foreach ($pathImages as $index => $image)
-                            <div class="bg-white rounded-xl shadow-sm border p-4 image-card transition-all duration-300"
+                            <div class="bg-white rounded-xl shadow-sm p-4 image-card transition-all duration-300 dark:text-gray-300 dark:bg-gray-800"
                                 data-image-id="{{ $image->id }}">
                                 <div class="relative">
                                     <!-- Selection Checkbox -->
@@ -133,7 +129,7 @@
                                 <div class="mt-4 space-y-4">
                                     <!-- Image Order Input -->
                                     <div>
-                                        <label class="block text-sm text-gray-700 mb-1">Display Order</label>
+                                        <label class="block text-sm text-gray-700 mb-1 dark:text-gray-300">Display Order</label>
                                         <input type="number" name="images[{{ $index }}][image_order]"
                                             value="{{ $image->image_order }}" min="1"
                                             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:ring focus:ring-primary focus:outline-none">
@@ -141,7 +137,7 @@
 
                                     <!-- Replace Image File -->
                                     <div>
-                                        <label class="block text-sm text-gray-700 mb-1">Replace Image</label>
+                                        <label class="block text-sm text-gray-700 mb-1 dark:text-gray-300">Replace Image</label>
                                         <input type="file" name="images[{{ $index }}][image_file]"
                                             accept="image/*" onchange="previewImageChange(this, {{ $index }})"
                                             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:bg-primary file:text-white file:text-xs">
@@ -295,22 +291,22 @@
             @endif
 
             <!-- Additional Info -->
-            <div class="bg-white rounded-xl shadow-sm border p-6">
-                <h3 class="text-md font-semibold text-gray-700 mb-3">
+            <div class="bg-white rounded-xl shadow-sm border p-6 dark:bg-gray-800">
+                <h3 class="text-md text-center text-gray-700 mb-3 dark:text-gray-300">
                     <i class="fas fa-info-circle text-primary"></i> Update Information
                 </h3>
-                <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                <ul class="list-disc list-inside text-sm text-gray-600 space-y-1 dark:text-gray-300">
                     @if (isset($pathImages) && $pathImages->count() > 1)
                         <li>Select multiple images to delete them in bulk</li>
                         <li>You can update order numbers and replace files simultaneously</li>
                         <li>Changes are saved when you click "Save All Changes"</li>
-                        <li class="text-red-600"><i class="fas fa-exclamation-triangle"></i> Deleted and replaced images
+                        <li class="text-secondary"><i class="fas fa-exclamation-triangle"></i> Deleted and replaced images
                             cannot be recovered</li>
                     @else
                         <li>You can update the image order without replacing the file</li>
                         <li>You can replace the image file without changing the order</li>
                         <li>Both fields are optional - update only what you need</li>
-                        <li class="text-red-600"><i class="fas fa-exclamation-triangle"></i> Replacing the image will
+                        <li class="text-secondary"><i class="fas fa-exclamation-triangle"></i> Replacing the image will
                             delete the old file permanently</li>
                     @endif
                 </ul>

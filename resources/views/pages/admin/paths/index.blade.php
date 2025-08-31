@@ -5,7 +5,7 @@
         <!-- Header Section -->
         <div class="bg-white dark:bg-gray-900 mb-8 text-center sticky top-0 z-48">
             <h1 class="text-3xl font-bold text-gray-800 mb-2 dark:text-gray-100">
-                <span class="text-primary">Paths</span> Management
+                <span class="text-primary">Path</span> Management
             </h1>
             <p class="text-gray-600 dark:text-gray-300">Manage paths between offices</p>
             <div class="mt-4 flex justify-center">
