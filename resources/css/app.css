@@ -48,11 +48,7 @@
 
 @layer utilities {
     .border-b-primary {
-        border-bottom: 2px solid var(--color-primary);
-    }
-
-    .dark .dark-border-b-primary {
-        border-bottom: 2px solid var(--color-primary);
+        border-bottom-color: var(--color-primary);
     }
 
     .bg-primary {

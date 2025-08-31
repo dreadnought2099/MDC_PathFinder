@@ -1,7 +1,8 @@
 <!-- Room Details Partial -->
-<div class="min-h-screen p-8 rounded-xl shadow-lg container mx-auto max-w-4xl space-y-12 border-2 border-primary">
+<div class="min-h-screen p-8 rounded-xl shadow-lg container mx-auto max-w-4xl space-y-12 border-2 border-primary dark:bg-gray-800">
     <!-- Room Title -->
-    <h1 class="text-4xl font-extrabold text-gray-900 border-b-2 border-primary dark:text-gray-100 pb-3">
+    <h1 class="text-4xl font-extrabold text-gray-900 dark:text-gray-300 
+           border-b-2 border-b-primary dark:border-b-primary text-center pb-3">
         {{ $room->name }}
     </h1>
 
@@ -15,7 +16,7 @@
     <!-- Cover Image -->
     @if ($room->image_path)
         <div>
-            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Cover Image</h2>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 text-center">Cover Image</h2>
             <img src="{{ Storage::url($room->image_path) }}" alt="Cover Image"
                 class="w-full max-h-[500px] object-cover cursor-pointer hover:scale-105 transition-all duration-500 rounded-lg"
                 onclick="openModal('{{ asset('storage/' . $room->image_path) }}')" />
@@ -25,7 +26,7 @@
     <!-- Video -->
     @if ($room->video_path)
         <div>
-            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Room Video</h2>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 text-center">Room Video</h2>
             <video controls class="w-full rounded-lg shadow-md border-2 border-primary max-h-[400px]">
                 <source src="{{ asset('storage/' . $room->video_path) }}" type="video/mp4">
                 Your browser does not support the video tag.
@@ -36,7 +37,7 @@
     <!-- Gallery -->
     @if ($room->images && $room->images->count())
         <div>
-            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Gallery</h2>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 text-center">Gallery</h2>
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
                 @foreach ($room->images as $image)
                     <div
@@ -53,7 +54,7 @@
     <!-- Assigned Staff -->
     @if ($room->staff->isNotEmpty())
         <div>
-            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Assigned Staff</h2>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 text-center">Assigned Staff</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach ($room->staff as $member)
                     <div
@@ -84,9 +85,9 @@
 
     <!-- Office Hours -->
     <div class="mt-6">
-        <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">Office Hours</h3>
+        <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200 text-center">Office Hours</h3>
         <div
-            class="whitespace-pre-line bg-gray-50 dark:bg-gray-700 p-4 rounded border text-gray-800 dark:text-gray-200">
+            class="whitespace-pre-line bg-gray-50 dark:bg-gray-800 p-4 rounded-2xl border-2 border-primary text-gray-800 dark:text-gray-300">
             {!! nl2br(e($room->formatted_office_hours)) !!}
         </div>
     </div>
@@ -101,9 +102,9 @@
 
     <!-- Scan Another QR Code Button -->
     <div class="text-center pt-8 border-t border-gray-200 dark:border-gray-600">
-        <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">Want to explore another room?</p>
+        <p class="text-sm text-gray-500 dark:text-gray-300 mb-3">Want to explore another room?</p>
         <a href="{{ route('ar.view') }}"
-            class="inline-block bg-primary hover:bg-white hover:text-primary text-white py-3 px-6 rounded-lg shadow-md border border-primary transition-all duration-300">
+            class="inline-block bg-primary hover:bg-white hover:text-primary text-white py-3 px-6 rounded-lg shadow-md border border-primary transition-all duration-300 dark:hover:bg-gray-800">
             Scan Another QR Code
         </a>
     </div>

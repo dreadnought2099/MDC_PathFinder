@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="bg-white dark:bg-gray-900" x-data x-cloak>
 
 <head>
     <meta charset="UTF-8">

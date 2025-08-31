@@ -1,7 +1,7 @@
 @extends('layouts.guest')
 
 @section('content')
-    <div class="min-h-screen flex flex-col justify-between px-4 py-6 dark:bg-gray-800">
+    <div class="min-h-screen flex flex-col justify-between px-4 py-6 dark:bg-gray-900">
         <!-- Top bar -->
         <div class="relative w-full">
             <!-- Toggle button (top-right) -->
