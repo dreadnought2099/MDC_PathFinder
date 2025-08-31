@@ -48,11 +48,11 @@
 
 @layer utilities {
     .border-b-primary {
-        border-bottom: 1px solid var(--color-primary);
+        border-bottom: 2px solid var(--color-primary);
     }
 
     .dark .dark-border-b-primary {
-        border-bottom: 1px solid var(--color-primary);
+        border-bottom: 2px solid var(--color-primary);
     }
 
     .bg-primary {
@@ -88,6 +88,11 @@
     }
 
     .border-primary {
+        border-color: var(--color-primary);
+    }
+
+    .dark .border-primary {
+        border-width: 2px;
         border-color: var(--color-primary);
     }
 

@@ -6,7 +6,7 @@
     <x-floating-actions />
 
     <div class="max-w-xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-6">
-        <h2 class="text-2xl text-center mb-6">
+        <h2 class="text-2xl text-center mb-6 dark:text-gray-300">
             <span class="text-primary">Upload</span> Path Images
         </h2>
 
@@ -15,9 +15,9 @@
             @csrf
 
             {{-- Path Selector --}}
-            <div class="mb-4">
-                <label for="path_id" class="block text-gray-700 font-semibold mb-2">Select Path</label>
-                <select name="path_id" id="path_id" required class="w-full border rounded px-3 py-2">
+            <div class="mb-4 dark:text-gray-300">
+                <label for="path_id" class="block text-gray-700 mb-2 dark:text-gray-300">Select Path</label>
+                <select name="path_id" id="path_id" required class="w-full border rounded px-3 py-2 dark:bg-gray-800">
                     @foreach ($paths as $p)
                         <option value="{{ $p->id }}" {{ $p->id == $defaultPath->id ? 'selected' : '' }}>
                             {{ $p->fromRoom->name ?? 'Room #' . $p->from_room_id }} →
@@ -45,7 +45,7 @@
 
             {{-- Submit Button --}}
             <button type="submit" id="submitBtn"
-                class="w-full bg-primary text-white px-4 py-2 rounded hover:bg-white hover:text-primary border-2 border-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                class="w-full bg-primary text-white px-4 py-2 rounded dark:hover:bg-gray-800 hover:bg-white hover:text-primary border-2 border-primary disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 disabled>
                 <i class="fas fa-upload mr-2"></i> Upload Images
             </button>

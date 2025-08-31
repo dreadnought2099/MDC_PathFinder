@@ -5,14 +5,16 @@
         <div class="max-w-7xl mx-auto space-y-8">
 
             <x-floating-actions />
-            
+
             <!-- Header -->
             <div class="text-center">
-                <h1 class="text-3xl font-bold text-gray-800 mb-2">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2 dark:text-gray-300">
                     @if (isset($pathImages) && $pathImages->count() > 1)
-                        Edit <span class="text-primary">Path Images</span>
+                        {{-- Edit <span class="text-primary">Path Images</span> --}}
+                        <span class="text-primary">Edit</span> Path Images
                     @else
-                        Edit <span class="text-primary">Path Image</span>
+                        {{-- Edit <span class="text-primary">Path Image</span> --}}
+                        <span class="text-primary">Edit</span> Path Image
                     @endif
                 </h1>
                 <p class="text-gray-600">

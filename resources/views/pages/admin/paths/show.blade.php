@@ -7,26 +7,26 @@
 
     <div class="container mx-auto max-w-6xl px-4 py-6">
         <!-- Header -->
-        <div class="mb-6 flex items-center justify-between">
+        <div class="mb-6 text-center ">
             <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
-                <i class="fas fa-route mr-2"></i> Path Details
+                <i class="fas fa-route mr-2"></i> <span class="text-primary">Path</span> Details
             </h1>
         </div>
 
         <!-- Path Info & Visualization -->
         <div class="grid md:grid-cols-2 gap-6 mb-6">
             <!-- Path Info Card -->
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-5">
-                <h2 class="text-lg font-semibold mb-4"><i class="fas fa-info-circle mr-2"></i> Path Info</h2>
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-5 text-center">
+                <h2 class="text-lg mb-4 dark:text-gray-300">Path Info</h2>
                 <dl class="space-y-3 text-sm text-gray-700 dark:text-gray-300">
                     <!-- Path ID -->
                     <div class="flex justify-between">
-                        <dt class="font-medium text-gray-500">Path ID:</dt>
+                        <dt class="font-medium dark:text-gray-300">Path ID:</dt>
                         <dd>{{ $path->id }}</dd>
                     </div>
                     <!-- From Room -->
                     <div class="flex justify-between items-center">
-                        <dt class="font-medium text-gray-500">From Room:</dt>
+                        <dt class="font-medium dark:text-gray-300">From Room:</dt>
                         <dd>
                             <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
                                 {{ $path->fromRoom->name ?? 'Room #' . $path->from_room_id }}
@@ -38,7 +38,7 @@
                     </div>
                     <!-- To Room -->
                     <div class="flex justify-between items-center">
-                        <dt class="font-medium text-gray-500">To Room:</dt>
+                        <dt class="font-medium dark:text-gray-300">To Room:</dt>
                         <dd>
                             <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">
                                 {{ $path->toRoom->name ?? 'Room #' . $path->to_room_id }}
@@ -50,12 +50,12 @@
                     </div>
                     <!-- Created At -->
                     <div class="flex justify-between">
-                        <dt class="font-medium text-gray-500">Created:</dt>
+                        <dt class="font-medium dark:text-gray-300">Created:</dt>
                         <dd>{{ $path->created_at?->format('M d, Y H:i') }}</dd>
                     </div>
                     <!-- Number of Images -->
                     <div class="flex justify-between">
-                        <dt class="font-medium text-gray-500">Images:</dt>
+                        <dt class="font-medium dark:text-gray-300">Images:</dt>
                         <dd>
                             <span class="px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm">
                                 {{ $path->images->count() }}
@@ -80,8 +80,8 @@
         </div>
 
         <!-- Path Images Card -->
-        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-5">
-            <h2 class="text-lg font-semibold mb-4"><i class="fas fa-images mr-2"></i> Path Images
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-5 text-center">
+            <h2 class="text-xl font-semibold mb-4 dark:text-gray-300"><i class="fas fa-images mr-2"></i> Path Images
                 ({{ $path->images->count() }})</h2>
             @if ($path->images->count() > 0)
                 <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -113,7 +113,7 @@
             @else
                 <div class="text-center py-10 text-gray-400">
                     <i class="fas fa-image fa-3x mb-4"></i>
-                    <h4 class="text-lg font-semibold">No Images Found</h4>
+                    <h4 class="text-lg">No Images Found</h4>
                     <p class="text-sm">This path doesn't have any images yet.</p>
                 </div>
             @endif

@@ -12,8 +12,8 @@
         <div x-show="uploading" 
              class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
              style="display: none;">
-            <div class="bg-white rounded p-6 w-96 shadow-lg">
-                <h2 class="text-lg mb-4">{{ $title ?? 'Uploading...' }}</h2>
+            <div class="bg-white rounded p-6 w-96 shadow-lg dark:bg-gray-800 border-primary">
+                <h2 class="text-lg mb-4 dark:text-gray-300">{{ $title ?? 'Uploading...' }}</h2>
 
                 <!-- Progress Bar -->
                 <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden relative">
@@ -22,7 +22,7 @@
                     </div>
                 </div>
 
-                <p class="mt-2 text-sm text-gray-600" x-text="progress + '%'"></p>
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-300" x-text="progress + '%'"></p>
             </div>
         </div>
     </div>
