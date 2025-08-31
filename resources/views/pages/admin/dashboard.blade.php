@@ -46,7 +46,7 @@
                         </div>
                         <div>
                             <h3 class="text-lg text-gray-800 dark:text-white group-hover:text-primary transition-colors">
-                                Manage Rooms/Offices
+                                Manage Offices
                             </h3>
                             <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">Configure office spaces and rooms</p>
                         </div>

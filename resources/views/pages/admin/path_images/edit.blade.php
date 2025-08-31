@@ -129,7 +129,8 @@
                                 <div class="mt-4 space-y-4">
                                     <!-- Image Order Input -->
                                     <div>
-                                        <label class="block text-sm text-gray-700 mb-1 dark:text-gray-300">Display Order</label>
+                                        <label class="block text-sm text-gray-700 mb-1 dark:text-gray-300">Display
+                                            Order</label>
                                         <input type="number" name="images[{{ $index }}][image_order]"
                                             value="{{ $image->image_order }}" min="1"
                                             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-primary focus:ring focus:ring-primary focus:outline-none">
@@ -137,7 +138,8 @@
 
                                     <!-- Replace Image File -->
                                     <div>
-                                        <label class="block text-sm text-gray-700 mb-1 dark:text-gray-300">Replace Image</label>
+                                        <label class="block text-sm text-gray-700 mb-1 dark:text-gray-300">Replace
+                                            Image</label>
                                         <input type="file" name="images[{{ $index }}][image_file]"
                                             accept="image/*" onchange="previewImageChange(this, {{ $index }})"
                                             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:bg-primary file:text-white file:text-xs">
@@ -315,20 +317,26 @@
     </div>
 
     <!-- Image Modal -->
-    <dialog id="imageModal" class="p-0 rounded-xl w-full max-w-3xl backdrop:bg-black backdrop:bg-opacity-50">
-        <div class="bg-white rounded-xl p-6">
-            <h2 id="modalTitle" class="text-lg font-semibold mb-4">Path Image</h2>
-            <div class="text-center">
-                <img id="modalImage" class="mx-auto rounded-lg max-h-[600px]">
-                <div id="modalInfo" class="mt-3 text-sm text-gray-600"></div>
-            </div>
-            <div class="mt-6 text-right">
-                <button onclick="closeImageModal()" class="border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100">
-                    Close
-                </button>
-            </div>
+    <div id="imageModal"
+        class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+        <div class="absolute top-5 right-5 flex items-center space-x-8">
+            <!-- Download button -->
+            <a id="downloadBtn" href="#" download title="Download Image"
+                class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6">
+                <img src="{{ asset('icons/download-button.png') }}" alt="Download Image" class="w-10 h-10">
+            </a>
+
+            <!-- Close button -->
+            <button onclick="closeImageModal()"
+                class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6 cursor-pointer"
+                title="Close Modal">
+                <img src="{{ asset('icons/exit.png') }}" alt="Close Modal" class="w-10 h-10">
+            </button>
         </div>
-    </dialog>
+
+        <!-- Image -->
+        <img id="modalImage" src="" alt="Full Image" class="max-w-full max-h-full rounded shadow-lg" />
+    </div>
 
     <!-- Delete Modal -->
     <dialog id="deleteModal" class="p-0 rounded-xl w-full max-w-lg backdrop:bg-black backdrop:bg-opacity-50">
@@ -378,9 +386,11 @@
             </div>
         </div>
     </dialog>
+@endsection
 
+@push('scripts')
     <script>
-        // Single image preview (original functionality)
+        // Image preview functions
         function previewNewImage(input) {
             const file = input.files[0];
             if (file) {
@@ -399,7 +409,6 @@
             document.getElementById('previewImage').src = '';
         }
 
-        // Multiple images functionality
         function previewImageChange(input, index) {
             const file = input.files[0];
             if (file) {
@@ -417,21 +426,28 @@
             document.getElementById(`newPreview_${index}`).classList.add('hidden');
             document.getElementById(`previewImg_${index}`).src = '';
         }
+    </script>
+@endpush
 
+@push('scripts')
+    <script>
         // Modal functions
         function showImageModal(src, order, filename, date) {
-            document.getElementById('modalTitle').textContent = `Path Image - Order ${order}`;
-            document.getElementById('modalImage').src = src;
-            document.getElementById('modalInfo').innerHTML = `
-                <p><strong>File:</strong> ${filename}</p>
-                <p><strong>Order:</strong> ${order}</p>
-                <p><strong>Uploaded:</strong> ${date}</p>
-            `;
-            document.getElementById('imageModal').showModal();
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            const downloadBtn = document.getElementById('downloadBtn');
+
+            modalImage.src = src;
+            downloadBtn.href = src;
+            modal.classList.remove('hidden');
         }
 
         function closeImageModal() {
-            document.getElementById('imageModal').close();
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+
+            modalImage.src = '';
+            modal.classList.add('hidden');
         }
 
         function showDeleteModal() {
@@ -442,8 +458,22 @@
             document.getElementById('deleteModal').close();
         }
 
-        // Multiple images selection logic
-        @if (isset($pathImages) && $pathImages->count() > 1)
+        // Click outside to close modal
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('imageModal');
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeImageModal();
+                }
+            });
+        });
+    </script>
+@endpush
+
+@if (isset($pathImages) && $pathImages->count() > 1)
+    @push('scripts')
+        <script>
+            // Multiple images selection logic
             document.addEventListener('DOMContentLoaded', function() {
                 const selectAllCheckbox = document.getElementById('selectAll');
                 const deleteCheckboxes = document.querySelectorAll('.delete-image-checkbox');
@@ -499,15 +529,14 @@
 
                 bulkDeleteBtn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    const selectedCount = document.querySelectorAll('.delete-image-checkbox:checked')
-                        .length;
+                    const selectedCount = document.querySelectorAll('.delete-image-checkbox:checked').length;
 
                     document.getElementById('deleteContent').innerHTML = `
-                    <p class="text-sm mb-3">Are you sure you want to delete <strong>${selectedCount}</strong> selected image(s)?</p>
-                    <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-3 text-sm mb-3">
-                        <p>This will permanently delete ${selectedCount} image(s) from the path.</p>
-                    </div>
-                `;
+                        <p class="text-sm mb-3">Are you sure you want to delete <strong>${selectedCount}</strong> selected image(s)?</p>
+                        <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-3 text-sm mb-3">
+                            <p>This will permanently delete ${selectedCount} image(s) from the path.</p>
+                        </div>
+                    `;
 
                     showDeleteModal();
                 });
@@ -535,6 +564,6 @@
 
                 updateSelectionUI();
             });
-        @endif
-    </script>
-@endsection
+        </script>
+    @endpush
+@endif
