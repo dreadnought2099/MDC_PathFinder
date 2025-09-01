@@ -1,6 +1,6 @@
 @props(['staff'])
 
-<div class="min-h-screen bg-white py-8 px-4">
+<div class="min-h-screen bg-white py-8 px-4 dark:bg-gray-900">
     <div class="max-w-2xl mx-auto">
 
         <!-- Profile Card -->
@@ -24,7 +24,7 @@
             </div>
 
             <!-- Content -->
-            <div class="p-8">
+            <div class="p-8 dark:bg-gray-800">
                 <div class="flex flex-col lg:flex-row gap-8">
 
                     {{-- @if ($staff->photo_path) --}}
@@ -41,56 +41,56 @@
 
                         <!-- Bio -->
                         <div
-                            class="border border-gray-200 rounded-xl p-4 hover:border-primary hover:bg-primary-10 transition-all duration-300">
+                            class="border border-primary rounded-xl p-4 hover:scale-110 transition-all duration-250 ease-in-out">
                             <div class="flex items-start space-x-3">
                                 <div class="bg-blue-100 p-2 rounded-lg">
                                     <img src="{{ asset('icons/user.png') }}" alt="User" class="h-6 w-6">
                                 </div>
                                 <div>
-                                    <p class="font-semibold text-gray-800 mb-1">Bio</p>
-                                    <p class="text-gray-600 leading-relaxed">{{ $staff->bio ?? 'N/A' }}</p>
+                                    <p class="font-semibold text-gray-800 mb-1 dark:text-gray-300">Bio</p>
+                                    <p class="text-gray-600 leading-relaxed dark:text-gray-300">{{ $staff->bio ?? 'N/A' }}</p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Email -->
                         <div
-                            class="border border-gray-200 rounded-xl p-4 hover:border-primary hover:bg-primary-10 transition-all duration-300">
+                            class="border border-primary rounded-xl p-4 hover:scale-110 transition-all duration-250 ease-in-out">
                             <div class="flex items-center space-x-3">
                                 <div class="bg-orange-100 p-2 rounded-lg">
                                     <img src="{{ asset('icons/email.png') }}" alt="User" class="h-6 w-6">
                                 </div>
                                 <div>
-                                    <p class="font-semibold text-gray-800">Email</p>
-                                    <p class="text-gray-600">{{ $staff->email ?? 'N/A' }}</p>
+                                    <p class="font-semibold text-gray-800 dark:text-gray-300">Email</p>
+                                    <p class="text-gray-600 dark:text-gray-300">{{ $staff->email ?? 'N/A' }}</p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Position -->
                         <div
-                            class="border border-gray-200 rounded-xl p-4 hover:border-primary hover:bg-primary-10 transition-all duration-300">
+                            class="border border-primary rounded-xl p-4 hover:scale-110 transition-all duration-250 ease-in-out">
                             <div class="flex items-center space-x-3">
                                 <div class="bg-purple-200 p-2 rounded-lg">
                                     <img src="{{ asset('icons/hierarchy.png') }}" alt="User" class="h-6 w-6">
                                 </div>
                                 <div>
-                                    <p class="font-semibold text-gray-800">Position</p>
-                                    <p class="text-gray-600">{{ $staff->position ?? 'N/A' }}</p>
+                                    <p class="font-semibold text-gray-800 dark:text-gray-300">Position</p>
+                                    <p class="text-gray-600 dark:text-gray-300">{{ $staff->position ?? 'N/A' }}</p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Phone -->
                         <div
-                            class="border border-gray-200 rounded-xl p-4 hover:border-primary hover:bg-primary-10 transition-all duration-300">
+                            class="border border-primary rounded-xl p-4 hover:scale-110 transition-all duration-250 ease-in-out">
                             <div class="flex items-center space-x-3">
                                 <div class="bg-green-100 p-2 rounded-lg">
                                     <img src="{{ asset('icons/phone.png') }}" alt="User" class="h-6 w-6">
                                 </div>
                                 <div>
-                                    <p class="font-semibold text-gray-800">Phone</p>
-                                    <p class="text-gray-600">{{ $staff->phone_num ?? 'N/A' }}</p>
+                                    <p class="font-semibold text-gray-800 dark:text-gray-300">Phone</p>
+                                    <p class="text-gray-600 dark:text-gray-300">{{ $staff->phone_num ?? 'N/A' }}</p>
                                 </div>
                             </div>
                         </div>
@@ -111,7 +111,7 @@
 
                 <!-- Close button -->
                 <button onclick="closeModal()"
-                    class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6 cursor-pointer"
+                    class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6"
                     title="Close Modal">
                     <img src="{{ asset('icons/exit.png') }}" alt="Close Modal" class="w-10 h-10">
                 </button>

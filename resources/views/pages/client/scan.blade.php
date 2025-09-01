@@ -3,12 +3,11 @@
 @section('content')
     <div class="min-h-screen dark:bg-gray-900 mb-8">
         <!-- Top navigation bar with back button and dark mode toggle -->
-        <div
-            class="flex justify-between items-center p-4 mb-6 sticky top-0 z-50
-            bg-white dark:bg-gray-900 
+        <div class="flex justify-between items-center p-4 mb-2 sticky top-0 z-50
+            dark:bg-gray-900 
             border-b-2 border-b-primary dark:border-b-primary">
 
-            <!-- Back button - conditional logic -->
+            <!-- Back button - conditional logi c -->
             @if ($room)
                 <!-- If viewing room details, go back to QR scanner -->
                 <a href="{{ route('ar.view') }}"
@@ -40,8 +39,7 @@
             <!-- QR Scanner Content -->
             <div class="w-full min-h-screen flex flex-col justify-center items-center text-center px-4 py-6">
                 <!-- Main content -->
-                <div
-                    class="flex-grow flex flex-col justify-center items-center border-2 border-primary p-6 rounded-2xl max-w-2xl w-full">
+                <div class="flex-grow flex flex-col justify-center items-center border-2 border-primary p-6 rounded-2xl max-w-2xl w-full">
                     <h1 class="text-3xl font-bold text-gray-800 mb-4 text-primary dark:text-gray-100">
                         {{ config('app.name') }}
                     </h1>
@@ -51,9 +49,9 @@
 
                     <!-- Camera scanner -->
                     <div class="max-w-lg w-full mx-auto">
-                        <div id="qr-reader" class="relative mx-auto mb-4 rounded-lg overflow-hidden border-2 border-primary"
+                        <div id="qr-reader" class="relative mx-auto mb-4 rounded-lg overflow-hidden"
                             style="max-width: 350px;">
-                        </div>
+                        </div>  
 
                         <!-- Control buttons -->
                         <div class="flex flex-col gap-3 items-center">
@@ -71,8 +69,7 @@
                         </div>
 
                         <!-- Results and status messages -->
-                        <div id="qr-reader-results"
-                            class="mt-4 text-sm text-gray-600 text-center dark:text-gray-300 min-h-[24px]"></div>
+                        <div id="qr-reader-results" class="mt-4 text-sm text-gray-600 text-center dark:text-gray-300 min-h-[24px]"></div>
                     </div>
                 </div>
             </div>
@@ -81,9 +78,6 @@
 
     <!-- QR Scanner JavaScript (only load when needed) -->
     @if (!$room)
-        <!-- Include Html5Qrcode library -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
-
         <script>
             class QRScanner {
                 constructor() {
@@ -143,9 +137,9 @@
                 async checkRoomExists(roomId) {
                     try {
                         this.showMessage(`Checking if room ${roomId} exists...`, 'info');
-
+                        
                         const response = await fetch(`/api/rooms/${roomId}/exists`);
-
+                        
                         if (!response.ok) {
                             throw new Error(`HTTP error! status: ${response.status}`);
                         }
@@ -176,7 +170,7 @@
                     this.stopScanner();
 
                     let roomId = null;
-
+                    
                     // Parse QR code content
                     if (decodedText.startsWith("room_")) {
                         roomId = decodedText.replace("room_", "");
@@ -195,10 +189,9 @@
                     // Only increment attempts for actual scan failures, not permission issues
                     if (this.isScanning && error.includes('NotFoundException')) {
                         this.scanAttempts++;
-
+                        
                         if (this.scanAttempts >= this.maxScanAttempts) {
-                            this.showMessage("Having trouble scanning? Make sure the QR code is clear and well-lit.",
-                                "warning");
+                            this.showMessage("Having trouble scanning? Make sure the QR code is clear and well-lit.", "warning");
                             this.scanAttempts = 0;
                         }
                     }
@@ -212,14 +205,11 @@
 
                         this.showMessage("Initializing camera...", 'info');
 
-                        await this.html5QrCode.start({
-                                facingMode: "environment"
-                            }, {
+                        await this.html5QrCode.start(
+                            { facingMode: "environment" },
+                            {
                                 fps: 10,
-                                qrbox: {
-                                    width: 300,
-                                    height: 300
-                                },
+                                qrbox: undefined,
                                 aspectRatio: 1.0
                             },
                             (decodedText) => this.onScanSuccess(decodedText),
@@ -232,14 +222,14 @@
 
                     } catch (error) {
                         console.error("Failed to start scanner:", error);
-
+                        
                         let errorMessage = "Camera initialization failed.";
                         if (error.name === 'NotAllowedError') {
                             errorMessage = "Camera permission denied. Please enable camera access.";
                         } else if (error.name === 'NotFoundError') {
                             errorMessage = "No camera found. Please check your device.";
                         }
-
+                        
                         this.showMessage(errorMessage, "error");
                         this.isScanning = false;
                     }
@@ -260,7 +250,7 @@
 
                 async restartScanner() {
                     await this.stopScanner();
-
+                    
                     // Add a brief delay before restarting
                     setTimeout(() => {
                         this.startScanner();

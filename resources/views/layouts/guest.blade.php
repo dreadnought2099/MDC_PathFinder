@@ -19,6 +19,7 @@
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8"></script>
     <link rel="icon" href="{{ asset('images/mdc-logo.png') }}">
 </head>
 
@@ -68,7 +69,6 @@
     </main>
 
     @stack('scripts')
-    <script src="https://unpkg.com/html5-qrcode@2.3.8"></script>
 </body>
 
 </html>

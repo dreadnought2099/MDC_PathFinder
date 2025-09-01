@@ -12,7 +12,7 @@
             <div class="relative w-40 h-40 mx-auto mb-16">
                 <img id="profile-page-image"
                     src="{{ $user->profile_photo_path ? asset('storage/' . $user->profile_photo_path) . '?v=' . time() : asset('images/mdc-logo.png') }}"
-                    alt="Profile" class="w-full h-full rounded-full object-cover border">
+                    alt="Profile" class="w-full h-full rounded-full object-cover border-2 border-primary">
 
                 <!-- Overlay Button -->
                 <button onclick="openModal()"

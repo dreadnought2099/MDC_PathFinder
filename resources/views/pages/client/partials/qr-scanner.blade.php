@@ -4,12 +4,12 @@
         <h1 class="text-3xl font-bold text-gray-800 mb-4 text-primary dark:text-gray-100">{{ config('app.name') }}</h1>
         <p class="text-gray-600 mb-6 dark:text-gray-300">
             Point your camera at a QR code to start exploring campus rooms.
-        </p>
+        </p>    
 
         <!-- Camera scanner -->
         <div class="max-w-lg w-full mx-auto">
-            <div id="qr-reader" class="relative mx-auto mb-4 rounded-lg overflow-hidden border- border-primary"
-                style="max-width: 350px;">
+            <div id="qr-reader" class="relative mx-auto mb-4 rounded-lg overflow-hidden border-2 border-primary"
+                style="max-width: 440px;">
             </div>  
 
             <!-- Stop button -->
