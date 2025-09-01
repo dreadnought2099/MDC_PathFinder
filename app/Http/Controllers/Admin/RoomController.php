@@ -369,10 +369,6 @@ class RoomController extends Controller
 
     public function assignStaff(Request $request)
     {
-        //For Debugging
-        Log::info('Room ID received: ' . $request->room_id);
-        Log::info('Current page: ' . $request->input('page', 1));
-
         $request->validate([
             'room_id' => 'required|exists:rooms,id',
             'staff_ids' => 'nullable|array',
@@ -414,9 +410,6 @@ class RoomController extends Controller
         // Get current page from request
         $page = $request->input('page', 1);
 
-        //For Debugging
-        Log::info('Redirecting to room: ' . $request->room_id . ' with page: ' . $page);
-
         // Redirect with both roomId and page parameters
         return redirect()
             ->route('room.assign', ['roomId' => $room->id])
@@ -437,8 +430,6 @@ class RoomController extends Controller
         // Preserve pagination page after the page reload
         // Get page from request or session
         $page = $request->input('page') ?? session('current_page', 1);
-
-        Log::info('Removing staff, current page: ' . $page);
 
         return redirect()
             ->route('room.assign', ['roomId' => $room->id])
