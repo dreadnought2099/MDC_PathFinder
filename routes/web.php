@@ -141,16 +141,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/path-images/create/{path?}', [PathImageController::class, 'create'])->name('create');
         Route::post('/path-images', [PathImageController::class, 'store'])->name('store');
 
-        // PATH-SPECIFIC ROUTES
+        // PATH-SPECIFIC ROUTES (operate on collections of images under a path)
         Route::get('/paths/{path}/images/edit', [PathImageController::class, 'edit'])->name('edit-multiple');
         Route::put('/paths/{path}/images/order', [PathImageController::class, 'updateOrder'])->name('update-order');
-        Route::patch('/paths/{path}/images', [PathImageController::class, 'update'])->name('update-multiple');
+        Route::patch('/paths/{path}/images', [PathImageController::class, 'updateMultiple'])->name('update-multiple');
         Route::delete('/paths/{path}/images/bulk', [PathImageController::class, 'destroyMultiple'])->name('destroy-multiple');
 
         // INDIVIDUAL IMAGE ROUTES
-        Route::get('/path-images/{pathImage}/edit', [PathImageController::class, 'edit'])->name('edit');
-        Route::put('/path-images/{pathImage}', [PathImageController::class, 'update'])->name('update');
-        Route::delete('/path-images/{pathImage}', [PathImageController::class, 'destroy'])->name('destroy');
+        Route::get('/path-images/{pathImage}/edit', [PathImageController::class, 'editSingle'])->name('edit-single');
+        Route::put('/path-images/{pathImage}', [PathImageController::class, 'updateSingle'])->name('update-single');
+        Route::delete('/path-images/{pathImage}', [PathImageController::class, 'destroySingle'])->name('destroy-single');
     });
 });
 

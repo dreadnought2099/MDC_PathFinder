@@ -31,8 +31,10 @@
             $backUrl = route('room.index'); // safer fallback
         } elseif ($currentRouteName === 'staff.edit') {
             $backUrl = route('staff.index');
-        } elseif ($currentRouteName === 'path-image.edit') {
+        } elseif ($currentRouteName === 'path-image.edit-multiple') {
             $backUrl = route('path.index'); // no path.show in edit mode
+        } elseif ($currentRouteName === 'path-image.edit-single') {
+            $backUrl = route('path-image.create'); // or another fallback
         }
     }
 

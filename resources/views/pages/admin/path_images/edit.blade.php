@@ -242,7 +242,7 @@
                             </div>
                         @endif
 
-                        <form action="{{ route('path-image.update', $pathImage->id) }}" method="POST"
+                        <form action="{{ route('path-image.update-single', $pathImage->id) }}" method="POST"
                             enctype="multipart/form-data" class="space-y-6">
                             @csrf
                             @method('PUT')
@@ -369,7 +369,7 @@
                 <div id="deleteAction">
                     @if (isset($pathImages) && $pathImages->count() === 1)
                         @php $pathImage = $pathImages->first(); @endphp
-                        <form action="{{ route('path-image.destroy', $pathImage) }}" method="POST">
+                        <form action="{{ route('path-image.destroy-single', $pathImage) }}" method="POST">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">

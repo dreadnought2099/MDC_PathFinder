@@ -16,7 +16,7 @@
         <!-- Path Info & Visualization -->
         <div class="grid md:grid-cols-2 gap-6 mb-6">
             <!-- Path Info Card -->
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-5 text-center">
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-5 text-center border-2 border-primary">
                 <h2 class="text-lg mb-4 dark:text-gray-300">Path Info</h2>
                 <dl class="space-y-3 text-sm text-gray-700 dark:text-gray-300">
                     <!-- Path ID -->
@@ -66,7 +66,7 @@
             </div>
 
             <!-- Path Visualization Card -->
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-5 flex items-center justify-around">
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-5 flex items-center justify-around border-2 border-primary">
                 <div class="text-center p-4 bg-blue-500 text-white rounded shadow">
                     <i class="fas fa-door-open fa-2x mb-2"></i>
                     <div>{{ $path->fromRoom->name ?? 'Room #' . $path->from_room_id }}</div>
@@ -80,7 +80,7 @@
         </div>
 
         <!-- Path Images Card -->
-        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-5 text-center">
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-5 text-center border-2 border-primary">
             <h2 class="text-xl font-semibold mb-4 dark:text-gray-300"><i class="fas fa-images mr-2"></i> Path Images
                 ({{ $path->images->count() }})</h2>
             @if ($path->images->count() > 0)
