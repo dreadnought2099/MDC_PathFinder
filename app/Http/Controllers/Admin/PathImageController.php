@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Path;
 use App\Models\PathImage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class PathImageController extends Controller
@@ -30,6 +31,29 @@ class PathImageController extends Controller
     // Store multiple images for a path
     public function store(Request $request)
     {
+        // Debug logging
+        Log::info('Request received:', [
+            'has_files' => $request->hasFile('files'),
+            'files_count' => $request->hasFile('files') ? count($request->file('files')) : 0,
+            'all_data_keys' => array_keys($request->all()),
+            'request_method' => $request->method(),
+            'content_type' => $request->header('content-type'),
+            'is_ajax' => $request->ajax()
+        ]);
+
+        // CRITICAL: Early return for empty file requests to prevent double processing
+        if (!$request->hasFile('files') || count($request->file('files')) === 0) {
+            Log::warning('Request received without files, returning early');
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'errors' => ['files' => ['Please select at least one image file.']]
+                ], 422);
+            }
+
+            return back()->withErrors(['files' => 'Please select at least one image file.']);
+        }
+
         $request->validate([
             'path_id' => 'required|exists:paths,id',
             'files'   => 'required|array|min:1',
@@ -38,9 +62,10 @@ class PathImageController extends Controller
 
         $path = Path::findOrFail($request->path_id);
 
-        // Rest of your existing logic stays the same
         $files = $request->file('files');
         $nextOrder = PathImage::where('path_id', $path->id)->max('image_order') ?? 0;
+
+        Log::info('Processing files:', ['count' => count($files)]);
 
         foreach ($files as $file) {
             $imagePath = $file->store('path_images/' . $path->id, 'public');
@@ -53,6 +78,8 @@ class PathImageController extends Controller
         }
 
         $successMessage = "Images for Path {$path->fromRoom->name} → {$path->toRoom->name} uploaded successfully.";
+
+        Log::info('Upload completed successfully:', ['message' => $successMessage]);
 
         if ($request->expectsJson()) {
             return response()->json([

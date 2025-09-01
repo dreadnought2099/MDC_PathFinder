@@ -10,10 +10,8 @@
             <span class="text-primary">Upload</span> Path Images
         </h2>
 
-        <form id="uploadForm" action="{{ route('path-image.store') }}" method="POST" enctype="multipart/form-data"
-            class="space-y-6" data-upload onsubmit="return false;">
+        <form id="uploadForm" action="{{ route('path-image.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
-
             {{-- Path Selector --}}
             <div class="mb-4 dark:text-gray-300">
                 <label for="path_id" class="block text-gray-700 mb-2 dark:text-gray-300">Select Path</label>
@@ -35,17 +33,14 @@
                 <span class="text-xs text-gray-400">
                     JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 50MB each | multiple allowed
                 </span>
-                <input type="file" name="files[]" id="fileInput" multiple accept="image/*" class="hidden">
+                <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
             </label>
 
             <div id="fileError" class="text-red-500 text-sm mt-2 hidden"></div>
+            <div id="selectedFiles" class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4"></div>
 
-            {{-- Selected Files Preview --}}
-            <div id="selectedFiles" class="grid grid-cols-2 md:grid-cols-3 gap-4" style="display:none;"></div>
-
-            {{-- Submit Button --}}
             <button type="submit" id="submitBtn"
-                class="w-full bg-primary text-white px-4 py-2 rounded dark:hover:bg-gray-800 hover:bg-white hover:text-primary border-2 border-primary disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                class="w-full bg-primary text-white px-4 py-2 rounded mt-4 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 disabled>
                 <i class="fas fa-upload mr-2"></i> Upload Images
             </button>
@@ -72,31 +67,13 @@
             const selectedFilesContainer = document.getElementById('selectedFiles');
             const submitBtn = document.getElementById('submitBtn');
             const uploadForm = document.getElementById('uploadForm');
-            const pathSelect = document.getElementById('path_id');
-            const uploadModal = document.getElementById('uploadModal');
-            const progressBar = document.getElementById('progressBar');
-            const progressText = document.getElementById('progressText');
 
             let files = [];
+            let isSubmitting = false;
 
             function updateSubmitButton() {
-                submitBtn.disabled = files.length === 0 || pathSelect.value === '';
+                submitBtn.disabled = files.length === 0 || isSubmitting;
             }
-
-            fileInput.addEventListener('change', () => {
-                addFiles(Array.from(fileInput.files));
-                fileInput.value = '';
-                updateSubmitButton();
-            });
-
-            // Change dropdown → reload with new default path
-            pathSelect.addEventListener('change', function() {
-                const selectedId = this.value;
-                if (selectedId) {
-                    let baseUrl = "{{ route('path-image.create', ':id') }}".replace(':id', selectedId);
-                    window.location.href = baseUrl;
-                }
-            });
 
             function addFiles(newFiles) {
                 const fileError = document.getElementById('fileError');
@@ -104,17 +81,16 @@
                 let errorMessages = [];
 
                 newFiles.forEach(file => {
-                    if (file.type.startsWith('image/') && file.size <= 50 * 1024 * 1024) {
-                        files.push(file);
+                    if (!file.type.startsWith('image/')) {
+                        errorMessages.push(`File ${file.name} is not an image.`);
+                    } else if (file.size > 50 * 1024 * 1024) {
+                        errorMessages.push(`File ${file.name} exceeds 50MB.`);
                     } else {
-                        let error = `File ${file.name}: `;
-                        if (!file.type.startsWith('image/')) error += 'Must be an image.';
-                        else error += 'Size exceeds 50MB.';
-                        errorMessages.push(error);
+                        files.push(file);
                     }
                 });
 
-                if (errorMessages.length > 0) {
+                if (errorMessages.length) {
                     fileError.textContent = errorMessages.join(' ');
                     fileError.classList.remove('hidden');
                 }
@@ -131,11 +107,8 @@
 
             function renderPreviews() {
                 selectedFilesContainer.innerHTML = '';
-                if (!files.length) {
-                    selectedFilesContainer.style.display = 'none';
-                    return;
-                }
-                selectedFilesContainer.style.display = 'grid';
+                if (!files.length) return;
+
                 files.forEach((file, index) => {
                     const reader = new FileReader();
                     const div = document.createElement('div');
@@ -143,10 +116,10 @@
                     reader.onload = e => {
                         div.innerHTML = `
                     <img src="${e.target.result}" class="w-full h-24 object-cover">
-                    <button type="button"
-                        class="absolute top-1 right-1 bg-red-500 text-white w-5 h-5 rounded-full
-                        flex items-center justify-center text-xs"
-                        onclick="removeFile(${index})">&times;</button>`;
+                    <button type="button" class="absolute top-1 right-1 bg-red-500 text-white w-5 h-5 rounded-full
+                    flex items-center justify-center text-xs hover:bg-red-600"
+                    onclick="removeFile(${index})">&times;</button>
+                `;
                     };
                     reader.readAsDataURL(file);
                     selectedFilesContainer.appendChild(div);
@@ -155,56 +128,63 @@
 
             window.removeFile = removeFile;
 
-            uploadForm.addEventListener('submit', async e => {
+            fileInput.addEventListener('change', function() {
+                addFiles(Array.from(this.files));
+                this.value = '';
+            });
+
+            uploadForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                if (!files.length || !pathSelect.value) return;
+                if (isSubmitting || !files.length) return false;
+
+                isSubmitting = true;
+                updateSubmitButton();
 
                 const formData = new FormData();
                 formData.append('_token', document.querySelector('input[name="_token"]').value);
-                formData.append('path_id', pathSelect.value);
+                formData.append('path_id', document.getElementById('path_id').value);
                 files.forEach(file => formData.append('files[]', file));
 
-                // Show modal
-                uploadModal.classList.remove('hidden');
-                progressBar.style.width = '0%';
-                progressText.textContent = '0%';
+                // Start Alpine.js modal
+                window.dispatchEvent(new CustomEvent('upload-start'));
 
                 const xhr = new XMLHttpRequest();
+                xhr.open('POST', uploadForm.action, true);
+                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
                 xhr.upload.addEventListener('progress', e => {
                     if (e.lengthComputable) {
                         const percent = Math.round((e.loaded / e.total) * 100);
-                        progressBar.style.width = `${percent}%`;
-                        progressText.textContent = `${percent}%`;
+                        window.dispatchEvent(new CustomEvent('upload-progress', {
+                            detail: {
+                                progress: percent
+                            }
+                        }));
                     }
                 });
 
-                xhr.addEventListener('load', () => {
-                    uploadModal.classList.add('hidden');
+                xhr.onload = () => {
+                    isSubmitting = false;
+                    updateSubmitButton();
+                    window.dispatchEvent(new CustomEvent('upload-finish'));
+
                     try {
                         const data = JSON.parse(xhr.responseText);
-                        if (xhr.status === 200) {
-                            if (data.redirect) window.location.href = data.redirect;
-                            else location.reload();
-                        } else if (xhr.status === 422) {
-                            alert('Validation error: ' + (data.errors ? Object.values(data
-                                .errors).join(', ') : data.message));
-                        } else {
-                            alert('Upload failed. Status: ' + xhr.status);
-                        }
-                    } catch (err) {
-                        console.error('Response parse error:', err);
-                        alert('Upload failed. Check console for details.');
+                        if (data.redirect) window.location.href = data.redirect;
+                        else alert(data.message || 'Upload completed.');
+                    } catch {
+                        alert('Upload completed, but response could not be parsed.');
                     }
-                });
+                };
 
-                xhr.addEventListener('error', () => {
-                    uploadModal.classList.add('hidden');
-                    alert('Upload failed. Check console for details.');
-                });
+                xhr.onerror = () => {
+                    isSubmitting = false;
+                    updateSubmitButton();
+                    window.dispatchEvent(new CustomEvent('upload-finish'));
+                    alert('Upload failed. Check console.');
+                    console.error(xhr.responseText);
+                };
 
-                xhr.open('POST', uploadForm.action);
-                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
                 xhr.send(formData);
             });
         });
