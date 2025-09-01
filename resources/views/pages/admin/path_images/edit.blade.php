@@ -54,7 +54,7 @@
                     </p>
                     <div class="flex space-x-2">
                         @if (isset($pathImages) && $pathImages->count() === 1)
-                            <a href="{{ route('path-image.edit-multiple', $path) }}"
+                            <a href="{{ route('path-image.edit', $path) }}"
                                 class="bg-primary hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm transition">
                                 <i class="fas fa-images mr-1"></i> Edit All Images
                             </a>

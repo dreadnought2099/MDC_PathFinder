@@ -75,39 +75,20 @@ class PathImageController extends Controller
         return redirect()->route('path.show', $path)->with('success', $successMessage);
     }
 
-    // Show form to edit multiple images for a path
-    public function edit(Request $request, $pathOrPathImage = null)
+    // Show form to edit single or multiple images
+    public function edit(Request $request, Path $path, PathImage $pathImage = null)
     {
-        // Handle both single image edit and multiple images edit
-        if ($pathOrPathImage instanceof PathImage) {
-            // Single image edit (backward compatibility)
-            $pathImage = $pathOrPathImage;
-            $path = $pathImage->path;
-            $pathImages = collect([$pathImage]);
-        } else {
-            // Multiple images edit by path
-            $pathId = $pathOrPathImage ?? $request->input('path_id');
+        $path->load(['fromRoom', 'toRoom']);
+        $pathImages = $pathImage && $pathImage->exists
+            ? collect([$pathImage->path_id === $path->id ? $pathImage : null])->filter()
+            : PathImage::where('path_id', $path->id)->orderBy('image_order')->get();
 
-            if (!$pathId) {
-                // If no path specified, show path selection
-                $paths = Path::with(['fromRoom', 'toRoom'])->get();
-                return view('pages.admin.path_images.select_path', compact('paths'));
-            }
-
-            $path = Path::findOrFail($pathId);
-            $pathImages = PathImage::where('path_id', $path->id)
-                ->orderBy('image_order')
-                ->get();
-
-            // Kung walay path images assigned to that specific path
-            // It will redirect to showing the path navigation — path.show
-            if ($pathImages->isEmpty()) {
-                return redirect()->route('path.show', $path)
-                    ->with('warning', 'No images found for this path. Redirected to Path Details.');
-            }
+        if ($pathImages->isEmpty()) {
+            return redirect()->route('path.show', $path)
+                ->with('warning', 'No images found for this path.');
         }
 
-        return view('pages.admin.path_images.edit', compact('pathImages', 'path'));
+        return view('pages.admin.path_images.edit', compact('path', 'pathImages'));
     }
 
     // Update multiple images (orders and/or files)
@@ -122,24 +103,19 @@ class PathImageController extends Controller
     }
 
     // Update single image (backward compatibility)
-    private function updateSingle(Request $request, PathImage $pathImage)
+    public function updateSingle(Request $request, PathImage $pathImage)
     {
         $data = $request->validate([
             'image_order' => 'nullable|integer|min:1',
             'image_file'  => 'nullable|image|max:51200',
         ]);
 
-        // Update image order if provided
         if (isset($data['image_order'])) {
             $pathImage->update(['image_order' => $data['image_order']]);
         }
 
-        // Replace image file if new one is uploaded
         if ($request->hasFile('image_file')) {
-            // Delete old image
             Storage::disk('public')->delete($pathImage->image_file);
-
-            // Store new image
             $newImagePath = $request->file('image_file')->store('path_images', 'public');
             $pathImage->update(['image_file' => $newImagePath]);
         }
@@ -149,7 +125,7 @@ class PathImageController extends Controller
     }
 
     // Update multiple images
-    private function updateMultiple(Request $request, $pathId = null)
+    public function updateMultiple(Request $request, $pathId = null)
     {
         $pathId = $pathId ?? $request->input('path_id');
         $path = Path::findOrFail($pathId);
@@ -230,14 +206,10 @@ class PathImageController extends Controller
     }
 
     // Delete a specific image
-    public function destroy(PathImage $pathImage)
+    public function destroySingle(PathImage $pathImage)
     {
         $path = $pathImage->path;
-
-        // Delete the file from storage
         Storage::disk('public')->delete($pathImage->image_file);
-
-        // Delete the database record
         $pathImage->delete();
 
         if (request()->expectsJson()) {
@@ -265,9 +237,7 @@ class PathImageController extends Controller
                 ->first();
 
             if ($pathImage) {
-                // Delete the file from storage
                 Storage::disk('public')->delete($pathImage->image_file);
-                // Delete the database record
                 $pathImage->delete();
                 $deletedCount++;
             }
@@ -286,7 +256,7 @@ class PathImageController extends Controller
         return redirect()->route('path.show', $path)->with('success', $successMessage);
     }
 
-    // Bulk update image orders (for drag-and-drop reordering)
+    // Bulk update image orders
     public function updateOrder(Request $request, Path $path)
     {
         $request->validate([

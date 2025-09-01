@@ -1,4 +1,5 @@
 @props([
+    'path' => null,
     'roomFallback' => 'room.index',
     'staffFallback' => 'staff.index',
     'pathFallback' => 'path.index',
@@ -20,21 +21,19 @@
             $backUrl = route('room.index');
         } elseif ($currentRouteName === 'staff.create') {
             $backUrl = route('staff.index');
-        } elseif ($currentRouteName === 'path-image.create' || $currentRouteName === 'path-image.edit-multiple') {
+        } elseif ($currentRouteName === 'path-image.create') {
             $backUrl = route('path.index');
         }
     }
 
-    // Edit pages → fallback to index
+    // Edit pages → fallback to index or path.show
     elseif (str_ends_with($currentRouteName, '.edit')) {
         if ($currentRouteName === 'room.edit') {
-            $backUrl = route('room.index'); // safer fallback
+            $backUrl = route('room.index');
         } elseif ($currentRouteName === 'staff.edit') {
             $backUrl = route('staff.index');
-        } elseif ($currentRouteName === 'path-image.edit-multiple') {
-            $backUrl = route('path.index'); // no path.show in edit mode
-        } elseif ($currentRouteName === 'path-image.edit-single') {
-            $backUrl = route('path-image.create'); // or another fallback
+        } elseif ($currentRouteName === 'path-image.edit') {
+            $backUrl = $path ? route('path.show', $path) : route('path.index');
         }
     }
 
