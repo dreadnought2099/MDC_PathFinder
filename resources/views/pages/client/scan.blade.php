@@ -34,7 +34,7 @@
 
         <!-- Main content area -->
         @if ($room)
-            @include('pages.client.partials.room-details', ['room' => $room])
+            @include('pages.client.room-details', ['room' => $room])
         @else
             <!-- QR Scanner Content -->
             <div class="w-full min-h-screen flex flex-col justify-center items-center text-center px-4 py-6">

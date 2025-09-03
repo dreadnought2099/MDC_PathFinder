@@ -10,7 +10,7 @@
             <span class="text-primary">Upload</span> Path Images
         </h2>
 
-        <form id="uploadForm" action="{{ route('path-image.store') }}" method="POST" enctype="multipart/form-data">
+        <form id="uploadForm" action="{{ route('path-image.store') }}" method="POST" enctype="multipart/form-data" data-upload>
             @csrf
             {{-- Path Selector --}}
             <div class="mb-4 dark:text-gray-300">
@@ -33,14 +33,14 @@
                 <span class="text-xs text-gray-400">
                     JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 50MB each | multiple allowed
                 </span>
-                <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
+                <input type="file" name="files[]" id="fileInput" multiple accept="image/*" class="hidden">
             </label>
 
             <div id="fileError" class="text-red-500 text-sm mt-2 hidden"></div>
             <div id="selectedFiles" class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4"></div>
 
             <button type="submit" id="submitBtn"
-                class="w-full bg-primary text-white px-4 py-2 rounded mt-4 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                class="w-full bg-primary text-white px-4 py-2 rounded-2xl border-2 border-primary duration-300 transition-all ease-in-out mt-4 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer hover:bg-white hover:text-primary dark:hover:bg-gray-800"
                 disabled>
                 <i class="fas fa-upload mr-2"></i> Upload Images
             </button>
@@ -130,62 +130,6 @@
 
             fileInput.addEventListener('change', function() {
                 addFiles(Array.from(this.files));
-                this.value = '';
-            });
-
-            uploadForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                if (isSubmitting || !files.length) return false;
-
-                isSubmitting = true;
-                updateSubmitButton();
-
-                const formData = new FormData();
-                formData.append('_token', document.querySelector('input[name="_token"]').value);
-                formData.append('path_id', document.getElementById('path_id').value);
-                files.forEach(file => formData.append('files[]', file));
-
-                // Start Alpine.js modal
-                window.dispatchEvent(new CustomEvent('upload-start'));
-
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', uploadForm.action, true);
-                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-                xhr.upload.addEventListener('progress', e => {
-                    if (e.lengthComputable) {
-                        const percent = Math.round((e.loaded / e.total) * 100);
-                        window.dispatchEvent(new CustomEvent('upload-progress', {
-                            detail: {
-                                progress: percent
-                            }
-                        }));
-                    }
-                });
-
-                xhr.onload = () => {
-                    isSubmitting = false;
-                    updateSubmitButton();
-                    window.dispatchEvent(new CustomEvent('upload-finish'));
-
-                    try {
-                        const data = JSON.parse(xhr.responseText);
-                        if (data.redirect) window.location.href = data.redirect;
-                        else alert(data.message || 'Upload completed.');
-                    } catch {
-                        alert('Upload completed, but response could not be parsed.');
-                    }
-                };
-
-                xhr.onerror = () => {
-                    isSubmitting = false;
-                    updateSubmitButton();
-                    window.dispatchEvent(new CustomEvent('upload-finish'));
-                    alert('Upload failed. Check console.');
-                    console.error(xhr.responseText);
-                };
-
-                xhr.send(formData);
             });
         });
     </script>
