@@ -12,7 +12,9 @@
 
         @font-face {
             font-family: 'Anton';
-            src: url('{{ asset('font/Anton-Regular.ttf') }}') format('truetype');
+            src: url("{{ asset('fonts/Anton-Regular.woff2') }}") format("woff2"),
+                url("{{ asset('fonts/Anton-Regular.woff') }}") format("woff"),
+                url("{{ asset('fonts/Anton-Regular.ttf') }}") format("truetype");
             font-weight: normal;
             font-style: normal;
         }

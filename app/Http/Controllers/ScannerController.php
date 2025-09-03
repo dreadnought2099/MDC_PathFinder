@@ -10,9 +10,6 @@ class ScannerController extends Controller
 {
     public function index(?Room $room = null)
     {
-        // Add this debug line temporarily
-        Log::info('ScannerController hit with room: ' . ($room ? $room->name : 'null'));
-        
         if (request()->is('scan-marker/*') && is_null($room)) {
             return redirect()->route('scan.index')->with('error', 'Invalid room token.');
         }
