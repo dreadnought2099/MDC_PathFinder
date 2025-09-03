@@ -79,8 +79,7 @@ class RoomController extends Controller
 
             // Generate QR code
             $marker_id = 'room_' . $room->id;
-            $scanUrl = route('scan.room', $room->token);
-            $qrImage = QrCode::format('svg')->size(300)->generate($scanUrl);
+            $qrImage = QrCode::format('svg')->size(300)->generate($room->token);
             $qrPath = 'rooms/' . $room->id . '/qrcodes/' . $marker_id . '.svg';
             Storage::disk('public')->put($qrPath, $qrImage);
 
@@ -127,8 +126,7 @@ class RoomController extends Controller
         if (!$room->qr_code_path || !Storage::disk('public')->exists($room->qr_code_path)) {
             $marker_id = 'room_' . $room->id;
 
-            $scanUrl = route('scan.room', $room->token);
-            $qrImage = QrCode::format('svg')->size(300)->generate($scanUrl);
+            $qrImage = QrCode::format('svg')->size(300)->generate($room->token);
             $qrPath = 'qrcodes/' . $marker_id . '.svg';
             Storage::disk('public')->put($qrPath, $qrImage);
 
@@ -307,8 +305,7 @@ class RoomController extends Controller
         // Regenerate QR code if missing
         if (!$room->qr_code_path || !Storage::disk('public')->exists($room->qr_code_path)) {
             $marker_id = 'room_' . $room->id;
-            $scanUrl = route('scan.room', $room->token);
-            $qrImage = QrCode::format('svg')->size(300)->generate($scanUrl);
+            $qrImage = QrCode::format('svg')->size(300)->generate($room->token);
             $qrPath = 'rooms/' . $room->id . '/qrcodes/' . $marker_id . '.svg';
             Storage::disk('public')->put($qrPath, $qrImage);
 
