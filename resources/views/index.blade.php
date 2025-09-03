@@ -20,7 +20,7 @@
 
         <!-- Bottom button -->
         <div class="flex justify-center pb-6">
-            <a href="{{ route('ar.view') }}">
+            <a href="{{ route('scan.index') }}">
                 <img src="{{ asset('icons/qr-code.png') }}" alt="Scan Office"
                     class="w-10 h-10 hover:scale-110 transition-all duration-300 ease-in-out" title="Scan Office">
             </a>

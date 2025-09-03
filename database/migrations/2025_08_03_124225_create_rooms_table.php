@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('rooms', function (Blueprint $table) {
             $table->id();
+            $table->string('token', 64)->unique(false);
             $table->string('name');
             $table->text('description')->nullable();
             $table->string('qr_code_path')->nullable();

@@ -3,14 +3,15 @@
 @section('content')
     <div class="min-h-screen dark:bg-gray-900 mb-8">
         <!-- Top navigation bar with back button and dark mode toggle -->
-        <div class="bg-white flex justify-between items-center p-4 mb-2 sticky top-0 z-50
+        <div
+            class="bg-white flex justify-between items-center p-4 mb-2 sticky top-0 z-50
             dark:bg-gray-900 
             border-b-2 border-b-primary dark:border-b-primary">
 
             <!-- Back button - conditional logi c -->
             @if ($room)
                 <!-- If viewing room details, go back to QR scanner -->
-                <a href="{{ route('ar.view') }}"
+                <a href="{{ route('scan.index') }}"
                     class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 dark:text-gray-300">
                     <svg class="h-6 w-6 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
@@ -39,7 +40,8 @@
             <!-- QR Scanner Content -->
             <div class="w-full min-h-screen flex flex-col justify-center items-center text-center px-4 py-6">
                 <!-- Main content -->
-                <div class="flex-grow flex flex-col justify-center items-center border-2 border-primary p-6 rounded-2xl max-w-2xl w-full">
+                <div
+                    class="flex-grow flex flex-col justify-center items-center border-2 border-primary p-6 rounded-2xl max-w-2xl w-full">
                     <h1 class="text-3xl font-bold text-gray-800 mb-4 text-primary dark:text-gray-100">
                         {{ config('app.name') }}
                     </h1>
@@ -51,13 +53,13 @@
                     <div class="max-w-lg w-full mx-auto">
                         <div id="qr-reader" class="relative mx-auto mb-4 rounded-lg overflow-hidden"
                             style="max-width: 350px;">
-                        </div>  
+                        </div>
 
                         <!-- Control buttons -->
                         <div class="flex flex-col gap-3 items-center">
                             <!-- Stop button -->
                             <button id="stopBtn"
-                                class="w-full max-w-xs bg-secondary hover:text-secondary hover:bg-white text-white border-2 border-secondary dark:hover:bg-gray-800 text-sm py-2 px-4 rounded-lg transition-all duration-300 ease-in-out cursor-pointer">
+                                class="w-full max-w-xs bg-secondary hover:text-secondary hover:bg-white text-white border-2 border-secondary dark:hover:bg-gray-800 py-2 px-4 rounded-lg transition-all duration-300 ease-in-out cursor-pointer">
                                 Stop Scanning
                             </button>
 
@@ -69,7 +71,8 @@
                         </div>
 
                         <!-- Results and status messages -->
-                        <div id="qr-reader-results" class="mt-4 text-sm text-gray-600 text-center dark:text-gray-300 min-h-[24px]"></div>
+                        <div id="qr-reader-results"
+                            class="mt-4 text-sm text-gray-600 text-center dark:text-gray-300 min-h-[24px]"></div>
                     </div>
                 </div>
             </div>
@@ -134,12 +137,13 @@
                     `;
                 }
 
-                async checkRoomExists(roomId) {
+                async checkRoomExists(roomToken) {
                     try {
-                        this.showMessage(`Checking if room ${roomId} exists...`, 'info');
-                        
-                        const response = await fetch(`/api/rooms/${roomId}/exists`);
-                        
+                        this.showMessage(`Checking if room ${roomToken} exists...`, 'info');
+
+                        // CHANGED: use token instead of numeric ID
+                        const response = await fetch(`/api/rooms/${roomToken}/exists`);
+
                         if (!response.ok) {
                             throw new Error(`HTTP error! status: ${response.status}`);
                         }
@@ -147,13 +151,13 @@
                         const data = await response.json();
 
                         if (data.exists) {
-                            this.showMessage(`Room ${roomId} found! Redirecting...`, 'success');
-                            // Add a slight delay for better UX
+                            this.showMessage(`Room found! Redirecting...`, 'success');
                             setTimeout(() => {
-                                window.location.href = `{{ route('ar.view') }}?room=${roomId}`;
+                                window.location.href = "{{ route('scan.room', ['room' => ':roomToken']) }}".replace(
+                                    ':roomToken', roomToken);
                             }, 1000);
                         } else {
-                            this.showMessage(`Room ${roomId} does not exist.`, 'error');
+                            this.showMessage(`Room does not exist.`, 'error');
                             setTimeout(() => this.restartScanner(), 2000);
                         }
                     } catch (error) {
@@ -166,32 +170,28 @@
                 onScanSuccess(decodedText) {
                     if (!this.isScanning) return;
 
-                    // Stop scanning immediately
                     this.stopScanner();
 
-                    let roomId = null;
-                    
-                    // Parse QR code content
-                    if (decodedText.startsWith("room_")) {
-                        roomId = decodedText.replace("room_", "");
-                    } else if (/^\d+$/.test(decodedText)) {
-                        roomId = decodedText;
-                    } else {
-                        this.showMessage("Invalid QR code format. Expected room ID.", "error");
+                    // CHANGED: treat decodedText as token, not just number
+                    const roomToken = decodedText; // Expect raw 32-character token
+
+                    if (!roomToken || roomToken.length !== 32 || !/^[a-zA-Z0-9]+$/.test(roomToken)) {
+                        this.showMessage("Invalid QR code format. Expected a 32-character room token.", "error");
                         setTimeout(() => this.restartScanner(), 2000);
                         return;
                     }
 
-                    this.checkRoomExists(roomId);
+                    this.checkRoomExists(roomToken);
                 }
 
                 onScanFailure(error) {
                     // Only increment attempts for actual scan failures, not permission issues
                     if (this.isScanning && error.includes('NotFoundException')) {
                         this.scanAttempts++;
-                        
+
                         if (this.scanAttempts >= this.maxScanAttempts) {
-                            this.showMessage("Having trouble scanning? Make sure the QR code is clear and well-lit.", "warning");
+                            this.showMessage("Having trouble scanning? Make sure the QR code is clear and well-lit.",
+                                "warning");
                             this.scanAttempts = 0;
                         }
                     }
@@ -205,9 +205,9 @@
 
                         this.showMessage("Initializing camera...", 'info');
 
-                        await this.html5QrCode.start(
-                            { facingMode: "environment" },
-                            {
+                        await this.html5QrCode.start({
+                                facingMode: "environment"
+                            }, {
                                 fps: 10,
                                 qrbox: undefined,
                                 aspectRatio: 1.0
@@ -222,14 +222,14 @@
 
                     } catch (error) {
                         console.error("Failed to start scanner:", error);
-                        
+
                         let errorMessage = "Camera initialization failed.";
                         if (error.name === 'NotAllowedError') {
                             errorMessage = "Camera permission denied. Please enable camera access.";
                         } else if (error.name === 'NotFoundError') {
                             errorMessage = "No camera found. Please check your device.";
                         }
-                        
+
                         this.showMessage(errorMessage, "error");
                         this.isScanning = false;
                     }
@@ -250,7 +250,7 @@
 
                 async restartScanner() {
                     await this.stopScanner();
-                    
+
                     // Add a brief delay before restarting
                     setTimeout(() => {
                         this.startScanner();

@@ -8,28 +8,33 @@ use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\TourController;
-use App\Models\Path;
+use App\Http\Controllers\ScannerController;
 use App\Models\Room;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Public Routes
-|--------------------------------------------------------------------------
-| Routes accessible without authentication
-*/
 
 // Home page - displays main landing page
 Route::get('/', [HomeController::class, 'index'])->name('index');
 
-Route::get('/scan-marker', [TourController::class, 'index'])->name('ar.view');
+// Scanner page (no room yet)
+Route::get('/scan-marker', [ScannerController::class, 'index'])->name('scan.index');
+
+// Room details via token - SINGLE ROUTE with validation
+Route::get('/scan-marker/{room}', function (Room $room) {
+    // Additional verification that the token format is correct
+    if (!preg_match('/^[a-f0-9]{32}$/', $room->token)) {
+        abort(404);
+    }
+    
+    return app(ScannerController::class)->index($room);
+})->name('scan.room');
 
 // Client-facing staff profile
 Route::get('/staffs/{staff}', [StaffController::class, 'clientShow'])->name('staff.client-show');
 
-Route::get('/api/rooms/{id}/exists', function ($id) {
-    $exists = \App\Models\Room::where('id', $id)->exists();
+// API endpoint for checking room existence
+Route::get('/api/rooms/{token}/exists', function ($token) {
+    $exists = \App\Models\Room::where('token', $token)->exists();
     return response()->json(['exists' => $exists]);
 });
 
@@ -49,12 +54,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/profile', [ProfileController::class, 'index'])->name('admin.profile');
     Route::post('/admin/profile/update-image', [ProfileController::class, 'updateImage'])->name('admin.profile.updateImage');
 
-    /*
-    |----------------------------------------------------------------------
-    | Room Management Routes
-    |----------------------------------------------------------------------
-    | IMPORTANT: Specific routes MUST come before parameterized routes
-    */
 
     Route::prefix('admin')->name('room.')->group(function () {
 
@@ -90,13 +89,6 @@ Route::middleware('auth')->group(function () {
         Route::delete('/rooms/staff/{id}/remove', [RoomController::class, 'removeFromRoom'])->name('staff.remove');
     });
 
-    /*
-    |----------------------------------------------------------------------
-    | Staff Management Routes
-    |----------------------------------------------------------------------
-    | Same principle: specific routes before parameterized routes
-    */
-
     Route::prefix('admin')->name('staff.')->group(function () {
 
         // List all staff
@@ -129,13 +121,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/paths/{path}', [PathController::class, 'show'])->name('show');
     });
 
-    /*
-    |----------------------------------------------------------------------
-    | Path Image Management Routes
-    |----------------------------------------------------------------------
-    | These are nested under paths but follow similar naming conventions
-    */
-
     Route::prefix('admin')->name('path-image.')->group(function () {
         // GENERIC ROUTES (no path parameter needed)
         Route::get('/path-images/create/{path?}', [PathImageController::class, 'create'])->name('create');
@@ -154,24 +139,3 @@ Route::middleware('auth')->group(function () {
         Route::delete('/path-images/{pathImage}', [PathImageController::class, 'destroySingle'])->name('destroy-single');
     });
 });
-
-/*
-|--------------------------------------------------------------------------
-| Route Order Rules
-|--------------------------------------------------------------------------
-| 
-| 1. Static/Specific routes MUST come before dynamic/parameterized routes
-| 2. More specific patterns should be defined before less specific ones
-| 3. Routes are matched from top to bottom - first match wins
-| 
-| CORRECT ORDER:
-| ✅ /rooms/create
-| ✅ /rooms/recycle-bin  
-| ✅ /rooms/{room}
-| 
-| INCORRECT ORDER:
-| ❌ /rooms/{room}        <- This would catch everything
-| ❌ /rooms/create        <- Never reached
-| ❌ /rooms/recycle-bin   <- Never reached
-|
-*/

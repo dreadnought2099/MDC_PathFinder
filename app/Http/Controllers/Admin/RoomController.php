@@ -33,78 +33,85 @@ class RoomController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'image_path' => 'nullable|image|max:51200',
-            'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:102400',
-            'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:102400',
 
-            // Office hours
-            'office_hours' => 'nullable|array',
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'image_path' => 'nullable|image|max:51200',
+                'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:102400',
+                'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:102400',
 
-        $roomData = collect($validated)->except('office_hours')->toArray();
-        $room = Room::create($roomData);
+                // Office hours
+                'office_hours' => 'nullable|array',
+            ]);
 
-        if ($request->has('office_hours')) {
-            foreach ($request->office_hours as $day => $ranges) {
-                foreach ($ranges as $range) {
-                    if (!empty($range['start']) && !empty($range['end'])) {
-                        $room->officeHours()->create([
-                            'day'        => $day,
-                            'start_time' => $range['start'],
-                            'end_time'   => $range['end'],
-                        ]);
+            $roomData = collect($validated)->except('office_hours')->toArray();
+            $room = Room::create($roomData);
+
+            if ($request->has('office_hours')) {
+                foreach ($request->office_hours as $day => $ranges) {
+                    foreach ($ranges as $range) {
+                        if (!empty($range['start']) && !empty($range['end'])) {
+                            $room->officeHours()->create([
+                                'day'        => $day,
+                                'start_time' => $range['start'],
+                                'end_time'   => $range['end'],
+                            ]);
+                        }
                     }
                 }
             }
-        }
 
-        // Cover image
-        if ($request->hasFile('image_path')) {
-            $path = $request->file('image_path')->store('rooms/' . $room->id . '/cover_images', 'public');
-            $room->image_path = $path;
-            $room->save();
-        }
-
-        // Video
-        if ($request->hasFile('video_path')) {
-            $path = $request->file('video_path')->store('rooms/' . $room->id . '/videos', 'public');
-            $room->video_path = $path;
-            $room->save();
-        }
-
-        // Generate QR code
-        $marker_id = 'room_' . $room->id;
-        $qrImage = QrCode::format('svg')->size(300)->generate($room->id);
-        $qrPath = 'rooms/' . $room->id . '/qrcodes/' . $marker_id . '.svg';
-        Storage::disk('public')->put($qrPath, $qrImage);
-
-        $room->update([
-            'marker_id' => $marker_id,
-            'qr_code_path' => $qrPath,
-        ]);
-
-        // Carousel images
-        if ($request->hasFile('carousel_images')) {
-            foreach ($request->file('carousel_images') as $carouselImage) {
-                $path = $carouselImage->store('rooms/' . $room->id . '/carousel', 'public');
-                RoomImage::create([
-                    'room_id' => $room->id,
-                    'image_path' => $path
-                ]);
+            // Cover image
+            if ($request->hasFile('image_path')) {
+                $path = $request->file('image_path')->store('rooms/' . $room->id . '/cover_images', 'public');
+                $room->image_path = $path;
+                $room->save();
             }
+
+            // Video
+            if ($request->hasFile('video_path')) {
+                $path = $request->file('video_path')->store('rooms/' . $room->id . '/videos', 'public');
+                $room->video_path = $path;
+                $room->save();
+            }
+
+            // Generate QR code
+            $marker_id = 'room_' . $room->id;
+            $scanUrl = route('scan.room', $room->token);
+            $qrImage = QrCode::format('svg')->size(300)->generate($scanUrl);
+            $qrPath = 'rooms/' . $room->id . '/qrcodes/' . $marker_id . '.svg';
+            Storage::disk('public')->put($qrPath, $qrImage);
+
+            $room->update([
+                'marker_id' => $marker_id,
+                'qr_code_path' => $qrPath,
+            ]);
+
+            // Carousel images
+            if ($request->hasFile('carousel_images')) {
+                foreach ($request->file('carousel_images') as $carouselImage) {
+                    $path = $carouselImage->store('rooms/' . $room->id . '/carousel', 'public');
+                    RoomImage::create([
+                        'room_id' => $room->id,
+                        'image_path' => $path
+                    ]);
+                }
+            }
+
+            session()->flash('success', "{$room->name} was added successfully.");
+
+            if ($request->expectsJson()) {
+                return response()->json(['redirect' => route('room.show', $room->id)], 200);
+            }
+
+            return redirect()->route('room.show', $room->id)
+                ->with('success', "{$room->name} was added successfully.");
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Room creation error: ' . $e->getMessage(), ['request' => $request->all()]);
+            return back()->withInput()->with('error', 'Failed to create room: ' . $e->getMessage());
         }
-
-        session()->flash('success', "{$room->name} was added successfully.");
-
-        if ($request->expectsJson()) {
-            return response()->json(['redirect' => route('room.show', $room->id)], 200);
-        }
-
-        return redirect()->route('room.show', $room->id)
-            ->with('success', "{$room->name} was added successfully.");
     }
 
     public function show(Room $room)
@@ -119,7 +126,9 @@ class RoomController extends Controller
 
         if (!$room->qr_code_path || !Storage::disk('public')->exists($room->qr_code_path)) {
             $marker_id = 'room_' . $room->id;
-            $qrImage = QrCode::format('svg')->size(300)->generate($room->id);
+
+            $scanUrl = route('scan.room', $room->token);
+            $qrImage = QrCode::format('svg')->size(300)->generate($scanUrl);
             $qrPath = 'qrcodes/' . $marker_id . '.svg';
             Storage::disk('public')->put($qrPath, $qrImage);
 
@@ -298,7 +307,8 @@ class RoomController extends Controller
         // Regenerate QR code if missing
         if (!$room->qr_code_path || !Storage::disk('public')->exists($room->qr_code_path)) {
             $marker_id = 'room_' . $room->id;
-            $qrImage = QrCode::format('svg')->size(300)->generate($room->id);
+            $scanUrl = route('scan.room', $room->token);
+            $qrImage = QrCode::format('svg')->size(300)->generate($scanUrl);
             $qrPath = 'rooms/' . $room->id . '/qrcodes/' . $marker_id . '.svg';
             Storage::disk('public')->put($qrPath, $qrImage);
 

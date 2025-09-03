@@ -4,15 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Room;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
-class TourController extends Controller
+class ScannerController extends Controller
 {
-    public function index(Request $request)
+    public function index(?Room $room = null)
     {
-        $room = null;
-
-        if ($request->has('room')) {
-            $room = Room::find($request->room);
+        // Add this debug line temporarily
+        Log::info('ScannerController hit with room: ' . ($room ? $room->name : 'null'));
+        
+        if (request()->is('scan-marker/*') && is_null($room)) {
+            return redirect()->route('scan.index')->with('error', 'Invalid room token.');
         }
 
         // Load JSON
@@ -21,16 +23,12 @@ class TourController extends Controller
 
         if (file_exists($filePath)) {
             $facts = json_decode(file_get_contents($filePath), true);
+            $officeName = $room?->name;
 
-            // Use office name if $room exists
-            $officeName = $room ? $room->name : null;
-
-            if ($officeName && isset($facts['offices'][$officeName]) && count($facts['offices'][$officeName]) > 0) {
-                // Random fact for this office
+            if ($officeName && !empty($facts['offices'][$officeName])) {
                 $officeFacts = $facts['offices'][$officeName];
                 $fact = $officeFacts[array_rand($officeFacts)];
-            } elseif (isset($facts['general']) && count($facts['general']) > 0) {
-                // Random general campus fact
+            } elseif (!empty($facts['general'])) {
                 $generalFacts = $facts['general'];
                 $fact = $generalFacts[array_rand($generalFacts)];
             }

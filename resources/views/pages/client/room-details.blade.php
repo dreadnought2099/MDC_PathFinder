@@ -103,7 +103,7 @@
     <!-- Scan Another QR Code Button -->
     <div class="text-center pt-8 border-t border-gray-200 dark:border-gray-600">
         <p class="text-sm text-gray-500 dark:text-gray-300 mb-3">Want to explore another room?</p>
-        <a href="{{ route('scan.view') }}"
+        <a href="{{ route('scan.index') }}"
             class="inline-block bg-primary hover:bg-white hover:text-primary text-white py-3 px-6 rounded-lg shadow-md border border-primary transition-all duration-300 dark:hover:bg-gray-800">
             Scan Another QR Code
         </a>

@@ -18,6 +18,7 @@ class Room extends Model
         'marker_id',
         'image_path',
         'video_path',
+        'token',
     ];
 
     public function staff()
@@ -142,6 +143,12 @@ class Room extends Model
 
     protected static function booted()
     {
+        static::creating(function ($room) {
+            if (empty($room->token)) {
+                $room->token = self::generateSecureToken();
+            }
+        });
+
         static::created(function ($room) {
             // Get all other rooms
             $otherRooms = Room::where('id', '!=', $room->id)->get();
@@ -160,5 +167,47 @@ class Room extends Model
                 ]);
             }
         });
+    }
+
+
+    /**
+     * Context-aware route key selection
+     * - Use tokens for public/scanner routes (secure)
+     * - Use IDs for admin routes (convenient)
+     */
+    public function getRouteKeyName()
+    {
+        $request = request();
+        $currentRoute = $request->route();
+
+        if ($currentRoute) {
+            $routeName = $currentRoute->getName();
+            $uri = $request->getRequestUri();
+
+            // Use token for public scanner routes
+            if ($routeName && (str_contains($routeName, 'scan') || str_contains($uri, 'scan-marker'))) {
+                return 'token';
+            }
+
+            // Use token for client-facing routes
+            if (str_contains($uri, '/rooms/') && !str_contains($uri, '/admin/')) {
+                return 'token';
+            }
+        }
+
+        // Use ID for admin routes (default)
+        return 'id';
+    }
+
+    /**
+     * Generate URL-safe tokens
+     */
+    public static function generateSecureToken()
+    {
+        do {
+            $token = bin2hex(random_bytes(16)); // 32 character hex string
+        } while (self::where('token', $token)->exists());
+
+        return $token;
     }
 }
