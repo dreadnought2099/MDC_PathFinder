@@ -24,7 +24,7 @@
         <div
             class="w-[330px] h-[330px] mx-auto p-5 bg-white rounded-2xl border-4 border-primary shadow-[0_0_25px_4px_rgba(21,126,225,0.35)] hover:shadow-[0_0_40px_6px_rgba(21,126,225,0.55)] transition">
             <img src="{{ asset('storage/' . $room->qr_code_path) }}" alt="QR Code for {{ $room->name }}"
-                class="w-full h-full object-contain rounded-xl select-none">
+                class="w-full h-full object-contain select-none">
         </div>
 
         <!-- Scan Phrase -->
