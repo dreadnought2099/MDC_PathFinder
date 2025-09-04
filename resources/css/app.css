@@ -44,12 +44,18 @@
     body {
         font-family: "Anton", Verdana, sans-serif;
     }
+
+    @media print {
+        .print-border-primary {
+            border-color: var(--color-primary) !important;
+        }
+    }
 }
 
 @layer utilities {
     /* ========================
-       BORDER UTILITIES
-       ======================== */
+        BORDER UTILITIES
+        ======================== */
     .border-b-primary {
         border-bottom-color: var(--color-primary);
     }
@@ -73,8 +79,8 @@
     }
 
     /* ========================
-       BACKGROUND UTILITIES
-       ======================== */
+        BACKGROUND UTILITIES
+        ======================== */
     .bg-primary {
         background-color: var(--color-primary);
     }
@@ -89,8 +95,8 @@
     }
 
     /* ========================
-       TEXT UTILITIES
-       ======================== */
+        TEXT UTILITIES
+        ======================== */
     .text-primary {
         color: var(--color-primary);
     }
@@ -105,8 +111,8 @@
     }
 
     /* ========================
-       HOVER UTILITIES
-       ======================== */
+        HOVER UTILITIES
+        ======================== */
     .hover\:bg-primary:hover {
         background-color: var(--color-primary);
     }
@@ -130,8 +136,8 @@
     }
 
     /* ========================
-       GROUP HOVER UTILITIES
-       ======================== */
+        GROUP HOVER UTILITIES
+        ======================== */
     .group:hover .group-hover\:text-primary {
         color: var(--color-primary);
     }
@@ -172,8 +178,8 @@
     }
 
     /* ========================
-       FOCUS UTILITIES
-       ======================== */
+        FOCUS UTILITIES
+        ======================== */
     .focus\:ring-primary:focus {
         --tw-ring-color: var(--color-primary);
         box-shadow: 0 0 0 1px var(--tw-ring-color);
@@ -193,8 +199,8 @@
     }
 
     /* ========================
-       CARD SHADOW EFFECTS
-       ======================== */
+        CARD SHADOW EFFECTS
+        ======================== */
     .shadow-primary-hover {
         transition: all 0.3s ease;
     }
@@ -302,8 +308,8 @@
         @apply left-0 w-full;
     }
     /* ========================================
-       CARD COMPONENTS - Added for reusable card styling with box shadow
-       ======================================== */
+        CARD COMPONENTS - Added for reusable card styling with box shadow
+        ======================================== */
 
     .card-shadow-hover {
         @apply bg-white rounded-xl shadow-md hover:shadow-xl transform transition-all duration-300 hover:-translate-y-2;
@@ -315,6 +321,6 @@
     }
 
     /* ========================================
-       END CARD COMPONENTS
-       ======================================== */
+        END CARD COMPONENTS
+        ======================================== */
 }
