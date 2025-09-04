@@ -11,9 +11,11 @@
             <div class="mt-4 flex justify-center">
                 {{ $rooms->appends(request()->query())->links('pagination::tailwind') }}
             </div>
-        </div>
+            <div class="py-4">
+                <x-sort-by :route="route('room.index')" :fields="['name' => 'Name', 'created_at' => 'Created At']" :current-sort="$sort" :current-direction="$direction" />
 
-        <x-sort-by :route="route('room.index')" :fields="['name' => 'Name', 'created_at' => 'Created At']" :current-sort="$sort" :current-direction="$direction" />
+            </div>
+        </div>
 
         <!-- Floating Actions -->
         <div class="mb-6">

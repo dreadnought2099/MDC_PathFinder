@@ -11,9 +11,10 @@
             <div class="mt-4 flex justify-center">
                 {{ $staffs->appends(request()->query())->links('pagination::tailwind') }}
             </div>
+            <div class="py-4">
+                <x-sort-by :route="route('staff.index')" :fields="['first_name' => 'First Name', 'last_name' => 'Last Name', 'email' => 'Email']" :current-sort="$sort" :current-direction="$direction" />
+            </div>
         </div>
-
-        <x-sort-by :route="route('staff.index')" :fields="['first_name' => 'First Name', 'last_name' => 'Last Name', 'email' => 'Email']" :current-sort="$sort" :current-direction="$direction" />
 
         <!-- Floating Actions -->
         <div class="mb-6">

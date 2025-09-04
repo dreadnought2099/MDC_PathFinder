@@ -10,7 +10,7 @@
                 <input type="hidden" name="{{ $key }}" value="{{ $value }}">
             @endforeach
 
-            <select name="sort" onchange="this.form.submit()" class="border rounded p-1 text-sm dark:bg-gray-800 dark:text-white">
+            <select name="sort" onchange="this.form.submit()" class="border border-primary rounded p-1 text-sm dark:bg-gray-800 dark:text-white">
                 @foreach ($fields as $key => $label)
                     <option value="{{ $key }}" {{ $currentSort === $key ? 'selected' : '' }}>
                         {{ $label }}
@@ -18,7 +18,7 @@
                 @endforeach
             </select>
 
-            <select name="direction" onchange="this.form.submit()" class="border rounded p-1 text-sm dark:bg-gray-800 dark:text-white">
+            <select name="direction" onchange="this.form.submit()" class="border border-primary rounded p-1 text-sm dark:bg-gray-800 dark:text-white">
                 <option value="asc" {{ $currentDirection === 'asc' ? 'selected' : '' }}>Ascending</option>
                 <option value="desc" {{ $currentDirection === 'desc' ? 'selected' : '' }}>Descending</option>
             </select>

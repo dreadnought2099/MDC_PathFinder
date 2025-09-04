@@ -11,14 +11,17 @@
             <div class="mt-4 flex justify-center">
                 {{ $paths->appends(request()->query())->links('pagination::tailwind') }}
             </div>
+            <div class="py-4">
+                <x-sort-by :route="route('path.index')" :fields="[
+                    'id' => 'ID',
+                    'from_room_id' => 'From Room',
+                    'to_room_id' => 'To Room',
+                    'created_at' => 'Created At',
+                ]" :current-sort="$sort" :current-direction="$direction" />
+            </div>
         </div>
 
-        <x-sort-by :route="route('path.index')" :fields="[
-            'id' => 'ID',
-            'from_room_id' => 'From Room',
-            'to_room_id' => 'To Room',
-            'created_at' => 'Created At',
-        ]" :current-sort="$sort" :current-direction="$direction" />
+
 
         <!-- Floating Actions -->
         <div class="mb-6">
@@ -79,7 +82,7 @@
                                             class="hover-underline text-primary hover:scale-105 transform transition duration-200">
                                             View
                                         </a>
-                                         <a href="{{ route('path-image.create', $path->id) }}"
+                                        <a href="{{ route('path-image.create', $path->id) }}"
                                             class="hover-underline-tertiary text-tertiary hover:scale-105 transform transition duration-200">
                                             Add Path Images
                                         </a>
