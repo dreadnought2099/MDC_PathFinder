@@ -17,7 +17,8 @@
                 {{-- Description --}}
                 @if ($room->description)
                     <div class="max-w-4xl mx-auto text-center">
-                        <p class="text-xl text-slate-700 leading-relaxed font-light dark:text-gray-300">{{ $room->description }}</p>
+                        <p class="text-xl text-slate-700 leading-relaxed font-light dark:text-gray-300">
+                            {{ $room->description }}</p>
                     </div>
                 @endif
             </div>
@@ -119,15 +120,9 @@
                 </section>
             @else
                 <div class="text-center py-8">
-                    <div class="bg-slate-200 rounded-2xl p-8 border border-slate-200 flex flex-col items-center">
-                        <!-- SVG Icon: Centered using flexbox (items-center) on parent -->
-                        <svg class="w-8 h-8 text-primary mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
-                            </path>
-                        </svg>
-                        <!-- Text: Follows SVG, centered by parent flexbox -->
-                        <p class="text-slate-600 text-lg font-medium">No staff assigned to this room yet.</p>
+                    <div class="rounded-2xl p-8 border-2 border-primary flex flex-col items-center dark:bg-gray-800">
+                        <img src="{{ asset('icons/group.png') }}" alt="Assigned Staff Icon" class="w-10 h-8">
+                        <p class="text-slate-500 text-lg font-medium">No staff assigned to this room yet.</p>
                     </div>
                 </div>
             @endif
@@ -168,7 +163,8 @@
             @if ($room->qr_code_path && Storage::disk('public')->exists($room->qr_code_path))
                 <div class="mt-12">
                     <div class="bg-white rounded-2xl shadow-lg p-8 text-center border-2 border-primary dark:bg-gray-800">
-                        <h3 class="text-2xl font-bold text-slate-800 mb-6 dark:text-gray-300">{{ $room->name }} QR Code</h3>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-6 dark:text-gray-300">{{ $room->name }} QR Code
+                        </h3>
                         <div class="inline-block bg-slate-50 p-6 rounded-xl border-2 border-primary mb-6">
                             <img src="{{ Storage::url($room->qr_code_path) }}" alt="QR Code for {{ $room->name }}"
                                 class="max-w-[200px] mx-auto" />

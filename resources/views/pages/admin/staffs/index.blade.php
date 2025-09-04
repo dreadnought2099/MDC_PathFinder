@@ -41,7 +41,7 @@
                             </th>
                             <th
                                 class="px-6 py-4 text-left text-sm text-gray-700 uppercase tracking-wide dark:text-gray-300">
-                                Office Name
+                                Office Assigned
                             </th>
                             <th
                                 class="px-6 py-4 text-right text-sm text-gray-700 uppercase tracking-wide dark:text-gray-300">
@@ -70,7 +70,7 @@
 
                                 <!-- Office Name -->
                                 <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-400">
-                                    {{ $staff->office->name ?? 'N/A' }}
+                                    {{ $staff->room->name ?? 'N/A' }}
                                 </td>
 
                                 <!-- Actions -->
