@@ -19,6 +19,24 @@
                 <textarea name="description" class="w-full border p-2 rounded"></textarea>
             </div>
 
+            <!-- Add this after the description field in your form -->
+            <div class="mb-4">
+                <label class="block mb-2 font-medium">Room Type</label>
+                <select name="room_type"
+                    class="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    required>
+                    <option value="regular" {{ old('room_type') === 'regular' ? 'selected' : '' }}>
+                        Regular Room/Office
+                    </option>
+                    <option value="entrance_gate" {{ old('room_type') === 'entrance_gate' ? 'selected' : '' }}>
+                        Entrance Gate
+                    </option>
+                </select>
+                <p class="text-sm text-gray-600 mt-1">
+                    Entrance gates automatically connect to all other rooms for navigation purposes.
+                </p>
+            </div>
+
             <div class="mb-4">
                 <label class="block mb-2">Cover Image (optional)</label>
 

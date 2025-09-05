@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Room;
 use App\Models\RoomImage;
 use App\Models\Staff;
+use App\Services\EntranceGateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -31,13 +32,14 @@ class RoomController extends Controller
         return view('pages.admin.rooms.create', compact('staffs'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, EntranceGateService $entranceGateService)
     {
 
         try {
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
+                'room_type' => 'required|in:regular,entrance_gate',
                 'image_path' => 'nullable|image|max:51200',
                 'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:102400',
                 'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:102400',
@@ -46,8 +48,27 @@ class RoomController extends Controller
                 'office_hours' => 'nullable|array',
             ]);
 
-            $roomData = collect($validated)->except('office_hours')->toArray();
-            $room = Room::create($roomData);
+            // Handle entrance gate creation
+            if ($validated['room_type'] === 'entrance_gate') {
+                $result = $entranceGateService->createEntranceGate($validated);
+                $room = $result['room'];
+                $pathsCreated = $result['paths_created'];
+                $roomsConnected = $result['rooms_connected'];
+
+                $successMessage = "Entrance gate '{$room->name}' created and connected to {$roomsConnected} rooms with {$pathsCreated} paths.";
+            } else {
+                // Create regular room
+                $roomData = collect($validated)->except('office_hours')->toArray();
+                $room = Room::create($roomData);
+
+                // Connect to entrance gates
+                $entranceGateService->connectNewRoomToEntranceGates($room);
+
+                $successMessage = "{$room->name} was added successfully and connected to entrance gates.";
+            }
+
+            // $roomData = collect($validated)->except('office_hours')->toArray();
+            // $room = Room::create($roomData);
 
             if ($request->has('office_hours')) {
                 foreach ($request->office_hours as $day => $ranges) {
@@ -277,8 +298,13 @@ class RoomController extends Controller
             ->with('success', "{$room->name} was updated successfully.");
     }
 
-    public function destroy(Room $room)
+    public function destroy(Room $room, EntranceGateService $entranceGateService)
     {
+        // Remove paths if it's an entrance gate
+        if ($room->room_type === 'entrance_gate') {
+            $entranceGateService->removeEntranceGatePaths($room);
+        }
+
         // Soft delete the room (images are soft-deleted via cascade, video_path remains untouched)
         $room->delete();
 

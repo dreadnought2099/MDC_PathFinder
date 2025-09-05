@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('marker_id')->unique()->nullable();
             $table->string('image_path')->nullable();
             $table->string('video_path')->nullable();
+            $table->enum('room_type', ['regular', 'entrance_gate'])->default('regular');
             $table->softDeletes();
             $table->timestamps();
         });
