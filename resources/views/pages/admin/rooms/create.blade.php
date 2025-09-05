@@ -341,11 +341,10 @@
             }
 
             // ================= Enhanced Office Hours =================
-
             const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
             let officeHoursData = {}; // stores applied ranges per day
 
-            // Quick select
+            // Quick select functionality
             document.querySelectorAll('.quick-select').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const days = btn.dataset.days.split(',');
@@ -359,12 +358,12 @@
                 });
             });
 
-            // Clear all
+            // Clear all selection
             document.querySelector('.clear-select').addEventListener('click', () => {
                 document.querySelectorAll('.bulk-day-checkbox').forEach(cb => cb.checked = false);
             });
 
-            // Apply bulk
+            // Apply bulk changes
             document.querySelector('.apply-bulk').addEventListener('click', function() {
                 const selectedDays = Array.from(document.querySelectorAll('.bulk-day-checkbox:checked'))
                     .map(cb => cb.value);
@@ -379,9 +378,8 @@
 
                 renderOfficeHours();
                 showTemporaryFeedback(this, "Applied Successfully!");
+                showTemporaryMessage("Office hours updated for selected days!", "success");
             });
-
-            // -------- Helpers --------
 
             // Clear time input when X is clicked
             document.addEventListener('click', e => {
@@ -395,6 +393,7 @@
                 }
             });
 
+            // Helper Functions
             function collectBulkRanges() {
                 const ranges = [];
                 let valid = true;
@@ -439,6 +438,7 @@
                 return `${hour12}:${minutes} ${ampm}`;
             }
 
+            // Enhanced renderOfficeHours with edit/delete functionality
             function renderOfficeHours() {
                 const container = document.getElementById("officeHoursDisplay");
                 container.innerHTML = "";
@@ -464,7 +464,7 @@
                 // Render grouped schedule
                 Object.entries(groupedSchedule).forEach(([rangeKey, group]) => {
                     const li = document.createElement("li");
-                    li.className = "mb-3 p-3 bg-white rounded border";
+                    li.className = "mb-3 p-3 bg-white rounded border relative";
 
                     const daysText = formatDaysGroup(group.days);
                     let timeText;
@@ -473,13 +473,30 @@
                         timeText = "Closed";
                     } else {
                         timeText = group.ranges.map(r =>
-                            `${formatTime12Hour(r.start)} - ${formatTime12Hour(r.end)}`).join(", ");
+                            `${formatTime12Hour(r.start)} - ${formatTime12Hour(r.end)}`
+                        ).join(", ");
                     }
 
                     li.innerHTML = `
-            <div class="font-medium text-gray-800">${daysText}</div>
-            <div class="text-sm text-gray-600 mt-1">${timeText}</div>
-        `;
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <div class="font-medium text-gray-800">${daysText}</div>
+                        <div class="text-sm text-gray-600 mt-1">${timeText}</div>
+                    </div>
+                    ${rangeKey !== "closed" ? `
+                                <div class="flex gap-2 ml-4">
+                                    <button type="button" class="edit-schedule-btn text-blue-600 hover:text-blue-800 text-sm px-2 py-1 rounded border border-blue-300 hover:bg-blue-50 transition-colors" 
+                                            data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                        Edit
+                                    </button>
+                                    <button type="button" class="delete-schedule-btn text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded border border-red-300 hover:bg-red-50 transition-colors" 
+                                            data-days='${JSON.stringify(group.days)}'>
+                                        Delete
+                                    </button>
+                                </div>
+                            ` : ''}
+                </div>
+            `;
 
                     // Add hidden inputs for form submission
                     group.days.forEach(day => {
@@ -500,6 +517,66 @@
                     });
 
                     container.appendChild(li);
+                });
+
+                // Add event listeners for edit and delete buttons
+                attachScheduleActionListeners();
+            }
+
+            // Function to attach event listeners to edit and delete buttons
+            function attachScheduleActionListeners() {
+                // Delete functionality
+                document.querySelectorAll('.delete-schedule-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const days = JSON.parse(this.dataset.days);
+                        const daysText = formatDaysGroup(days);
+
+                        if (confirm(
+                                `Are you sure you want to remove office hours for ${daysText}?`)) {
+                            days.forEach(day => {
+                                delete officeHoursData[day];
+                            });
+                            renderOfficeHours();
+                            showTemporaryMessage("Office hours deleted successfully!", "success");
+                        }
+                    });
+                });
+
+                // Edit functionality
+                document.querySelectorAll('.edit-schedule-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const days = JSON.parse(this.dataset.days);
+                        const ranges = JSON.parse(this.dataset.ranges);
+
+                        // Pre-select the days
+                        document.querySelectorAll('.bulk-day-checkbox').forEach(cb => {
+                            cb.checked = days.includes(cb.value);
+                        });
+
+                        // Pre-fill the time inputs with the first range
+                        if (ranges.length > 0) {
+                            document.querySelector('.bulk-start-time').value = ranges[0].start;
+                            document.querySelector('.bulk-end-time').value = ranges[0].end;
+                        }
+
+                        // Scroll to the bulk edit section
+                        document.querySelector('.bulk-time-ranges').scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+
+                        // Add visual highlight
+                        const bulkSection = document.querySelector(
+                            '.mb-6.p-4.border.rounded.bg-blue-50');
+                        bulkSection.classList.add('ring-2', 'ring-blue-400');
+                        setTimeout(() => {
+                            bulkSection.classList.remove('ring-2', 'ring-blue-400');
+                        }, 2000);
+
+                        showTemporaryMessage(
+                            "Schedule loaded for editing. Modify time and click 'Apply'.",
+                            "info");
+                    });
                 });
             }
 
@@ -528,6 +605,32 @@
                 return sortedDays.join(", ");
             }
 
+            // Show temporary message notifications
+            function showTemporaryMessage(message, type = "info") {
+                const existing = document.getElementById("temp-message");
+                if (existing) existing.remove();
+
+                const div = document.createElement("div");
+                div.id = "temp-message";
+                div.textContent = message;
+
+                const base =
+                    "fixed top-24 right-4 p-3 rounded shadow-lg z-50 transition-opacity duration-500 border-l-4";
+                const colors = {
+                    success: "bg-green-100 text-green-700 border border-green-300 dark:bg-green-800 dark:text-green-200 dark:border-green-600",
+                    error: "bg-red-100 text-red-700 border border-red-300 dark:bg-red-800 dark:text-red-200 dark:border-red-600",
+                    info: "bg-yellow-100 text-yellow-700 border border-yellow-300 dark:bg-yellow-700 dark:text-yellow-200 dark:border-yellow-500"
+                };
+
+                div.className = `${base} ${colors[type] || colors.info}`;
+                document.body.appendChild(div);
+
+                setTimeout(() => {
+                    div.style.opacity = "0";
+                    setTimeout(() => div.remove(), 500);
+                }, 3000);
+            }
+
             function hasOverlap(ranges) {
                 const sorted = ranges.slice().sort((a, b) => a.start.localeCompare(b.start));
                 for (let i = 0; i < sorted.length - 1; i++) {
@@ -540,11 +643,11 @@
                 const old = button.textContent;
                 button.textContent = text;
                 button.classList.add('bg-green-500');
-                button.classList.remove('bg-blue-500');
+                button.classList.remove('bg-primary');
                 setTimeout(() => {
                     button.textContent = old;
                     button.classList.remove('bg-green-500');
-                    button.classList.add('bg-blue-500');
+                    button.classList.add('bg-primary');
                 }, 2000);
             }
 
