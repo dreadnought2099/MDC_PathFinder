@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Path;
 use App\Models\Room;
 use App\Models\RoomImage;
 use App\Models\Staff;
@@ -61,14 +62,18 @@ class RoomController extends Controller
                 $roomData = collect($validated)->except('office_hours')->toArray();
                 $room = Room::create($roomData);
 
-                // Connect to entrance gates
-                $entranceGateService->connectNewRoomToEntranceGates($room);
+                // CHANGE 2: Capture the result from connectNewRoomToEntranceGates
+                // This requires updating the EntranceGateService method to return feedback
+                $connectionResult = $entranceGateService->connectNewRoomToEntranceGates($room);
 
-                $successMessage = "{$room->name} was added successfully and connected to entrance gates.";
+                // CHANGE 3: Build a more informative success message
+                $entranceGateCount = Room::where('room_type', 'entrance_gate')->count();
+                if ($entranceGateCount > 0) {
+                    $successMessage = "{$room->name} was added successfully and connected to {$entranceGateCount} entrance gates.";
+                } else {
+                    $successMessage = "{$room->name} was added successfully. No entrance gates available for connection.";
+                }
             }
-
-            // $roomData = collect($validated)->except('office_hours')->toArray();
-            // $room = Room::create($roomData);
 
             if ($request->has('office_hours')) {
                 foreach ($request->office_hours as $day => $ranges) {
@@ -120,14 +125,16 @@ class RoomController extends Controller
                 }
             }
 
-            session()->flash('success', "{$room->name} was added successfully.");
+            // CHANGE 4: Use the dynamic success message instead of hardcoded one
+            session()->flash('success', $successMessage);
 
             if ($request->expectsJson()) {
                 return response()->json(['redirect' => route('room.show', $room->id)], 200);
             }
 
+            // CHANGE 5: Use the dynamic success message here too
             return redirect()->route('room.show', $room->id)
-                ->with('success', "{$room->name} was added successfully.");
+                ->with('success', $successMessage);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Room creation error: ' . $e->getMessage(), ['request' => $request->all()]);
             return back()->withInput()->with('error', 'Failed to create room: ' . $e->getMessage());
@@ -300,9 +307,16 @@ class RoomController extends Controller
 
     public function destroy(Room $room, EntranceGateService $entranceGateService)
     {
-        // Remove paths if it's an entrance gate
+        // CHANGE 6: Improve path cleanup for both room types
         if ($room->room_type === 'entrance_gate') {
+            // Use the service method for entrance gates (already exists)
             $entranceGateService->removeEntranceGatePaths($room);
+        } else {
+            // CHANGE 7: Add path cleanup for regular rooms too
+            // Remove all paths connected to this regular room
+            Path::where('from_room_id', $room->id)
+                ->orWhere('to_room_id', $room->id)
+                ->delete();
         }
 
         // Soft delete the room (images are soft-deleted via cascade, video_path remains untouched)
@@ -339,6 +353,23 @@ class RoomController extends Controller
                 'marker_id' => $marker_id,
                 'qr_code_path' => $qrPath,
             ]);
+        }
+
+        // CHANGE 8: Reconnect paths when restoring a room
+        if ($room->room_type === 'entrance_gate') {
+            // For entrance gates, reconnect to all regular rooms
+            $regularRooms = Room::where('room_type', 'regular')->get();
+            foreach ($regularRooms as $regularRoom) {
+                Path::firstOrCreate(['from_room_id' => $room->id, 'to_room_id' => $regularRoom->id]);
+                Path::firstOrCreate(['from_room_id' => $regularRoom->id, 'to_room_id' => $room->id]);
+            }
+        } else {
+            // For regular rooms, reconnect to all entrance gates
+            $entranceGates = Room::where('room_type', 'entrance_gate')->get();
+            foreach ($entranceGates as $gate) {
+                Path::firstOrCreate(['from_room_id' => $gate->id, 'to_room_id' => $room->id]);
+                Path::firstOrCreate(['from_room_id' => $room->id, 'to_room_id' => $gate->id]);
+            }
         }
 
         return redirect()->route('room.recycle-bin')

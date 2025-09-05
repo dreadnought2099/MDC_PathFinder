@@ -4,26 +4,26 @@
     <x-floating-actions />
 
     <div class="max-w-xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-6">
-        <h2 class="text-2xl text-center mb-6"><span class="text-primary">Add</span> New Office</h2>
+        <h2 class="text-2xl text-center mb-6 dark:text-gray-300"><span class="text-primary">Add</span> New Office</h2>
 
         <form action="{{ route('room.store') }}" method="POST" enctype="multipart/form-data" data-upload>
             @csrf
 
             <div class="mb-4">
-                <label class="block">Office Name</label>
+                <label class="block dark:text-gray-300">Office Name</label>
                 <input type="text" name="name" class="w-full border p-2 rounded" required>
             </div>
 
             <div class="mb-4">
-                <label class="block">Description</label>
+                <label class="block dark:text-gray-300">Description</label>
                 <textarea name="description" class="w-full border p-2 rounded"></textarea>
             </div>
 
             <!-- Add this after the description field in your form -->
             <div class="mb-4">
-                <label class="block mb-2 font-medium">Room Type</label>
+                <label class="block mb-2 font-medium dark:text-gray-300">Room Type</label>
                 <select name="room_type"
-                    class="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    class="w-full border dark:text-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                     required>
                     <option value="regular" {{ old('room_type') === 'regular' ? 'selected' : '' }}>
                         Regular Room/Office
@@ -32,13 +32,13 @@
                         Entrance Gate
                     </option>
                 </select>
-                <p class="text-sm text-gray-600 mt-1">
+                <p class="text-sm text-gray-600 mt-1 dark:text-gray-300">
                     Entrance gates automatically connect to all other rooms for navigation purposes.
                 </p>
             </div>
 
             <div class="mb-4">
-                <label class="block mb-2">Cover Image (optional)</label>
+                <label class="block mb-2 dark:text-gray-300">Cover Image (optional)</label>
 
                 <label for="image_path" id="uploadBox"
                     class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors overflow-hidden relative">
@@ -46,7 +46,7 @@
                         fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                     </svg>
-                    <span id="uploadText" class="text-gray-500">Click to upload image</span>
+                    <span id="uploadText" class="text-gray-500 dark:text-gray-300">Click to upload image</span>
                     <input type="file" name="image_path" id="image_path" class="hidden" accept="image/*" />
                     <img id="previewImage" class="absolute inset-0 object-cover w-full h-full hidden" alt="Image preview" />
                 </label>
@@ -54,7 +54,7 @@
 
             {{-- Carousel Images --}}
             <div class="mb-4 max-w-xl mx-auto">
-                <label class="block mb-2">Carousel Images (optional)</label>
+                <label class="block mb-2 dark:text-gray-300">Carousel Images (optional)</label>
 
                 <label for="carousel_images" id="carouselUploadBox"
                     class="flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors p-4 overflow-auto relative">
@@ -63,7 +63,8 @@
                         fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                     </svg>
-                    <span id="carouselUploadText" class="text-gray-500 mb-4">Click to upload images (max 50)</span>
+                    <span id="carouselUploadText" class="text-gray-500 mb-4 dark:text-gray-300">Click to upload images (max
+                        50)</span>
 
                     <input type="file" name="carousel_images[]" id="carousel_images" class="hidden" accept="image/*"
                         multiple />
@@ -74,7 +75,7 @@
             </div>
 
             <div class="mb-4 max-w-xl mx-auto">
-                <label class="block mb-2">Short Video (optional)</label>
+                <label class="block mb-2 dark:text-gray-300">Short Video (optional)</label>
 
                 <div id="videoDropZone"
                     class="relative w-full min-h-[150px] border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center text-gray-500 cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors p-4">
@@ -83,8 +84,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14m-6 6v-6m0 0l-4.553 2.276A1 1 0 014 13.382V6.618a1 1 0 011.447-.894L9 8" />
                     </svg>
-                    <p class="mb-2">Drag & drop a video file here or click to select</p>
-                    <p class="text-xs text-gray-400">(mp4, avi, mpeg | max 100MB)</p>
+                    <p class="mb-2 dark:text-gray-300">Drag & drop a video file here or click to select</p>
+                    <p class="text-xs text-gray-400 dark:text-gray-300">(mp4, avi, mpeg | max 100MB)</p>
 
                     <input type="file" id="video_path" name="video_path" accept="video/mp4,video/avi,video/mpeg"
                         class="hidden" />
@@ -99,15 +100,15 @@
             </div>
 
             <div class="mb-6">
-                <label class="block font-semibold mb-2">Office Hours</label>
+                <label class="block font-semibold mb-2 dark:text-gray-300">Office Hours</label>
 
                 {{-- Bulk Day Selection Section --}}
-                <div class="mb-6 p-4 border rounded bg-blue-50">
-                    <p class="font-semibold mb-3">Set Time Range for Multiple Days</p>
+                <div class="mb-6 p-4 border border-primary rounded dark:bg-gray-800">
+                    <p class="font-semibold mb-3 dark:text-gray-300">Set Time Range for Multiple Days</p>
 
                     {{-- Day Selection --}}
                     <div class="mb-4">
-                        <label class="block text-sm font-medium mb-2">Select Days:</label>
+                        <label class="block text-sm font-medium mb-2 dark:text-gray-300">Select Days:</label>
                         <div class="flex gap-2 flex-wrap">
                             @php
                                 $daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -136,7 +137,7 @@
 
                     {{-- Time Range Input (Single Row Only) --}}
                     <div class="bulk-time-ranges mb-4">
-                        <label class="block text-sm font-medium mb-2">Time Range:</label>
+                        <label class="block text-sm font-medium mb-2 dark:text-gray-300">Time Range:</label>
                         <div class="bulk-ranges-container">
                             <div class="flex gap-2 mb-2 bulk-range-row">
                                 <div class="relative flex-1">
@@ -171,8 +172,8 @@
                 </div>
 
                 {{-- Display Saved Hours --}}
-                <div class="p-4 border rounded bg-gray-50">
-                    <p class="font-semibold mb-3">Saved Office Hours</p>
+                <div class="p-4 border border-primary rounded">
+                    <p class="font-semibold mb-3 dark:text-gray-300">Saved Office Hours</p>
                     <ul id="officeHoursDisplay" class="space-y-2 text-sm text-gray-700"></ul>
                 </div>
             </div>
@@ -464,7 +465,7 @@
                 // Render grouped schedule
                 Object.entries(groupedSchedule).forEach(([rangeKey, group]) => {
                     const li = document.createElement("li");
-                    li.className = "mb-3 p-3 bg-white rounded border relative";
+                    li.className = "mb-3 p-3 bg-white rounded border relative dark:bg-gray-800";
 
                     const daysText = formatDaysGroup(group.days);
                     let timeText;
@@ -480,21 +481,21 @@
                     li.innerHTML = `
                 <div class="flex justify-between items-start">
                     <div class="flex-1">
-                        <div class="font-medium text-gray-800">${daysText}</div>
-                        <div class="text-sm text-gray-600 mt-1">${timeText}</div>
+                        <div class="font-medium text-gray-800 dark:text-gray-300">${daysText}</div>
+                        <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                     </div>
                     ${rangeKey !== "closed" ? `
-                                <div class="flex gap-2 ml-4">
-                                    <button type="button" class="edit-schedule-btn text-blue-600 hover:text-blue-800 text-sm px-2 py-1 rounded border border-blue-300 hover:bg-blue-50 transition-colors" 
-                                            data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                        Edit
-                                    </button>
-                                    <button type="button" class="delete-schedule-btn text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded border border-red-300 hover:bg-red-50 transition-colors" 
-                                            data-days='${JSON.stringify(group.days)}'>
-                                        Delete
-                                    </button>
-                                </div>
-                            ` : ''}
+                                        <div class="flex gap-2 ml-4">
+                                            <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded border border-primary transition-all duration-300 ease-in-out cursor-pointer" 
+                                                    data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                Edit
+                                            </button>
+                                            <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded border border-secondary transition-all duration-300 ease-in-out cursor-pointer" 
+                                                    data-days='${JSON.stringify(group.days)}'>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    ` : ''}
                 </div>
             `;
 
@@ -565,13 +566,15 @@
                             block: 'center'
                         });
 
-                        // Add visual highlight
                         const bulkSection = document.querySelector(
-                            '.mb-6.p-4.border.rounded.bg-blue-50');
-                        bulkSection.classList.add('ring-2', 'ring-blue-400');
-                        setTimeout(() => {
-                            bulkSection.classList.remove('ring-2', 'ring-blue-400');
-                        }, 2000);
+                            '.mb-6.p-4.border.border-primary.rounded'
+                        );
+                        if (bulkSection) {
+                            bulkSection.classList.add('ring-2', 'ring-blue-400');
+                            setTimeout(() => {
+                                bulkSection.classList.remove('ring-2', 'ring-blue-400');
+                            }, 2000);
+                        }
 
                         showTemporaryMessage(
                             "Schedule loaded for editing. Modify time and click 'Apply'.",

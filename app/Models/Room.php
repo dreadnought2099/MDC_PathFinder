@@ -148,25 +148,6 @@ class Room extends Model
                 $room->token = self::generateSecureToken();
             }
         });
-
-        static::created(function ($room) {
-            // Get all other rooms
-            $otherRooms = Room::where('id', '!=', $room->id)->get();
-
-            foreach ($otherRooms as $other) {
-                // Create path: new → other
-                Path::firstOrCreate([
-                    'from_room_id' => $room->id,
-                    'to_room_id'   => $other->id,
-                ]);
-
-                // Create path: other → new
-                Path::firstOrCreate([
-                    'from_room_id' => $other->id,
-                    'to_room_id'   => $room->id,
-                ]);
-            }
-        });
     }
 
 

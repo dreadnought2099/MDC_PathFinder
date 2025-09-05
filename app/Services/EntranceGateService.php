@@ -61,23 +61,31 @@ class EntranceGateService
     public function connectNewRoomToEntranceGates(Room $newRoom)
     {
         if ($newRoom->room_type === 'entrance_gate') {
-            return; // Don't connect entrance gates to each other
+            return ['connected' => 0, 'message' => 'Entrance gates handle their own connections'];
         }
 
         $entranceGates = Room::where('room_type', 'entrance_gate')->get();
+        $pathsCreated = 0;
 
         foreach ($entranceGates as $gate) {
-            // Create bidirectional paths
-            Path::firstOrCreate([
+            $path1 = Path::firstOrCreate([
                 'from_room_id' => $gate->id,
                 'to_room_id' => $newRoom->id,
             ]);
 
-            Path::firstOrCreate([
+            $path2 = Path::firstOrCreate([
                 'from_room_id' => $newRoom->id,
                 'to_room_id' => $gate->id,
             ]);
+
+            if ($path1->wasRecentlyCreated) $pathsCreated++;
+            if ($path2->wasRecentlyCreated) $pathsCreated++;
         }
+
+        return [
+            'paths_created' => $pathsCreated,
+            'gates_connected' => $entranceGates->count()
+        ];
     }
 
     /**
