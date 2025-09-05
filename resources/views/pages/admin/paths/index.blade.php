@@ -31,7 +31,7 @@
         <!-- Paths Table -->
         <div class="bg-white rounded-xl shadow-sm border-2 border-primary overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full">
+                <table class="w-full dark:bg-gray-800">
                     <thead>
                         <tr
                             class="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 dark:from-gray-800 dark:to-gray-700 dark:border-gray-600">
@@ -98,8 +98,8 @@
                                 <td colspan="5" class="px-6 py-16 text-center">
                                     <div class="flex flex-col items-center justify-center space-y-4">
                                         <div
-                                            class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-                                            <i class="fas fa-route fa-2x text-gray-400"></i>
+                                            class="w-16 h-16 bg-primary-10 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                                            <img src="{{ asset('icons/navigation.png')}}" alt="Manage Office" class="w-12 h-12">
                                         </div>
                                         <div class="text-center">
                                             <h3 class="text-lg font-medium dark:text-gray-300 text-gray-700 mb-2">No paths

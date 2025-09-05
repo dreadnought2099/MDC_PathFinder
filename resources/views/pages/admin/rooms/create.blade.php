@@ -166,7 +166,7 @@
 
                     {{-- Apply Button --}}
                     <button type="button"
-                        class="apply-bulk bg-primary text-center text-white px-4 py-2 rounded hover:text-primary border-2 border-primary hover:bg-white duration-300 ease-in-out transition-all cursor-pointer">
+                        class="apply-bulk bg-primary text-center text-white px-4 py-2 rounded hover:text-primary border-2 border-primary hover:bg-white duration-300 ease-in-out transition-all cursor-pointer dark:hover:bg-gray-800">
                         Apply to Selected Days
                     </button>
                 </div>
@@ -180,7 +180,7 @@
 
             <div>
                 <button type="submit"
-                    class="w-full bg-primary text-white px-4 py-2 bg-primary rounded hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer">
+                    class="w-full bg-primary text-white px-4 py-2 bg-primary rounded hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800">
                     Save Room
                 </button>
             </div>

@@ -29,9 +29,10 @@
 
         <!-- Scan Phrase -->
         <div
-            class="mt-8 text-lg sm:text-xl leading-relaxed text-center max-w-md mx-auto border border-primary rounded-lg p-4 bg-gray-50 border-gray-300 dark:bg-gray-800 dark:text-gray-300">
+            class="mt-8 text-lg sm:text-xl leading-relaxed text-center max-w-md mx-auto border border-primary rounded-lg p-4 bg-gray-50 text-gray-900 dark:bg-gray-800 dark:text-gray-300 print:bg-white print:text-black print:border-black">
             Visit
-            <a href="{{ config('app.url') }}" target="_blank" class="text-primary font-semibold hover-underline dark:text-300">
+            <a href="{{ config('app.url') }}" target="_blank"
+                class="text-primary font-semibold hover-underline dark:text-300">
                 {{ config('app.url') }}
             </a>
             and scan the QR Code above to know more about this office.

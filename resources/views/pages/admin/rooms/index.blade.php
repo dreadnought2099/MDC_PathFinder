@@ -86,7 +86,7 @@
                                 <td colspan="3" class="px-6 py-16 text-center">
                                     <div class="flex flex-col items-center justify-center space-y-4">
                                         <div
-                                            class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                                            class="w-16 h-16 bg-primary-10 dark:bg-gray-800 rounded-full flex items-center justify-center">
                                             <img src="{{ asset('icons/offices.png') }}" alt="Group icon" class="w-11 h-10">
                                         </div>
                                         <div class="text-center">
