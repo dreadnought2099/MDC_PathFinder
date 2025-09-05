@@ -49,31 +49,13 @@ class RoomController extends Controller
                 'office_hours' => 'nullable|array',
             ]);
 
-            // Handle entrance gate creation
-            if ($validated['room_type'] === 'entrance_gate') {
-                $result = $entranceGateService->createEntranceGate($validated);
-                $room = $result['room'];
-                $pathsCreated = $result['paths_created'];
-                $roomsConnected = $result['rooms_connected'];
+            // Create the room (regular or entrance gate)
+            $room = Room::create(collect($validated)->except('office_hours')->toArray());
 
-                $successMessage = "Entrance gate '{$room->name}' created and connected to {$roomsConnected} rooms with {$pathsCreated} paths.";
-            } else {
-                // Create regular room
-                $roomData = collect($validated)->except('office_hours')->toArray();
-                $room = Room::create($roomData);
+            // Always auto-connect this new room to all other rooms
+            $connectionResult = $entranceGateService->connectNewRoomToAllRooms($room);
 
-                // CHANGE 2: Capture the result from connectNewRoomToEntranceGates
-                // This requires updating the EntranceGateService method to return feedback
-                $connectionResult = $entranceGateService->connectNewRoomToEntranceGates($room);
-
-                // CHANGE 3: Build a more informative success message
-                $entranceGateCount = Room::where('room_type', 'entrance_gate')->count();
-                if ($entranceGateCount > 0) {
-                    $successMessage = "{$room->name} was added successfully and connected to {$entranceGateCount} entrance gates.";
-                } else {
-                    $successMessage = "{$room->name} was added successfully. No entrance gates available for connection.";
-                }
-            }
+            $successMessage = "{$room->name} created and connected to {$connectionResult['rooms_connected']} rooms with {$connectionResult['paths_created']} paths.";
 
             if ($request->has('office_hours')) {
                 foreach ($request->office_hours as $day => $ranges) {
@@ -136,7 +118,9 @@ class RoomController extends Controller
             return redirect()->route('room.show', $room->id)
                 ->with('success', $successMessage);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Room creation error: ' . $e->getMessage(), ['request' => $request->all()]);
+            \Illuminate\Support\Facades\Log::error('Room creation error: ' . $e->getMessage(), [
+                'request' => $request->all()
+            ]);
             return back()->withInput()->with('error', 'Failed to create room: ' . $e->getMessage());
         }
     }

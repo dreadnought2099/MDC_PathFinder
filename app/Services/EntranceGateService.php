@@ -58,24 +58,20 @@ class EntranceGateService
     /**
      * Auto-connect entrance gates to a new regular room
      */
-    public function connectNewRoomToEntranceGates(Room $newRoom)
+    public function connectNewRoomToAllRooms(Room $newRoom)
     {
-        if ($newRoom->room_type === 'entrance_gate') {
-            return ['connected' => 0, 'message' => 'Entrance gates handle their own connections'];
-        }
-
-        $entranceGates = Room::where('room_type', 'entrance_gate')->get();
+        $otherRooms = Room::where('id', '!=', $newRoom->id)->get();
         $pathsCreated = 0;
 
-        foreach ($entranceGates as $gate) {
+        foreach ($otherRooms as $room) {
             $path1 = Path::firstOrCreate([
-                'from_room_id' => $gate->id,
-                'to_room_id' => $newRoom->id,
+                'from_room_id' => $newRoom->id,
+                'to_room_id'   => $room->id,
             ]);
 
             $path2 = Path::firstOrCreate([
-                'from_room_id' => $newRoom->id,
-                'to_room_id' => $gate->id,
+                'from_room_id' => $room->id,
+                'to_room_id'   => $newRoom->id,
             ]);
 
             if ($path1->wasRecentlyCreated) $pathsCreated++;
@@ -83,8 +79,8 @@ class EntranceGateService
         }
 
         return [
-            'paths_created' => $pathsCreated,
-            'gates_connected' => $entranceGates->count()
+            'paths_created'   => $pathsCreated,
+            'rooms_connected' => $otherRooms->count(),
         ];
     }
 
