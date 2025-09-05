@@ -65,14 +65,16 @@ class PathImageController extends Controller
 
         $successMessage = "Images for Path {$path->fromRoom->name} → {$path->toRoom->name} uploaded successfully.";
 
+        // Flash the message to the session for both JSON and non-JSON requests
+        session()->flash('success', $successMessage);
+
         if ($request->expectsJson()) {
             return response()->json([
                 'redirect' => route('path.show', $path),
-                'message' => $successMessage,
             ], 200);
         }
 
-        return redirect()->route('path.show', $path)->with('success', $successMessage);
+        return redirect()->route('path.show', $path)->with('success', $path);
     }
 
     // Show form to edit single or multiple images
