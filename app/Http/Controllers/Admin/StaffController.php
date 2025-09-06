@@ -73,7 +73,7 @@ class StaffController extends Controller
 
     public function clientShow(Staff $staff)
     {
-        return view('pages.client.client-show', compact('staff'));
+        return view('pages.client.room-details.client-show', compact('staff'));
     }
 
     public function edit($id)
