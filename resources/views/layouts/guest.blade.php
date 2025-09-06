@@ -33,6 +33,8 @@
     </style>
 </head>
 
+{{-- This means: use "body-class" from the child page (like login).  
+        If the child page does NOT give one, then use default: bg-white dark:bg-gray-900 --}}
 <body class="@yield('body-class', 'bg-white dark:bg-gray-900')">
     <div id="success-message-container" class="absolute top-24 right-4 z-49">
         @if (session('success') || session('error') || session('info') || $errors->any())

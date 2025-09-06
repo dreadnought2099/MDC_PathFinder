@@ -1,10 +1,12 @@
 @extends('layouts.guest')
 
+{{-- This tells the layout: "Hey! Instead of plain white, use my blue-to-white gradient." --}}
 @section('body-class', 'bg-gradient-to-tr from-blue-400 to-white')
 
 @section('content')
-    <div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
-        <div class="w-full max-w-4xl flex flex-col md:flex-row rounded-xl shadow-lg overflow-hidden bg-white">
+    <div class="min-h-screen flex items-center justify-center px-4">
+        <div
+            class="w-full max-w-4xl flex flex-col md:flex-row rounded-xl shadow-lg overflow-hidden bg-white border border-primary">
 
             {{-- Left - Login --}}
             <div class="w-full md:w-1/2 p-8 space-y-6 flex flex-col justify-center">
