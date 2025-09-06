@@ -73,8 +73,12 @@ class PathController extends Controller
         return view('pages.client.navigation.results', compact('fromRoom', 'toRoom', 'paths'));
     }
 
-
-    // API: Get all rooms for selection dropdowns
+    /*
+        API: Get all rooms for selection dropdowns
+        (API for dropdowns)
+        Scenario: If later you want to populate the Starting Point 
+        and Destination dropdowns dynamically via AJAX instead of passing $rooms from the controller.
+    */
     public function getRooms()
     {
         $rooms = Room::select('id', 'name')
@@ -84,7 +88,11 @@ class PathController extends Controller
         return response()->json($rooms);
     }
 
-    // API: Get popular/available paths
+    /* API: Get popular/available paths
+        API for suggested/common routes)
+        Scenario: If you want to show “Suggested routes” or “Most used paths” on the homepage or dashboard.
+        Example: mobile app integration showing “popular routes” list.
+    */
     public function getPopularPaths()
     {
         $paths = Path::with(['fromRoom', 'toRoom'])
@@ -104,7 +112,12 @@ class PathController extends Controller
         return response()->json($paths);
     }
 
-    // API: Get navigation data for specific route
+    /* API: Get navigation data for specific route
+        (API version of navigationShow)
+        Scenario: If you want your frontend (Vue/React/mobile app) to fetch paths via 
+        JSON and render them dynamically, instead of loading a Blade view.
+        Example: An AR/VR navigation app that needs JSON path + images.
+    */
     public function getNavigationRoute(Request $request)
     {
         $fromRoomId = $request->get('from');
@@ -141,7 +154,12 @@ class PathController extends Controller
         ]);
     }
 
-    // API: Get path navigation data by path ID (for backward compatibility)
+    /* API: Get path navigation data by path ID (for backward compatibility)
+        (API by path ID)
+        Scenario: Useful for mobile apps or a single-page app that just needs path details 
+        for one specific ID, instead of by from/to rooms.
+        Example: “Resume navigation on path #5” feature.
+    */
     public function getPathNavigation(Path $path)
     {
         $path->load(['fromRoom', 'toRoom', 'images' => function ($query) {
@@ -163,7 +181,12 @@ class PathController extends Controller
         ]);
     }
 
-    // API: Get all available navigation paths (for backward compatibility)
+    /* API: Get all available navigation paths (for backward compatibility)
+        (API: list all paths)
+        Scenario: If you want a route explorer or admin dashboard that shows all available navigation 
+        paths with thumbnails, in a separate app or frontend component.
+        Example: React dashboard fetching /api/paths.
+    */
     public function getNavigationPaths()
     {
         $paths = Path::with(['fromRoom', 'toRoom', 'images' => function ($query) {

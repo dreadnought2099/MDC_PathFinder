@@ -47,10 +47,6 @@ Route::get('/api/rooms/{token}/exists', function ($token) {
 Route::get('/navigation/select', [PathController::class, 'selection'])->name('paths.select');
 Route::post('/navigation/results', [PathController::class, 'navigationShow'])->name('paths.results');
 
-// API route (can stay here for now, but better in api.php if you want separation)
-Route::get('/api/paths/navigate', [PathController::class, 'getNavigationRoute'])->name('paths.navigate');
-
-
 // Admin login form (GET) and login processing (POST)
 Route::get('/admin', [LogInController::class, 'showLoginForm'])->name('login');
 Route::post('/admin', [LogInController::class, 'login']);
