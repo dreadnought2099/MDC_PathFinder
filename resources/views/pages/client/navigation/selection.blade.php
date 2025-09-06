@@ -58,9 +58,13 @@
                         </select>
                     </div>
 
-                    <div class="flex justify-center">
-                        <button type="submit"
-                            class="px-6 py-2 rounded-full bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary dark:hover:bg-gray-800 shadow-primary-light transition-all cursor-pointer">
+                    <div x-data="{ selectedPath: null }" class="flex justify-center">
+                        <!-- Start Navigation button -->
+                        <button :disabled="!selectedPath"
+                            class="px-6 py-2 rounded-full bg-primary text-white 
+               hover:bg-white hover:text-primary border-2 border-primary 
+               dark:hover:bg-gray-800 shadow-primary-light transition-all 
+               cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                             Start Navigation
                         </button>
                     </div>
