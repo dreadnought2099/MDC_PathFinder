@@ -11,7 +11,7 @@
                 <svg class="h-6 w-6 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                 </svg>
-                <span class="font-medium">Back to Scanner</span>
+                <span class="font-medium">Back to Home</span>
             </a>
 
             <!-- Dark mode toggle -->

@@ -6,12 +6,12 @@
         <div
             class="w-full flex justify-between items-center p-4 border-b-2 border-primary dark:border-primary bg-white dark:bg-gray-900 sticky top-0 z-50">
             <!-- Back button -->
-            <a href="{{ route('index') }}"
+            <a href="{{ route('paths.select') }}"
                 class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 dark:text-gray-300">
                 <svg class="h-6 w-6 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                 </svg>
-                <span class="font-medium">Back to Scanner</span>
+                <span class="font-medium">Back to Selection</span>
             </a>
 
             <!-- Dark mode toggle -->
@@ -21,7 +21,7 @@
         <!-- Main content -->
         <div class="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8">
             <div class="w-full max-w-5xl bg-white border-2 border-primary dark:bg-gray-800 shadow-lg rounded-lg p-6">
-                <h2 class="text-2xl font-semibold mb-6 text-center dark:text-gray-200">
+                <h2 class="text-2xl mb-6 text-center dark:text-gray-200">
                     Select Starting Point & Destination
                 </h2>
 
@@ -34,7 +34,7 @@
                         <!-- Path Images Card -->
                         <div
                             class="bg-white dark:bg-gray-800 shadow rounded-lg p-5 mb-8 text-center border-2 border-primary">
-                            <h2 class="text-xl font-semibold mb-4 dark:text-gray-300">
+                            <h2 class="text-xl mb-4 dark:text-gray-300">
                                 <i class="fas fa-images mr-2"></i> Path Images ({{ $path->images->count() }})
                             </h2>
 
@@ -79,7 +79,7 @@
 
                 <div class="mt-8 flex justify-center">
                     <a href="{{ route('paths.select') }}"
-                        class="px-4 py-2 bg-primary text-white rounded-lg shadow hover:bg-primary/90">
+                        class="px-6 py-2 rounded-full bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary dark:hover:bg-gray-800 shadow-primary-light transition-all cursor-pointer">
                         Start New Navigation
                     </a>
                 </div>
