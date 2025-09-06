@@ -9,7 +9,6 @@ use App\Models\RoomImage;
 use App\Models\Staff;
 use App\Services\EntranceGateService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
