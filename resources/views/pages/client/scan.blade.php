@@ -8,7 +8,7 @@
             dark:bg-gray-900 
             border-b-2 border-b-primary dark:border-b-primary">
 
-            <!-- Back button - conditional logi c -->
+            <!-- Back button - conditional logic -->
             @if ($room)
                 <!-- If viewing room details, go back to QR scanner -->
                 <a href="{{ route('scan.index') }}"

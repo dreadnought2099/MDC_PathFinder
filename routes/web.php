@@ -16,8 +16,10 @@ use Illuminate\Support\Facades\Route;
 // Home page - displays main landing page
 Route::get('/', [HomeController::class, 'index'])->name('index');
 
+
 // Scanner page (no room yet)
 Route::get('/scan-marker', [ScannerController::class, 'index'])->name('scan.index');
+
 
 // Room details via token - SINGLE ROUTE with validation
 Route::get('/scan-marker/{room}', function (Room $room) {
@@ -25,18 +27,29 @@ Route::get('/scan-marker/{room}', function (Room $room) {
     if (!preg_match('/^[a-f0-9]{32}$/', $room->token)) {
         abort(404);
     }
-    
+
     return app(ScannerController::class)->index($room);
 })->name('scan.room');
 
+
 // Client-facing staff profile
 Route::get('/staffs/{staff}', [StaffController::class, 'clientShow'])->name('staff.client-show');
+
 
 // API endpoint for checking room existence
 Route::get('/api/rooms/{token}/exists', function ($token) {
     $exists = \App\Models\Room::where('token', $token)->exists();
     return response()->json(['exists' => $exists]);
 });
+
+
+// Client-side navigation
+Route::get('/navigation/select', [PathController::class, 'selection'])->name('paths.select');
+Route::post('/navigation/results', [PathController::class, 'navigationShow'])->name('paths.results');
+
+// API route (can stay here for now, but better in api.php if you want separation)
+Route::get('/api/paths/navigate', [PathController::class, 'getNavigationRoute'])->name('paths.navigate');
+
 
 // Admin login form (GET) and login processing (POST)
 Route::get('/admin', [LogInController::class, 'showLoginForm'])->name('login');

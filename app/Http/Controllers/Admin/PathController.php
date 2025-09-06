@@ -32,4 +32,154 @@ class PathController extends Controller
 
         return view('pages.admin.paths.show', compact('path'));
     }
+
+    // Client-side path selection page
+    public function selection()
+    {
+        $rooms = Room::orderBy('name')->get();
+        return view('pages.client.navigation.selection', compact('rooms'));
+    }
+
+    // Client-side navigation results page
+    public function navigationShow(Request $request)
+    {
+        $fromRoomId = $request->get('from_room');
+        $toRoomId = $request->get('to_room');
+
+        // Validate
+        if (!$fromRoomId || !$toRoomId) {
+            return redirect()->route('paths.select')->with('error', 'Please select both starting point and destination.');
+        }
+
+        $fromRoom = Room::find($fromRoomId);
+        $toRoom = Room::find($toRoomId);
+
+        if (!$fromRoom || !$toRoom) {
+            return redirect()->route('paths.select')->with('error', 'Invalid room selection.');
+        }
+
+        if ($fromRoomId == $toRoomId) {
+            return redirect()->route('paths.select')->with('error', 'Starting point and destination cannot be the same.');
+        }
+
+        // Load paths with images
+        $paths = Path::with(['images' => function ($query) {
+            $query->orderBy('image_order');
+        }])
+            ->where('from_room_id', $fromRoomId)
+            ->where('to_room_id', $toRoomId)
+            ->get();
+
+        return view('pages.client.navigation.results', compact('fromRoom', 'toRoom', 'paths'));
+    }
+
+
+    // API: Get all rooms for selection dropdowns
+    public function getRooms()
+    {
+        $rooms = Room::select('id', 'name')
+            ->orderBy('name')
+            ->get();
+
+        return response()->json($rooms);
+    }
+
+    // API: Get popular/available paths
+    public function getPopularPaths()
+    {
+        $paths = Path::with(['fromRoom', 'toRoom'])
+            ->whereHas('images') // Only paths with images
+            ->get()
+            ->map(function ($path) {
+                return [
+                    'id' => $path->id,
+                    'from_room_id' => $path->from_room_id,
+                    'to_room_id' => $path->to_room_id,
+                    'from_room' => $path->fromRoom->name ?? 'Unknown',
+                    'to_room' => $path->toRoom->name ?? 'Unknown',
+                    'total_images' => $path->images()->count()
+                ];
+            });
+
+        return response()->json($paths);
+    }
+
+    // API: Get navigation data for specific route
+    public function getNavigationRoute(Request $request)
+    {
+        $fromRoomId = $request->get('from');
+        $toRoomId = $request->get('to');
+
+        if (!$fromRoomId || !$toRoomId) {
+            return response()->json(['error' => 'Missing parameters'], 400);
+        }
+
+        // Find path between the two rooms
+        $path = Path::with(['fromRoom', 'toRoom', 'images' => function ($query) {
+            $query->orderBy('image_order');
+        }])
+            ->where('from_room_id', $fromRoomId)
+            ->where('to_room_id', $toRoomId)
+            ->first();
+
+        if (!$path) {
+            return response()->json(['error' => 'Path not found'], 404);
+        }
+
+        return response()->json([
+            'path_id' => $path->id,
+            'from_room' => $path->fromRoom->name ?? 'Unknown',
+            'to_room' => $path->toRoom->name ?? 'Unknown',
+            'images' => $path->images->map(function ($image) {
+                return [
+                    'id' => $image->id,
+                    'url' => asset('storage/' . $image->image_path),
+                    'order' => $image->image_order,
+                    'description' => $image->description ?? 'Continue along this path'
+                ];
+            })
+        ]);
+    }
+
+    // API: Get path navigation data by path ID (for backward compatibility)
+    public function getPathNavigation(Path $path)
+    {
+        $path->load(['fromRoom', 'toRoom', 'images' => function ($query) {
+            $query->orderBy('image_order');
+        }]);
+
+        return response()->json([
+            'path_id' => $path->id,
+            'from_room' => $path->fromRoom->name ?? 'Unknown',
+            'to_room' => $path->toRoom->name ?? 'Unknown',
+            'images' => $path->images->map(function ($image) {
+                return [
+                    'id' => $image->id,
+                    'url' => asset('storage/' . $image->image_path),
+                    'order' => $image->image_order,
+                    'description' => $image->description ?? 'Continue along this path'
+                ];
+            })
+        ]);
+    }
+
+    // API: Get all available navigation paths (for backward compatibility)
+    public function getNavigationPaths()
+    {
+        $paths = Path::with(['fromRoom', 'toRoom', 'images' => function ($query) {
+            $query->orderBy('image_order')->limit(1); // Get first image as thumbnail
+        }])->get();
+
+        return response()->json([
+            'paths' => $paths->map(function ($path) {
+                return [
+                    'id' => $path->id,
+                    'from_room' => $path->fromRoom->name ?? 'Unknown',
+                    'to_room' => $path->toRoom->name ?? 'Unknown',
+                    'thumbnail' => $path->images->first() ? asset('storage/' . $path->images->first()->image_path) : null,
+                    'total_images' => $path->images()->count()
+                ];
+            })
+        ]);
+    }
 }
