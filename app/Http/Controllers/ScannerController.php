@@ -31,6 +31,6 @@ class ScannerController extends Controller
             }
         }
 
-        return view('pages.client.scan', compact('room', 'fact'));
+        return view('pages.client.room-details.scan', compact('room', 'fact'));
     }
 }

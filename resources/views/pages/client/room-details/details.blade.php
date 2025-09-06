@@ -1,4 +1,3 @@
-<!-- Room Details Partial -->
 <div class="min-h-screen p-8 rounded-xl shadow-lg container mx-auto max-w-4xl space-y-12 border-2 border-primary dark:bg-gray-800">
     <!-- Room Title -->
     <h1 class="text-4xl font-extrabold text-gray-900 dark:text-gray-300 

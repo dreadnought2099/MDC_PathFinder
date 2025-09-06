@@ -1,24 +1,19 @@
 @extends('layouts.guest')
 
 @section('content')
-    <div class="min-h-screen flex flex-col justify-between px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 dark:bg-gray-900">
-        <!-- Top bar -->
-        <div class="relative w-full flex-shrink-0">
-            <!-- Toggle button (top-right) -->
-            <div class="absolute top-0 right-0 z-10">
-                <x-dark-mode-toggle />
-            </div>
+    <div class="absolute top-6 right-6 z-10">
+        <x-dark-mode-toggle />
+    </div>
 
-            <!-- Welcome message (top-center) -->
-            <div class="text-center mt-12 sm:mt-16 lg:mt-20 xl:mt-24 px-4 sm:px-6 lg:px-8">
-                <h3
-                    class="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-semibold dark:text-gray-300 mb-3 sm:mb-4 lg:mb-6">
-                    Welcome to
-                </h3>
-                <h1 class="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight">
-                    <span class="text-primary">{{ config('app.name') }}</span>
-                </h1>
-            </div>
+    <div class="min-h-screen flex flex-col justify-between px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 dark:bg-gray-900">
+        <!-- Welcome message (top-center) -->
+        <div class="text-center mt-12 sm:mt-16 lg:mt-20 xl:mt-24 px-4 sm:px-6 lg:px-8">
+            <h3 class="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-semibold dark:text-gray-300 mb-3 sm:mb-4 lg:mb-6">
+                Welcome to
+            </h3>
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight">
+                <span class="text-primary">{{ config('app.name') }}</span>
+            </h1>
         </div>
 
         <!-- Center spacer for perfect vertical centering -->

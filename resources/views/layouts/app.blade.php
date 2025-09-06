@@ -34,7 +34,7 @@
     <!-- GLightbox CSS -->
     <link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet">
 
-    <!-- x-cloak CSS: Ensures Alpine.js components (e.g., navbar dropdown) are hidden until initialized -->
+    <!-- x-cloak CSS: Ensures Alpine.js components (dark mode toggle, navbar dropdown) are hidden until initialized -->
     <style>
         [x-cloak] {
             display: none !important;
