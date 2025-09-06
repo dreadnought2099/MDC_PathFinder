@@ -103,14 +103,14 @@
     <div class="text-center pt-8 border-t border-gray-200 dark:border-gray-600">
         <p class="text-sm text-gray-500 dark:text-gray-300 mb-3">Want to explore another room?</p>
         <a href="{{ route('scan.index') }}"
-            class="inline-block bg-primary hover:bg-white hover:text-primary text-white py-3 px-6 rounded-lg shadow-md border border-primary transition-all duration-300 dark:hover:bg-gray-800">
+            class="inline-block bg-primary hover:bg-white hover:text-primary text-white py-3 px-6 rounded-lg border border-primary transition-all duration-300 dark:hover:bg-gray-800 shadow-primary-hover">
             Scan Another QR Code
         </a>
     </div>
 </div>
 
 <!-- Reusable Image Modal Markup -->
-<div id="imageModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+<div id="imageModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
     <!-- Top-right controls -->
     <div class="absolute top-5 right-5 flex items-center space-x-8">
         <!-- Download button -->

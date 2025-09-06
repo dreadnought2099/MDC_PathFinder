@@ -18,6 +18,9 @@
             <x-dark-mode-toggle />
         </div>
 
+        <x-floating-q-r href="{{ route('scan.index') }}" icon="{{ asset('icons/qr-code.png') }}" alt="Scan Office"
+            title="Scan office to know more" />
+
         <!-- Main content -->
         <div class="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8">
             <div class="w-full max-w-5xl bg-white border-2 border-primary dark:bg-gray-800 shadow-lg rounded-lg p-6">

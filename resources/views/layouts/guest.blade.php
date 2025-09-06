@@ -24,7 +24,7 @@
 
     <!-- GLightbox CSS -->
     <link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet">
-    
+
     <!-- x-cloak CSS: Ensures Alpine.js components (dark mode toggle, navbar dropdown) are hidden until initialized -->
     <style>
         [x-cloak] {
@@ -33,7 +33,7 @@
     </style>
 </head>
 
-<body class="@yield('body-class', 'bg-gray-100')">
+<body>
     <div id="success-message-container" class="absolute top-24 right-4 z-49">
         @if (session('success') || session('error') || session('info') || $errors->any())
             <div id="message"
@@ -74,7 +74,8 @@
             </script>
         @endif
     </div>
-    <main class="@yield('main-class', 'container mx-auto')">
+
+    <main>
         @yield('content')
     </main>
 
