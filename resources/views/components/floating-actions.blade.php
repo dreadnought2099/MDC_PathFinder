@@ -10,7 +10,7 @@
                     <div class="flex items-center justify-center w-12 h-12 hover:scale-120 transition-all duration-300">
                         <img src="{{ asset('icons/offices.png') }}" alt="Add Room/Office" />
                     </div>
-                    <span class="text-sm text-gray-700 hover-underline dark:text-gray-300">Add Room/Office</span>
+                    <span class="text-sm text-gray-700 hover-underline dark:text-gray-300">Add Office</span>
                 </a>
 
                 @php

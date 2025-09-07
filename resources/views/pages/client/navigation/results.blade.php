@@ -24,10 +24,14 @@
         <!-- Main content -->
         <div class="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8">
             <div class="w-full max-w-5xl bg-white border-2 border-primary dark:bg-gray-800 shadow-lg rounded-lg p-6">
-                <h2 class="text-2xl mb-6 text-center dark:text-gray-200">
-                    Select Starting Point & Destination
+                <h2 class="text-2xl mb-6 text-center text-primary">
+                    <div class="flex items-center justify-center gap-3">
+                        <span>{{ $fromRoom->name ?? ($fromRoom->room_name ?? 'Unknown Room') }}</span>
+                        <img src="{{ asset('icons/arrow.png') }}" alt="Arrow" class="w-6 h-6">
+                        <span>{{ $toRoom->name ?? ($toRoom->room_name ?? 'Unknown Room') }}</span>
+                    </div>
                 </h2>
-
+                
                 @if ($paths->isEmpty())
                     <p class="text-center text-gray-600 dark:text-gray-300">
                         No navigation path available between these rooms.
@@ -47,7 +51,7 @@
                                         <!-- GLightbox Wrapper -->
                                         <a href="{{ asset('storage/' . $image->image_file) }}" class="glightbox"
                                             data-gallery="path-{{ $path->id }}"
-                                            data-title="{{ $image->description ?? 'Order ' . $image->image_order }}">
+                                            data-title="{{ $image->description ?? 'Path ' . $image->image_order }}">
                                             <div
                                                 class="relative group overflow-hidden rounded shadow hover:shadow-lg transition">
                                                 <img src="{{ asset('storage/' . $image->image_file) }}"
@@ -61,7 +65,7 @@
                                                 @else
                                                     <div
                                                         class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-sm p-2 text-center">
-                                                        Order {{ $image->image_order }}
+                                                        Path {{ $image->image_order }}
                                                     </div>
                                                 @endif
                                             </div>

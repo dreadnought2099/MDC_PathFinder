@@ -89,7 +89,7 @@
                         <!-- GLightbox Wrapper -->
                         <a href="{{ asset('storage/' . $image->image_file) }}" class="glightbox"
                             data-gallery="path-{{ $path->id }}"
-                            data-title="{{ $image->description ?? 'Order ' . $image->image_order }}">
+                            data-title="{{ $image->description ?? 'Path ' . $image->image_order }}">
                             <div class="relative group overflow-hidden rounded shadow hover:shadow-lg transition">
                                 <img src="{{ asset('storage/' . $image->image_file) }}"
                                     class="w-full h-48 object-cover transform group-hover:scale-105 transition"
@@ -102,7 +102,7 @@
                                 @else
                                     <div
                                         class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-sm p-2 text-center">
-                                        Order {{ $image->image_order }}
+                                        Path {{ $image->image_order }}
                                     </div>
                                 @endif
                             </div>
