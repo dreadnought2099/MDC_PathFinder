@@ -8,24 +8,57 @@
             dark:bg-gray-900 
             border-b-2 border-b-primary dark:border-b-primary">
 
-            <!-- Back button - conditional logic -->
+            <!-- Back button - enhanced conditional logic -->
             @if ($room)
-                <!-- If viewing room details, go back to QR scanner -->
-                <a href="{{ route('scan.index') }}"
+                <!-- If viewing room details, check if we have a return parameter -->
+                @php
+                    $returnRoute = request('return');
+                    $backUrl = route('scan.index');
+                    $backText = 'Back to Scanner';
+
+                    if ($returnRoute) {
+                        $backUrl = route('scan.index', ['return' => $returnRoute]);
+                    }
+                @endphp
+
+                <a href="{{ $backUrl }}"
                     class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 dark:text-gray-300">
                     <svg class="h-6 w-6 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                     </svg>
-                    <span class="font-medium">Back to Scanner</span>
+                    <span class="font-medium">{{ $backText }}</span>
                 </a>
             @else
-                <!-- If on QR scanner page, go back to home/index -->
-                <a href="{{ route('index') }}"
+                <!-- If on QR scanner page, check for return parameter -->
+                @php
+                    $returnRoute = request('return');
+                    $backUrl = route('index');
+                    $backText = 'Back to Home';
+
+                    if ($returnRoute && Route::has($returnRoute)) {
+                        switch ($returnRoute) {
+                            case 'paths.select':
+                                $backUrl = route('paths.select');
+                                $backText = 'Back to Path Selection';
+                                break;
+                            case 'paths.results':
+                                // Return to the previous search results using session data
+                                $backUrl = route('paths.return-to-results');
+                                $backText = 'Back to Results';
+                                break;
+                            default:
+                                $backUrl = route('index');
+                                $backText = 'Back to Home';
+                        }
+                    }
+                @endphp
+
+                <a href="{{ $backUrl }}"
                     class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 dark:text-gray-300">
                     <svg class="h-6 w-6 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                     </svg>
-                    <span class="font-medium">Back to Home</span>
+                    <span class="font-medium">{{ $backText }}</span>
                 </a>
             @endif
 
@@ -141,7 +174,6 @@
                     try {
                         this.showMessage(`Checking if room ${roomToken} exists...`, 'info');
 
-                        // CHANGED: use token instead of numeric ID
                         const response = await fetch(`/api/rooms/${roomToken}/exists`);
 
                         if (!response.ok) {
@@ -152,9 +184,18 @@
 
                         if (data.exists) {
                             this.showMessage(`Room found! Redirecting...`, 'success');
+
+                            // Preserve return parameter when redirecting to room details
+                            const returnParam = new URLSearchParams(window.location.search).get('return');
+                            let roomUrl = "{{ route('scan.room', ['room' => ':roomToken']) }}".replace(':roomToken',
+                                roomToken);
+
+                            if (returnParam) {
+                                roomUrl += `?return=${returnParam}`;
+                            }
+
                             setTimeout(() => {
-                                window.location.href = "{{ route('scan.room', ['room' => ':roomToken']) }}".replace(
-                                    ':roomToken', roomToken);
+                                window.location.href = roomUrl;
                             }, 1000);
                         } else {
                             this.showMessage(`Room does not exist.`, 'error');
@@ -172,8 +213,7 @@
 
                     this.stopScanner();
 
-                    // CHANGED: treat decodedText as token, not just number
-                    const roomToken = decodedText; // Expect raw 32-character token
+                    const roomToken = decodedText;
 
                     if (!roomToken || roomToken.length !== 32 || !/^[a-zA-Z0-9]+$/.test(roomToken)) {
                         this.showMessage("Invalid QR code format. Expected a 32-character room token.", "error");
@@ -185,7 +225,6 @@
                 }
 
                 onScanFailure(error) {
-                    // Only increment attempts for actual scan failures, not permission issues
                     if (this.isScanning && error.includes('NotFoundException')) {
                         this.scanAttempts++;
 
@@ -251,22 +290,18 @@
                 async restartScanner() {
                     await this.stopScanner();
 
-                    // Add a brief delay before restarting
                     setTimeout(() => {
                         this.startScanner();
                     }, 1000);
                 }
             }
 
-            // Initialize the QR scanner
             new QRScanner();
         </script>
     @endif
 
     @if ($room)
-        <!-- Add any room-specific JavaScript here if needed -->
         <script>
-            // Room details specific functionality can go here
             console.log('Room details loaded for room:', @json($room->id ?? null));
         </script>
     @endif

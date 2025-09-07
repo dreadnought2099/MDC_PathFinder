@@ -12,40 +12,40 @@ use App\Http\Controllers\ScannerController;
 use App\Models\Room;
 use Illuminate\Support\Facades\Route;
 
+Route::middleware(['web'])->group(function () {
+    // Home page - displays main landing page
+    Route::get('/', [HomeController::class, 'index'])->name('index');
 
-// Home page - displays main landing page
-Route::get('/', [HomeController::class, 'index'])->name('index');
+    // Scanner page (no room yet)
+    Route::get('/scan-marker', [ScannerController::class, 'index'])->name('scan.index');
 
+    // Room details via token - SINGLE ROUTE with validation
+    Route::get('/scan-marker/{room}', function (Room $room) {
+        // Additional verification that the token format is correct
+        if (!preg_match('/^[a-f0-9]{32}$/', $room->token)) {
+            abort(404);
+        }
 
-// Scanner page (no room yet)
-Route::get('/scan-marker', [ScannerController::class, 'index'])->name('scan.index');
+        return app(ScannerController::class)->index($room);
+    })->name('scan.room');
 
+    // Client-facing staff profile
+    Route::get('/staffs/{staff}', [StaffController::class, 'clientShow'])->name('staff.client-show');
 
-// Room details via token - SINGLE ROUTE with validation
-Route::get('/scan-marker/{room}', function (Room $room) {
-    // Additional verification that the token format is correct
-    if (!preg_match('/^[a-f0-9]{32}$/', $room->token)) {
-        abort(404);
-    }
+    // API endpoint for checking room existence
+    Route::get('/api/rooms/{token}/exists', function ($token) {
+        $exists = \App\Models\Room::where('token', $token)->exists();
+        return response()->json(['exists' => $exists]);
+    });
 
-    return app(ScannerController::class)->index($room);
-})->name('scan.room');
+    // Client-side navigation
+    Route::get('/navigation/select', [PathController::class, 'selection'])->name('paths.select');
+    Route::post('/navigation/results', [PathController::class, 'navigationShow'])->name('paths.results');
 
-
-// Client-facing staff profile
-Route::get('/staffs/{staff}', [StaffController::class, 'clientShow'])->name('staff.client-show');
-
-
-// API endpoint for checking room existence
-Route::get('/api/rooms/{token}/exists', function ($token) {
-    $exists = \App\Models\Room::where('token', $token)->exists();
-    return response()->json(['exists' => $exists]);
+    // Return to results
+    Route::get('/paths/return-to-results', [PathController::class, 'returnToResults'])
+        ->name('paths.return-to-results');
 });
-
-
-// Client-side navigation
-Route::get('/navigation/select', [PathController::class, 'selection'])->name('paths.select');
-Route::post('/navigation/results', [PathController::class, 'navigationShow'])->name('paths.results');
 
 // Admin login form (GET) and login processing (POST)
 Route::get('/admin', [LogInController::class, 'showLoginForm'])->name('login');

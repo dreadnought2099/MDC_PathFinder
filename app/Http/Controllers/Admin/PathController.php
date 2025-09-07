@@ -43,6 +43,7 @@ class PathController extends Controller
     // Client-side navigation results page
     public function navigationShow(Request $request)
     {
+
         $fromRoomId = $request->get('from_room');
         $toRoomId = $request->get('to_room');
 
@@ -71,6 +72,81 @@ class PathController extends Controller
             ->get();
 
         return view('pages.client.navigation.results', compact('fromRoom', 'toRoom', 'paths'));
+    }
+
+    public function select()
+    {
+        $rooms = Room::all(); // or however you fetch rooms
+        return view('paths.select', compact('rooms'));
+    }
+
+    public function results(Request $request)
+    {
+        // Validate the request
+        $request->validate([
+            'from_room' => 'required|exists:rooms,id',
+            'to_room' => 'required|exists:rooms,id|different:from_room',
+        ]);
+
+        // Store the form data in session for potential return navigation
+        session(['last_path_search' => [
+            'from_room' => $request->from_room,
+            'to_room' => $request->to_room,
+        ]]);
+
+        $fromRoom = Room::find($request->from_room);
+        $toRoom = Room::find($request->to_room);
+
+        // Find paths between the rooms - Get only the first match to avoid duplicates
+        $path = Path::where(function ($query) use ($request) {
+            $query->where('from_room_id', $request->from_room)
+                ->where('to_room_id', $request->to_room);
+        })->orWhere(function ($query) use ($request) {
+            $query->where('from_room_id', $request->to_room)
+                ->where('to_room_id', $request->from_room);
+        })->with('images')->first(); // Use first() instead of get()
+
+        // Convert to collection for consistent template handling
+        $paths = $path ? collect([$path]) : collect([]);
+
+        return view('paths.results', compact('paths', 'fromRoom', 'toRoom'));
+    }
+
+    public function returnToResults()
+    {
+        $searchData = session('last_path_search');
+
+        if (!$searchData) {
+            return redirect()->route('paths.select')
+                ->with('message', 'No previous search found. Please make a new search.');
+        }
+
+        // Get room IDs
+        $fromRoomId = $searchData['from_room'];
+        $toRoomId = $searchData['to_room'];
+
+        $fromRoom = Room::find($fromRoomId);
+        $toRoom = Room::find($toRoomId);
+
+        // Check if rooms still exist
+        if (!$fromRoom || !$toRoom) {
+            return redirect()->route('paths.select')
+                ->with('error', 'Previous search rooms no longer exist. Please make a new search.');
+        }
+
+        // Find paths between the rooms - Get only the first match to avoid duplicates
+        $path = Path::where(function ($query) use ($fromRoomId, $toRoomId) {
+            $query->where('from_room_id', $fromRoomId)
+                ->where('to_room_id', $toRoomId);
+        })->orWhere(function ($query) use ($fromRoomId, $toRoomId) {
+            $query->where('from_room_id', $toRoomId)
+                ->where('to_room_id', $fromRoomId);
+        })->with('images')->first(); // Use first() instead of get()
+
+        // Convert to collection for consistent template handling
+        $paths = $path ? collect([$path]) : collect([]);
+
+        return view('pages.client.navigation.results', compact('paths', 'fromRoom', 'toRoom'));
     }
 
     /*
