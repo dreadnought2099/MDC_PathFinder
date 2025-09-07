@@ -20,7 +20,7 @@
                 <a href="{{ $firstPath ? route('path-image.create', $firstPath) : '#' }}"
                     class="group flex items-center space-x-2 @if (!$firstPath) opacity-50 cursor-not-allowed @endif">
                     <div class="flex items-center justify-center w-12 h-12 hover:scale-120 transition-all duration-300">
-                        <img src="{{ asset('images/mdc-logo.png') }}" alt="Add Path Images" />
+                        <img src="{{ asset('icons/image.png') }}" alt="Add Path Images" />
                     </div>
                     <span class="text-sm text-gray-700 hover-underline dark:text-gray-300">
                         Add Path Images

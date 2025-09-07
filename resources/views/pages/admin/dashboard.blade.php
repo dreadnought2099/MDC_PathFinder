@@ -110,8 +110,8 @@
 
             <!-- Quick Stats Section (Optional) -->
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border-2 border-primary dark:border-gray-700">
-                <h2 class="text-2xl text-gray-800 mb-6 dark:text-white text-center">Quick Overview</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <h2 class="text-2xl text-primary mb-6 text-center">Quick Overview</h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
 
                     <!-- Total Staff -->
                     <div
@@ -119,7 +119,7 @@
                         <div class="text-3xl font-bold text-blue-600 mb-2 dark:text-blue-400">
                             {{ \App\Models\Staff::count() }}
                         </div>
-                        <div class="text-sm text-gray-600 dark:text-gray-300">Total Staff Members</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-300">Total Staff Member/s</div>
                     </div>
 
                     <!-- Total Rooms -->
@@ -128,7 +128,7 @@
                         <div class="text-3xl font-bold text-green-600 mb-2 dark:text-green-400">
                             {{ \App\Models\Room::count() }}
                         </div>
-                        <div class="text-sm text-gray-600 dark:text-gray-300">Total Rooms</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-300">Total Room/s</div>
                     </div>
 
                     <!-- Assignments -->
@@ -137,7 +137,16 @@
                         <div class="text-3xl font-bold text-purple-600 mb-2 dark:text-purple-400">
                             {{ \App\Models\Staff::whereNotNull('room_id')->count() }}
                         </div>
-                        <div class="text-sm text-gray-600 dark:text-gray-300">Staff Assignments</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-300">Staff Assignment/s</div>
+                    </div>
+
+                    {{-- Paths --}}
+                    <div
+                        class="text-center p-4 bg-orange-50 dark:bg-orange-900 rounded-lg border-2 border-orange-600 dark:border-purple-900-">
+                        <div class="text-3xl font-bold text-orange-600 mb-2 dark:text-orange-400">
+                            {{ \App\Models\Path::count() }}
+                        </div>
+                        <div class="text-sm text-gray-600 dark:text-gray-300">Path/s</div>
                     </div>
                 </div>
             </div>

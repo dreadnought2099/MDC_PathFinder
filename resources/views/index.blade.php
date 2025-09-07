@@ -1,7 +1,7 @@
 @extends('layouts.guest')
 
 @section('content')
-    <div class="absolute top-6 right-6 z-10">
+    <div class="absolute top-4 right-4 z-10">
         <x-dark-mode-toggle />
     </div>
 
