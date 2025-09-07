@@ -15,7 +15,6 @@ Route::prefix('api')->name('api.')->group(function () {
 });
 
 
-// routes/api.php
 Route::get('/rooms/{room}/exists', function ($roomToken) {
     try {
         // Check if room exists by token

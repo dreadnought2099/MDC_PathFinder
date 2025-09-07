@@ -40,7 +40,7 @@ Route::middleware(['web'])->group(function () {
 
     // Client-side navigation
     Route::get('/navigation/select', [PathController::class, 'selection'])->name('paths.select');
-    Route::post('/navigation/results', [PathController::class, 'navigationShow'])->name('paths.results');
+    Route::post('/navigation/results', [PathController::class, 'results'])->name('paths.results');
 
     // Return to results
     Route::get('/paths/return-to-results', [PathController::class, 'returnToResults'])
