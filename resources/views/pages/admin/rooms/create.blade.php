@@ -3,7 +3,7 @@
 @section('content')
     <x-floating-actions />
 
-    <div class="max-w-xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-6">
+    <div class="max-w-xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-6 dark:bg-gray-800">
         <h2 class="text-2xl text-center mb-6 dark:text-gray-300"><span class="text-primary">Add</span> New Office</h2>
 
         <form action="{{ route('room.store') }}" method="POST" enctype="multipart/form-data" data-upload>
@@ -11,19 +11,19 @@
 
             <div class="mb-4">
                 <label class="block dark:text-gray-300">Office Name</label>
-                <input type="text" name="name" class="w-full border p-2 rounded" required>
+                <input type="text" name="name" class="w-full border p-2 rounded border-primary dark:bg-gray-800"
+                    required>
             </div>
 
             <div class="mb-4">
                 <label class="block dark:text-gray-300">Description</label>
-                <textarea name="description" class="w-full border p-2 rounded"></textarea>
+                <textarea name="description" class="w-full border p-2 rounded border-primary dark:bg-gray-800"></textarea>
             </div>
 
-            <!-- Add this after the description field in your form -->
             <div class="mb-4">
                 <label class="block mb-2 font-medium dark:text-gray-300">Room Type</label>
                 <select name="room_type"
-                    class="w-full border dark:text-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    class="w-full border dark:text-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent border-primary dark:bg-gray-800"
                     required>
                     <option value="regular" {{ old('room_type') === 'regular' ? 'selected' : '' }}>
                         Regular Room/Office
@@ -41,13 +41,19 @@
                 <label class="block mb-2 dark:text-gray-300">Cover Image (optional)</label>
 
                 <label for="image_path" id="uploadBox"
-                    class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors overflow-hidden relative">
-                    <svg id="uploadIcon" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-400 mb-2"
-                        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                    </svg>
-                    <span id="uploadText" class="text-gray-500 dark:text-gray-300">Click to upload image</span>
+                    class="flex flex-col items-center justify-center w-full h-40 
+               border-2 border-dashed border-gray-300 dark:border-gray-600 
+               rounded cursor-pointer 
+               hover:border-primary hover:bg-gray-50 
+               dark:hover:border-primary dark:hover:bg-gray-800
+               transition-colors overflow-hidden relative">
+                    <img src="{{ asset('icons/image.png') }}" alt="Image Icon" class="w-8 h-8">
+                    <span id="uploadText" class="text-gray-500 dark:text-gray-300">
+                        Click to upload cover image
+                    </span>
+
                     <input type="file" name="image_path" id="image_path" class="hidden" accept="image/*" />
+
                     <img id="previewImage" class="absolute inset-0 object-cover w-full h-full hidden" alt="Image preview" />
                 </label>
             </div>
@@ -57,12 +63,13 @@
                 <label class="block mb-2 dark:text-gray-300">Carousel Images (optional)</label>
 
                 <label for="carousel_images" id="carouselUploadBox"
-                    class="flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors p-4 overflow-auto relative">
-
-                    <svg id="carouselUploadIcon" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-400 mb-2"
-                        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                    </svg>
+                    class="flex flex-col items-center justify-center w-full h-40 
+               border-2 border-dashed border-gray-300 dark:border-gray-600 
+               rounded cursor-pointer 
+               hover:border-primary hover:bg-gray-50 
+               dark:hover:border-primary dark:hover:bg-gray-800
+               transition-colors overflow-hidden relative">
+                    <img src="{{ asset('icons/image.png') }}" alt="Image Icon" class="w-8 h-8">
                     <span id="carouselUploadText" class="text-gray-500 mb-4 dark:text-gray-300">Click to upload images (max
                         50)</span>
 
@@ -78,12 +85,13 @@
                 <label class="block mb-2 dark:text-gray-300">Short Video (optional)</label>
 
                 <div id="videoDropZone"
-                    class="relative w-full min-h-[150px] border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center text-gray-500 cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors p-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mb-2" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14m-6 6v-6m0 0l-4.553 2.276A1 1 0 014 13.382V6.618a1 1 0 011.447-.894L9 8" />
-                    </svg>
+                    class="flex flex-col items-center justify-center w-full h-40 
+               border-2 border-dashed border-gray-300 dark:border-gray-600 
+               rounded cursor-pointer 
+               hover:border-primary hover:bg-gray-50 
+               dark:hover:border-primary dark:hover:bg-gray-800
+               transition-colors overflow-hidden relative">
+                    <img src="{{ asset('icons/video.png') }}" alt="Video Icon" class="w-9 h-9">
                     <p class="mb-2 dark:text-gray-300">Drag & drop a video file here or click to select</p>
                     <p class="text-xs text-gray-400 dark:text-gray-300">(mp4, avi, mpeg | max 100MB)</p>
 
@@ -166,21 +174,21 @@
 
                     {{-- Apply Button --}}
                     <button type="button"
-                        class="apply-bulk bg-primary text-center text-white px-4 py-2 rounded hover:text-primary border-2 border-primary hover:bg-white duration-300 ease-in-out transition-all cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
+                        class="apply-bulk bg-primary text-center text-white px-4 py-2 rounded-full hover:text-primary border-2 border-primary hover:bg-white duration-300 ease-in-out transition-all cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
                         Apply to Selected Days
                     </button>
                 </div>
 
                 {{-- Display Saved Hours --}}
-                <div class="p-4 border border-primary rounded">
-                    <p class="font-semibold mb-3 dark:text-gray-300">Saved Office Hours</p>
+                <div class="p-4 border border-primary rounded dark:bg-gray-800">
+                    <p class="mb-3 dark:text-gray-300">Saved Office Hours</p>
                     <ul id="officeHoursDisplay" class="space-y-2 text-sm text-gray-700"></ul>
                 </div>
             </div>
 
             <div>
                 <button type="submit"
-                    class="w-full bg-primary text-white px-4 py-2 bg-primary rounded hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
+                    class="w-full bg-primary text-white px-4 py-2 bg-primary rounded-full hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
                     Save Room
                 </button>
             </div>
@@ -465,7 +473,8 @@
                 // Render grouped schedule
                 Object.entries(groupedSchedule).forEach(([rangeKey, group]) => {
                     const li = document.createElement("li");
-                    li.className = "mb-3 p-3 bg-white rounded border relative dark:bg-gray-800";
+                    li.className =
+                        "mb-3 p-3 bg-white rounded border relative dark:bg-gray-800 border border-primary";
 
                     const daysText = formatDaysGroup(group.days);
                     let timeText;
@@ -485,17 +494,17 @@
                         <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                     </div>
                     ${rangeKey !== "closed" ? `
-                                        <div class="flex gap-2 ml-4">
-                                            <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded border border-primary transition-all duration-300 ease-in-out cursor-pointer" 
-                                                    data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                                Edit
-                                            </button>
-                                            <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded border border-secondary transition-all duration-300 ease-in-out cursor-pointer" 
-                                                    data-days='${JSON.stringify(group.days)}'>
-                                                Delete
-                                            </button>
-                                        </div>
-                                    ` : ''}
+                                                        <div class="flex gap-2 ml-4">
+                                                            <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                    data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                                Edit
+                                                            </button>
+                                                            <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                    data-days='${JSON.stringify(group.days)}'>
+                                                                Delete
+                                                            </button>
+                                                        </div>
+                                                    ` : ''}
                 </div>
             `;
 
