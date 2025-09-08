@@ -7,7 +7,7 @@ use App\Models\Path;
 use App\Models\Room;
 use App\Models\RoomImage;
 use App\Models\Staff;
-use App\Services\EntranceGateService;
+use App\Services\EntrancePointService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -32,14 +32,14 @@ class RoomController extends Controller
         return view('pages.admin.rooms.create', compact('staffs'));
     }
 
-    public function store(Request $request, EntranceGateService $entranceGateService)
+    public function store(Request $request, EntrancePointService $entrancePointService)
     {
 
         try {
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
-                'room_type' => 'required|in:regular,entrance_gate',
+                'room_type' => 'required|in:regular,entrance_point',
                 'image_path' => 'nullable|image|max:51200',
                 'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:102400',
                 'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:102400',
@@ -52,7 +52,7 @@ class RoomController extends Controller
             $room = Room::create(collect($validated)->except('office_hours')->toArray());
 
             // Always auto-connect this new room to all other rooms
-            $connectionResult = $entranceGateService->connectNewRoomToAllRooms($room);
+            $connectionResult = $entrancePointService->connectNewRoomToAllRooms($room);
 
             $successMessage = "{$room->name} created and connected to {$connectionResult['rooms_connected']} rooms with {$connectionResult['paths_created']} paths.";
 
@@ -288,12 +288,12 @@ class RoomController extends Controller
             ->with('success', "{$room->name} was updated successfully.");
     }
 
-    public function destroy(Room $room, EntranceGateService $entranceGateService)
+    public function destroy(Room $room, EntrancePointService $entrancePointService)
     {
         // CHANGE 6: Improve path cleanup for both room types
-        if ($room->room_type === 'entrance_gate') {
+        if ($room->room_type === 'entrance_point') {
             // Use the service method for entrance gates (already exists)
-            $entranceGateService->removeEntranceGatePaths($room);
+            $entrancePointService->removeEntrancePointPaths($room);
         } else {
             // CHANGE 7: Add path cleanup for regular rooms too
             // Remove all paths connected to this regular room
@@ -352,7 +352,7 @@ class RoomController extends Controller
          * - If it's an entrance gate, connect it to all regular rooms.
          * - If it's a regular room, connect it to all entrance gates.
          */
-        if ($room->room_type === 'entrance_gate') {
+        if ($room->room_type === 'entrance_point') {
             $regularRooms = Room::where('room_type', 'regular')
                 ->whereNull('deleted_at') // only active rooms
                 ->get();
@@ -362,7 +362,7 @@ class RoomController extends Controller
                 Path::firstOrCreate(['from_room_id' => $regularRoom->id, 'to_room_id' => $room->id]);
             }
         } else {
-            $entranceGates = Room::where('room_type', 'entrance_gate')
+            $entranceGates = Room::where('room_type', 'entrance_point')
                 ->whereNull('deleted_at') // only active gates
                 ->get();
 

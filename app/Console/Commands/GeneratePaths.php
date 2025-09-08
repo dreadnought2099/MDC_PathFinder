@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Path;
 use App\Models\Room;
-use App\Services\EntranceGateService;
+use App\Services\EntrancePointService;
 use Illuminate\Console\Command;
 
 class GeneratePaths extends Command
@@ -16,21 +16,21 @@ class GeneratePaths extends Command
      */
     protected $signature = 'paths:generate 
                             {--force : Re-generate paths even if they already exist}
-                            {--entrance-gates-only : Only generate paths for entrance gates}';
+                            {--entrance-points-only : Only generate paths for entrance points}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Generate missing paths between rooms following entrance gate rules';
-    protected $entranceGateService;
+    protected $description = 'Generate missing paths between rooms following entrance point rules';
+    protected $entrancePointService;
 
 
-    public function __construct(EntranceGateService $entranceGateService)
+    public function __construct(EntrancePointService $entrancePointService)
     {
         parent::__construct();
-        $this->entranceGateService = $entranceGateService;
+        $this->entrancePointService = $entrancePointService;
     }
 
     /**
@@ -39,7 +39,7 @@ class GeneratePaths extends Command
     public function handle()
     {
         $force = $this->option('force');
-        $entranceGatesOnly = $this->option('entrance-gates-only');
+        $entranceGatesOnly = $this->option('entrance-points-only');
 
         if ($force) {
             $this->warn('Force option will delete and recreate ALL paths!');
@@ -55,7 +55,7 @@ class GeneratePaths extends Command
         $pathsCreated = 0;
 
         if ($entranceGatesOnly) {
-            $pathsCreated = $this->generateEntranceGatePaths();
+            $pathsCreated = $this->generateEntrancePointPaths();
         } else {
             $pathsCreated = $this->generateAllPaths();
         }
@@ -64,23 +64,23 @@ class GeneratePaths extends Command
         return 0;
     }
 
-    protected function generateEntranceGatePaths(): int
+    protected function generateEntrancePointPaths(): int
     {
         $pathsCreated = 0;
-        $entranceGates = Room::where('room_type', 'entrance_gate')->get();
+        $entrancePoints = Room::where('room_type', 'entrance_point')->get();
         $regularRooms = Room::where('room_type', 'regular')->get();
 
-        foreach ($entranceGates as $gate) {
+        foreach ($entrancePoints as $points) {
             foreach ($regularRooms as $room) {
-                // Bidirectional paths between entrance gates and regular rooms
+                // Bidirectional paths between entrance points and regular rooms
                 $path1 = Path::firstOrCreate([
-                    'from_room_id' => $gate->id,
+                    'from_room_id' => $points->id,
                     'to_room_id' => $room->id,
                 ]);
 
                 $path2 = Path::firstOrCreate([
                     'from_room_id' => $room->id,
-                    'to_room_id' => $gate->id,
+                    'to_room_id' => $points->id,
                 ]);
 
                 if ($path1->wasRecentlyCreated) $pathsCreated++;
@@ -95,20 +95,20 @@ class GeneratePaths extends Command
     {
         $pathsCreated = 0;
         $rooms = Room::all();
-        $entranceGates = $rooms->where('room_type', 'entrance_gate');
+        $entrancePoints = $rooms->where('room_type', 'point');
         $regularRooms = $rooms->where('room_type', 'regular');
 
-        // 1. Connect entrance gates to regular rooms (bidirectional)
-        foreach ($entranceGates as $gate) {
+        // 1. Connect entrance points to regular rooms (bidirectional)
+        foreach ($entrancePoints as $point) {
             foreach ($regularRooms as $room) {
                 $path1 = Path::firstOrCreate([
-                    'from_room_id' => $gate->id,
+                    'from_room_id' => $point->id,
                     'to_room_id' => $room->id,
                 ]);
 
                 $path2 = Path::firstOrCreate([
                     'from_room_id' => $room->id,
-                    'to_room_id' => $gate->id,
+                    'to_room_id' => $point->id,
                 ]);
 
                 if ($path1->wasRecentlyCreated) $pathsCreated++;
@@ -131,16 +131,16 @@ class GeneratePaths extends Command
             }
         }
 
-        // Note: Entrance gates are NOT connected to each other
+        // Note: Entrance points are NOT connected to each other
 
         return $pathsCreated;
     }
 }
 
-//  Generate only missing entrance gate connections
-// php artisan paths:generate --entrance-gates-only
+//  Generate only missing entrance point connections
+// php artisan paths:generate --entrance-points-only
 
-//  Generate all missing paths (entrance gates + regular room connections)  
+//  Generate all missing paths (entrance points + regular room connections)  
 // php artisan paths:generate
 
 //  Force regenerate all paths (destructive)

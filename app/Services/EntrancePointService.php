@@ -7,22 +7,22 @@ use App\Models\Room;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class EntranceGateService
+class EntrancePointService
 {
     /**
      * Create an entrance gate and auto-connect it to all existing rooms
      */
-    public function createEntranceGate(array $roomData)
+    public function createEntrancePoint(array $roomData)
     {
         return DB::transaction(function () use ($roomData) {
             // Create the entrance gate room
-            $entranceGate = Room::create(array_merge($roomData, [
-                'room_type' => 'entrance_gate'
+           $entrancePoint = Room::create(array_merge($roomData, [
+                'room_type' => 'entrance_point'
             ]));
 
             // Get all regular rooms (excluding other entrance gates)
             $regularRooms = Room::where('room_type', 'regular')
-                ->where('id', '!=', $entranceGate->id)
+                ->where('id', '!=',$entrancePoint->id)
                 ->get();
 
             $pathsCreated = 0;
@@ -31,24 +31,24 @@ class EntranceGateService
             foreach ($regularRooms as $room) {
                 // Path from entrance gate to room
                 $path1 = Path::firstOrCreate([
-                    'from_room_id' => $entranceGate->id,
+                    'from_room_id' =>$entrancePoint->id,
                     'to_room_id' => $room->id,
                 ]);
 
                 // Path from room to entrance gate (bidirectional)
                 $path2 = Path::firstOrCreate([
                     'from_room_id' => $room->id,
-                    'to_room_id' => $entranceGate->id,
+                    'to_room_id' =>$entrancePoint->id,
                 ]);
 
                 if ($path1->wasRecentlyCreated) $pathsCreated++;
                 if ($path2->wasRecentlyCreated) $pathsCreated++;
             }
 
-            Log::info("Created entrance gate '{$entranceGate->name}' with {$pathsCreated} new paths");
+            Log::info("Created entrance gate '{$entrancePoint->name}' with {$pathsCreated} new paths");
 
             return [
-                'room' => $entranceGate,
+                'room' =>$entrancePoint,
                 'paths_created' => $pathsCreated,
                 'rooms_connected' => $regularRooms->count()
             ];
@@ -87,14 +87,14 @@ class EntranceGateService
     /**
      * Remove all paths connected to an entrance gate
      */
-    public function removeEntranceGatePaths(Room $entranceGate)
+    public function removeEntrancePointPaths(Room$entrancePoint)
     {
-        if ($entranceGate->room_type !== 'entrance_gate') {
+        if ($entrancePoint->room_type !== 'entrance_point') {
             return;
         }
 
-        Path::where('from_room_id', $entranceGate->id)
-            ->orWhere('to_room_id', $entranceGate->id)
+        Path::where('from_room_id',$entrancePoint->id)
+            ->orWhere('to_room_id',$entrancePoint->id)
             ->delete();
     }
 }
