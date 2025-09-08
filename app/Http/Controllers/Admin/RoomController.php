@@ -319,45 +319,64 @@ class RoomController extends Controller
 
     public function restore($id)
     {
+        // Fetch the trashed room by ID
         $room = Room::onlyTrashed()->findOrFail($id);
+
+        // Restore the room itself
         $room->restore();
 
-        // Restore soft-deleted carousel images
-        RoomImage::onlyTrashed()->where('room_id', $room->id)->restore();
+        // IMPORTANT: Refresh the model so it has the latest DB state
+        $room->refresh();
 
-        // Regenerate QR code if missing
+        // Restore soft-deleted carousel images linked to this room
+        RoomImage::onlyTrashed()
+            ->where('room_id', $room->id)
+            ->restore();
+
+        // Regenerate QR code if missing or file was deleted
         if (!$room->qr_code_path || !Storage::disk('public')->exists($room->qr_code_path)) {
             $marker_id = 'room_' . $room->id;
             $qrImage = QrCode::format('svg')->size(300)->generate($room->token);
             $qrPath = 'rooms/' . $room->id . '/qrcodes/' . $marker_id . '.svg';
+
             Storage::disk('public')->put($qrPath, $qrImage);
 
             $room->update([
-                'marker_id' => $marker_id,
+                'marker_id'    => $marker_id,
                 'qr_code_path' => $qrPath,
             ]);
         }
 
-        // CHANGE 8: Reconnect paths when restoring a room
+        /**
+         * Reconnect paths when restoring a room
+         * - If it's an entrance gate, connect it to all regular rooms.
+         * - If it's a regular room, connect it to all entrance gates.
+         */
         if ($room->room_type === 'entrance_gate') {
-            // For entrance gates, reconnect to all regular rooms
-            $regularRooms = Room::where('room_type', 'regular')->get();
+            $regularRooms = Room::where('room_type', 'regular')
+                ->whereNull('deleted_at') // only active rooms
+                ->get();
+
             foreach ($regularRooms as $regularRoom) {
                 Path::firstOrCreate(['from_room_id' => $room->id, 'to_room_id' => $regularRoom->id]);
                 Path::firstOrCreate(['from_room_id' => $regularRoom->id, 'to_room_id' => $room->id]);
             }
         } else {
-            // For regular rooms, reconnect to all entrance gates
-            $entranceGates = Room::where('room_type', 'entrance_gate')->get();
+            $entranceGates = Room::where('room_type', 'entrance_gate')
+                ->whereNull('deleted_at') // only active gates
+                ->get();
+
             foreach ($entranceGates as $gate) {
                 Path::firstOrCreate(['from_room_id' => $gate->id, 'to_room_id' => $room->id]);
                 Path::firstOrCreate(['from_room_id' => $room->id, 'to_room_id' => $gate->id]);
             }
         }
 
+        // Redirect back to recycle bin with success message
         return redirect()->route('room.recycle-bin')
-            ->with('success', 'Room and associated images restored successfully.');
+            ->with('success', 'Room and associated images restored successfully, with paths reconnected.');
     }
+
 
     public function forceDelete($id)
     {

@@ -18,6 +18,7 @@ class Room extends Model
         'marker_id',
         'image_path',
         'video_path',
+        'room_type',
         'token',
     ];
 

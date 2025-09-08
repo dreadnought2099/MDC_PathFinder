@@ -36,7 +36,7 @@
                     class="w-full border dark:text-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent border-primary dark:bg-gray-800"
                     required>
                     <option value="regular" {{ old('room_type') === 'regular' ? 'selected' : '' }}>
-                        Regular Room/Office
+                        Regular Office
                     </option>
                     <option value="entrance_gate" {{ old('room_type') === 'entrance_gate' ? 'selected' : '' }}>
                         Entrance Gate
