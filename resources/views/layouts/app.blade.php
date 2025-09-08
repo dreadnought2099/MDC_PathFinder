@@ -21,7 +21,32 @@
             }
         })();
     </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
 
+        ::-webkit-scrollbar-track {
+            background: #157ee1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #464c58;
+            border-radius: 10px;
+            transition: background-color 0.2s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9896a2;
+        }
+
+        /* Optional: Handle scrollbar corners */
+        ::-webkit-scrollbar-corner {
+            background: #157ee1;
+        }
+    </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="icon" href="{{ asset('images/mdc-logo.png') }}">
 
@@ -69,7 +94,7 @@
                 @if (session('warning'))
                     <p>{{ session('warning') }}</p>
                 @endif
-                
+
                 {{-- Display validation errors --}}
                 @foreach ($errors->all() as $error)
                     <p>{{ $error }}</p>

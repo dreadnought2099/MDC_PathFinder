@@ -250,6 +250,49 @@
 }
 
 @layer components {
+    .custom-time-input {
+        color-scheme: light;
+        accent-color: var(--color-primary);
+    }
+
+    .custom-time-input::-webkit-calendar-picker-indicator {
+        filter: brightness(0) saturate(100%) invert(42%) sepia(93%)
+            saturate(1352%) hue-rotate(204deg) brightness(95%) contrast(86%);
+        cursor: pointer;
+        opacity: 0.8;
+        transition: opacity 0.2s ease;
+    }
+
+    .custom-time-input::-webkit-calendar-picker-indicator:hover {
+        opacity: 1;
+    }
+
+    /* Blue checkbox styling */
+    .bulk-day-checkbox:checked {
+        background-color: var(--color-primary);
+        border-color: var(--color-primary);
+    }
+
+    .bulk-day-checkbox:focus {
+        box-shadow: 0 0 0 2px var(--color-primary);
+        border-color: var(--color-primary);
+    }
+
+    /* Modern browsers support */
+    .bulk-day-checkbox {
+        accent-color: var(--color-primary);
+    }
+
+    /* Better cross-browser support */
+    .bulk-day-checkbox:checked::before {
+        background-color: white;
+    }
+
+    /* Hover effect */
+    .bulk-day-checkbox:hover {
+        border-color: #60a5fa;
+    }
+
     .hover-underline {
         @apply relative inline-block;
     }

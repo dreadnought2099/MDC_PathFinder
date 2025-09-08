@@ -9,15 +9,25 @@
         <form action="{{ route('room.store') }}" method="POST" enctype="multipart/form-data" data-upload>
             @csrf
 
-            <div class="mb-4">
-                <label class="block dark:text-gray-300">Office Name</label>
-                <input type="text" name="name" class="w-full border p-2 rounded border-primary dark:bg-gray-800"
-                    required>
+            @php
+                $inputClasses =
+                    'peer py-3 w-full placeholder-transparent rounded-md text-gray-700 dark:text-gray-300 ring-1 px-4 ring-gray-400 dark:ring-gray-500 focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-white dark:bg-gray-700';
+
+                $labelClasses =
+                    'absolute cursor-text left-0 -top-3 text-sm text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 mx-1 px-1 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3 peer-focus:text-primary peer-focus:text-sm peer-focus:bg-white dark:peer-focus:bg-gray-800 peer-focus:px-2 peer-focus:rounded-md';
+
+                $textClass =
+                    'peer py-3 w-full rounded-md text-gray-700 dark:text-gray-300 ring-1 px-4 ring-gray-400 dark:ring-gray-500 focus:ring-2 focus:ring-primary outline-none bg-white dark:bg-gray-700';
+            @endphp
+
+            <div class="relative mb-4">
+                <input type="text" name="name" placeholder="Office Name" class="{{ $inputClasses }}" required>
+                <label class="{{ $labelClasses }}">Office Name</label>
             </div>
 
-            <div class="mb-4">
-                <label class="block dark:text-gray-300">Description</label>
-                <textarea name="description" class="w-full border p-2 rounded border-primary dark:bg-gray-800"></textarea>
+            <div class="relative mb-4">
+                <textarea name="description" class="{{ $textClass }}" rows="3"></textarea>
+                <label class="{{ $labelClasses }}">Description</label>
             </div>
 
             <div class="mb-4">
@@ -123,23 +133,29 @@
                             @endphp
                             @foreach ($daysOfWeek as $day)
                                 <label
-                                    class="flex items-center bg-white border rounded px-3 py-2 cursor-pointer hover:bg-gray-50">
-                                    <input type="checkbox" class="bulk-day-checkbox mr-2" value="{{ $day }}">
-                                    <span class="text-sm">{{ $day }}</span>
+                                    class="flex items-center bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                                    <input type="checkbox"
+                                        class="bulk-day-checkbox mr-2 text-primary focus:ring-primary dark:focus:ring-primary"
+                                        value="{{ $day }}">
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">{{ $day }}</span>
                                 </label>
                             @endforeach
                         </div>
 
                         {{-- Quick Select Buttons --}}
                         <div class="mt-2 flex gap-2 flex-wrap">
-                            <button type="button" class="quick-select bg-gray-500 text-white px-3 py-1 rounded text-sm"
+                            <button type="button"
+                                class="quick-select bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white px-3 py-1 rounded text-sm transition-colors"
                                 data-days="Mon,Tue,Wed,Thu,Fri">Weekdays</button>
-                            <button type="button" class="quick-select bg-gray-500 text-white px-3 py-1 rounded text-sm"
+                            <button type="button"
+                                class="quick-select bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white px-3 py-1 rounded text-sm transition-colors"
                                 data-days="Sat,Sun">Weekends</button>
-                            <button type="button" class="quick-select bg-gray-500 text-white px-3 py-1 rounded text-sm"
+                            <button type="button"
+                                class="quick-select bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white px-3 py-1 rounded text-sm transition-colors"
                                 data-days="Mon,Tue,Wed,Thu,Fri,Sat,Sun">All Days</button>
                             <button type="button"
-                                class="clear-select bg-gray-300 text-gray-700 px-3 py-1 rounded text-sm">Clear All</button>
+                                class="clear-select bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300 px-3 py-1 rounded text-sm transition-colors">Clear
+                                All</button>
                         </div>
                     </div>
 
@@ -149,9 +165,10 @@
                         <div class="bulk-ranges-container">
                             <div class="flex gap-2 mb-2 bulk-range-row">
                                 <div class="relative flex-1">
-                                    <input type="time" class="bulk-start-time border rounded p-2 w-full pr-8">
+                                    <input type="time"
+                                        class="custom-time-input bulk-start-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary dark:focus:border-primary">
                                     <button type="button"
-                                        class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500"
+                                        class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
                                         title="Clear">
                                         <img src="{{ asset('icons/exit.png') }}"
                                             class="w-3 h-3 cursor-pointer hover:scale-120 transition-all duration-300 ease-in-out"
@@ -159,9 +176,10 @@
                                     </button>
                                 </div>
                                 <div class="relative flex-1">
-                                    <input type="time" class="bulk-end-time border rounded p-2 w-full pr-8">
+                                    <input type="time"
+                                        class="custom-time-input bulk-end-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary dark:focus:border-primary">
                                     <button type="button"
-                                        class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500"
+                                        class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
                                         title="Clear">
                                         <img src="{{ asset('icons/exit.png') }}"
                                             class="w-3 h-3 cursor-pointer hover:scale-120 transition-all duration-300 ease-in-out"
@@ -174,7 +192,7 @@
 
                     {{-- Apply Button --}}
                     <button type="button"
-                        class="apply-bulk bg-primary text-center text-white px-4 py-2 rounded-full hover:text-primary border-2 border-primary hover:bg-white duration-300 ease-in-out transition-all cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
+                        class="apply-bulk bg-primary text-center text-white px-4 py-2 rounded-full hover:text-primary border-2 border-primary hover:bg-white dark:hover:bg-gray-800 duration-300 ease-in-out transition-all cursor-pointer shadow-primary-hover">
                         Apply to Selected Days
                     </button>
                 </div>
@@ -182,7 +200,7 @@
                 {{-- Display Saved Hours --}}
                 <div class="p-4 border border-primary rounded dark:bg-gray-800">
                     <p class="mb-3 dark:text-gray-300">Saved Office Hours</p>
-                    <ul id="officeHoursDisplay" class="space-y-2 text-sm text-gray-700"></ul>
+                    <ul id="officeHoursDisplay" class="space-y-2 text-sm text-gray-700 dark:text-gray-300"></ul>
                 </div>
             </div>
 
@@ -202,7 +220,6 @@
             // Cover image upload preview
             const coverInput = document.getElementById('image_path');
             const coverPreview = document.getElementById('previewImage');
-            const coverUploadIcon = document.getElementById('uploadIcon');
             const coverUploadText = document.getElementById('uploadText');
 
             coverInput.addEventListener('change', () => {
@@ -212,26 +229,38 @@
                     reader.onload = e => {
                         coverPreview.src = e.target.result;
                         coverPreview.classList.remove('hidden');
-                        coverUploadIcon.style.display = 'none';
-                        coverUploadText.style.display = 'none';
+                        // Hide the upload text and icon when image is shown
+                        const uploadBox = document.getElementById('uploadBox');
+                        const icon = uploadBox.querySelector('img');
+                        const text = uploadBox.querySelector('span');
+                        if (icon) icon.style.display = 'none';
+                        if (text) text.style.display = 'none';
                     };
 
                     reader.readAsDataURL(coverInput.files[0]);
                 }
-                // No else — keep existing preview if no file selected
             });
 
             // Carousel images functionality
             const carouselInput = document.getElementById('carousel_images');
             const carouselPreviewContainer = document.getElementById('carouselPreviewContainer');
-            const carouselUploadIcon = document.getElementById('carouselUploadIcon');
             const carouselUploadText = document.getElementById('carouselUploadText');
 
             let selectedFiles = [];
 
             function updateUploadIconVisibility() {
-                carouselUploadIcon.style.display = selectedFiles.length > 0 ? 'none' : '';
-                carouselUploadText.style.display = selectedFiles.length > 0 ? 'none' : '';
+                // Get the carousel upload box elements
+                const carouselUploadBox = document.getElementById('carouselUploadBox');
+                const icon = carouselUploadBox.querySelector('img');
+                const text = carouselUploadBox.querySelector('span');
+
+                // Hide/show icon and text based on selected files
+                if (icon) {
+                    icon.style.display = selectedFiles.length > 0 ? 'none' : '';
+                }
+                if (text) {
+                    text.style.display = selectedFiles.length > 0 ? 'none' : '';
+                }
             }
 
             function updateInputFiles() {
@@ -494,17 +523,17 @@
                         <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                     </div>
                     ${rangeKey !== "closed" ? `
-                                                        <div class="flex gap-2 ml-4">
-                                                            <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                    data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                                                Edit
-                                                            </button>
-                                                            <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                    data-days='${JSON.stringify(group.days)}'>
-                                                                Delete
-                                                            </button>
-                                                        </div>
-                                                    ` : ''}
+                                        <div class="flex gap-2 ml-4">
+                                            <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                    data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                Edit
+                                            </button>
+                                            <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                    data-days='${JSON.stringify(group.days)}'>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    ` : ''}
                 </div>
             `;
 

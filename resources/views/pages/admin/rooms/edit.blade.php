@@ -87,7 +87,9 @@
                             @foreach ($daysOfWeek as $day)
                                 <label
                                     class="flex items-center bg-white border rounded px-3 py-2 cursor-pointer hover:bg-gray-50">
-                                    <input type="checkbox" class="bulk-day-checkbox mr-2" value="{{ $day }}">
+                                    <input type="checkbox"
+                                        class="bulk-day-checkbox mr-2 text-primary focus:ring-primary dark:focus:ring-primary"
+                                        value="{{ $day }}">
                                     <span class="text-sm">{{ $day }}</span>
                                 </label>
                             @endforeach
@@ -116,7 +118,7 @@
                         <div class="bulk-ranges-container">
                             <div class="flex gap-2 mb-2 bulk-range-row">
                                 <div class="relative flex-1">
-                                    <input type="time" class="bulk-start-time border rounded p-2 w-full pr-8">
+                                    <input type="time" class="custom-time-input bulk-start-time border rounded p-2 w-full pr-8">
                                     <button type="button"
                                         class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500"
                                         title="Clear">
@@ -126,7 +128,7 @@
                                     </button>
                                 </div>
                                 <div class="relative flex-1">
-                                    <input type="time" class="bulk-end-time border rounded p-2 w-full pr-8">
+                                    <input type="time" class="custom-time-input bulk-end-time border rounded p-2 w-full pr-8">
                                     <button type="button"
                                         class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500"
                                         title="Clear">
@@ -526,17 +528,17 @@
                                 <div class="text-sm text-gray-600 mt-1">${timeText}</div>
                             </div>
                             ${rangeKey !== "closed" ? `
-                                                <div class="flex gap-2 ml-4">
-                                                    <button type="button" class="edit-schedule-btn text-blue-600 hover:text-blue-800 text-sm px-2 py-1 rounded border border-blue-300 hover:bg-blue-50 transition-colors" 
-                                                            data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                                        Edit
-                                                    </button>
-                                                    <button type="button" class="delete-schedule-btn text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded border border-red-300 hover:bg-red-50 transition-colors" 
-                                                            data-days='${JSON.stringify(group.days)}'>
-                                                        Delete
-                                                    </button>
-                                                </div>
-                                                ` : ''}
+                                                    <div class="flex gap-2 ml-4">
+                                                        <button type="button" class="edit-schedule-btn text-blue-600 hover:text-blue-800 text-sm px-2 py-1 rounded border border-blue-300 hover:bg-blue-50 transition-colors" 
+                                                                data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                            Edit
+                                                        </button>
+                                                        <button type="button" class="delete-schedule-btn text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded border border-red-300 hover:bg-red-50 transition-colors" 
+                                                                data-days='${JSON.stringify(group.days)}'>
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                    ` : ''}
                         </div>
                     `;
 
