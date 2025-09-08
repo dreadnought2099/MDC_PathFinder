@@ -37,6 +37,9 @@
                             class="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 dark:from-gray-800 dark:to-gray-700 dark:border-gray-600">
                             <th
                                 class="px-6 py-4 text-left text-sm text-gray-700 uppercase tracking-wide dark:text-gray-300">
+                                ID</th>
+                            <th
+                                class="px-6 py-4 text-left text-sm text-gray-700 uppercase tracking-wide dark:text-gray-300">
                                 From Room</th>
                             <th
                                 class="px-6 py-4 text-left text-sm text-gray-700 uppercase tracking-wide dark:text-gray-300">
@@ -56,6 +59,11 @@
                         @forelse($paths as $path)
                             <tr
                                 class="hover:bg-gray-50 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-800">
+                                <td class="px-6 py-4">
+                                    <span class="px-2 py-1 bg-blue-100 text-primary rounded-full text-sm">
+                                        {{ $path->id }}
+                                    </span>
+                                </td>
                                 <td class="px-6 py-4">
                                     <span class="px-2 py-1 bg-blue-100 text-primary rounded-full text-sm">
                                         {{ $path->fromRoom->name ?? 'Room #' . $path->from_room_id }}
@@ -99,7 +107,8 @@
                                     <div class="flex flex-col items-center justify-center space-y-4">
                                         <div
                                             class="w-16 h-16 bg-primary-10 dark:bg-gray-800 rounded-full flex items-center justify-center">
-                                            <img src="{{ asset('icons/navigation.png')}}" alt="Manage Office" class="w-12 h-12">
+                                            <img src="{{ asset('icons/navigation.png') }}" alt="Manage Office"
+                                                class="w-12 h-12">
                                         </div>
                                         <div class="text-center">
                                             <h3 class="text-lg font-medium dark:text-gray-300 text-gray-700 mb-2">No paths

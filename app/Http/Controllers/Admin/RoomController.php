@@ -178,6 +178,7 @@ class RoomController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'room_type' => 'required|in:regular,entrance_point',
             'image_path' => 'nullable|image|max:51200',
             'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:102400',
             'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:102400',
@@ -185,11 +186,27 @@ class RoomController extends Controller
             'office_hours' => 'nullable|array',
         ]);
 
+        $oldType = $room->room_type;
         $roomData = collect($validated)->except('office_hours')->toArray();
         $room->update($roomData);
 
         // Remove old hours
         $room->officeHours()->delete();
+
+        // If type changed, reset and reconnect paths
+        if ($oldType !== $room->room_type) {
+            // Delete old paths
+            Path::where('from_room_id', $room->id)
+                ->orWhere('to_room_id', $room->id)
+                ->delete();
+            $entranceService = app(\App\Services\EntrancePointService::class);
+
+            if ($room->room_type === 'entrance_point') {
+                $entranceService->reconnectEntrancePoint($room);
+            } else {
+                $entranceService->connectNewRoomToAllRooms($room);
+            }
+        }
 
         if ($request->has('office_hours')) {
             foreach ($request->office_hours as $day => $ranges) {
@@ -317,28 +334,22 @@ class RoomController extends Controller
         return view('pages.admin.recycle-bin', compact('rooms', 'staffs'));
     }
 
-    public function restore($id)
+    public function restore($id, EntrancePointService $entrancePointService)
     {
-        // Fetch the trashed room by ID
         $room = Room::onlyTrashed()->findOrFail($id);
 
-        // Restore the room itself
+        // Restore the room
         $room->restore();
-
-        // IMPORTANT: Refresh the model so it has the latest DB state
         $room->refresh();
 
-        // Restore soft-deleted carousel images linked to this room
-        RoomImage::onlyTrashed()
-            ->where('room_id', $room->id)
-            ->restore();
+        // Restore images
+        RoomImage::onlyTrashed()->where('room_id', $room->id)->restore();
 
-        // Regenerate QR code if missing or file was deleted
+        // Regenerate QR code if missing
         if (!$room->qr_code_path || !Storage::disk('public')->exists($room->qr_code_path)) {
             $marker_id = 'room_' . $room->id;
             $qrImage = QrCode::format('svg')->size(300)->generate($room->token);
             $qrPath = 'rooms/' . $room->id . '/qrcodes/' . $marker_id . '.svg';
-
             Storage::disk('public')->put($qrPath, $qrImage);
 
             $room->update([
@@ -348,31 +359,16 @@ class RoomController extends Controller
         }
 
         /**
-         * Reconnect paths when restoring a room
-         * - If it's an entrance gate, connect it to all regular rooms.
-         * - If it's a regular room, connect it to all entrance gates.
+         * Reconnect paths automatically using the service
          */
         if ($room->room_type === 'entrance_point') {
-            $regularRooms = Room::where('room_type', 'regular')
-                ->whereNull('deleted_at') // only active rooms
-                ->get();
-
-            foreach ($regularRooms as $regularRoom) {
-                Path::firstOrCreate(['from_room_id' => $room->id, 'to_room_id' => $regularRoom->id]);
-                Path::firstOrCreate(['from_room_id' => $regularRoom->id, 'to_room_id' => $room->id]);
-            }
+            // Connect entrance gate to all regular rooms
+            $entrancePointService->createEntrancePoint($room->toArray());
         } else {
-            $entranceGates = Room::where('room_type', 'entrance_point')
-                ->whereNull('deleted_at') // only active gates
-                ->get();
-
-            foreach ($entranceGates as $gate) {
-                Path::firstOrCreate(['from_room_id' => $gate->id, 'to_room_id' => $room->id]);
-                Path::firstOrCreate(['from_room_id' => $room->id, 'to_room_id' => $gate->id]);
-            }
+            // Connect new regular room to all existing rooms (including points)
+            $entrancePointService->connectNewRoomToAllRooms($room);
         }
 
-        // Redirect back to recycle bin with success message
         return redirect()->route('room.recycle-bin')
             ->with('success', 'Room and associated images restored successfully, with paths reconnected.');
     }

@@ -27,6 +27,25 @@
                     class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200">{{ old('description', $room->description) }}</textarea>
             </div>
 
+            <div class="mb-4">
+                <label class="block mb-2 font-medium dark:text-gray-300">Room Type</label>
+                <select name="room_type"
+                    class="w-full border dark:text-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent border-primary dark:bg-gray-800"
+                    required>
+                    <option value="regular" {{ old('room_type', $room->room_type) === 'regular' ? 'selected' : '' }}>
+                        Regular Office
+                    </option>
+                    <option value="entrance_point"
+                        {{ old('room_type', $room->room_type) === 'entrance_point' ? 'selected' : '' }}>
+                        Entrance Point
+                    </option>
+                </select>
+                <p class="text-sm text-gray-600 mt-1 dark:text-gray-300">
+                    Entrance gates automatically connect to all other rooms for navigation purposes.
+                </p>
+            </div>
+
+
             {{-- Current Cover Image --}}
             @if ($room->image_path && Storage::disk('public')->exists($room->image_path))
                 <div>
@@ -118,7 +137,8 @@
                         <div class="bulk-ranges-container">
                             <div class="flex gap-2 mb-2 bulk-range-row">
                                 <div class="relative flex-1">
-                                    <input type="time" class="custom-time-input bulk-start-time border rounded p-2 w-full pr-8">
+                                    <input type="time"
+                                        class="custom-time-input bulk-start-time border rounded p-2 w-full pr-8">
                                     <button type="button"
                                         class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500"
                                         title="Clear">
@@ -128,7 +148,8 @@
                                     </button>
                                 </div>
                                 <div class="relative flex-1">
-                                    <input type="time" class="custom-time-input bulk-end-time border rounded p-2 w-full pr-8">
+                                    <input type="time"
+                                        class="custom-time-input bulk-end-time border rounded p-2 w-full pr-8">
                                     <button type="button"
                                         class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500"
                                         title="Clear">
@@ -528,17 +549,17 @@
                                 <div class="text-sm text-gray-600 mt-1">${timeText}</div>
                             </div>
                             ${rangeKey !== "closed" ? `
-                                                    <div class="flex gap-2 ml-4">
-                                                        <button type="button" class="edit-schedule-btn text-blue-600 hover:text-blue-800 text-sm px-2 py-1 rounded border border-blue-300 hover:bg-blue-50 transition-colors" 
-                                                                data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                                            Edit
-                                                        </button>
-                                                        <button type="button" class="delete-schedule-btn text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded border border-red-300 hover:bg-red-50 transition-colors" 
-                                                                data-days='${JSON.stringify(group.days)}'>
-                                                            Delete
-                                                        </button>
-                                                    </div>
-                                                    ` : ''}
+                                                            <div class="flex gap-2 ml-4">
+                                                                <button type="button" class="edit-schedule-btn text-blue-600 hover:text-blue-800 text-sm px-2 py-1 rounded border border-blue-300 hover:bg-blue-50 transition-colors" 
+                                                                        data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                                    Edit
+                                                                </button>
+                                                                <button type="button" class="delete-schedule-btn text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded border border-red-300 hover:bg-red-50 transition-colors" 
+                                                                        data-days='${JSON.stringify(group.days)}'>
+                                                                    Delete
+                                                                </button>
+                                                            </div>
+                                                            ` : ''}
                         </div>
                     `;
 
