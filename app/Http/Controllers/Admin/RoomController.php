@@ -363,7 +363,7 @@ class RoomController extends Controller
          */
         if ($room->room_type === 'entrance_point') {
             // Connect entrance gate to all regular rooms
-            $entrancePointService->createEntrancePoint($room->toArray());
+            $entrancePointService->reconnectEntrancePoint($room);
         } else {
             // Connect new regular room to all existing rooms (including points)
             $entrancePointService->connectNewRoomToAllRooms($room);
