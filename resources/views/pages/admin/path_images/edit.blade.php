@@ -31,14 +31,14 @@
                 <div class="flex items-center justify-center space-x-6">
                     <div class="text-center p-3 bg-primary text-white rounded-xl">
                         <i class="fas fa-door-open fa-lg mb-1"></i>
-                        <p class="text-sm font-bold">
+                        <p class="text-sm">
                             {{ $path->fromRoom->name ?? 'Room #' . $path->from_room_id }}
                         </p>
                     </div>
                     <i class="fas fa-arrow-right fa-lg text-gray-500"></i>
                     <div class="text-center p-3 bg-green-600 text-white rounded-xl">
                         <i class="fas fa-door-open fa-lg mb-1"></i>
-                        <p class="text-sm font-bold">
+                        <p class="text-sm">
                             {{ $path->toRoom->name ?? 'Room #' . $path->to_room_id }}
                         </p>
                     </div>
@@ -191,11 +191,11 @@
                 @php $pathImage = $pathImages->first(); @endphp
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <!-- Current Image -->
-                    <div class="bg-white rounded-xl shadow-sm border p-6">
-                        <h2 class="text-lg font-semibold text-gray-700 mb-4">
-                            <i class="fas fa-image text-primary"></i> Current Image
+                    <div class="bg-white rounded-xl shadow-sm border-2 border-primary p-6 dark:bg-gray-800">
+                        <h2 class="text-lg font-semibold text-gray-700 mb-4 dark:text-gray-300">
+                            Current Image
                         </h2>
-                        <div class="bg-gray-50 border-2 border-dashed rounded-xl p-4 text-center">
+                        <div class="dark:bg-gray-800 border-2 border-dashed border-primary rounded-xl p-4 text-center">
                             <img src="{{ asset('storage/' . $pathImage->image_file) }}"
                                 alt="Path Image {{ $pathImage->image_order }}"
                                 class="mx-auto rounded-lg shadow max-h-80 cursor-pointer"
@@ -204,30 +204,30 @@
                                 Order: {{ $pathImage->image_order }}
                             </p>
                         </div>
-                        <div class="mt-4 grid grid-cols-2 gap-4 text-sm text-gray-600">
+                        <div class="mt-4 grid grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-300">
                             <div>
-                                <strong>File:</strong><br>
+                                File:<br>
                                 {{ basename($pathImage->image_file) }}
                             </div>
                             <div>
-                                <strong>Uploaded:</strong><br>
-                                {{ $pathImage->created_at->format('M d, Y H:i') }}
+                                Uploaded:<br>
+                                    {{ $pathImage->created_at->format('M d, Y H:i') }}
                             </div>
                         </div>
 
                         <!-- Quick Actions -->
                         <div class="mt-6 flex space-x-4">
                             <button type="button" onclick="showDeleteModal()"
-                                class="flex-1 border border-red-500 text-red-500 rounded-xl px-4 py-2 hover:bg-red-50 transition">
-                                <i class="fas fa-trash"></i> Delete Image
+                                class="flex-1 px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-red-600 rounded-xl hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover">
+                                Delete Image
                             </button>
                         </div>
                     </div>
 
                     <!-- Edit Form -->
-                    <div class="bg-white rounded-xl shadow-sm border p-6">
-                        <h2 class="text-lg font-semibold text-gray-700 mb-4">
-                            <i class="fas fa-edit text-primary"></i> Edit Image
+                    <div class="bg-white rounded-xl shadow-sm p-6 dark:bg-gray-800 border-2 border-primary">
+                        <h2 class="text-lg font-semibold text-gray-700 mb-4 dark:text-gray-300">
+                            Edit Image
                         </h2>
 
                         @if ($errors->any())
@@ -283,8 +283,8 @@
                             <!-- Submit -->
                             <div>
                                 <button type="submit"
-                                    class="w-full bg-primary text-white rounded-xl px-6 py-3 shadow hover:bg-white hover:text-primary border-2 border-primary transition">
-                                    <i class="fas fa-save"></i> Update Image
+                                    class="w-full bg-primary text-white px-4 py-2 bg-primary rounded-2xl hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
+                                    Update Image
                                 </button>
                             </div>
                         </form>
@@ -293,7 +293,7 @@
             @endif
 
             <!-- Additional Info -->
-            <div class="bg-white rounded-xl shadow-sm border p-6 dark:bg-gray-800">
+            <div class="bg-white rounded-xl shadow-sm border p-6 dark:bg-gray-800 border-2 border-primary">
                 <h3 class="text-md text-center text-gray-700 mb-3 dark:text-gray-300">
                     <i class="fas fa-info-circle text-primary"></i> Update Information
                 </h3>
@@ -372,14 +372,14 @@
                         <form action="{{ route('path-image.destroy-single', $pathImage) }}" method="POST">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
-                                <i class="fas fa-trash"></i> Delete Image
+                            <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-red-600 rounded-lg hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800">
+                                Delete Image
                             </button>
                         </form>
                     @else
                         <button type="button" id="confirmBulkDelete"
                             class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
-                            <i class="fas fa-trash"></i> Delete Selected
+                            Delete Selected
                         </button>
                     @endif
                 </div>

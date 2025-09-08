@@ -107,7 +107,7 @@
                                                             Cancel
                                                         </button>
                                                         <button type="submit"
-                                                            class="bg-primary text-white text-sm font-medium px-4 py-2 bg-primary rounded-lg hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800">
+                                                            class="bg-primary text-white text-sm font-medium px-4 py-2 bg-primary rounded-lg hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
                                                             Restore
                                                         </button>
                                                     </div>
@@ -172,7 +172,7 @@
                                                             Cancel
                                                         </button>
                                                         <button type="submit"
-                                                            class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-red-600 rounded-lg hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800">
+                                                            class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-red-600 rounded-lg hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover">
                                                             Delete
                                                         </button>
                                                     </div>

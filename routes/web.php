@@ -13,6 +13,7 @@ use App\Models\Room;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web'])->group(function () {
+    
     // Home page - displays main landing page
     Route::get('/', [HomeController::class, 'index'])->name('index');
 
