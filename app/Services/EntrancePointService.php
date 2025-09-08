@@ -11,36 +11,36 @@ class EntrancePointService
 {
     /**
      * Scenario:
-     * Used when creating a brand-new entrance point (from create form).
-     * - Creates the room with type = 'entrance_point'
-     * - Automatically connects it to ALL existing *regular* rooms
+     * Called when creating a brand-new ENTRANCE POINT (via create form).
+     *
+     * Behavior:
+     * - Creates a new Room with type = 'entrance_point'
+     * - Automatically connects it to ALL existing regular rooms
      * - Skips connecting to other entrances
+     * - Uses firstOrCreate to avoid duplicate paths
      */
     public function createEntrancePoint(array $roomData)
     {
         return DB::transaction(function () use ($roomData) {
-            // Create the entrance gate room
             $entrancePoint = Room::create(array_merge($roomData, [
                 'room_type' => 'entrance_point'
             ]));
 
-            // Get all regular rooms (excluding other entrance gates)
             $regularRooms = Room::where('room_type', 'regular')
                 ->where('id', '!=', $entrancePoint->id)
                 ->get();
 
             $pathsCreated = 0;
 
-            // Create bidirectional paths between entrance gate and all regular rooms
             foreach ($regularRooms as $room) {
                 $path1 = Path::firstOrCreate([
                     'from_room_id' => $entrancePoint->id,
-                    'to_room_id' => $room->id,
+                    'to_room_id'   => $room->id,
                 ]);
 
                 $path2 = Path::firstOrCreate([
                     'from_room_id' => $room->id,
-                    'to_room_id' => $entrancePoint->id,
+                    'to_room_id'   => $entrancePoint->id,
                 ]);
 
                 if ($path1->wasRecentlyCreated) $pathsCreated++;
@@ -50,8 +50,8 @@ class EntrancePointService
             Log::info("Created entrance gate '{$entrancePoint->name}' with {$pathsCreated} new paths");
 
             return [
-                'room' => $entrancePoint,
-                'paths_created' => $pathsCreated,
+                'room'            => $entrancePoint,
+                'paths_created'   => $pathsCreated,
                 'rooms_connected' => $regularRooms->count()
             ];
         });
@@ -59,9 +59,12 @@ class EntrancePointService
 
     /**
      * Scenario:
-     * Used when creating a *new regular room* (not an entrance).
-     * - Connects this new room to all existing rooms (entrances + regulars).
-     * - Ensures bidirectional paths exist.
+     * Called when creating a brand-new REGULAR ROOM.
+     *
+     * Behavior:
+     * - Connects the new room to ALL existing rooms (both entrances and regulars)
+     * - Ensures bidirectional paths exist
+     * - Uses firstOrCreate so restored/old paths are reused, no duplicates
      */
     public function connectNewRoomToAllRooms(Room $newRoom)
     {
@@ -91,9 +94,11 @@ class EntrancePointService
 
     /**
      * Scenario:
-     * Used when deleting or demoting an entrance point.
-     * - Clears ALL paths connected to this entrance.
-     * - Keeps the room record but makes it isolated until reconnected.
+     * Called when REMOVING or DEMOTING an entrance point.
+     *
+     * Behavior:
+     * - Deletes all paths linked to this entrance point
+     * - Leaves the room record intact but isolated
      */
     public function removeEntrancePointPaths(Room $entrancePoint)
     {
@@ -108,24 +113,33 @@ class EntrancePointService
 
     /**
      * Scenario:
-     * Used when *converting an existing room* into an entrance (via update).
-     * - Removes its old paths in the controller
-     * - Reconnects it to *all other rooms* (regular + entrances)
+     * Called when converting a REGULAR ROOM into an ENTRANCE (via update/restore).
+     *
+     * Behavior:
+     * - Connects the entrance to ALL other rooms (regular + entrances)
      * - Ensures bidirectional paths
+     * - Uses firstOrCreate so old/restored paths are reused, missing ones get added
      */
     public function reconnectEntrancePoint(Room $room)
     {
         $rooms = Room::where('id', '!=', $room->id)->get();
+        $pathsCreated = 0;
 
         foreach ($rooms as $other) {
-            Path::create([
+            $path1 = Path::firstOrCreate([
                 'from_room_id' => $room->id,
                 'to_room_id'   => $other->id,
             ]);
-            Path::create([
+
+            $path2 = Path::firstOrCreate([
                 'from_room_id' => $other->id,
                 'to_room_id'   => $room->id,
             ]);
+
+            if ($path1->wasRecentlyCreated) $pathsCreated++;
+            if ($path2->wasRecentlyCreated) $pathsCreated++;
         }
+
+        return $pathsCreated;
     }
 }

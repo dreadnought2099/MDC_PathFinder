@@ -345,6 +345,12 @@ class RoomController extends Controller
         // Restore images
         RoomImage::onlyTrashed()->where('room_id', $room->id)->restore();
 
+        // Restore old paths (same IDs)
+        Path::onlyTrashed()
+            ->where('from_room_id', $room->id)
+            ->orWhere('to_room_id', $room->id)
+            ->restore();
+
         // Regenerate QR code if missing
         if (!$room->qr_code_path || !Storage::disk('public')->exists($room->qr_code_path)) {
             $marker_id = 'room_' . $room->id;
@@ -359,18 +365,16 @@ class RoomController extends Controller
         }
 
         /**
-         * Reconnect paths automatically using the service
+         * Ensure the restored room is also connected to any NEW rooms
          */
         if ($room->room_type === 'entrance_point') {
-            // Connect entrance gate to all regular rooms
             $entrancePointService->reconnectEntrancePoint($room);
         } else {
-            // Connect new regular room to all existing rooms (including points)
             $entrancePointService->connectNewRoomToAllRooms($room);
         }
 
         return redirect()->route('room.recycle-bin')
-            ->with('success', 'Room and associated images restored successfully, with paths reconnected.');
+            ->with('success', 'Room and paths restored successfully, including connections to new rooms.');
     }
 
 

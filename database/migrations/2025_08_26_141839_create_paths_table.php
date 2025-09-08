@@ -23,7 +23,8 @@ return new class extends Migration
             $table->foreignId('to_room_id')
                 ->constrained('rooms')
                 ->onDelete('cascade');
-
+                
+            $table->softDeletes();
             $table->timestamps();
 
             // Unique index ensures no duplicates
