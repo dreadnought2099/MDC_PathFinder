@@ -144,7 +144,9 @@
                     <div
                         class="text-center p-4 bg-orange-50 dark:bg-orange-900 rounded-lg border-2 border-orange-600 dark:border-purple-900-">
                         <div class="text-3xl font-bold text-orange-600 mb-2 dark:text-orange-400">
-                            {{ \App\Models\Path::count() }}
+                            {{ \App\Models\Path::whereHas('fromRoom')
+                                                ->whereHas('toRoom')
+                                                ->count() }}
                         </div>
                         <div class="text-sm text-gray-600 dark:text-gray-300">Path/s</div>
                     </div>

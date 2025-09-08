@@ -17,6 +17,9 @@ class PathController extends Controller
         $direction = $request->get('direction', 'asc');
 
         $paths = Path::with(['fromRoom', 'toRoom'])
+            ->whereNull('deleted_at') // ensure trashed paths are excluded
+            ->whereHas('fromRoom')   // only paths where fromRoom exists
+            ->whereHas('toRoom')     // only paths where toRoom exists
             ->orderBy($sort, $direction)
             ->paginate(10)
             ->appends(['sort' => $sort, 'direction' => $direction]);
