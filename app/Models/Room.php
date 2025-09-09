@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class Room extends Model
 {
@@ -149,47 +150,101 @@ class Room extends Model
                 $room->token = self::generateSecureToken();
             }
         });
+
+        // Clear cache when room changes
+        static::saved(function ($room) {
+            self::clearTokenCache($room->token);
+        });
+
+        static::deleted(function ($room) {
+            self::clearTokenCache($room->token);
+        });
     }
 
+    /**
+     * Generate cryptographically secure unique token
+     */
+    public static function generateSecureToken(): string
+    {
+        $maxAttempts = 10;
+        $attempts = 0;
+
+        do {
+            $token = bin2hex(random_bytes(16)); // 32 character hex string
+            $attempts++;
+
+            if ($attempts >= $maxAttempts) {
+                throw new \RuntimeException('Unable to generate unique token after ' . $maxAttempts . ' attempts');
+            }
+        } while (self::tokenExists($token));
+
+        return $token;
+    }
+
+    /**
+     * Check if token exists with caching
+     */
+    private static function tokenExists(string $token): bool
+    {
+        return Cache::remember("token_exists:{$token}", 300, function () use ($token) {
+            return self::where('token', $token)->exists();
+        });
+    }
+
+    /**
+     * Validate token format (hex string, 32 characters)
+     */
+    public static function isValidTokenFormat(string $token): bool
+    {
+        return preg_match('/^[a-f0-9]{32}$/', $token) === 1;
+    }
+
+    /**
+     * Find room by token with caching and validation
+     */
+    public static function findByValidToken(string $token): ?self
+    {
+        if (!self::isValidTokenFormat($token)) {
+            return null;
+        }
+
+        return Cache::remember("room_token:{$token}", 600, function () use ($token) {
+            return self::where('token', $token)->first();
+        });
+    }
+
+    /**
+     * Clear token-related cache
+     */
+    private static function clearTokenCache(string $token): void
+    {
+        Cache::forget("room_token:{$token}");
+        Cache::forget("token_exists:{$token}");
+    }
 
     /**
      * Context-aware route key selection
      * - Use tokens for public/scanner routes (secure)
      * - Use IDs for admin routes (convenient)
      */
-    public function getRouteKeyName()
+    public function getRouteKeyName(): string
     {
         $request = request();
-        $currentRoute = $request->route();
+        $uri = $request->getRequestUri();
+        $routeName = optional($request->route())->getName();
 
-        if ($currentRoute) {
-            $routeName = $currentRoute->getName();
-            $uri = $request->getRequestUri();
-
-            // Use token for public scanner routes
-            if ($routeName && (str_contains($routeName, 'scan') || str_contains($uri, 'scan-marker'))) {
-                return 'token';
-            }
-
-            // Use token for client-facing routes
-            if (str_contains($uri, '/rooms/') && !str_contains($uri, '/admin/')) {
-                return 'token';
-            }
+        // Use token for public/client routes
+        if ($this->shouldUseToken($routeName, $uri)) {
+            return 'token';
         }
 
-        // Use ID for admin routes (default)
-        return 'id';
+        return 'id'; // Default for admin routes
     }
 
-    /**
-     * Generate URL-safe tokens
-     */
-    public static function generateSecureToken()
+    private function shouldUseToken(?string $routeName, string $uri): bool
     {
-        do {
-            $token = bin2hex(random_bytes(16)); // 32 character hex string
-        } while (self::where('token', $token)->exists());
-
-        return $token;
+        return ($routeName && str_contains($routeName, 'scan'))
+            || (str_contains($uri, '/rooms/') && !str_contains($uri, '/admin/'))
+            || str_contains($uri, '/api/');
     }
 }

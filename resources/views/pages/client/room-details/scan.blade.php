@@ -163,18 +163,26 @@
                     };
 
                     resultsDiv.innerHTML = `
-                        <div class="${colors[type]} flex items-center justify-center gap-2">
-                            <img src="${icons[type]}" alt="${type}" class="h-4 w-4" />
-                            <span>${message}</span>
-                        </div>
-                    `;
+                    <div class="${colors[type]} flex items-center justify-center gap-2">
+                        <img src="${icons[type]}" alt="${type}" class="h-4 w-4" />
+                        <span>${message}</span>
+                    </div>
+                `;
                 }
 
                 async checkRoomExists(roomToken) {
                     try {
                         this.showMessage(`Checking if room ${roomToken} exists...`, 'info');
 
-                        const response = await fetch(`/api/rooms/${roomToken}/exists`);
+                        // ✅ fixed to use route() with placeholder
+                        const url = `{{ route('rooms.exists', ['token' => 'TOKEN_PLACEHOLDER']) }}`
+                            .replace('TOKEN_PLACEHOLDER', roomToken);
+
+                        const response = await fetch(url, {
+                            headers: {
+                                "Accept": "application/json"
+                            }
+                        });
 
                         if (!response.ok) {
                             throw new Error(`HTTP error! status: ${response.status}`);
@@ -185,10 +193,9 @@
                         if (data.exists) {
                             this.showMessage(`Room found! Redirecting...`, 'success');
 
-                            // Preserve return parameter when redirecting to room details
                             const returnParam = new URLSearchParams(window.location.search).get('return');
-                            let roomUrl = "{{ route('scan.room', ['room' => ':roomToken']) }}".replace(':roomToken',
-                                roomToken);
+                            let roomUrl = `{{ route('scan.room', ['token' => 'TOKEN_PLACEHOLDER']) }}`
+                                .replace('TOKEN_PLACEHOLDER', roomToken);
 
                             if (returnParam) {
                                 roomUrl += `?return=${returnParam}`;
@@ -213,9 +220,10 @@
 
                     this.stopScanner();
 
-                    const roomToken = decodedText;
+                    const roomToken = decodedText.trim();
 
-                    if (!roomToken || roomToken.length !== 32 || !/^[a-zA-Z0-9]+$/.test(roomToken)) {
+                    // ✅ enforce hex 32 chars only
+                    if (!/^[a-f0-9]{32}$/i.test(roomToken)) {
                         this.showMessage("Invalid QR code format. Expected a 32-character room token.", "error");
                         setTimeout(() => this.restartScanner(), 2000);
                         return;
@@ -299,7 +307,6 @@
             new QRScanner();
         </script>
     @endif
-
     @if ($room)
         <script>
             console.log('Room details loaded for room:', @json($room->id ?? null));

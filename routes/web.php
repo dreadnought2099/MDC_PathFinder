@@ -9,35 +9,30 @@ use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ScannerController;
+use App\Http\Controllers\TokenController;
 use App\Models\Room;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web'])->group(function () {
-    
+
     // Home page - displays main landing page
     Route::get('/', [HomeController::class, 'index'])->name('index');
 
     // Scanner page (no room yet)
     Route::get('/scan-marker', [ScannerController::class, 'index'])->name('scan.index');
 
-    // Room details via token - SINGLE ROUTE with validation
-    Route::get('/scan-marker/{room}', function (Room $room) {
-        // Additional verification that the token format is correct
-        if (!preg_match('/^[a-f0-9]{32}$/', $room->token)) {
-            abort(404);
-        }
+    // Room details via token - now using dedicated controller method
+    Route::get('/scan-marker/{token}', [TokenController::class, 'getRoomByToken'])
+        ->name('scan.room')
+        ->where('token', '[a-f0-9]{32}'); // Route constraint for performance
 
-        return app(ScannerController::class)->index($room);
-    })->name('scan.room');
-
+    //  Check if a room exists by token (used by QR scanner JS)
+    Route::get('/rooms/{token}/exists', [TokenController::class, 'checkRoomExists'])
+        ->name('rooms.exists')
+        ->where('token', '[a-f0-9]{32}');
+    
     // Client-facing staff profile
     Route::get('/staffs/{staff}', [StaffController::class, 'clientShow'])->name('staff.client-show');
-
-    // API endpoint for checking room existence
-    Route::get('/api/rooms/{token}/exists', function ($token) {
-        $exists = \App\Models\Room::where('token', $token)->exists();
-        return response()->json(['exists' => $exists]);
-    });
 
     // Client-side navigation
     Route::get('/navigation/select', [PathController::class, 'selection'])->name('paths.select');
