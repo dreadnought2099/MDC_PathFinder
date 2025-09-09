@@ -15,6 +15,18 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web'])->group(function () {
 
+    //  To test custom error page
+    Route::get('/test-error/{code}', function ($code) {
+        // List of allowed codes for safety
+        $allowedCodes = [401, 402, 403, 404, 419, 429, 500, 503];
+
+        if (!in_array($code, $allowedCodes)) {
+            abort(400, 'Invalid test error code.');
+        }
+
+        abort($code);
+    });
+
     // Home page - displays main landing page
     Route::get('/', [HomeController::class, 'index'])->name('index');
 
@@ -30,7 +42,7 @@ Route::middleware(['web'])->group(function () {
     Route::get('/rooms/{token}/exists', [TokenController::class, 'checkRoomExists'])
         ->name('rooms.exists')
         ->where('token', '[a-f0-9]{32}');
-    
+
     // Client-facing staff profile
     Route::get('/staffs/{staff}', [StaffController::class, 'clientShow'])->name('staff.client-show');
 
