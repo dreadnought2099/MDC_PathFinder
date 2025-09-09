@@ -174,7 +174,6 @@
                     try {
                         this.showMessage(`Checking if room ${roomToken} exists...`, 'info');
 
-                        // ✅ fixed to use route() with placeholder
                         const url = `{{ route('rooms.exists', ['token' => 'TOKEN_PLACEHOLDER']) }}`
                             .replace('TOKEN_PLACEHOLDER', roomToken);
 
@@ -184,11 +183,11 @@
                             }
                         });
 
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-
                         const data = await response.json();
+
+                        if (!response.ok || data.error) {
+                            throw new Error(data.error || `HTTP ${response.status}`);
+                        }
 
                         if (data.exists) {
                             this.showMessage(`Room found! Redirecting...`, 'success');
@@ -210,7 +209,7 @@
                         }
                     } catch (error) {
                         console.error('Room check error:', error);
-                        this.showMessage(`Connection error. Please try again.`, 'error');
+                        this.showMessage(error.message || `Connection error. Please try again.`, 'error');
                         setTimeout(() => this.restartScanner(), 2000);
                     }
                 }
@@ -220,14 +219,8 @@
 
                     this.stopScanner();
 
+                    // Just trim and pass to backend — regex is handled by route constraint
                     const roomToken = decodedText.trim();
-
-                    // ✅ enforce hex 32 chars only
-                    if (!/^[a-f0-9]{32}$/i.test(roomToken)) {
-                        this.showMessage("Invalid QR code format. Expected a 32-character room token.", "error");
-                        setTimeout(() => this.restartScanner(), 2000);
-                        return;
-                    }
 
                     this.checkRoomExists(roomToken);
                 }
@@ -297,7 +290,6 @@
 
                 async restartScanner() {
                     await this.stopScanner();
-
                     setTimeout(() => {
                         this.startScanner();
                     }, 1000);
