@@ -101,7 +101,7 @@
                             @endif
                         @empty
                             <tr>
-                                <td colspan="6" class="px-6 py-16 text-center">No paths found.</td>
+                                <td colspan="6" class="px-6 py-16 text-center text-gray-600 dark:text-gray-300">No paths found.</td>
                             </tr>
                         @endforelse
                     </tbody>

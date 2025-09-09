@@ -108,9 +108,9 @@
         <div id="roomDeleteModal"
             class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden transition-all duration-300 opacity-0"
             onclick="closeRoomModal()">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform transition-all duration-300 scale-95 dark:bg-gray-800"
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform transition-all duration-300 scale-95 dark:bg-gray-800 border-2 border-primary"
                 onclick="event.stopPropagation()">
-                <div class="px-6 py-4 border-b border-gray-200">
+                <div class="px-6 py-4 border-b border-primary">
                     <div class="flex items-center justify-between">
                         <h2 class="text-xl text-gray-900 dark:text-gray-300">Confirm <span
                                 class="text-secondary">Deletion</span></h2>
@@ -147,11 +147,11 @@
                         @method('DELETE')
                         <div class="flex justify-end space-x-3">
                             <button type="button" onclick="closeRoomModal()"
-                                class="px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-full transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300">
+                                class="px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-full transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover">
                                 Cancel
                             </button>
                             <button type="submit"
-                                class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-red-600 rounded-full hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover">
+                                class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-secondary rounded-full hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover">
                                 Delete
                             </button>
                         </div>

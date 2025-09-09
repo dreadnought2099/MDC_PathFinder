@@ -213,7 +213,7 @@
     }
     
     .shadow-cancel-hover:hover {
-        box-shadow: 1 10px 40px rgba(107, 114, 128, 0.5);
+        box-shadow: 0 10px 40px rgba(107, 114, 128, 0.5);
     }
 
     .bg-primary-10 {

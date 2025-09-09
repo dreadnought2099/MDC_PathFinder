@@ -38,7 +38,7 @@
 
         <!-- Floating + Button -->
         <button @click="open = !open"
-            class="w-12 h-12 rounded-full bg-primary text-white text-4xl flex items-center justify-center shadow-lg hover:bg-white hover:text-primary border-2 border-primary transition-all duration-300 cursor-pointer dark:hover:bg-gray-800">
+            class="w-12 h-12 rounded-full bg-primary text-white text-4xl flex items-center justify-center shadow-lg hover:bg-white hover:text-primary border-2 border-primary transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
             <span x-text="open ? '-' : '+'"></span>
         </button>
     </div>

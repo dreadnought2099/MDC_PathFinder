@@ -16,7 +16,7 @@
             <div class="flex justify-center px-4 pb-8">
                 <form id="assign-staff-form" method="GET" action="{{ route('room.assign') }}" class="w-full max-w-md">
                     <select name="roomId"
-                        class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200">
+                        class="w-full border-2 border-primary rounded-lg px-4 py-3 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200">
                         @foreach ($rooms as $room)
                             <option value="{{ $room->id }}"
                                 {{ isset($selectedRoom) && $selectedRoom->id == $room->id ? 'selected' : '' }}>
@@ -116,7 +116,7 @@
                 <!-- Submit Button with proper spacing -->
                 <div class="flex justify-center pt-8 pb-8 sticky bottom-0">
                     <button type="submit"
-                        class="bg-primary text-white px-8 py-4 rounded-full hover:text-primary border-2 border-primary hover:bg-white dark:hover:bg-gray-800 transition-all duration-300 cursor-pointer min-w-[200px] font-medium">
+                        class="bg-primary text-white px-4 py-4 rounded-full hover:text-primary border-2 border-primary hover:bg-white dark:hover:bg-gray-800 transition-all duration-300 cursor-pointer min-w-[100px] font-medium shadow-primary-hover">
                         Update Assignment
                     </button>
                 </div>
@@ -128,9 +128,9 @@
     <div id="confirmModal"
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden transition-all duration-300 opacity-0"
         onclick="closeModal()">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform transition-all duration-300 scale-95 dark:bg-gray-800"
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform transition-all duration-300 scale-95 dark:bg-gray-800 border-2 border-primary"
             onclick="event.stopPropagation()">
-            <div class="px-6 py-4 border-b border-gray-200">
+            <div class="px-6 py-4 border-b border-primary">
                 <div class="flex items-center justify-between">
                     <h2 class="text-xl text-gray-900 dark:text-gray-300">Confirm <span
                             class="text-secondary">Unassignment</span></h2>
@@ -163,14 +163,14 @@
             <div class="px-6 py-4 bg-gray-50 rounded-b-2xl dark:bg-gray-800">
                 <div class="flex justify-end space-x-3">
                     <button type="button" onclick="closeModal()"
-                        class="px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-full transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300">
+                        class="px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-full transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover">
                         Cancel
                     </button>
                     <form id="unassignForm" method="POST" style="display: inline;">
                         @csrf
                         @method('DELETE')
                         <button type="submit"
-                            class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-red-600 rounded-full hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800">
+                            class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-secondary rounded-full hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover">
                             Unassign Staff
                         </button>
                     </form>

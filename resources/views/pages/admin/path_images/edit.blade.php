@@ -85,12 +85,12 @@
                             </div>
                             <div class="flex space-x-3">
                                 <button type="submit"
-                                    class="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition">
-                                    <i class="fas fa-save mr-2"></i>Save Changes
+                                    class="bg-primary text-white text-sm font-medium px-4 py-2 bg-primary rounded-full hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
+                                    Save Changes
                                 </button>
                                 <button type="button" id="bulkDeleteBtn"
-                                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition hidden">
-                                    <i class="fas fa-trash mr-2"></i>Delete Selected
+                                    class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-secondary rounded-full hover:bg-white hover:text-secondary focus:ring-2 focus:ring-secondary focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover">
+                                    Delete Selected
                                 </button>
                             </div>
                         </div>
@@ -168,12 +168,12 @@
                     <!-- Submit Actions -->
                     <div class="text-center mt-8">
                         <button type="submit"
-                            class="bg-primary hover:bg-blue-600 text-white px-8 py-3 rounded-xl text-lg font-medium transition">
-                            <i class="fas fa-save mr-2"></i>Save All Changes
+                            class="bg-primary text-white text-sm font-medium px-6 py-3 bg-primary rounded-full hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
+                            Save All Changes
                         </button>
                         <a href="{{ route('path.show', $path) }}"
-                            class="ml-4 bg-gray-100 hover:bg-gray-200 text-gray-700 px-8 py-3 rounded-xl text-lg font-medium transition">
-                            <i class="fas fa-times mr-2"></i>Cancel
+                            class="ml-4 px-6 py-3 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-full transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover">
+                            Cancel
                         </a>
                     </div>
                 </form>
@@ -211,7 +211,7 @@
                             </div>
                             <div>
                                 Uploaded:<br>
-                                    {{ $pathImage->created_at->format('M d, Y H:i') }}
+                                {{ $pathImage->created_at->format('M d, Y H:i') }}
                             </div>
                         </div>
 
@@ -372,7 +372,8 @@
                         <form action="{{ route('path-image.destroy-single', $pathImage) }}" method="POST">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-red-600 rounded-lg hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800">
+                            <button type="submit"
+                                class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-red-600 rounded-lg hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800">
                                 Delete Image
                             </button>
                         </form>
