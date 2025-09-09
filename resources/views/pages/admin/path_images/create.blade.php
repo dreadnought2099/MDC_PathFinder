@@ -40,7 +40,7 @@
             <div id="selectedFiles" class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4"></div>
 
             <button type="submit" id="submitBtn"
-                class="w-full bg-primary text-white px-4 py-2 rounded-2xl border-2 border-primary duration-300 transition-all ease-in-out mt-4 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer hover:bg-white hover:text-primary dark:hover:bg-gray-800"
+                class="w-full bg-primary text-white px-4 py-2 rounded-full border-2 border-primary duration-300 transition-all ease-in-out mt-4 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer hover:bg-white hover:text-primary dark:hover:bg-gray-800"
                 disabled>
                 <i class="fas fa-upload mr-2"></i> Upload Images
             </button>

@@ -97,7 +97,7 @@
 
             <div>
                 <button type="submit"
-                    class="w-full bg-primary text-white px-4 py-2 bg-primary rounded hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
+                    class="w-full bg-primary text-white px-4 py-2 bg-primary rounded-full shadow-cancel-hover hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
                     Save Staff
                 </button>
             </div>

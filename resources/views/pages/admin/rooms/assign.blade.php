@@ -116,7 +116,7 @@
                 <!-- Submit Button with proper spacing -->
                 <div class="flex justify-center pt-8 pb-8 sticky bottom-0">
                     <button type="submit"
-                        class="bg-primary text-white px-8 py-4 rounded-lg hover:text-primary border-2 border-primary hover:bg-white dark:hover:bg-gray-800 transition-all duration-300 cursor-pointer min-w-[200px] font-medium">
+                        class="bg-primary text-white px-8 py-4 rounded-full hover:text-primary border-2 border-primary hover:bg-white dark:hover:bg-gray-800 transition-all duration-300 cursor-pointer min-w-[200px] font-medium">
                         Update Assignment
                     </button>
                 </div>
@@ -163,14 +163,14 @@
             <div class="px-6 py-4 bg-gray-50 rounded-b-2xl dark:bg-gray-800">
                 <div class="flex justify-end space-x-3">
                     <button type="button" onclick="closeModal()"
-                        class="px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-lg transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300">
+                        class="px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-full transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300">
                         Cancel
                     </button>
                     <form id="unassignForm" method="POST" style="display: inline;">
                         @csrf
                         @method('DELETE')
                         <button type="submit"
-                            class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-red-600 rounded-lg hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800">
+                            class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-red-600 rounded-full hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800">
                             Unassign Staff
                         </button>
                     </form>

@@ -208,6 +208,14 @@
         box-shadow: 0 10px 40px rgba(21, 126, 225, 0.3);
     }
 
+    .shadow-cancel-hover {
+        transition: all 0.3s ease;
+    }
+    
+    .shadow-cancel-hover:hover {
+        box-shadow: 1 10px 40px rgba(107, 114, 128, 0.5);
+    }
+
     .bg-primary-10 {
         background-color: rgba(21, 126, 225, 0.1);
     }

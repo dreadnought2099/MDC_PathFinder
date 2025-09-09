@@ -164,7 +164,7 @@
 
                     {{-- Apply Button --}}
                     <button type="button"
-                        class="apply-bulk bg-primary text-center text-white px-4 py-2 rounded hover:text-primary border-2 border-primary hover:bg-white duration-300 ease-in-out transition-all cursor-pointer">
+                        class="apply-bulk bg-primary text-center text-white px-4 py-2 rounded-full hover:text-primary border-2 border-primary hover:bg-white duration-300 ease-in-out transition-all cursor-pointer">
                         Apply to Selected Days
                     </button>
                 </div>
@@ -224,7 +224,7 @@
             {{-- Submit --}}
             <div>
                 <button type="submit"
-                    class="w-full bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary transition-all duration-300 px-6 py-3 rounded-xl shadow-md hover:shadow-lg cursor-pointer">
+                    class="w-full bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary transition-all duration-300 px-6 py-3 rounded-full shadow-md hover:shadow-lg cursor-pointer">
                     Update Room
                 </button>
             </div>
