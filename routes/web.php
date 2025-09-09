@@ -27,6 +27,10 @@ Route::middleware(['web'])->group(function () {
         abort($code);
     });
 
+    Route::get('/about', function() {
+        return view('pages.client.about.index');
+    })->name('about');
+
     // Home page - displays main landing page
     Route::get('/', [HomeController::class, 'index'])->name('index');
 

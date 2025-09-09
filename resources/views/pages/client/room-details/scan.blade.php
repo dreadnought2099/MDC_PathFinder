@@ -46,6 +46,10 @@
                                 $backUrl = route('paths.return-to-results');
                                 $backText = 'Back to Results';
                                 break;
+                            case 'about':
+                                $backUrl = route('about');
+                                $backText = 'Back to About';
+                            break;
                             default:
                                 $backUrl = route('index');
                                 $backText = 'Back to Home';
