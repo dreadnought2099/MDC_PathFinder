@@ -15,7 +15,7 @@
             {{-- Path Selector --}}
             <div class="mb-4 dark:text-gray-300">
                 <label for="path_id" class="block text-gray-700 mb-2 dark:text-gray-300">Select Path</label>
-                <select name="path_id" id="path_id" required class="w-full border rounded px-3 py-2 dark:bg-gray-800">
+                <select name="path_id" id="path_id" required class="w-full border border-primary rounded px-3 py-2 dark:bg-gray-800">
                     @foreach ($paths as $p)
                         <option value="{{ $p->id }}" {{ $p->id == $defaultPath->id ? 'selected' : '' }}>
                             {{ $p->fromRoom->name ?? 'Room #' . $p->from_room_id }} →
@@ -27,9 +27,8 @@
 
             {{-- Dropzone --}}
             <label for="fileInput"
-                class="flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors p-4 overflow-auto relative">
-                <i class="fas fa-cloud-upload-alt fa-4x text-gray-400 mb-2"></i>
-                <span class="text-gray-500 mb-2">Drop images here or click to browse</span>
+                class="flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary dark:hover:bg-gray-800 transition-colors p-4 overflow-auto relative">
+                <span class="text-gray-600 dark:text-gray-300 mb-2">Drop images here or click to browse</span>
                 <span class="text-xs text-gray-400">
                     JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 50MB each | multiple allowed
                 </span>
