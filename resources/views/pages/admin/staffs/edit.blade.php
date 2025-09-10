@@ -157,7 +157,7 @@
                         <!-- Submit Button -->
                         <div class="pt-4">
                             <button type="submit"
-                                class="w-full bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary transition-all duration-300 px-6 py-3 rounded-xl shadow-md hover:shadow-lg cursor-pointer">
+                                class="w-full bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary transition-all duration-300 px-6 py-3 rounded-md shadow-md hover:shadow-lg cursor-pointer">
                                 Update Staff Member
                             </button>
                         </div>

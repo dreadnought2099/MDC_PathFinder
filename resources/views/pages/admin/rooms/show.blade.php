@@ -171,7 +171,7 @@
                         </div>
                         <div>
                             <a href="{{ route('room.print-qrcode', $room->id) }}" target="_blank"
-                                class="inline-flex items-center gap-2 text-white bg-primary border border-primary hover:text-primary hover:bg-white px-4 py-4 text-sm rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 dark:hover:bg-gray-800">
+                                class="inline-flex items-center gap-2 text-white bg-primary border border-primary hover:text-primary hover:bg-white px-4 py-4 text-sm rounded-md transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 dark:hover:bg-gray-800">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">

@@ -1,10 +1,16 @@
 <div class="dark-mode-toggle-component">
     <!-- Nothing worth having comes easy. - Theodore Roosevelt -->
-    <button id="darkModeToggle" class="toggle-switch" aria-label="Toggle dark mode">
+    <button id="darkModeToggle" class="relative group toggle-switch" aria-label="Toggle dark mode">
         <div class="toggle-slider">
             <img src="{{ asset('icons/sun.png') }}" alt="Light mode" class="sun-icon">
             <img src="{{ asset('icons/moon.png') }}" alt="Dark mode" class="moon-icon">
         </div>
+        <span
+            class="hidden lg:flex absolute right-full mr-3 px-3 py-1.5 rounded-md 
+                 bg-gray-800 text-white text-sm shadow-md opacity-0 group-hover:opacity-100 
+                 transition-opacity duration-300 whitespace-nowrap">
+            Click to toggle dark mode
+        </span>
     </button>
 </div>
 

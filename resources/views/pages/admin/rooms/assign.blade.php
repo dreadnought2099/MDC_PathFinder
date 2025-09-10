@@ -98,7 +98,7 @@
                                         <label class="flex items-center justify-center w-full cursor-pointer">
                                             <input type="checkbox" data-staff-id="{{ $member->id }}" name="staff_ids[]"
                                                 value="{{ $member->id }}"
-                                                class="h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary focus:ring-2 transition-all duration-200"
+                                                class="custom-time-input h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary focus:ring-2 transition-all duration-200"
                                                 @if ($isSelectedRoom) checked @endif
                                                 @if ($isAssignedOtherRoom) disabled @endif>
                                             <span
@@ -116,7 +116,7 @@
                 <!-- Submit Button with proper spacing -->
                 <div class="flex justify-center pt-8 pb-8 sticky bottom-0">
                     <button type="submit"
-                        class="bg-primary text-white px-4 py-4 rounded-full hover:text-primary border-2 border-primary hover:bg-white dark:hover:bg-gray-800 transition-all duration-300 cursor-pointer min-w-[100px] font-medium shadow-primary-hover">
+                        class="bg-primary text-white px-4 py-4 rounded-md hover:text-primary border-2 border-primary hover:bg-white dark:hover:bg-gray-800 transition-all duration-300 cursor-pointer min-w-[100px] font-medium shadow-primary-hover">
                         Update Assignment
                     </button>
                 </div>
@@ -163,14 +163,14 @@
             <div class="px-6 py-4 bg-gray-50 rounded-b-2xl dark:bg-gray-800">
                 <div class="flex justify-end space-x-3">
                     <button type="button" onclick="closeModal()"
-                        class="px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-full transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover">
+                        class="px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover">
                         Cancel
                     </button>
                     <form id="unassignForm" method="POST" style="display: inline;">
                         @csrf
                         @method('DELETE')
                         <button type="submit"
-                            class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-secondary rounded-full hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover">
+                            class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-secondary rounded-md hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover">
                             Unassign Staff
                         </button>
                     </form>

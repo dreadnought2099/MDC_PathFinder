@@ -4,9 +4,9 @@
     <div class="relative min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col px-4 sm:px-6 lg:px-8">
 
         <!-- Top-right controls: Dark Mode + About -->
-        <div class="absolute top-4 right-4 z-10 flex items-center space-x-4">
+        <div class="absolute top-4 right-4 z-10 flex items-center space-x-8">
             <!-- About Icon -->
-            <a href="{{ route('about') }}" class="relative group">
+            <a href="{{ route('about') }}" class="relative group top-0">
                 <img src="{{ asset('icons/information.png') }}" alt="About MDC PathFinder"
                     class="w-8 h-8 sm:w-10 sm:h-10 hover:scale-115 transition-transform duration-300">
                 <!-- Tooltip (desktop only) -->
@@ -18,15 +18,9 @@
                 </span>
             </a>
 
-            <div class="relative group">
+            <div>
                 <!-- Dark Mode Toggle -->
                 <x-dark-mode-toggle />
-                <span
-                    class="hidden lg:flex absolute right-full mr-3 px-3 py-1.5 rounded-md 
-                 bg-gray-800 text-white text-sm shadow-md opacity-0 group-hover:opacity-100 
-                 transition-opacity duration-300 whitespace-nowrap">
-                    Click to toggle dark mode
-                </span>
             </div>
 
         </div>

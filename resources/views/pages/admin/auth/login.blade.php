@@ -53,7 +53,7 @@
                     </div>
 
                     <button type="submit"
-                        class="w-full bg-primary text-white py-2 rounded-md hover:bg-white hover:text-primary border border-primary transition-all duration-300 cursor-pointer">
+                        class="w-full bg-primary text-white py-2 rounded-md hover:bg-white hover:text-primary border border-primary transition-all duration-300 cursor-pointer shadow-primary-hover">
                         Log In
                     </button>
                 </form>

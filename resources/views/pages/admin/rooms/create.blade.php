@@ -189,7 +189,7 @@
 
                     {{-- Apply Button --}}
                     <button type="button"
-                        class="apply-bulk bg-primary text-center text-white px-4 py-2 rounded-full hover:text-primary border-2 border-primary hover:bg-white dark:hover:bg-gray-800 duration-300 ease-in-out transition-all cursor-pointer shadow-primary-hover">
+                        class="apply-bulk bg-primary text-center text-white px-4 py-2 rounded-md hover:text-primary border-2 border-primary hover:bg-white dark:hover:bg-gray-800 duration-300 ease-in-out transition-all cursor-pointer shadow-primary-hover">
                         Apply to Selected Days
                     </button>
                 </div>
@@ -203,7 +203,7 @@
 
             <div>
                 <button type="submit"
-                    class="w-full bg-primary text-white px-4 py-2 bg-primary rounded-full hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
+                    class="w-full bg-primary text-white px-4 py-2 bg-primary rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
                     Save Room
                 </button>
             </div>
@@ -521,11 +521,11 @@
                     </div>
                     ${rangeKey !== "closed" ? `
                                             <div class="flex gap-2 ml-4">
-                                                <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
                                                         data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
                                                     Edit
                                                 </button>
-                                                <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
                                                         data-days='${JSON.stringify(group.days)}'>
                                                     Delete
                                                 </button>

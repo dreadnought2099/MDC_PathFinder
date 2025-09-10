@@ -164,7 +164,7 @@
 
                     {{-- Apply Button --}}
                     <button type="button"
-                        class="apply-bulk bg-primary text-center text-white px-4 py-2 rounded-full hover:text-primary border-2 border-primary hover:bg-white duration-300 ease-in-out transition-all cursor-pointer">
+                        class="apply-bulk bg-primary text-center text-white px-4 py-2 rounded-md hover:text-primary border-2 border-primary hover:bg-white duration-300 ease-in-out transition-all cursor-pointer">
                         Apply to Selected Days
                     </button>
                 </div>
@@ -224,7 +224,7 @@
             {{-- Submit --}}
             <div>
                 <button type="submit"
-                    class="w-full bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary transition-all duration-300 px-6 py-3 rounded-full shadow-md hover:shadow-lg cursor-pointer">
+                    class="w-full bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary transition-all duration-300 px-6 py-3 rounded-md shadow-md hover:shadow-lg cursor-pointer">
                     Update Room
                 </button>
             </div>
@@ -550,11 +550,11 @@
                             </div>
                             ${rangeKey !== "closed" ? `
                                                             <div class="flex gap-2 ml-4">
-                                                                <button type="button" class="edit-schedule-btn text-blue-600 hover:text-blue-800 text-sm px-2 py-1 rounded border border-blue-300 hover:bg-blue-50 transition-colors" 
+                                                                <button type="button" class="edit-schedule-btn text-blue-600 hover:text-blue-800 text-sm px-2 py-1 rounded-md border border-blue-300 hover:bg-blue-50 transition-colors" 
                                                                         data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
                                                                     Edit
                                                                 </button>
-                                                                <button type="button" class="delete-schedule-btn text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded border border-red-300 hover:bg-red-50 transition-colors" 
+                                                                <button type="button" class="delete-schedule-btn text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded-md border border-red-300 hover:bg-red-50 transition-colors" 
                                                                         data-days='${JSON.stringify(group.days)}'>
                                                                     Delete
                                                                 </button>
