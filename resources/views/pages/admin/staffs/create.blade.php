@@ -12,10 +12,10 @@
 
             @php
                 $inputClasses =
-                    'peer py-3 w-full placeholder-transparent rounded-md text-gray-700 dark:text-gray-300 ring-1 px-4 ring-gray-400 dark:ring-gray-500 focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-white dark:bg-gray-700';
+                    'peer py-3 w-full placeholder-transparent font-sofia rounded-md text-gray-700 dark:text-gray-300 ring-1 px-4 ring-gray-400 dark:ring-gray-500 focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-white dark:bg-gray-700';
 
                 $labelClasses =
-                    'absolute cursor-text left-0 -top-3 text-sm text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 mx-1 px-1 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3 peer-focus:text-primary peer-focus:text-sm peer-focus:bg-white dark:peer-focus:bg-gray-800 peer-focus:px-2 peer-focus:rounded-md';
+                    'absolute cursor-text left-0 -top-3 text-sm font-sofia text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 mx-1 px-1 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3 peer-focus:text-primary peer-focus:text-sm peer-focus:bg-white dark:peer-focus:bg-gray-800 peer-focus:px-2 peer-focus:rounded-md';
             @endphp
 
             <div class="relative mb-4">
@@ -85,13 +85,13 @@
             </div>
 
             <div class="relative mb-4">
-                <input type="text" name="phone_num" placeholder="Phone Number" class="{{ $inputClasses }}"
+                <input type="number" name="phone_num" placeholder="Phone Number" class="{{ $inputClasses }}"
                     placeholder="0900 000 0000">
                 <label class="{{ $labelClasses }}">Phone Number</label>
             </div>
 
             <div class="relative mb-4">
-                <input type="file" name="photo_path" class="{{ $inputClasses }}">
+                <input type="file" name="photo_path" class="peer py-3 w-full placeholder-transparent rounded-md text-gray-700 dark:text-gray-300 ring-1 px-4 ring-gray-400 dark:ring-gray-500 focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-white dark:bg-gray-700">
                 <label class="{{ $labelClasses }}">Photo</label>
             </div>
 

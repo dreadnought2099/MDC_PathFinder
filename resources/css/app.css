@@ -16,11 +16,21 @@
 
 @font-face {
     font-family: "Anton";
-    src: url("../fonts/Anton-Regular.woff2") format("woff2"),
-        url("../fonts/Anton-Regular.woff") format("woff"),
-        url("../fonts/Anton-Regular.ttf") format("truetype");
+    src: url("../fonts/Cubano.woff2") format("woff2"),
+        url("../fonts/Cubano.woff") format("woff"),
+        url("..fonts/Cubano.ttf") format("truetype");
     font-weight: normal;
     font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Sofia Pro";
+    src: url("../fonts/Sofia Pro Black Az.woff2") format("woff2"),
+        url("../fonts/Sofia Pro Black Az.woff") format("woff"),
+        url("..fonts/Sofia Pro Black Az.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
 }
 
 @layer base {
@@ -42,13 +52,29 @@
     }
 
     body {
-        font-family: "Anton", Verdana, sans-serif;
+        font-family: "Cubano", Verdana, sans-serif;
+    }
+
+    .font-sofia {
+        font-family: "Sofia Pro", Verdana, sans-serif;
+        text-transform: none;
     }
 
     @media print {
         .print-border-primary {
             border-color: var(--color-primary) !important;
         }
+    }
+
+    /* Remove spinner arrows from number inputs */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type="number"] {
+        -moz-appearance: textfield; /* Firefox */
     }
 }
 
@@ -211,7 +237,7 @@
     .shadow-cancel-hover {
         transition: all 0.3s ease;
     }
-    
+
     .shadow-cancel-hover:hover {
         box-shadow: 0 10px 40px rgba(107, 114, 128, 0.5);
     }
