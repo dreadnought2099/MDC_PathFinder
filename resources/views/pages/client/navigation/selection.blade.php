@@ -4,7 +4,7 @@
     <div class="min-h-screen dark:bg-gray-900 flex flex-col">
         <!-- Top bar -->
         <div
-            class="w-full flex justify-between items-center p-4 border-b-2 border-primary dark:border-primary bg-white dark:bg-gray-900 sticky top-0 z-50">
+            class="w-full flex justify-between items-center p-4 dark:border-b-2 border-b-primary dark:border-b-primary bg-white dark:bg-gray-900 sticky top-0 z-50">
 
             <!-- Left: Back button -->
             <a href="{{ route('index') }}"
@@ -44,7 +44,7 @@
                             Starting Point
                         </label>
                         <select id="from_room" name="from_room"
-                            class="w-full border border-primary rounded-lg p-2 dark:bg-gray-700 dark:text-gray-200">
+                            class="w-full border border-primary focus:ring-2 focus:border-primary focus:ring-primary focus:outline-none rounded-lg p-2 dark:bg-gray-700 dark:text-gray-200 transition-all duration-200">
                             <option value="">-- Select a room --</option>
                             @foreach ($rooms as $room)
                                 <option value="{{ $room->id }}">{{ $room->name }}</option>
@@ -58,7 +58,7 @@
                             Destination
                         </label>
                         <select id="to_room" name="to_room"
-                            class="w-full border border-primary rounded-lg p-2 dark:bg-gray-700 dark:text-gray-200">
+                            class="w-full border border-primary focus:ring-2 focus:border-primary focus:ring-primary focus:outline-none rounded-lg p-2 dark:bg-gray-700 dark:text-gray-200 transition-all duration-200">
                             <option value="">-- Select a room --</option>
                             @foreach ($rooms as $room)
                                 <option value="{{ $room->id }}">{{ $room->name }}</option>

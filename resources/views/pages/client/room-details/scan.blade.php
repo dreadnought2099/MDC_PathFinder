@@ -5,7 +5,7 @@
         <!-- Top navigation bar with back button and dark mode toggle -->
         <div
             class="bg-white flex justify-between items-center p-4 mb-2 sticky top-0 z-50
-           dark:bg-gray-900 border-b-2 border-b-primary dark:border-b-primary">
+           dark:bg-gray-900 dark:border-b-2 border-b-primary dark:border-b-primary">
 
             <!-- Left: Back button -->
             <div>

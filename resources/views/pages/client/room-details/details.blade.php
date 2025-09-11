@@ -1,7 +1,9 @@
-<div class="min-h-screen p-8 rounded-xl shadow-lg container mx-auto max-w-4xl space-y-12 border-2 border-primary dark:bg-gray-800">
+<div
+    class="min-h-screen p-8 rounded-xl shadow-lg container mx-auto max-w-4xl space-y-12 border-2 border-primary dark:bg-gray-800">
     <!-- Room Title -->
-    <h1 class="text-4xl font-extrabold text-gray-900 dark:text-gray-300 
-           border-b-2 border-b-primary dark:border-b-primary text-center pb-3">
+    <h1
+        class="text-4xl font-extrabold text-gray-900 dark:text-gray-300 
+           dark:border-b-2 border-b-primary dark:border-b-primary text-center pb-3">
         {{ $room->name }}
     </h1>
 
@@ -110,7 +112,8 @@
 </div>
 
 <!-- Reusable Image Modal Markup -->
-<div id="imageModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+<div id="imageModal"
+    class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
     <!-- Top-right controls -->
     <div class="absolute top-5 right-5 flex items-center space-x-8">
         <!-- Download button -->

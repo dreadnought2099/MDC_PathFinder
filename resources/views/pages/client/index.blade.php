@@ -1,11 +1,11 @@
 @extends('layouts.guest')
 
 @section('content')
-    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+    <div class="min-h-screen bg-white dark:bg-gray-900 flex flex-col">
 
         <!-- Sticky Top Bar -->
         <div
-            class="w-full flex justify-between items-center p-4 border-b-2 border-primary dark:border-primary bg-white dark:bg-gray-900 sticky top-0 z-50">
+            class="w-full flex justify-between items-center p-4 dark:border-primary bg-white dark:bg-gray-900 sticky top-0 z-50">
             <!-- Left (empty for index) -->
             <div></div>
 

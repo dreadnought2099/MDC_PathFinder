@@ -85,6 +85,7 @@
     .border-b-primary {
         border-bottom-color: var(--color-primary);
     }
+
     .dark .border-b-primary {
         border-bottom-color: var(--color-primary);
     }
