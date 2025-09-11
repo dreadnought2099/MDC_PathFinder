@@ -40,6 +40,12 @@
         <button @click="open = !open"
             class="w-12 h-12 rounded-full bg-primary text-white text-4xl flex items-center justify-center shadow-lg hover:bg-white hover:text-primary border-2 border-primary transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
             <span x-text="open ? '-' : '+'"></span>
+            <span
+                class="hidden lg:flex absolute right-full mr-3 px-3 py-1.5 rounded-md 
+                 bg-gray-800 text-white text-sm shadow-md opacity-0 group-hover:opacity-100 
+                 transition-opacity duration-300 whitespace-nowrap">
+                Click to Collapse
+            </span>
         </button>
     </div>
 </div>

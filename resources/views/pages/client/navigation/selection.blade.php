@@ -5,7 +5,8 @@
         <!-- Top bar -->
         <div
             class="w-full flex justify-between items-center p-4 border-b-2 border-primary dark:border-primary bg-white dark:bg-gray-900 sticky top-0 z-50">
-            <!-- Back button -->
+
+            <!-- Left: Back button -->
             <a href="{{ route('index') }}"
                 class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 dark:text-gray-300">
                 <svg class="h-6 w-6 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -14,8 +15,15 @@
                 <span class="font-medium">Back to Home</span>
             </a>
 
-            <!-- Dark mode toggle -->
-            <x-dark-mode-toggle />
+            <!-- Right: About + Dark Mode -->
+            <div class="flex items-center space-x-4">
+                <!-- About icon -->
+                <x-about-page />
+
+                <!-- Dark Mode Toggle -->
+                <x-dark-mode-toggle />
+            </div>
+
         </div>
 
         <x-floating-q-r href="{{ route('scan.index') }}" icon="{{ asset('icons/qr-code.png') }}" alt="Scan Office"
@@ -36,7 +44,7 @@
                             Starting Point
                         </label>
                         <select id="from_room" name="from_room"
-                            class="w-full border rounded-lg p-2 dark:bg-gray-700 dark:text-gray-200">
+                            class="w-full border border-primary rounded-lg p-2 dark:bg-gray-700 dark:text-gray-200">
                             <option value="">-- Select a room --</option>
                             @foreach ($rooms as $room)
                                 <option value="{{ $room->id }}">{{ $room->name }}</option>
@@ -50,7 +58,7 @@
                             Destination
                         </label>
                         <select id="to_room" name="to_room"
-                            class="w-full border rounded-lg p-2 dark:bg-gray-700 dark:text-gray-200">
+                            class="w-full border border-primary rounded-lg p-2 dark:bg-gray-700 dark:text-gray-200">
                             <option value="">-- Select a room --</option>
                             @foreach ($rooms as $room)
                                 <option value="{{ $room->id }}">{{ $room->name }}</option>

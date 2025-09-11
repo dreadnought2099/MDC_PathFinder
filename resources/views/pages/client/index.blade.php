@@ -1,33 +1,23 @@
 @extends('layouts.guest')
 
 @section('content')
-    <div class="relative min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col px-4 sm:px-6 lg:px-8">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
 
-        <!-- Top-right controls: Dark Mode + About -->
-        <div class="absolute top-4 right-4 z-10 flex items-center space-x-8">
-            <!-- About Icon -->
-            <a href="{{ route('about') }}" class="relative group top-0">
-                <img src="{{ asset('icons/information.png') }}" alt="About MDC PathFinder"
-                    class="w-8 h-8 sm:w-10 sm:h-10 hover:scale-115 transition-transform duration-300">
-                <!-- Tooltip (desktop only) -->
-                <span
-                    class="hidden lg:flex absolute right-full mr-3 px-3 py-1.5 rounded-md 
-                 bg-gray-800 text-white text-sm shadow-md opacity-0 group-hover:opacity-100 
-                 transition-opacity duration-300 whitespace-nowrap">
-                    About {{ config('app.name') }}
-                </span>
-            </a>
+        <!-- Sticky Top Bar -->
+        <div
+            class="w-full flex justify-between items-center p-4 border-b-2 border-primary dark:border-primary bg-white dark:bg-gray-900 sticky top-0 z-50">
+            <!-- Left (empty for index) -->
+            <div></div>
 
-            <div>
-                <!-- Dark Mode Toggle -->
+            <!-- Right: About + Dark Mode -->
+            <div class="flex items-center space-x-4">
+                <x-about-page />
                 <x-dark-mode-toggle />
             </div>
-
         </div>
 
-        <!-- Main Content Wrapper -->
-        <div class="flex flex-col flex-grow justify-between items-center">
-
+        <!-- Main Content -->
+        <div class="flex flex-col flex-grow justify-between items-center px-4 sm:px-6 lg:px-8">
             <!-- Top: Welcome Message -->
             <div class="text-center mt-16 sm:mt-20 lg:mt-24 xl:mt-28 px-4 sm:px-6 lg:px-8">
                 <h3
@@ -51,7 +41,8 @@
                       border-2 border-primary shadow-lg hover:shadow-xl
                       hover:bg-white hover:text-primary dark:bg-gray-800 dark:hover:bg-gray-800
                       transition-all duration-300 ease-in-out shadow-primary-hover">
-                    <span class="text-lg sm:text-xl">Start Navigation</span><span
+                    <span class="text-lg sm:text-xl">Start Navigation</span>
+                    <span
                         class="hidden lg:flex absolute right-full mr-3 px-3 py-1.5 rounded-md 
                  bg-gray-800 text-white text-sm shadow-md opacity-0 group-hover:opacity-100 
                  transition-opacity duration-300 whitespace-nowrap">
@@ -59,7 +50,7 @@
                     </span>
                 </a>
             </div>
-
         </div>
+
     </div>
 @endsection

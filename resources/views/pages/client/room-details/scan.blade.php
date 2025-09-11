@@ -5,65 +5,66 @@
         <!-- Top navigation bar with back button and dark mode toggle -->
         <div
             class="bg-white flex justify-between items-center p-4 mb-2 sticky top-0 z-50
-            dark:bg-gray-900 
-            border-b-2 border-b-primary dark:border-b-primary">
+           dark:bg-gray-900 border-b-2 border-b-primary dark:border-b-primary">
 
-            <!-- Back button - enhanced conditional logic -->
-            @if ($room)
-                <!-- If viewing room details, check if we have a return parameter -->
-                @php
-                    $returnRoute = request('return');
-                    $backUrl = route('scan.index');
-                    $backText = 'Back to Scanner';
+            <!-- Left: Back button -->
+            <div>
+                @if ($room)
+                    @php
+                        $returnRoute = request('return');
+                        $backUrl = route('scan.index');
+                        $backText = 'Back to Scanner';
 
-                    if ($returnRoute) {
-                        $backUrl = route('scan.index', ['return' => $returnRoute]);
-                    }
-                @endphp
-
-                <a href="{{ $backUrl }}"
-                    class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 dark:text-gray-300">
-                    <svg class="h-6 w-6 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
-                    <span class="font-medium">{{ $backText }}</span>
-                </a>
-            @else
-                <!-- If on QR scanner page, check for return parameter -->
-                @php
-                    $returnRoute = request('return');
-                    $backUrl = route('index');
-                    $backText = 'Back to Home';
-
-                    if ($returnRoute && Route::has($returnRoute)) {
-                        switch ($returnRoute) {
-                            case 'paths.select':
-                                $backUrl = route('paths.select');
-                                $backText = 'Back to Path Selection';
-                                break;
-                            case 'paths.results':
-                                // Return to the previous search results using session data
-                                $backUrl = route('paths.return-to-results');
-                                $backText = 'Back to Results';
-                                break;
-                            default:
-                                $backUrl = route('index');
-                                $backText = 'Back to Home';
+                        if ($returnRoute) {
+                            $backUrl = route('scan.index', ['return' => $returnRoute]);
                         }
-                    }
-                @endphp
+                    @endphp
 
-                <a href="{{ $backUrl }}"
-                    class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 dark:text-gray-300">
-                    <svg class="h-6 w-6 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
-                    <span class="font-medium">{{ $backText }}</span>
-                </a>
-            @endif
+                    <a href="{{ $backUrl }}"
+                        class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 dark:text-gray-300">
+                        <svg class="h-6 w-6 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                        </svg>
+                        <span class="font-medium">{{ $backText }}</span>
+                    </a>
+                @else
+                    @php
+                        $returnRoute = request('return');
+                        $backUrl = route('index');
+                        $backText = 'Back to Home';
 
-            <!-- Dark mode toggle -->
-            <x-dark-mode-toggle />
+                        if ($returnRoute && Route::has($returnRoute)) {
+                            switch ($returnRoute) {
+                                case 'paths.select':
+                                    $backUrl = route('paths.select');
+                                    $backText = 'Back to Path Selection';
+                                    break;
+                                case 'paths.results':
+                                    $backUrl = route('paths.return-to-results');
+                                    $backText = 'Back to Results';
+                                    break;
+                                default:
+                                    $backUrl = route('index');
+                                    $backText = 'Back to Home';
+                            }
+                        }
+                    @endphp
+
+                    <a href="{{ $backUrl }}"
+                        class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 dark:text-gray-300">
+                        <svg class="h-6 w-6 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                        </svg>
+                        <span class="font-medium">{{ $backText }}</span>
+                    </a>
+                @endif
+            </div>
+
+            <!-- Right: About + Dark Mode -->
+            <div class="flex items-center space-x-4">
+                <x-about-page />
+                <x-dark-mode-toggle />
+            </div>
         </div>
 
         <!-- Main content area -->
