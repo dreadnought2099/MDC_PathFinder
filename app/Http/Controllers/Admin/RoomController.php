@@ -28,8 +28,7 @@ class RoomController extends Controller
 
     public function create()
     {
-        $staffs = Staff::all();
-        return view('pages.admin.rooms.create', compact('staffs'));
+        return view('pages.admin.rooms.create');
     }
 
     public function store(Request $request, EntrancePointService $entrancePointService)

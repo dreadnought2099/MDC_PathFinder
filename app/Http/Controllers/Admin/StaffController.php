@@ -26,8 +26,7 @@ class StaffController extends Controller
 
     public function create()
     {
-        $rooms = Room::all();
-        return view('pages.admin.staffs.create', compact('rooms'));
+        return view('pages.admin.staffs.create');
     }
 
     public function store(Request $request, Staff $staff)

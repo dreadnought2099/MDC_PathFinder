@@ -29,7 +29,7 @@
 
             <div class="mb-4">
                 <label class="block mb-2 font-medium dark:text-gray-300">Room Type</label>
-                <select name="room_type"
+                <select name="room_type" id="room_type"
                     class="w-full border dark:text-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent border-primary dark:bg-gray-800"
                     required>
                     <option value="regular" {{ old('room_type') === 'regular' ? 'selected' : '' }}>
@@ -44,7 +44,7 @@
                 </p>
             </div>
 
-            <div class="mb-4">
+            <div class="mb-4 conditional-field" id="cover-image-section">
                 <label class="block mb-2 dark:text-gray-300">Cover Image (optional)</label>
 
                 <label for="image_path" id="uploadBox"
@@ -66,7 +66,7 @@
             </div>
 
             {{-- Carousel Images --}}
-            <div class="mb-4 max-w-xl mx-auto">
+            <div class="mb-4 max-w-xl mx-auto conditional-field" id="carousel-images-section">
                 <label class="block mb-2 dark:text-gray-300">Carousel Images (optional)</label>
 
                 <label for="carousel_images" id="carouselUploadBox"
@@ -88,7 +88,7 @@
                 </label>
             </div>
 
-            <div class="mb-4 max-w-xl mx-auto">
+            <div class="mb-4 max-w-xl mx-auto conditional-field" id="video-section">
                 <label class="block mb-2 dark:text-gray-300">Short Video (optional)</label>
 
                 <div id="videoDropZone"
@@ -114,7 +114,7 @@
                 </div>
             </div>
 
-            <div class="mb-6">
+            <div class="mb-6 conditional-field" id="office-hours-section">
                 <label class="block font-semibold mb-2 dark:text-gray-300">Office Hours</label>
 
                 {{-- Bulk Day Selection Section --}}
@@ -214,6 +214,72 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Room type change handler
+            const roomTypeSelect = document.getElementById('room_type');
+            const conditionalFields = document.querySelectorAll('.conditional-field');
+
+            function toggleConditionalFields() {
+                const isEntrancePoint = roomTypeSelect.value === 'entrance_point';
+
+                conditionalFields.forEach(field => {
+                    if (isEntrancePoint) {
+                        field.style.display = 'none';
+                        // Disable all inputs within the field
+                        const inputs = field.querySelectorAll('input, textarea, select');
+                        inputs.forEach(input => {
+                            input.disabled = true;
+                            // Clear file inputs
+                            if (input.type === 'file') {
+                                input.value = '';
+                            }
+                        });
+                    } else {
+                        field.style.display = 'block';
+                        // Re-enable all inputs within the field
+                        const inputs = field.querySelectorAll('input, textarea, select');
+                        inputs.forEach(input => {
+                            input.disabled = false;
+                        });
+                    }
+                });
+
+                // Clear previews when switching to entrance point
+                if (isEntrancePoint) {
+                    // Clear cover image preview
+                    const coverPreview = document.getElementById('previewImage');
+                    const coverUploadText = document.getElementById('uploadText');
+                    const uploadBox = document.getElementById('uploadBox');
+                    if (coverPreview) {
+                        coverPreview.classList.add('hidden');
+                        coverPreview.src = '';
+                    }
+                    if (coverUploadText) coverUploadText.style.display = '';
+                    const uploadIcon = uploadBox?.querySelector('img');
+                    if (uploadIcon) uploadIcon.style.display = '';
+
+                    // Clear carousel previews
+                    const carouselContainer = document.getElementById('carouselPreviewContainer');
+                    if (carouselContainer) carouselContainer.innerHTML = '';
+                    selectedFiles = [];
+                    updateUploadIconVisibility();
+
+                    // Clear video preview
+                    clearVideo();
+                    const videoInput = document.getElementById('video_path');
+                    if (videoInput) videoInput.value = '';
+
+                    // Clear office hours
+                    officeHoursData = {};
+                    renderOfficeHours();
+                }
+            }
+
+            // Initialize on page load
+            toggleConditionalFields();
+
+            // Add event listener for room type changes
+            roomTypeSelect.addEventListener('change', toggleConditionalFields);
+
             // Cover image upload preview
             const coverInput = document.getElementById('image_path');
             const coverPreview = document.getElementById('previewImage');
@@ -520,17 +586,17 @@
                         <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                     </div>
                     ${rangeKey !== "closed" ? `
-                                            <div class="flex gap-2 ml-4">
-                                                <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                        data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                                    Edit
-                                                </button>
-                                                <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                        data-days='${JSON.stringify(group.days)}'>
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        ` : ''}
+                                                <div class="flex gap-2 ml-4">
+                                                    <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                            data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                        Edit
+                                                    </button>
+                                                    <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                            data-days='${JSON.stringify(group.days)}'>
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            ` : ''}
                 </div>
             `;
 

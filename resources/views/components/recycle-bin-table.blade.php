@@ -57,10 +57,10 @@
                                     <div id="restoreModal-{{ $routePrefix }}-{{ $item->id }}"
                                         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden transition-all duration-300 opacity-0"
                                         onclick="closeModal(event, this)">
-                                        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform transition-all duration-300 scale-95 dark:bg-gray-800"
+                                        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform transition-all duration-300 scale-95 dark:bg-gray-800 border border-primary"
                                             onclick="event.stopPropagation()">
                                             <!-- Modal Header -->
-                                            <div class="px-6 py-4 border-b border-gray-200 dark-border-b-primary">
+                                            <div class="px-6 py-4 border-b border-primary dark-border-b-primary">
                                                 <div class="flex items-center justify-between">
                                                     <h2 class="text-xl text-gray-900 dark:text-gray-300">Confirm <span
                                                             class="text-primary">Restore</span></h2>
@@ -95,7 +95,7 @@
                                                 </div>
                                             </div>
                                             <!-- Modal Footer -->
-                                            <div class="px-6 py-4 bg-gray-50 rounded-b-2xl dark:bg-gray-800">
+                                            <div class="px-6 py-4 bg-white rounded-b-2xl dark:bg-gray-800">
                                                 <form action="{{ route("{$routePrefix}.restore", $item->id) }}"
                                                     method="POST">
                                                     @csrf
@@ -120,10 +120,10 @@
                                     <div id="deleteModal-{{ $routePrefix }}-{{ $item->id }}"
                                         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden transition-all duration-300 opacity-0"
                                         onclick="closeModal(event, this)">
-                                        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform transition-all duration-300 scale-95 dark:bg-gray-800"
+                                        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform transition-all duration-300 scale-95 dark:bg-gray-800 border border-secondary"
                                             onclick="event.stopPropagation()">
                                             <!-- Modal Header -->
-                                            <div class="px-6 py-4 border-b border-gray-200">
+                                            <div class="px-6 py-4 border-b border-secondary">
                                                 <div class="flex items-center justify-between">
                                                     <h2 class="text-xl text-gray-900 dark:text-gray-300">Confirm <span
                                                             class="text-secondary">Permanent Deletion</span></h2>
@@ -159,7 +159,7 @@
                                                 </div>
                                             </div>
                                             <!-- Modal Footer -->
-                                            <div class="px-6 py-4 bg-gray-50 rounded-b-2xl dark:bg-gray-800">
+                                            <div class="px-6 py-4 bg-white rounded-b-2xl dark:bg-gray-800">
                                                 <form action="{{ route("{$routePrefix}.forceDelete", $item->id) }}"
                                                     method="POST">
                                                     @csrf

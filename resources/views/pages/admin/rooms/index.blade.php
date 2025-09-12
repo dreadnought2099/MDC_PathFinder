@@ -108,9 +108,9 @@
         <div id="roomDeleteModal"
             class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden transition-all duration-300 opacity-0"
             onclick="closeRoomModal()">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform transition-all duration-300 scale-95 dark:bg-gray-800 border-2 border-primary"
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform transition-all duration-300 scale-95 dark:bg-gray-800 border border-secondary"
                 onclick="event.stopPropagation()">
-                <div class="px-6 py-4 border-b border-primary">
+                <div class="px-6 py-4 border-b border-secondary">
                     <div class="flex items-center justify-between">
                         <h2 class="text-xl text-gray-900 dark:text-gray-300">Confirm <span
                                 class="text-secondary">Deletion</span></h2>
