@@ -9,7 +9,7 @@
         <h2 class="text-2xl text-center mb-6 dark:text-gray-300">
             <span class="text-primary">Upload</span> Path Images
         </h2>
-
+        
         <form id="uploadForm" action="{{ route('path-image.store') }}" method="POST" enctype="multipart/form-data" data-upload>
             @csrf
             {{-- Path Selector --}}
@@ -75,6 +75,9 @@
             // Session storage key
             const STORAGE_KEY = 'selected_path_id';
 
+            // Get the base URL from Laravel (more robust than hardcoding)
+            const createRouteBase = "{{ url('/admin/path-images/create') }}";
+
             // Load saved path selection from sessionStorage
             function loadSavedPathSelection() {
                 const savedPathId = sessionStorage.getItem(STORAGE_KEY);
@@ -82,7 +85,6 @@
                     const option = pathSelect.querySelector(`option[value="${savedPathId}"]`);
                     if (option) {
                         pathSelect.value = savedPathId;
-                        updateFormAction();
                     }
                 }
             }
@@ -92,22 +94,25 @@
                 sessionStorage.setItem(STORAGE_KEY, pathSelect.value);
             }
 
-            // Update form action URL with selected path ID
-            function updateFormAction() {
+            // Handle path selection change - redirect to maintain URL consistency
+            function handlePathChange() {
                 const selectedPathId = pathSelect.value;
+                console.log('Selected Path ID:', selectedPathId);
+                console.log('Create Route Base:', createRouteBase);
+
                 if (selectedPathId) {
-                    // Update the form action to include the path ID as a parameter
-                    const baseUrl = "{{ route('path-image.store') }}";
-                    const url = new URL(baseUrl);
-                    url.searchParams.set('path_id', selectedPathId);
-                    uploadForm.action = url.toString();
+                    savePathSelection();
+                    const newUrl = `${createRouteBase}/${selectedPathId}`;
+                    console.log('Redirecting to:', newUrl);
+                    // Redirect to the create route with the selected path
+                    window.location.href = newUrl;
                 }
             }
 
             // Handle path selection change
             pathSelect.addEventListener('change', function() {
-                savePathSelection();
-                updateFormAction();
+                console.log('Dropdown changed!');
+                handlePathChange();
             });
 
             function updateSubmitButton() {
@@ -175,7 +180,6 @@
 
             // Initialize on page load
             loadSavedPathSelection();
-            updateFormAction();
         });
     </script>
 @endpush

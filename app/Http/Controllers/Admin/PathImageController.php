@@ -21,8 +21,8 @@ class PathImageController extends Controller
                 ->with('warning', 'No paths available. Please create a path first.');
         }
 
-        // Default: use route param if provided, otherwise first path
-        $defaultPath = $path && $path->exists ? $path : $paths->first();
+        // Fixed: Remove the non-existent ->exists property
+        $defaultPath = $path ?? $paths->first();
 
         return view('pages.admin.path_images.create', compact('paths', 'defaultPath'));
     }
