@@ -93,13 +93,13 @@
                         <div class="flex flex-col gap-3 items-center">
                             <!-- Stop button -->
                             <button id="stopBtn"
-                                class="w-full max-w-xs bg-secondary hover:text-secondary hover:bg-white text-white border-2 border-secondary dark:hover:bg-gray-800 py-2 px-4 rounded-lg transition-all duration-300 ease-in-out cursor-pointer">
+                                class="w-full max-w-xs bg-secondary hover:text-secondary hover:bg-white text-white border-2 border-secondary dark:hover:bg-gray-800 py-2 px-4 rounded-md transition-all duration-300 ease-in-out cursor-pointer shadow-secondary-hover">
                                 Stop Scanning
                             </button>
 
                             <!-- Manual restart button -->
                             <button id="restartBtn"
-                                class="w-full max-w-xs bg-primary hover:bg-white hover:text-primary border-2 border-primary text-white dark:hover:bg-gray-800 py-2 px-4 rounded-lg transition-all duration-300 cursor-pointer">
+                                class="w-full max-w-xs bg-primary hover:bg-white hover:text-primary border-2 border-primary text-white dark:hover:bg-gray-800 py-2 px-4 rounded-md transition-all duration-300 cursor-pointer shadow-primary-hover">
                                 Restart Camera
                             </button>
                         </div>

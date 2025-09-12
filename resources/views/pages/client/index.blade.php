@@ -38,7 +38,7 @@
                 <div class="relative inline-block group">
                     <a href="{{ route('paths.select') }}"
                         class="inline-flex items-center justify-center 
-              p-4 sm:p-5 lg:p-6 rounded-full bg-primary text-white 
+              p-4 sm:p-5 lg:p-6 rounded-md bg-primary text-white 
               border-2 border-primary shadow-lg hover:shadow-xl
               hover:bg-white hover:text-primary dark:bg-gray-800 dark:hover:bg-gray-800
               transition-all duration-300 ease-in-out shadow-primary-hover">

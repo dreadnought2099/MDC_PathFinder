@@ -31,7 +31,7 @@
 
         <!-- Main content -->
         <div class="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8">
-            <div class="w-full max-w-lg bg-white border-2 border-primary dark:bg-gray-800 shadow-lg rounded-lg p-6">
+            <div class="w-full max-w-lg bg-white border-2 border-primary dark:bg-gray-800 shadow-lg rounded-md p-6">
                 <h2 class="text-2xl font-semibold mb-6 text-center dark:text-gray-200">
                     Select Starting Point & Destination
                 </h2>
@@ -68,7 +68,7 @@
 
                     <div class="flex justify-center">
                         <button type="submit"
-                            class="px-6 py-2 rounded-full bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary dark:hover:bg-gray-800 shadow-primary-light transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                            class="px-6 py-2 rounded-md bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary dark:hover:bg-gray-800 shadow-primary-light transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                             Start Navigation
                         </button>
                     </div>
