@@ -106,7 +106,7 @@
                                             class="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500">
                                     </div>
                                     <div class="p-6 text-center dark:bg-gray-700">
-                                        <a href="{{ route('staff.show', $member->id) }}"
+                                        <a href="{{ route('staff.show', $member->id) }}" target="_blank" rel="noopener noreferrer"
                                             class="block text-xl font-bold text-slate-800 hover:text-primary transition-colors duration-300 mb-2 dark:text-gray-300">
                                             {{ $member->full_name }}
                                         </a>

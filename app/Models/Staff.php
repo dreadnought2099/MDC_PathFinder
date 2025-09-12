@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Staff extends Model
 {
@@ -37,5 +38,14 @@ class Staff extends Model
             ($this->middle_name ? $this->middle_name . ' ' : '') .
             $this->last_name .
             ($this->suffix ? ' ' . $this->suffix : ''));
+    }
+
+    public static function booted()
+    {
+        static::creating(function ($staff) {
+            if (empty($staff->token)) {
+                $staff->token = Str::random(64);
+            }
+        });
     }
 }

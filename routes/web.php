@@ -48,7 +48,7 @@ Route::middleware(['web'])->group(function () {
         ->where('token', '[a-f0-9]{32}');
 
     // Client-facing staff profile
-    Route::get('/staffs/{staff}', [StaffController::class, 'clientShow'])->name('staff.client-show');
+    Route::get('/staffs/{staffToken}', [StaffController::class, 'clientShow'])->name('staff.client-show');
 
     // Client-side navigation
     Route::get('/navigation/select', [PathController::class, 'selection'])->name('paths.select');

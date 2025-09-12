@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('staff', function (Blueprint $table) {
             $table->id();
+            $table->string('token', 64)->unique(false);
             $table->foreignId('room_id')
                 ->nullable()
                 ->constrained('rooms')
