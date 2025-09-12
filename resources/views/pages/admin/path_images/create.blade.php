@@ -15,7 +15,8 @@
             {{-- Path Selector --}}
             <div class="mb-4 dark:text-gray-300">
                 <label for="path_id" class="block text-gray-700 mb-2 dark:text-gray-300">Select Path</label>
-                <select name="path_id" id="path_id" required class="w-full border border-primary rounded px-3 py-2 dark:bg-gray-800">
+                <select name="path_id" id="path_id" required
+                    class="w-full border border-primary rounded px-3 py-2 dark:bg-gray-800">
                     @foreach ($paths as $p)
                         <option value="{{ $p->id }}" {{ $p->id == $defaultPath->id ? 'selected' : '' }}>
                             {{ $p->fromRoom->name ?? 'Room #' . $p->from_room_id }} →
@@ -66,9 +67,48 @@
             const selectedFilesContainer = document.getElementById('selectedFiles');
             const submitBtn = document.getElementById('submitBtn');
             const uploadForm = document.getElementById('uploadForm');
+            const pathSelect = document.getElementById('path_id');
 
             let files = [];
             let isSubmitting = false;
+
+            // Session storage key
+            const STORAGE_KEY = 'selected_path_id';
+
+            // Load saved path selection from sessionStorage
+            function loadSavedPathSelection() {
+                const savedPathId = sessionStorage.getItem(STORAGE_KEY);
+                if (savedPathId) {
+                    const option = pathSelect.querySelector(`option[value="${savedPathId}"]`);
+                    if (option) {
+                        pathSelect.value = savedPathId;
+                        updateFormAction();
+                    }
+                }
+            }
+
+            // Save path selection to sessionStorage
+            function savePathSelection() {
+                sessionStorage.setItem(STORAGE_KEY, pathSelect.value);
+            }
+
+            // Update form action URL with selected path ID
+            function updateFormAction() {
+                const selectedPathId = pathSelect.value;
+                if (selectedPathId) {
+                    // Update the form action to include the path ID as a parameter
+                    const baseUrl = "{{ route('path-image.store') }}";
+                    const url = new URL(baseUrl);
+                    url.searchParams.set('path_id', selectedPathId);
+                    uploadForm.action = url.toString();
+                }
+            }
+
+            // Handle path selection change
+            pathSelect.addEventListener('change', function() {
+                savePathSelection();
+                updateFormAction();
+            });
 
             function updateSubmitButton() {
                 submitBtn.disabled = files.length === 0 || isSubmitting;
@@ -125,11 +165,17 @@
                 });
             }
 
+            // Make removeFile function global
             window.removeFile = removeFile;
 
+            // File input change handler
             fileInput.addEventListener('change', function() {
                 addFiles(Array.from(this.files));
             });
+
+            // Initialize on page load
+            loadSavedPathSelection();
+            updateFormAction();
         });
     </script>
 @endpush
