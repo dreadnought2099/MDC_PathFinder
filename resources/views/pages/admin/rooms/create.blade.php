@@ -220,7 +220,7 @@
 
             function toggleConditionalFields() {
                 const isEntrancePoint = roomTypeSelect.value === 'entrance_point';
-
+                
                 conditionalFields.forEach(field => {
                     if (isEntrancePoint) {
                         field.style.display = 'none';
@@ -228,8 +228,8 @@
                         const inputs = field.querySelectorAll('input, textarea, select');
                         inputs.forEach(input => {
                             input.disabled = true;
-                            // Clear file inputs
-                            if (input.type === 'file') {
+                            // Clear file inputs only when manually changing (not on page load)
+                            if (input.type === 'file' && !isPageLoad) {
                                 input.value = '';
                             }
                         });
@@ -243,8 +243,8 @@
                     }
                 });
 
-                // Clear previews when switching to entrance point
-                if (isEntrancePoint) {
+                // Clear previews only when manually switching to entrance point (not on page load)
+                if (isEntrancePoint && !isPageLoad) {
                     // Clear cover image preview
                     const coverPreview = document.getElementById('previewImage');
                     const coverUploadText = document.getElementById('uploadText');
@@ -272,13 +272,33 @@
                     officeHoursData = {};
                     renderOfficeHours();
                 }
+                
+                // Store the current room type in sessionStorage
+                sessionStorage.setItem('room_type', roomTypeSelect.value);
+            }
+
+            // Check if this is page load or manual change
+            let isPageLoad = true;
+
+            // Restore room type from sessionStorage on page load
+            const savedRoomType = sessionStorage.getItem('room_type');
+            if (savedRoomType && savedRoomType !== roomTypeSelect.value) {
+                roomTypeSelect.value = savedRoomType;
             }
 
             // Initialize on page load
             toggleConditionalFields();
-
+            
+            // Set isPageLoad to false after initial load
+            setTimeout(() => {
+                isPageLoad = false;
+            }, 100);
+            
             // Add event listener for room type changes
-            roomTypeSelect.addEventListener('change', toggleConditionalFields);
+            roomTypeSelect.addEventListener('change', () => {
+                isPageLoad = false; // Ensure this is treated as manual change
+                toggleConditionalFields();
+            });
 
             // Cover image upload preview
             const coverInput = document.getElementById('image_path');
@@ -586,17 +606,17 @@
                         <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                     </div>
                     ${rangeKey !== "closed" ? `
-                                                <div class="flex gap-2 ml-4">
-                                                    <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                            data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                                        Edit
-                                                    </button>
-                                                    <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                            data-days='${JSON.stringify(group.days)}'>
-                                                        Delete
-                                                    </button>
-                                                </div>
-                                            ` : ''}
+                                            <div class="flex gap-2 ml-4">
+                                                <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                        data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                    Edit
+                                                </button>
+                                                <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                        data-days='${JSON.stringify(group.days)}'>
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        ` : ''}
                 </div>
             `;
 
