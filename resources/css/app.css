@@ -39,6 +39,8 @@
         --color-secondary: #fb4141;
         --color-edit: #e1a224;
         --color-tertiary: #16c47f;
+        --color-purple: #9112BC;
+        --color-orange: #EF7722;
     }
 
     ::selection {
@@ -103,6 +105,18 @@
 
     .border-edit {
         border-color: var(--color-edit);
+    }
+
+    .border-tertiary {
+        border-color: var(--color-tertiary);
+    }
+
+    .border-purple {
+        border-color: var(--color-purple);
+    }
+
+    .border-orange {
+        border-color: var(--color-orange);
     }
 
     /* ========================
