@@ -8,8 +8,8 @@
     <div class="container mx-auto max-w-6xl px-4 py-6">
         <!-- Header -->
         <div class="mb-6 text-center ">
-            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
-                <i class="fas fa-route mr-2"></i> <span class="text-primary">Path</span> Details
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">
+                <span class="text-primary">Path</span> Details
             </h1>
         </div>
 

@@ -80,7 +80,7 @@
     <main>
         @yield('content')
     </main>
-
+        
     <!-- GLightbox JS -->
     <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
 

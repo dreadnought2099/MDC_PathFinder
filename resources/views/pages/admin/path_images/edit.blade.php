@@ -27,17 +27,14 @@
             </div>
 
             <!-- Path Information -->
-            <div class="bg-white border-2 border-primary rounded-xl shadow-sm p-6 dark:bg-gray-800">
+            <div class="bg-white border-2 border-primary rounded-md shadow-sm p-6 dark:bg-gray-800">
                 <div class="flex items-center justify-center space-x-6">
-                    <div class="text-center p-3 bg-primary text-white rounded-xl">
-                        <i class="fas fa-door-open fa-lg mb-1"></i>
+                    <div class="text-center p-3 bg-primary text-white rounded-md">
                         <p class="text-sm">
                             {{ $path->fromRoom->name ?? 'Room #' . $path->from_room_id }}
                         </p>
                     </div>
-                    <i class="fas fa-arrow-right fa-lg text-gray-500"></i>
-                    <div class="text-center p-3 bg-green-600 text-white rounded-xl">
-                        <i class="fas fa-door-open fa-lg mb-1"></i>
+                    <div class="text-center p-3 bg-green-600 text-white rounded-md">
                         <p class="text-sm">
                             {{ $path->toRoom->name ?? 'Room #' . $path->to_room_id }}
                         </p>
@@ -55,8 +52,8 @@
                     <div class="flex space-x-2">
                         @if (isset($pathImages) && $pathImages->count() === 1)
                             <a href="{{ route('path-image.edit', $path) }}"
-                                class="bg-primary hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm transition">
-                                <i class="fas fa-images mr-1"></i> Edit All Images
+                                class="bg-primary hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm transition">
+                                Edit All Images
                             </a>
                         @endif
                     </div>
@@ -72,7 +69,7 @@
                     <input type="hidden" name="path_id" value="{{ $path->id }}">
 
                     <!-- Bulk Actions -->
-                    <div class="bg-white rounded-xl shadow-sm border p-6 mb-6 dark:bg-gray-800 border-2 border-primary">
+                    <div class="bg-white rounded-md shadow-sm border p-6 mb-6 dark:bg-gray-800 border-2 border-primary">
                         <div class="flex justify-between items-center">
                             <div class="flex items-center space-x-4">
                                 <label class="flex items-center space-x-2">
@@ -85,11 +82,11 @@
                             </div>
                             <div class="flex space-x-3">
                                 <button type="submit"
-                                    class="bg-primary text-white text-sm font-medium px-4 py-2 bg-primary rounded-full hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
+                                    class="bg-primary text-white text-sm font-medium px-4 py-2 bg-primary rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
                                     Save Changes
                                 </button>
                                 <button type="button" id="bulkDeleteBtn"
-                                    class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-secondary rounded-full hover:bg-white hover:text-secondary focus:ring-2 focus:ring-secondary focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover">
+                                    class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-secondary rounded-md hover:bg-white hover:text-secondary focus:ring-2 focus:ring-secondary focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover">
                                     Delete Selected
                                 </button>
                             </div>
@@ -99,7 +96,7 @@
                     <!-- Images Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="imagesContainer">
                         @foreach ($pathImages as $index => $image)
-                            <div class="bg-white rounded-xl shadow-sm p-4 image-card transition-all duration-300 dark:text-gray-300 dark:bg-gray-800"
+                            <div class="bg-white rounded-md shadow-sm p-4 image-card transition-all duration-300 dark:text-gray-300 dark:bg-gray-800"
                                 data-image-id="{{ $image->id }}">
                                 <div class="relative">
                                     <!-- Selection Checkbox -->
@@ -149,8 +146,8 @@
                                             <img id="previewImg_{{ $index }}"
                                                 class="w-full h-24 object-cover rounded border-2 border-green-400">
                                             <button type="button" onclick="clearPreview({{ $index }})"
-                                                class="mt-1 text-xs text-red-500 hover:text-red-700">
-                                                <i class="fas fa-times mr-1"></i>Clear
+                                                class="mt-1 text-xs text-secondary hover:text-red-700">
+                                                Clear
                                             </button>
                                         </div>
                                     </div>
@@ -168,11 +165,11 @@
                     <!-- Submit Actions -->
                     <div class="text-center mt-8">
                         <button type="submit"
-                            class="bg-primary text-white text-sm font-medium px-6 py-3 bg-primary rounded-full hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
+                            class="bg-primary text-white text-sm font-medium px-6 py-3 bg-primary rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
                             Save All Changes
                         </button>
                         <a href="{{ route('path.show', $path) }}"
-                            class="ml-4 px-6 py-3 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-full transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover">
+                            class="ml-4 px-6 py-3 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover">
                             Cancel
                         </a>
                     </div>
@@ -191,11 +188,11 @@
                 @php $pathImage = $pathImages->first(); @endphp
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <!-- Current Image -->
-                    <div class="bg-white rounded-xl shadow-sm border-2 border-primary p-6 dark:bg-gray-800">
+                    <div class="bg-white rounded-md shadow-sm border-2 border-primary p-6 dark:bg-gray-800">
                         <h2 class="text-lg font-semibold text-gray-700 mb-4 dark:text-gray-300">
                             Current Image
                         </h2>
-                        <div class="dark:bg-gray-800 border-2 border-dashed border-primary rounded-xl p-4 text-center">
+                        <div class="dark:bg-gray-800 border-2 border-dashed border-primary rounded-md p-4 text-center">
                             <img src="{{ asset('storage/' . $pathImage->image_file) }}"
                                 alt="Path Image {{ $pathImage->image_order }}"
                                 class="mx-auto rounded-lg shadow max-h-80 cursor-pointer"
@@ -218,20 +215,20 @@
                         <!-- Quick Actions -->
                         <div class="mt-6 flex space-x-4">
                             <button type="button" onclick="showDeleteModal()"
-                                class="flex-1 px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-red-600 rounded-xl hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover">
+                                class="flex-1 px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-secondary rounded-md hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover">
                                 Delete Image
                             </button>
                         </div>
                     </div>
 
                     <!-- Edit Form -->
-                    <div class="bg-white rounded-xl shadow-sm p-6 dark:bg-gray-800 border-2 border-primary">
+                    <div class="bg-white rounded-md shadow-sm p-6 dark:bg-gray-800 border-2 border-primary">
                         <h2 class="text-lg font-semibold text-gray-700 mb-4 dark:text-gray-300">
                             Edit Image
                         </h2>
 
                         @if ($errors->any())
-                            <div class="mb-4 p-4 border border-red-300 bg-red-50 text-red-700 rounded-xl">
+                            <div class="mb-4 p-4 border border-red-300 bg-red-50 text-red-700 rounded-md">
                                 <p class="font-semibold"><i class="fas fa-exclamation-triangle"></i> Please fix the
                                     following:</p>
                                 <ul class="list-disc pl-5 mt-2 space-y-1">
@@ -252,7 +249,7 @@
                                 <label class="block text-sm text-gray-800 mb-2">Image Order</label>
                                 <input type="number" name="image_order"
                                     value="{{ old('image_order', $pathImage->image_order) }}" min="1"
-                                    class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:border-primary focus:ring focus:ring-primary focus:outline-none transition">
+                                    class="w-full border border-primary rounded-md dark:text-gray-300 px-4 py-2 focus:border-primary focus:ring focus:ring-primary focus:outline-none transition">
                                 <p class="text-xs text-gray-500 mt-1">Lower numbers appear first. Leave empty to keep
                                     current order.</p>
                             </div>
@@ -262,7 +259,7 @@
                                 <label class="block text-sm text-gray-800 mb-2">Replace Image File</label>
                                 <input type="file" name="image_file" accept="image/*"
                                     onchange="previewNewImage(this)"
-                                    class="w-full border border-gray-300 rounded-xl px-4 py-2 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary file:text-white file:cursor-pointer hover:file:bg-blue-500">
+                                    class="w-full dark:text-gray-300 border border-primary rounded-md px-4 py-2 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary file:text-white file:cursor-pointer hover:file:bg-blue-500">
 
                                 <p class="text-xs text-gray-500 mt-2">
                                     Leave empty to keep current image. Max 50MB. Supported: JPG, PNG, GIF, SVG, WEBP.
@@ -270,12 +267,12 @@
 
                                 <!-- New Image Preview -->
                                 <div id="newImagePreview" class="hidden mt-4 text-center">
-                                    <p class="text-green-600 text-sm mb-2"><i class="fas fa-eye"></i> New Image Preview:
+                                    <p class="text-green-600 text-sm mb-2">New Image Preview:
                                     </p>
-                                    <img id="previewImage" class="mx-auto rounded-xl border border-green-400 max-h-52">
+                                    <img id="previewImage" class="mx-auto rounded-md border border-green-400 max-h-52">
                                     <button type="button" onclick="clearImagePreview()"
-                                        class="mt-2 border border-gray-300 rounded-lg px-3 py-1 text-sm hover:bg-gray-100">
-                                        <i class="fas fa-times"></i> Clear Selection
+                                        class="mt-2 border border-gray-300 rounded-md px-3 py-1 text-sm hover:bg-gray-100">
+                                        Clear Selection
                                     </button>
                                 </div>
                             </div>
@@ -283,7 +280,7 @@
                             <!-- Submit -->
                             <div>
                                 <button type="submit"
-                                    class="w-full bg-primary text-white px-4 py-2 bg-primary rounded-2xl hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
+                                    class="w-full bg-primary text-white px-4 py-2 bg-primary rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
                                     Update Image
                                 </button>
                             </div>
@@ -293,7 +290,7 @@
             @endif
 
             <!-- Additional Info -->
-            <div class="bg-white rounded-xl shadow-sm border p-6 dark:bg-gray-800 border-2 border-primary">
+            <div class="bg-white rounded-md shadow-sm border p-6 dark:bg-gray-800 border-2 border-primary">
                 <h3 class="text-md text-center text-gray-700 mb-3 dark:text-gray-300">
                     <i class="fas fa-info-circle text-primary"></i> Update Information
                 </h3>
@@ -322,13 +319,13 @@
         <div class="absolute top-5 right-5 flex items-center space-x-8">
             <!-- Download button -->
             <a id="downloadBtn" href="#" download title="Download Image"
-                class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6">
+                class="p-2 rounded-md transition-all hover:scale-120 ease-in-out duration-300 mt-6">
                 <img src="{{ asset('icons/download-button.png') }}" alt="Download Image" class="w-10 h-10">
             </a>
 
             <!-- Close button -->
             <button onclick="closeImageModal()"
-                class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6 cursor-pointer"
+                class="p-2 rounded-md transition-all hover:scale-120 ease-in-out duration-300 mt-6 cursor-pointer"
                 title="Close Modal">
                 <img src="{{ asset('icons/exit.png') }}" alt="Close Modal" class="w-10 h-10">
             </button>
@@ -339,8 +336,8 @@
     </div>
 
     <!-- Delete Modal -->
-    <dialog id="deleteModal" class="p-0 rounded-xl w-full max-w-lg backdrop:bg-black backdrop:bg-opacity-50">
-        <div class="bg-white rounded-xl p-6">
+    <dialog id="deleteModal" class="p-0 rounded-md w-full max-w-lg backdrop:bg-black backdrop:bg-opacity-50">
+        <div class="bg-white rounded-md p-6">
             <h2 class="text-lg font-semibold text-red-600 mb-3">
                 <i class="fas fa-exclamation-triangle"></i> Confirm Deletion
             </h2>
