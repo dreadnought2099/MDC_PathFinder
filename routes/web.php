@@ -34,6 +34,10 @@ Route::middleware(['web'])->group(function () {
         return view('pages.client.about.index');
     })->name('about');
 
+    Route::get('/meet-the-team', function() {
+        return view('pages.team.index');
+    })->name('pages.team');
+
     // Scanner page (no room yet)
     Route::get('/scan-marker', [ScannerController::class, 'index'])->name('scan.index');
 
