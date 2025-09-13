@@ -24,7 +24,7 @@
             <!-- User Info -->
             <div class="space-y-2 text-center">
                 <p>
-                    <span class="text-primary">Name:</span>
+                    <span class="text-primary">{{ $user->name ? 'Name:' : 'Username:' }}</span>
                     <span class="dark:text-gray-300">{{ $user->name ?? $user->username }}</span>
                 </p>
                 <p>
