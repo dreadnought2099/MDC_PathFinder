@@ -79,12 +79,16 @@ class StaffController extends Controller
     {
         $staff = Staff::findOrFail($id);
         $rooms = Room::all();
+        $this->authorize('update', $staff); // uses StaffPolicy
         return view('pages.admin.staffs.edit', compact('staff', 'rooms'));
     }
 
     public function update(Request $request, $id)
     {
         $staff = Staff::findOrFail($id);
+
+        // Authorization
+        $this->authorize('update', $staff); // uses StaffPolicy
 
         $validated = $request->validate([
             'room_id'   => 'nullable|exists:rooms,id',

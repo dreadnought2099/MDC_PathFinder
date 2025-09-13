@@ -23,9 +23,16 @@
 
             <!-- User Info -->
             <div class="space-y-2 text-center">
-                <p><span class="text-primary">Name:</span> <span class="dark:text-gray-300">{{ $user->name }}</span></p>
-                <p><span class="text-primary">Email:</span> <span class="dark:text-gray-300">{{ $user->email }}</span></p>
+                <p>
+                    <span class="text-primary">Name:</span>
+                    <span class="dark:text-gray-300">{{ $user->name ?? $user->username }}</span>
+                </p>
+                <p>
+                    <span class="text-primary">Email:</span>
+                    <span class="dark:text-gray-300">{{ $user->email ?? 'N/A' }}</span>
+                </p>
             </div>
+
         </div>
     </div>
 
@@ -38,7 +45,8 @@
             <button type="button" onclick="closeModal()"
                 class="absolute top-2 right-4 text-6xl text-gray-500 hover:text-red-600 focus:outline-none cursor-pointer"
                 aria-label="Close">
-                <img src="{{ asset('icons/exit.png') }}" alt="Close Modal" class="w-6 h-6 hover:scale-120 duration-300 transition-all ease-in-out">
+                <img src="{{ asset('icons/exit.png') }}" alt="Close Modal"
+                    class="w-6 h-6 hover:scale-120 duration-300 transition-all ease-in-out">
             </button>
 
             <h3 class="text-xl mb-4 text-primary">Crop Image</h3>
@@ -60,7 +68,7 @@
                 <input type="file" id="profile_image" accept="image/*" class="hidden">
                 <div class="flex justify-end mt-4">
                     <button type="submit"
-                        class="bg-primary text-white text-sm font-medium px-4 py-2 bg-primary rounded-full hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
+                        class="bg-primary text-white text-sm font-medium px-4 py-2 bg-primary rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
                         Crop & Upload
                     </button>
                 </div>

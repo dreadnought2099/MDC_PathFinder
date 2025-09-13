@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
+            $table->foreignId('room_id')->nullable()->constrained()->onDelete('cascade');
+            $table->string('name')->nullable();           // optional for admin
+            $table->string('email')->unique()->nullable(); // required for admin, nullable for users
+            $table->string('username')->unique()->nullable(); // required for users, optional for admin
             $table->string('profile_photo_path')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->boolean('is_admin')->default(false);
             $table->rememberToken();
             $table->timestamps();
         });

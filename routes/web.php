@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\PathController;
 use App\Http\Controllers\Admin\PathImageController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\RoomController;
+use App\Http\Controllers\Admin\RoomUserController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ScannerController;
@@ -34,7 +35,7 @@ Route::middleware(['web'])->group(function () {
         return view('pages.client.about.index');
     })->name('about');
 
-    Route::get('/meet-the-team', function() {
+    Route::get('/meet-the-team', function () {
         return view('pages.team.index');
     })->name('pages.team');
 
@@ -80,7 +81,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/profile/update-image', [ProfileController::class, 'updateImage'])->name('admin.profile.updateImage');
 
 
-    Route::prefix('admin')->name('room.')->group(function () {
+    Route::prefix('admin')->name('room.')->middleware('permission:manage rooms')->group(function () {
 
         // List all rooms
         Route::get('/rooms', [RoomController::class, 'index'])->name('index');
@@ -114,7 +115,16 @@ Route::middleware('auth')->group(function () {
         Route::delete('/rooms/staff/{id}/remove', [RoomController::class, 'removeFromRoom'])->name('staff.remove');
     });
 
-    Route::prefix('admin')->name('staff.')->group(function () {
+    Route::prefix('admin')->name('room-user.')->middleware('permission:manage rooms')->group(function () {
+        Route::get('/room-users', [RoomUserController::class, 'index'])->name('index');
+        Route::get('/room-users/create', [RoomUserController::class, 'create'])->name('create');
+        Route::post('/room-users', [RoomUserController::class, 'store'])->name('store');
+        Route::get('/room-users/{user}/edit', [RoomUserController::class, 'edit'])->name('edit');
+        Route::put('/room-users/{user}', [RoomUserController::class, 'update'])->name('update');
+        Route::delete('/room-users/{user}', [RoomUserController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::prefix('admin')->name('staff.')->middleware('permission:manage staff')->group(function () {
 
         // List all staff
         Route::get('/staff', [StaffController::class, 'index'])->name('index');

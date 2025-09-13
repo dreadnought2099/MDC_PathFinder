@@ -8,9 +8,10 @@ use Illuminate\Support\Facades\Auth;
 
 class LogInController extends Controller
 {
-    public function showLoginForm() {
-        
-        if(Auth::check()) {
+    public function showLoginForm()
+    {
+
+        if (Auth::check()) {
             return redirect()->route('admin.dashboard');
         }
 
@@ -19,23 +20,31 @@ class LogInController extends Controller
 
     public function login(Request $request)
     {
-        $validated = $request->validate([
-            'email' => 'required|email',
+        $request->validate([
+            'login' => 'required',
             'password' => 'required'
         ]);
 
-        // Error message & validates using Auth::attempt() to avoid SQL injection
-        if (!Auth::attempt($validated)) {
-           return back()->with('error', 'Invalid email or password');           
+        $loginType = filter_var($request->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        $credentials = [
+            $loginType => $request->login,
+            'password' => $request->password,
+        ];
+
+        if (!Auth::attempt($credentials)) {
+            return back()->with('error', 'Invalid credentials');
         }
 
         $user = Auth::user();
 
+        $userName = $user->name ?? $user->username;
+
         // success message
-        return redirect()->route('admin.dashboard')->with('success', "Login successful! Welcome, {$user->name}.");
+        return redirect()->route('admin.dashboard')->with('success', "Login successful! Welcome, {$userName}.");
     }
 
-  
+
     public function logout(Request $request)
     {
         Auth::logout();

@@ -23,9 +23,9 @@
                     @endphp
 
                     <div class="relative">
-                        <input type="email" id="email" name="email" placeholder="Email" required
+                        <input type="text" id="login" name="login" placeholder="Email or Username" required
                             class="{{ $inputClasses }}">
-                        <label for="email" class="{{ $labelClasses }}">Email</label>
+                        <label for="login" class="{{ $labelClasses }}">Email or Username</label>
                     </div>
 
                     <div x-data="{ show: false }" class="relative">

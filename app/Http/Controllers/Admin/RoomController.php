@@ -155,6 +155,8 @@ class RoomController extends Controller
             $query->withTrashed(); // Include soft-deleted images
         }]);
 
+        $this->authorize('update', $room); // uses RoomPolicy
+        
         // Transform officeHours relation to JSON structure expected by JS
         $officeHours = [];
         $existingOfficeHours = []; // Add this variable
@@ -174,6 +176,9 @@ class RoomController extends Controller
 
     public function update(Request $request, Room $room)
     {
+        // Authorization
+        $this->authorize('update', $room); // uses RoomPolicy
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',

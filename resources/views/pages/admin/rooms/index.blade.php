@@ -45,42 +45,72 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
                         @forelse($rooms as $room)
-                            <tr
-                                class="hover:bg-gray-50 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-800">
+                            @php
+                                $user = auth()->user();
+                                // Admin sees everything, room users only their assigned room
+                                $showRoom = $user->hasRole('Admin') || $user->room_id == $room->id;
+                            @endphp
 
-                                <!-- ID Column -->
-                                <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">
-                                    {{ $room->id }}
-                                </td>
+                            @if ($showRoom)
+                                <tr
+                                    class="hover:bg-gray-50 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-800">
+                                    <!-- ID -->
+                                    <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">
+                                        {{ $room->id }}
+                                    </td>
 
-                                <!-- Office Name Column -->
-                                <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">
-                                    {{ $room->name }}
-                                </td>
+                                    <!-- Room Name -->
+                                    <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">
+                                        {{ $room->name }}
+                                    </td>
 
-                                <!-- Actions Column -->
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center justify-end space-x-3">
-                                        <a href="{{ route('room.show', $room->id) }}"
-                                            class="text-primary hover-underline hover:scale-105 transform transition duration-200">
-                                            View
-                                        </a>
-                                        <a href="{{ route('room.edit', $room->id) }}"
-                                            class="text-edit hover-underline-edit hover:scale-105 transform transition duration-200">
-                                            Edit
-                                        </a>
-                                        <a href="{{ route('room.assign', $room->id) }}"
-                                            class="text-tertiary hover-underline-tertiary hover:scale-105 transform transition duration-200">
-                                            Assign Staff
-                                        </a>
-                                        <button
-                                            onclick="openRoomModal('{{ $room->id }}', '{{ addslashes($room->name) }}')"
-                                            class="text-secondary hover-underline-delete hover:scale-105 transform transition duration-200 cursor-pointer">
-                                            Delete
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                                    <!-- Actions -->
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center justify-end space-x-3">
+                                            {{-- View --}}
+                                            @can('view', $room)
+                                                <a href="{{ route('room.show', $room->id) }}"
+                                                    class="text-primary hover-underline hover:scale-105 transform transition duration-200">
+                                                    View
+                                                </a>
+                                            @endcan
+
+                                            {{-- Edit --}}
+                                            @can('update', $room)
+                                                <a href="{{ route('room.edit', $room->id) }}"
+                                                    class="text-edit hover-underline-edit hover:scale-105 transform transition duration-200">
+                                                    Edit
+                                                </a>
+                                            @endcan
+
+                                            {{-- Assign Staff (Admin or Room Manager) --}}
+                                            @if(auth()->user()->hasRole('Admin'))
+                                                <a href="{{ route('room.assign', $room->id) }}"
+                                                    class="text-tertiary hover-underline-tertiary hover:scale-105 transform transition duration-200">
+                                                    Assign Staff
+                                                </a>
+                                            @endif
+
+                                            {{-- Create User (Admin only) --}}
+                                            @if ($user->hasRole('Admin'))
+                                                <a href="{{ route('room-user.create', $room->id) }}"
+                                                    class="text-green-600 hover-underline hover:scale-105 transform transition duration-200">
+                                                    Create User
+                                                </a>
+                                            @endif
+
+                                            {{-- Delete (Admin only) --}}
+                                            @can('delete', $room)
+                                                <button
+                                                    onclick="openRoomModal('{{ $room->id }}', '{{ addslashes($room->name) }}')"
+                                                    class="text-secondary hover-underline-delete hover:scale-105 transform transition duration-200 cursor-pointer">
+                                                    Delete
+                                                </button>
+                                            @endcan
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endif
                         @empty
                             <tr class="dark:bg-gray-800">
                                 <td colspan="3" class="px-6 py-16 text-center">
