@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ config('app.name') }}</title>
+
+    <!-- Dark mode initialization -->
     <script>
         (function() {
             const theme = localStorage.getItem("theme");
@@ -17,24 +19,50 @@
             }
         })();
     </script>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <!-- Libraries -->
     <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8"></script>
     <link rel="icon" href="{{ asset('images/mdc-logo.png') }}">
 
-    <!-- GLightbox CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet">
+    <!-- Pannellum CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
 
-    <!-- x-cloak CSS: Ensures Alpine.js components (dark mode toggle, navbar dropdown) are hidden until initialized -->
     <style>
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #157ee1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #464c58;
+            border-radius: 10px;
+            transition: background-color 0.2s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9896a2;
+        }
+
+        ::-webkit-scrollbar-corner {
+            background: #157ee1;
+        }
+
         [x-cloak] {
             display: none !important;
         }
     </style>
 </head>
 
-{{-- This means: use "body-class" from the child page (like login).  
-        If the child page does NOT give one, then use default: bg-white dark:bg-gray-900 --}}
+{{-- If child page provides "body-class" section, use it; otherwise fallback --}}
+
 <body class="@yield('body-class', 'bg-white dark:bg-gray-900')">
     <div id="success-message-container" class="absolute top-24 right-4 z-49">
         @if (session('success') || session('error') || session('info') || $errors->any())
@@ -62,27 +90,28 @@
                 @endforeach
             </div>
 
-            <!-- Auto-hide message after 5 seconds with fade-out animation -->
-            <script>
-                setTimeout(() => {
-                    const messageDiv = document.getElementById('message');
-                    if (messageDiv) {
-                        messageDiv.classList.add('opacity-0');
-                        setTimeout(() => {
-                            messageDiv.style.display = 'none';
-                        }, 500);
-                    }
-                }, 5000);
-            </script>
+            @push('scripts')
+                <script>
+                    setTimeout(() => {
+                        const messageDiv = document.getElementById('message');
+                        if (messageDiv) {
+                            messageDiv.classList.add('opacity-0');
+                            setTimeout(() => {
+                                messageDiv.style.display = 'none';
+                            }, 500);
+                        }
+                    }, 5000);
+                </script>
+            @endpush
         @endif
     </div>
 
     <main>
         @yield('content')
     </main>
-        
-    <!-- GLightbox JS -->
-    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+
+    <!-- Pannellum JS -->
+    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
 
     @stack('scripts')
 </body>
