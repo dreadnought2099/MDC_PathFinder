@@ -1,4 +1,3 @@
-<!-- resources/views/components/about-page.blade.php -->
 <div class="relative inline-block group">
     <!-- No surplus words or unnecessary actions. - Marcus Aurelius -->
     <a href="{{ route('about') }}" class="block">

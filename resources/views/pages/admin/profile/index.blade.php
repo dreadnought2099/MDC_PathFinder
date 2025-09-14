@@ -78,9 +78,6 @@
 @endsection
 
 @push('scripts')
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-
     <script>
         let cropper;
         const input = document.getElementById('profile_image');

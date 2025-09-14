@@ -31,7 +31,7 @@
                     <div
                         class="text-center p-4 bg-green-50 dark:bg-green-900/30 rounded-lg border border-tertiary dark:border-green-800">
                         <div class="text-2xl lg:text-3xl font-bold text-green-600 mb-1 dark:text-green-400">
-                            {{ \App\Models\Room::count() }}
+                            {{ $totalRooms }}
                         </div>
                         <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Total Rooms</div>
                     </div>
@@ -46,13 +46,15 @@
                     </div>
 
                     <!-- Paths -->
-                    <div
-                        class="text-center p-4 bg-orange-50 dark:bg-orange-900/30 rounded-lg border border-orange dark:border-orange-800">
-                        <div class="text-2xl lg:text-3xl font-bold text-orange-600 mb-1 dark:text-orange-400">
-                            {{ \App\Models\Path::whereHas('fromRoom')->whereHas('toRoom')->count() }}
+                    @if (auth()->user()->hasRole('Admin'))
+                        <div
+                            class="text-center p-4 bg-orange-50 dark:bg-orange-900/30 rounded-lg border border-orange dark:border-orange-800">
+                            <div class="text-2xl lg:text-3xl font-bold text-orange-600 mb-1 dark:text-orange-400">
+                                {{ \App\Models\Path::whereHas('fromRoom')->whereHas('toRoom')->count() }}
+                            </div>
+                            <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Paths</div>
                         </div>
-                        <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Paths</div>
-                    </div>
+                    @endif
                 </div>
             </div>
 
@@ -63,96 +65,105 @@
 
             <!-- Main Actions Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-6">
-
-                <a href="{{ route('path.index') }}"
-                    class="group card-shadow-hover shadow-primary-hover p-5 border-2 border-primary bg-white dark:bg-gray-800 rounded-lg transition-all duration-300">
-                    <div class="flex flex-col items-center text-center space-y-3">
-                        <div class="bg-primary-10 hover:bg-primary-20 p-3 rounded-full transition-all duration-300">
-                            <img src="{{ asset('icons/navigation.png') }}" alt="Manage Paths"
-                                class="h-10 w-10 object-contain group-hover:scale-120 transition-transform duration-300" />
+                @if (auth()->user()->hasRole('Admin'))
+                    <a href="{{ route('path.index') }}"
+                        class="group card-shadow-hover shadow-primary-hover p-5 border-2 border-primary bg-white dark:bg-gray-800 rounded-lg transition-all duration-300">
+                        <div class="flex flex-col items-center text-center space-y-3">
+                            <div class="bg-primary-10 hover:bg-primary-20 p-3 rounded-full transition-all duration-300">
+                                <img src="{{ asset('icons/navigation.png') }}" alt="Manage Paths"
+                                    class="h-10 w-10 object-contain group-hover:scale-120 transition-transform duration-300" />
+                            </div>
+                            <div>
+                                <h3
+                                    class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
+                                    Path Navigation
+                                </h3>
+                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Manage office paths</p>
+                            </div>
                         </div>
-                        <div>
-                            <h3
-                                class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
-                                Path Navigation
-                            </h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Manage office paths</p>
-                        </div>
-                    </div>
-                </a>
+                    </a>
+                @endif
 
                 <!-- Manage Rooms Card -->
-                <a href="{{ route('room.index') }}"
-                    class="group card-shadow-hover shadow-primary-hover p-5 border-2 border-primary bg-white dark:bg-gray-800 rounded-lg transition-all duration-300">
-                    <div class="flex flex-col items-center text-center space-y-3">
-                        <div class="bg-primary-10 hover:bg-primary-20 p-3 rounded-full transition-all duration-300">
-                            <img src="{{ asset('icons/manage-office.png') }}" alt="Manage Offices"
-                                class="h-10 w-10 object-contain group-hover:scale-120 transition-transform duration-300" />
+                @if (auth()->user()->hasRole('Admin') || auth()->user()->can('view rooms'))
+                    <a href="{{ route('room.index') }}"
+                        class="group card-shadow-hover shadow-primary-hover p-5 border-2 border-primary bg-white dark:bg-gray-800 rounded-lg transition-all duration-300">
+                        <div class="flex flex-col items-center text-center space-y-3">
+                            <div class="bg-primary-10 hover:bg-primary-20 p-3 rounded-full transition-all duration-300">
+                                <img src="{{ asset('icons/manage-office.png') }}" alt="Manage Offices"
+                                    class="h-10 w-10 object-contain group-hover:scale-120 transition-transform duration-300" />
+                            </div>
+                            <div>
+                                <h3
+                                    class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
+                                    Manage Offices
+                                </h3>
+                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Configure office spaces</p>
+                            </div>
                         </div>
-                        <div>
-                            <h3
-                                class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
-                                Manage Offices
-                            </h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Configure office spaces</p>
-                        </div>
-                    </div>
-                </a>
+                    </a>
+                @endif
 
                 <!-- Manage Staff Card -->
-                <a href="{{ route('staff.index') }}"
-                    class="group card-shadow-hover shadow-primary-hover p-5 border-2 border-primary bg-white dark:bg-gray-800 rounded-lg transition-all duration-300">
-                    <div class="flex flex-col items-center text-center space-y-3">
-                        <div class="bg-primary-10 hover:bg-primary-20 p-3 rounded-full transition-all duration-300">
-                            <img src="{{ asset('icons/manage-user.png') }}" alt="Manage Staff"
-                                class="h-10 w-10 object-contain group-hover:scale-120 transition-transform duration-300" />
+                @if (auth()->user()->hasRole('Admin') || auth()->user()->can('view staff'))
+                    <a href="{{ route('staff.index') }}"
+                        class="group card-shadow-hover shadow-primary-hover p-5 border-2 border-primary bg-white dark:bg-gray-800 rounded-lg transition-all duration-300">
+                        <div class="flex flex-col items-center text-center space-y-3">
+                            <div class="bg-primary-10 hover:bg-primary-20 p-3 rounded-full transition-all duration-300">
+                                <img src="{{ asset('icons/manage-user.png') }}" alt="Manage Staff"
+                                    class="h-10 w-10 object-contain group-hover:scale-120 transition-transform duration-300" />
+                            </div>
+                            <div>
+                                <h3
+                                    class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
+                                    Manage Staff
+                                </h3>
+                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Organize staff members</p>
+                            </div>
                         </div>
-                        <div>
-                            <h3
-                                class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
-                                Manage Staff
-                            </h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Organize staff members</p>
-                        </div>
-                    </div>
-                </a>
+                    </a>
+                @endif
 
                 <!-- Assign Staff Card -->
-                <a href="{{ route('room.assign') }}"
-                    class="group card-shadow-hover shadow-primary-hover p-5 border-2 border-primary bg-white dark:bg-gray-800 rounded-lg transition-all duration-300">
-                    <div class="flex flex-col items-center text-center space-y-3">
-                        <div class="bg-primary-10 hover:bg-primary-20 p-3 rounded-full transition-all duration-300">
-                            <img src="{{ asset('icons/assign-staff.png') }}" alt="Assign Staff"
-                                class="h-10 w-10 object-contain group-hover:scale-120 transition-transform duration-300" />
+                @if (auth()->user()->hasRole('Admin'))
+                    <a href="{{ route('room.assign') }}"
+                        class="group card-shadow-hover shadow-primary-hover p-5 border-2 border-primary bg-white dark:bg-gray-800 rounded-lg transition-all duration-300">
+                        <div class="flex flex-col items-center text-center space-y-3">
+                            <div class="bg-primary-10 hover:bg-primary-20 p-3 rounded-full transition-all duration-300">
+                                <img src="{{ asset('icons/assign-staff.png') }}" alt="Assign Staff"
+                                    class="h-10 w-10 object-contain group-hover:scale-120 transition-transform duration-300" />
+                            </div>
+                            <div>
+                                <h3
+                                    class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
+                                    Assign Staff
+                                </h3>
+                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Link staff to rooms</p>
+                            </div>
                         </div>
-                        <div>
-                            <h3
-                                class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
-                                Assign Staff
-                            </h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Link staff to rooms</p>
-                        </div>
-                    </div>
-                </a>
+                    </a>
+                @endif
 
                 <!-- Recycle Bin Card -->
-                <a href="{{ route('room.recycle-bin') }}"
-                    class="group card-shadow-hover shadow-primary-hover p-5 border-2 border-primary bg-white dark:bg-gray-800 rounded-lg transition-all duration-300">
-                    <div class="flex flex-col items-center text-center space-y-3">
-                        <div class="bg-primary-10 hover:bg-primary-20 p-3 rounded-full transition-all duration-300">
-                            <img src="{{ asset('icons/recycle-bin.png') }}" alt="Recycle Bin"
-                                class="h-10 w-10 object-contain group-hover:scale-120 transition-transform duration-300" />
+                @if (auth()->user()->hasRole('Admin'))
+                    <a href="{{ route('room.recycle-bin') }}"
+                        class="group card-shadow-hover shadow-primary-hover p-5 border-2 border-primary bg-white dark:bg-gray-800 rounded-lg transition-all duration-300">
+                        <div class="flex flex-col items-center text-center space-y-3">
+                            <div class="bg-primary-10 hover:bg-primary-20 p-3 rounded-full transition-all duration-300">
+                                <img src="{{ asset('icons/recycle-bin.png') }}" alt="Recycle Bin"
+                                    class="h-10 w-10 object-contain group-hover:scale-120 transition-transform duration-300" />
+                            </div>
+                            <div>
+                                <h3
+                                    class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
+                                    Recycle Bin
+                                </h3>
+                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Restore deleted items</p>
+                            </div>
                         </div>
-                        <div>
-                            <h3
-                                class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
-                                Recycle Bin
-                            </h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Restore deleted items</p>
-                        </div>
-                    </div>
-                </a>
-            </div>
+                    </a>
+                @endif
         </div>
     </div>
+</div>
 @endsection

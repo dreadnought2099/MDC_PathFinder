@@ -3,61 +3,65 @@
     <div x-data="{ open: false }" @click.away="open = false"
         class="fixed bottom-6 right-6 flex flex-col items-end space-y-2 z-50">
         <!-- Buttons -->
-        <template x-if="open">
-            <div class="flex flex-col space-y-2 mb-2">
+        @if (auth()->user()->hasRole('Admin'))
+            <template x-if="open">
+                <div class="flex flex-col space-y-2 mb-2">
+                    <a href="{{ route('room.create') }}" class="group flex items-center space-x-2">
+                        <div
+                            class="flex items-center justify-center w-12 h-12 hover:scale-120 transition-all duration-300">
+                            <img src="{{ asset('icons/offices.png') }}" alt="Add Room/Office" />
+                        </div>
+                        <span class="text-sm text-gray-700 hover-underline dark:text-gray-300">Add Office</span>
+                    </a>
 
-                <a href="{{ route('room.create') }}" class="group flex items-center space-x-2">
-                    <div class="flex items-center justify-center w-12 h-12 hover:scale-120 transition-all duration-300">
-                        <img src="{{ asset('icons/offices.png') }}" alt="Add Room/Office" />
-                    </div>
-                    <span class="text-sm text-gray-700 hover-underline dark:text-gray-300">Add Office</span>
-                </a>
+                    @php
+                        $firstPath = \App\Models\Path::first();
+                    @endphp
 
-                @php
-                    $firstPath = \App\Models\Path::first();
-                @endphp
+                    <a href="{{ $firstPath ? route('path-image.create', $firstPath) : '#' }}"
+                        class="group flex items-center space-x-2 @if (!$firstPath) opacity-50 cursor-not-allowed @endif">
+                        <div
+                            class="flex items-center justify-center w-12 h-12 hover:scale-120 transition-all duration-300">
+                            <img src="{{ asset('icons/image.png') }}" alt="Add Path Images" />
+                        </div>
+                        <span class="text-sm text-gray-700 hover-underline dark:text-gray-300">
+                            Add Path Images
+                        </span>
+                    </a>
 
-                <a href="{{ $firstPath ? route('path-image.create', $firstPath) : '#' }}"
-                    class="group flex items-center space-x-2 @if (!$firstPath) opacity-50 cursor-not-allowed @endif">
-                    <div class="flex items-center justify-center w-12 h-12 hover:scale-120 transition-all duration-300">
-                        <img src="{{ asset('icons/image.png') }}" alt="Add Path Images" />
-                    </div>
-                    <span class="text-sm text-gray-700 hover-underline dark:text-gray-300">
-                        Add Path Images
-                    </span>
-                </a>
+                    <a href="{{ route('staff.create') }}" class="group flex items-center space-x-2">
+                        <div
+                            class="flex items-center justify-center w-12 h-12 hover:scale-120 transition-all duration-300">
+                            <img src="{{ asset('icons/user.png') }}" alt="Add Staff Member" />
+                        </div>
+                        <span class="text-sm text-gray-700 hover-underline dark:text-gray-300">Add Staff Member</span>
+                    </a>
+                </div>
+            </template>
 
-                <a href="{{ route('staff.create') }}" class="group flex items-center space-x-2">
-                    <div class="flex items-center justify-center w-12 h-12 hover:scale-120 transition-all duration-300">
-                        <img src="{{ asset('icons/user.png') }}" alt="Add Staff Member" />
-                    </div>
-                    <span class="text-sm text-gray-700 hover-underline dark:text-gray-300">Add Staff Member</span>
-                </a>
-            </div>
-        </template>
+            <!-- Floating + Button -->
+            <div class="relative inline-block group">
+                <button @click="open = !open"
+                    class="w-12 h-12 inline-flex items-center justify-center rounded-full bg-primary text-white text-4xl shadow-lg hover:bg-white hover:text-primary border-2 border-primary transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
+                    <span x-text="open ? '-' : '+'"></span>
+                </button>
 
-        <!-- Floating + Button -->
-        <div class="relative inline-block group">
-            <button @click="open = !open"
-                class="w-12 h-12 inline-flex items-center justify-center rounded-full bg-primary text-white text-4xl shadow-lg hover:bg-white hover:text-primary border-2 border-primary transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
-                <span x-text="open ? '-' : '+'"></span>
-            </button>
-
-            <!-- Tooltip -->
-            <div
-                class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
+                <!-- Tooltip -->
+                <div
+                    class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
                 text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible
                 group-hover:opacity-100 group-hover:visible transition-all duration-300 
                 whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
-                Add
-                <!-- Arrow -->
-                <div
-                    class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
+                    Add
+                    <!-- Arrow -->
+                    <div
+                        class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
                     border-l-4 border-l-gray-900 dark:border-l-gray-700
                     border-t-4 border-t-transparent 
                     border-b-4 border-b-transparent">
+                    </div>
                 </div>
             </div>
-        </div>
+        @endif
     </div>
 </div>

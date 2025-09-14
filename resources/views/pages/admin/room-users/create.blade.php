@@ -1,8 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
+    <x-floating-actions />
+    
     <div class="container max-w-lg mx-auto mt-10">
-        <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6">Create Room User</h1>
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6">Create <span class="text-primary">Office
+                User</span></h1>
 
         <form action="{{ route('room-user.store') }}" method="POST" id="roomUserForm"
             class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">

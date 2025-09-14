@@ -36,7 +36,7 @@ Route::middleware(['web'])->group(function () {
     })->name('about');
 
     Route::get('/meet-the-team', function () {
-        return view('pages.team.index');
+        return view('pages.client.team.index');
     })->name('pages.team');
 
     // Scanner page (no room yet)
@@ -69,8 +69,7 @@ Route::get('/admin', [LogInController::class, 'showLoginForm'])->name('login');
 Route::post('/admin', [LogInController::class, 'login']);
 
 
-Route::middleware('auth')->group(function () {
-
+Route::middleware('auth', 'role:Admin|Room Manager')->group(function () {
     Route::post('/logout', [LogInController::class, 'logout'])->name('logout');
 
     // Admin dashboard - main landing page after login
@@ -81,71 +80,94 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/profile/update-image', [ProfileController::class, 'updateImage'])->name('admin.profile.updateImage');
 
 
-    Route::prefix('admin')->name('room.')->middleware('permission:manage rooms')->group(function () {
-
+    /*
+    |--------------------------------------------------------------------------
+    | Room Routes
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('admin')->name('room.')->group(function () {
         // List all rooms
-        Route::get('/rooms', [RoomController::class, 'index'])->name('index');
+        Route::get('/rooms', [RoomController::class, 'index'])->middleware('permission:view rooms')->name('index');
 
         // SPECIFIC ROUTES - These MUST come before {room} routes
-        Route::get('/rooms/create', [RoomController::class, 'create'])->name('create');
-        Route::get('/rooms/recycle-bin', [RoomController::class, 'recycleBin'])->name('recycle-bin');
+        Route::get('/rooms/create', [RoomController::class, 'create'])->middleware('permission:create rooms')->name('create');
+        Route::get('/rooms/recycle-bin', [RoomController::class, 'recycleBin'])->middleware('permission:delete rooms')->name('recycle-bin');
 
         // Staff assignment routes (also specific)
-        Route::get('/rooms/assign/{roomId?}', [RoomController::class, 'assign'])->name('assign');
-        Route::put('/rooms/assign', [RoomController::class, 'assignStaff'])->name('assign.update');
+        Route::get('/rooms/assign/{roomId?}', [RoomController::class, 'assign'])->middleware('permission:edit staff')->name('assign');
+        Route::put('/rooms/assign', [RoomController::class, 'assignStaff'])->middleware('permission:edit staff')->name('assign.update');
 
         // PARAMETERIZED ROUTES - These come after specific routes
-        Route::get('/rooms/{room}', [RoomController::class, 'show'])->name('show');
-        Route::get('/rooms/{room}/edit', [RoomController::class, 'edit'])->name('edit');
-        Route::get('/rooms/{room}/print-qrcode', [RoomController::class, 'printQRCode'])->name('print-qrcode');
+        Route::get('/rooms/{room}', [RoomController::class, 'show'])->middleware('permission:view rooms')->name('show');
+        Route::get('/rooms/{room}/edit', [RoomController::class, 'edit'])->middleware('permission:edit rooms')->name('edit');
+        Route::get('/rooms/{room}/print-qrcode', [RoomController::class, 'printQRCode'])->middleware('permission:view rooms')->name('print-qrcode');
 
         // Form submission routes
-        Route::post('/rooms', [RoomController::class, 'store'])->name('store');
-        Route::put('/rooms/{room}', [RoomController::class, 'update'])->name('update');
-        Route::delete('/rooms/{room}', [RoomController::class, 'destroy'])->name('destroy');
+        Route::post('/rooms', [RoomController::class, 'store'])->middleware('permission:create rooms')->name('store');
+        Route::put('/rooms/{room}', [RoomController::class, 'update'])->middleware('permission:edit rooms')->name('update');
+        Route::delete('/rooms/{room}', [RoomController::class, 'destroy'])->middleware('permission:delete rooms')->name('destroy');
 
         // Soft delete management (using IDs, not models)
-        Route::post('/rooms/{id}/restore', [RoomController::class, 'restore'])->name('restore');
-        Route::delete('/rooms/{id}/force-delete', [RoomController::class, 'forceDelete'])->name('forceDelete');
+        Route::post('/rooms/{id}/restore', [RoomController::class, 'restore'])->middleware('permission:delete rooms')->name('restore');
+        Route::delete('/rooms/{id}/force-delete', [RoomController::class, 'forceDelete'])->middleware('permission:delete rooms')->name('forceDelete');
 
         // Media management
-        Route::delete('/rooms/{room}/carousel/{image}', [RoomController::class, 'removeCarouselImage'])->name('carousel.remove');
+        Route::delete('/rooms/{room}/carousel/{image}', [RoomController::class, 'removeCarouselImage'])->middleware('permission:edit rooms')->name('carousel.remove');
 
         // Staff removal from room
-        Route::delete('/rooms/staff/{id}/remove', [RoomController::class, 'removeFromRoom'])->name('staff.remove');
+        Route::delete('/rooms/staff/{id}/remove', [RoomController::class, 'removeFromRoom'])->middleware('permission:edit staff')->name('staff.remove');
     });
 
-    Route::prefix('admin')->name('room-user.')->middleware('permission:manage rooms')->group(function () {
-        Route::get('/room-users', [RoomUserController::class, 'index'])->name('index');
-        Route::get('/room-users/create', [RoomUserController::class, 'create'])->name('create');
-        Route::post('/room-users', [RoomUserController::class, 'store'])->name('store');
-        Route::get('/room-users/{user}/edit', [RoomUserController::class, 'edit'])->name('edit');
-        Route::put('/room-users/{user}', [RoomUserController::class, 'update'])->name('update');
-        Route::delete('/room-users/{user}', [RoomUserController::class, 'destroy'])->name('destroy');
+    /*
+    |--------------------------------------------------------------------------
+    | Room Users (Managers)
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('admin')->name('room-user.')->group(function () {
+        Route::get('/room-users', [RoomUserController::class, 'index'])->middleware('permission:view room users')->name('index');
+        Route::get('/room-users/create/{room?}', [RoomUserController::class, 'create'])->middleware('permission:create room users')->name('create');
+        Route::post('/room-users', [RoomUserController::class, 'store'])->middleware('permission:create room users')->name('store');
+
+        Route::get('/room-users/{user}/edit', [RoomUserController::class, 'edit'])->middleware('permission:edit room users')->name('edit');
+        Route::put('/room-users/{user}', [RoomUserController::class, 'update'])->middleware('permission:edit room users')->name('update');
+        Route::delete('/room-users/{user}', [RoomUserController::class, 'destroy'])->middleware('permission:delete room users')->name('destroy');
     });
 
-    Route::prefix('admin')->name('staff.')->middleware('permission:manage staff')->group(function () {
+    /*
+    |--------------------------------------------------------------------------
+    | Staff
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('admin')->name('staff.')->group(function () {
 
         // List all staff
-        Route::get('/staff', [StaffController::class, 'index'])->name('index');
+        Route::get('/staff', [StaffController::class, 'index'])->middleware('permission:view staff')->name('index');
 
         // SPECIFIC ROUTES - These MUST come before {staff} routes
-        Route::get('/staff/create', [StaffController::class, 'create'])->name('create');
-        Route::get('/staff/recycle-bin', [RoomController::class, 'recycleBin'])->name('recycle-bin');
+        Route::get('/staff/create', [StaffController::class, 'create'])->middleware('permission:create staff')->name('create');
+        Route::get('/staff/recycle-bin', [RoomController::class, 'recycleBin'])->middleware('permission:delete staff')->name('recycle-bin');
 
         // PARAMETERIZED ROUTES - These come after specific routes
-        Route::get('/staff/{staff}', [StaffController::class, 'show'])->name('show');
-        Route::get('/staff/{staff}/edit', [StaffController::class, 'edit'])->name('edit');
+        Route::get('/staff/{staff}', [StaffController::class, 'show'])->middleware('permission:view staff')->name('show');
+        Route::get('/staff/{staff}/edit', [StaffController::class, 'edit'])->middleware('permission:edit staff')->name('edit');
 
         // Form submission routes
-        Route::post('/staff', [StaffController::class, 'store'])->name('store');
-        Route::put('/staff/{staff}', [StaffController::class, 'update'])->name('update');
-        Route::delete('/staff/{staff}', [StaffController::class, 'destroy'])->name('destroy');
+        Route::post('/staff', [StaffController::class, 'store'])->middleware('permission:create staff')->name('store');
+        Route::put('/staff/{staff}', [StaffController::class, 'update'])->middleware('permission:edit staff')->name('update');
+        Route::delete('/staff/{staff}', [StaffController::class, 'destroy'])->middleware('permission:delete staff')->name('destroy');
 
         // Soft delete management (using IDs, not models)
-        Route::post('/staff/{id}/restore', [StaffController::class, 'restore'])->name('restore');
-        Route::delete('/staff/{id}/force-delete', [StaffController::class, 'forceDelete'])->name('forceDelete');
+        Route::post('/staff/{id}/restore', [StaffController::class, 'restore'])->middleware('permission:delete staff')->name('restore');
+        Route::delete('/staff/{id}/force-delete', [StaffController::class, 'forceDelete'])->middleware('permission:delete staff')->name('forceDelete');
     });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Paths & Images
+    |--------------------------------------------------------------------------
+    */
 
     Route::prefix('admin')->name('path.')->group(function () {
 

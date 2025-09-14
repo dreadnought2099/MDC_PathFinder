@@ -1,21 +1,41 @@
 @extends('layouts.guest')
 
 @section('content')
-    <div class="min-h-screen bg-white dark:bg-gray-900 flex flex-col">
-        <!-- Header -->
-        <header class="sticky top-0 z-50 bg-white dark:bg-gray-900">
-            <div class="max-w-7xl mx-auto px-6 py-4 flex justify-center items-center relative">
-                <!-- Centered Title -->
-                <h1 class="text-4xl lg:text-5xl sm:text-3xl font-bold text-gray-800 dark:text-gray-200 text-center mt-8">
-                    Meet the <span class="text-primary">Team</span>
-                </h1>
+    <div class="min-h-screen dark:bg-gray-900 flex flex-col">
+        <!-- Top bar -->
+        <div
+            class="w-full flex items-center p-4 dark:border-b border-b-primary dark:border-b-primary bg-white dark:bg-gray-900 sticky top-0 z-50">
 
-                <!-- Dark Mode Toggle (kept at top-right using absolute positioning) -->
-                <div class="absolute right-6">
+            <div class="w-48 flex items-center">
+                <!-- Left: Back button -->
+                <a href="{{ route('index') }}"
+                    class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 dark:text-gray-300">
+                    <svg class="h-6 w-6 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
+                    <span class="font-medium">Back to Home</span>
+                </a>
+            </div>
+
+            <div class="flex-1"></div>
+
+            <!-- Right: fixed width container for About + Dark Mode -->
+            <div class="w-48 flex items-center">
+                <!-- Slot 1: About Page -->
+                <div class="flex-1 flex justify-end">
+                    <x-about-page />
+                </div>
+
+                <!-- Slot 2: Dark Mode Toggle -->
+                <div class="flex-1 flex justify-end">
                     <x-dark-mode-toggle />
                 </div>
             </div>
-        </header>
+        </div>
+
+        <h1 class="text-4xl lg:text-5xl sm:text-3xl font-bold text-gray-800 dark:text-gray-200 text-center mt-8">
+            Meet the <span class="text-primary">Team</span>
+        </h1>
 
         <!-- Team Section -->
         <main class="flex-1 max-w-7xl mx-auto px-6 py-16">
@@ -115,7 +135,8 @@
                         </a>
                         <a href="https://letterboxd.com/RMAGALLANEZ/" class="hover:scale-120 duration-300 transition-all"
                             target="_blank" rel="noopener noreferrer">
-                            <img src="{{ asset('icons/letterboxd.png') }}" alt="Letterboxd Logo" class="w-8 h-8 contain">
+                            <img src="{{ asset('icons/letterboxd.png') }}" alt="Letterboxd Logo"
+                                class="w-8 h-8 contain">
                         </a>
                     </div>
                 </div>

@@ -13,9 +13,20 @@ class StaffPolicy
      */
     public function view(User $user, Staff $staff): Response
     {
-        return $user->hasRole('Admin') || $user->room_id === $staff->room_id
+        return $user->hasPermissionTo('view staff') &&
+            ($user->hasRole('Admin') || $user->room_id === $staff->room_id)
             ? Response::allow()
             : Response::deny('You cannot view this staff member.');
+    }
+
+    /**
+     * Determine if the user can create staff.
+     */
+    public function create(User $user): Response
+    {
+        return $user->hasPermissionTo('create staff')
+            ? Response::allow()
+            : Response::deny('You are not allowed to create staff.');
     }
 
     /**
@@ -23,7 +34,8 @@ class StaffPolicy
      */
     public function update(User $user, Staff $staff): Response
     {
-        return $user->hasRole('Admin') || ($user->hasPermissionTo('manage staff') && $user->room_id === $staff->room_id)
+        return $user->hasPermissionTo('edit staff') &&
+            ($user->hasRole('Admin') || $user->room_id === $staff->room_id)
             ? Response::allow()
             : Response::deny('You are not allowed to update this staff member.');
     }
@@ -33,7 +45,7 @@ class StaffPolicy
      */
     public function delete(User $user, Staff $staff): Response
     {
-        return $user->hasRole('Admin')
+        return $user->hasPermissionTo('delete staff') && $user->hasRole('Admin')
             ? Response::allow()
             : Response::deny('Only Admins can delete staff members.');
     }

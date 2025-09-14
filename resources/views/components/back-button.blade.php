@@ -3,6 +3,7 @@
     'roomFallback' => 'room.index',
     'staffFallback' => 'staff.index',
     'pathFallback' => 'path.index',
+    'roomUserFallback' => 'room-user.index',
     'landing' => 'admin.dashboard',
 ])
 
@@ -23,6 +24,8 @@
             $backUrl = route('staff.index');
         } elseif ($currentRouteName === 'path-image.create') {
             $backUrl = route('path.index');
+        } elseif ($currentRouteName === 'room-user.create') {
+            $backUrl = route('room.index');
         }
     }
 
@@ -32,6 +35,8 @@
             $backUrl = route('room.index');
         } elseif ($currentRouteName === 'staff.edit') {
             $backUrl = route('staff.index');
+        } elseif ($currentRouteName === 'room-user.edit') {
+            $backUrl = route('room-user.index');    
         } elseif ($currentRouteName === 'path-image.edit') {
             $backUrl = $path ? route('path.show', $path) : route('path.index');
         }
@@ -45,6 +50,8 @@
             $backUrl = route('staff.index');
         } elseif ($currentRouteName === 'path.show') {
             $backUrl = route('path.index');
+        } elseif ($currentRouteName === 'room-user.show') {
+            $backUrl = route('room-user.index');
         }
     }
 

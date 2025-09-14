@@ -15,17 +15,33 @@ class RolesAndPermissionsSeeder extends Seeder
      */
     public function run(): void
     {
-        // Permissions
-        Permission::firstOrCreate(['name' => 'manage rooms']);
-        Permission::firstOrCreate(['name' => 'manage staff']);
+        // Permissions for Office
+        Permission::firstOrCreate(['name' => 'view rooms']);
+        Permission::firstOrCreate(['name' => 'create rooms']);
+        Permission::firstOrCreate(['name' => 'edit rooms']);
+        Permission::firstOrCreate(['name' => 'delete rooms']);
+
+        // Permission for Staff
+        Permission::firstOrCreate(['name' => 'view staff']);
+        Permission::firstOrCreate(['name' => 'create staff']);
+        Permission::firstOrCreate(['name' => 'edit staff']);
+        Permission::firstOrCreate(['name' => 'delete staff']);
+
+        // Permission for Room Users
+        Permission::firstOrCreate(['name' => 'view room users']);
+        Permission::firstOrCreate(['name' => 'create room users']);
+        Permission::firstOrCreate(['name' => 'edit room users']);
+        Permission::firstOrCreate(['name' => 'delete room users']);
 
         // Roles
         $adminRole = Role::firstOrCreate(['name' => 'Admin']);
         $managerRole = Role::firstOrCreate(['name' => 'Room Manager']);
 
         // Assign permissions
-        $adminRole->givePermissionTo(Permission::all());
-        $managerRole->givePermissionTo(['manage rooms', 'manage staff']);
+        $adminRole->syncPermissions(Permission::all());
+
+        // Room Manager can only view + edit, no create
+        $managerRole->givePermissionTo(['view rooms', 'edit rooms', 'view staff', 'edit staff']);
 
         // Default Admin
         $admin = User::firstOrCreate(

@@ -65,6 +65,9 @@
     <!-- GLightbox CSS -->
     <link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet">
 
+    {{-- Cropper CSS --}}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+
     @stack('styles')
 </head>
 
@@ -198,6 +201,9 @@
 
     <!-- GLightbox -->
     <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+
+    {{-- Cropper JS --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
     @stack('scripts')
 

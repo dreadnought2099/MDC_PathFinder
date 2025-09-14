@@ -45,117 +45,35 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
                         @forelse($rooms as $room)
-                            @php
-                                $user = auth()->user();
-                                // Admin sees everything, room users only their assigned room
-                                $showRoom = $user->hasRole('Admin') || $user->room_id == $room->id;
-                            @endphp
+                            <tr
+                                class="hover:bg-gray-50 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-800">
+                                <!-- ID -->
+                                <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">
+                                    {{ $room->id }}
+                                </td>
 
-                            @if ($showRoom)
-                                <tr
-                                    class="hover:bg-gray-50 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-800">
-                                    <!-- ID -->
-                                    <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">
-                                        {{ $room->id }}
-                                    </td>
+                                <!-- Room Name -->
+                                <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">
+                                    {{ $room->name }}
+                                </td>
 
-                                    <!-- Room Name -->
-                                    <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">
-                                        {{ $room->name }}
-                                    </td>
-
-                                    <!-- Actions -->
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center justify-end space-x-3">
-                                            {{-- View --}}
-                                            <div class="relative inline-block group">
-                                                @can('view', $room)
-                                                    <a href="{{ route('room.show', $room->id) }}"
-                                                        class=" text-primary hover-underline hover:scale-115 transform transition duration-200">
-                                                        <img src="{{ asset('icons/view.png') }}" alt="View Icon"
-                                                            class="w-8 h-8 object-contain">
-                                                    </a>
-                                                    <div
-                                                        class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
-                    text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible
-                    group-hover:opacity-100 group-hover:visible transition-all duration-300 
-                    whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
-                                                        View Office
-                                                        <!-- Arrow -->
-                                                        <div
-                                                            class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
-                        border-l-4 border-l-gray-900 dark:border-l-gray-700
-                        border-t-4 border-t-transparent 
-                        border-b-4 border-b-transparent">
-                                                        </div>
-                                                    </div>
-                                                @endcan
-                                            </div>
-
-                                            <div class="relative inline-block group">
-                                                {{-- Edit --}}
-                                                @can('update', $room)
-                                                    <a href="{{ route('room.edit', $room->id) }}"
-                                                        class="text-edit hover-underline-edit hover:scale-115 transform transition duration-200">
-                                                        <img src="{{ asset('icons/edit.png') }}" alt="Edit Icon"
-                                                            class="w-8 h-8 object-contain">
-                                                    </a>
-                                                    <div
-                                                        class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
-                    text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible
-                    group-hover:opacity-100 group-hover:visible transition-all duration-300 
-                    whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
-                                                        Edit Office
-                                                        <!-- Arrow -->
-                                                        <div
-                                                            class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
-                        border-l-4 border-l-gray-900 dark:border-l-gray-700
-                        border-t-4 border-t-transparent 
-                        border-b-4 border-b-transparent">
-                                                        </div>
-                                                    </div>
-                                                @endcan
-                                            </div>
-
-                                            <div class="relative inline-block group">
-                                                {{-- Assign Staff (Admin or Room Manager) --}}
-                                                @if (auth()->user()->hasRole('Admin'))
-                                                    <a href="{{ route('room.assign', $room->id) }}"
-                                                        class="text-tertiary hover-underline hover:scale-115 transform transition duration-200">
-                                                        <img src="{{ asset('icons/assign-staff.png') }}"
-                                                            alt="Assign Staff Icon" class="w-8 h-8 object-contain">
-                                                    </a>
-                                                    <div
-                                                        class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
-                    text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible
-                    group-hover:opacity-100 group-hover:visible transition-all duration-300 
-                    whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
-                                                        Assign Staff
-                                                        <!-- Arrow -->
-                                                        <div
-                                                            class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
-                        border-l-4 border-l-gray-900 dark:border-l-gray-700
-                        border-t-4 border-t-transparent 
-                        border-b-4 border-b-transparent">
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                            </div>
-
-                                            <div class="relative inline-block group">
-                                                {{-- Create User (Admin only) --}}
-                                                @if ($user->hasRole('Admin'))
-                                                    <a href="{{ route('room-user.create', $room->id) }}"
-                                                        class="text-green-600 hover-underline hover:scale-115 transform transition duration-200">
-                                                        <img src="{{ asset('icons/manager.png') }}" alt="Create Room User" class="w-8 h-8 object-contain">
-                                                    </a>
-                                                @endif
+                                <!-- Actions -->
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center justify-end space-x-3">
+                                        {{-- View --}}
+                                        <div class="relative inline-block group">
+                                            @if (auth()->user()->hasRole('Admin') || auth()->user()->can('view rooms'))
+                                                <a href="{{ route('room.show', $room->id) }}"
+                                                    class=" text-primary hover-underline hover:scale-115 transform transition duration-200">
+                                                    <img src="{{ asset('icons/view.png') }}" alt="View Icon"
+                                                        class="w-8 h-8 object-contain">
+                                                </a>
                                                 <div
                                                     class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
                     text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible
                     group-hover:opacity-100 group-hover:visible transition-all duration-300 
                     whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
-                                                    Create Room User Account
+                                                    View Office
                                                     <!-- Arrow -->
                                                     <div
                                                         class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
@@ -164,39 +82,114 @@
                         border-b-4 border-b-transparent">
                                                     </div>
                                                 </div>
-                                            </div>
-
-
-                                            <div class="relative inline-block group">
-                                                {{-- Delete (Admin only) --}}
-                                                @can('delete', $room)
-                                                    <button
-                                                        onclick="openRoomModal('{{ $room->id }}', '{{ addslashes($room->name) }}')"
-                                                        class="text-secondary hover-underline-delete hover:scale-115 transform transition duration-200 cursor-pointer">
-                                                        <img src="{{ asset('icons/trash.png') }}" alt="Trash Icon"
-                                                            class="w-8 h-8 object-contain">
-                                                    </button>
-                                                @endcan
-                                                <div
-                                                    class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
-                    text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible
-                    group-hover:opacity-100 group-hover:visible transition-all duration-300 
-                    whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
-                                                    Recycle Office
-                                                    <!-- Arrow -->
-                                                    <div
-                                                        class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
-                        border-l-4 border-l-gray-900 dark:border-l-gray-700
-                        border-t-4 border-t-transparent 
-                        border-b-4 border-b-transparent">
-                                                    </div>
-                                                </div>
-                                            </div>
-
+                                            @endif
                                         </div>
-                                    </td>
-                                </tr>
-                            @endif
+
+                                        <div class="relative inline-block group">
+                                            {{-- Edit --}}
+                                            @if (auth()->user()->hasRole('Admin') || auth()->user()->can('edit rooms'))
+                                                <a href="{{ route('room.edit', $room->id) }}"
+                                                    class="text-edit hover-underline-edit hover:scale-115 transform transition duration-200">
+                                                    <img src="{{ asset('icons/edit.png') }}" alt="Edit Icon"
+                                                        class="w-8 h-8 object-contain">
+                                                </a>
+                                                <div
+                                                    class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
+                    text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible
+                    group-hover:opacity-100 group-hover:visible transition-all duration-300 
+                    whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
+                                                    Edit Office
+                                                    <!-- Arrow -->
+                                                    <div
+                                                        class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
+                        border-l-4 border-l-gray-900 dark:border-l-gray-700
+                        border-t-4 border-t-transparent 
+                        border-b-4 border-b-transparent">
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        <div class="relative inline-block group">
+                                            {{-- Assign Staff (Admin or Room Manager) --}}
+                                            @if (auth()->user()->hasRole('Admin'))
+                                                <a href="{{ route('room.assign', $room->id) }}"
+                                                    class="text-tertiary hover-underline hover:scale-115 transform transition duration-200">
+                                                    <img src="{{ asset('icons/assign-staff.png') }}" alt="Assign Staff Icon"
+                                                        class="w-8 h-8 object-contain">
+                                                </a>
+                                                <div
+                                                    class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
+                    text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible
+                    group-hover:opacity-100 group-hover:visible transition-all duration-300 
+                    whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
+                                                    Assign Staff
+                                                    <!-- Arrow -->
+                                                    <div
+                                                        class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
+                        border-l-4 border-l-gray-900 dark:border-l-gray-700
+                        border-t-4 border-t-transparent 
+                        border-b-4 border-b-transparent">
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        <div class="relative inline-block group">
+                                            {{-- Create User (Admin only) --}}
+                                            @if (auth()->user()->hasRole('Admin'))
+                                                <a href="{{ route('room-user.create', $room->id) }}"
+                                                    class="text-green-600 hover-underline hover:scale-115 transform transition duration-200">
+                                                    <img src="{{ asset('icons/manager.png') }}" alt="Create Room User"
+                                                        class="w-8 h-8 object-contain">
+                                                </a>
+                                            @endif
+                                            <div
+                                                class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
+                    text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible
+                    group-hover:opacity-100 group-hover:visible transition-all duration-300 
+                    whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
+                                                Create Room User Account
+                                                <!-- Arrow -->
+                                                <div
+                                                    class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
+                        border-l-4 border-l-gray-900 dark:border-l-gray-700
+                        border-t-4 border-t-transparent 
+                        border-b-4 border-b-transparent">
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="relative inline-block group">
+                                            {{-- Delete (Admin only) --}}
+                                            @if (auth()->user()->hasRole('Admin'))
+                                                <button
+                                                    onclick="openRoomModal('{{ $room->id }}', '{{ addslashes($room->name) }}')"
+                                                    class="text-secondary hover-underline-delete hover:scale-115 transform transition duration-200 cursor-pointer">
+                                                    <img src="{{ asset('icons/trash.png') }}" alt="Trash Icon"
+                                                        class="w-8 h-8 object-contain">
+                                                </button>
+                                            @endif
+                                            <div
+                                                class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
+                    text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible
+                    group-hover:opacity-100 group-hover:visible transition-all duration-300 
+                    whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
+                                                Recycle Office
+                                                <!-- Arrow -->
+                                                <div
+                                                    class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
+                        border-l-4 border-l-gray-900 dark:border-l-gray-700
+                        border-t-4 border-t-transparent 
+                        border-b-4 border-b-transparent">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </td>
+                            </tr>
                         @empty
                             <tr class="dark:bg-gray-800">
                                 <td colspan="3" class="px-6 py-16 text-center">

@@ -51,101 +51,107 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-                        @forelse($staffs as $staff)
-                            <tr
-                                class="hover:bg-gray-50 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-800">
-                                <!-- Staff ID -->
-                                <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-300">
-                                    {{ $staff->id }}
-                                </td>
+                        @php $hasVisibleStaff = false; @endphp
 
-                                <!-- Staff Name -->
-                                <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-300">
-                                    {{ $staff->full_name }}
-                                </td>
+                        @foreach ($staffs as $staff)
+                            @can('view', $staff)
+                                @php $hasVisibleStaff = true; @endphp
+                                <tr
+                                    class="hover:bg-gray-50 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-800">
+                                    <!-- Staff ID -->
+                                    <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                        {{ $staff->id }}
+                                    </td>
 
-                                <!-- Room ID -->
-                                <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-400">
-                                    {{ $staff->room_id ?? 'N/A' }}
-                                </td>
+                                    <!-- Staff Name -->
+                                    <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                        {{ $staff->full_name }}
+                                    </td>
 
-                                <!-- Office Name -->
-                                <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-400">
-                                    {{ $staff->room->name ?? 'N/A' }}
-                                </td>
+                                    <!-- Room ID -->
+                                    <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-400">
+                                        {{ $staff->room_id ?? 'N/A' }}
+                                    </td>
 
-                                <!-- Actions -->
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center justify-end space-x-3">
-                                        <!-- View Button -->
-                                        <div class="relative group">
-                                            <a href="{{ route('staff.show', $staff->id) }}"
-                                                class="text-primary hover-underline hover:scale-115 transform transition duration-200">
-                                                <img src="{{ asset('icons/view.png') }}" alt="View Icon"
-                                                    class="w-8 h-8 object-contain">
-                                            </a>
-                                            <!-- Tooltip -->
-                                            <div
-                                                class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
+                                    <!-- Office Name -->
+                                    <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-400">
+                                        {{ $staff->room->name ?? 'N/A' }}
+                                    </td>
+
+                                    <!-- Actions -->
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center justify-end space-x-3">
+                                            <!-- View Button -->
+                                            <div class="relative group">
+                                                <a href="{{ route('staff.show', $staff->id) }}"
+                                                    class="text-primary hover-underline hover:scale-115 transform transition duration-200">
+                                                    <img src="{{ asset('icons/view.png') }}" alt="View Icon"
+                                                        class="w-8 h-8 object-contain">
+                                                </a>
+                                                <!-- Tooltip -->
+                                                <div
+                                                    class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
                         text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible
                         group-hover:opacity-100 group-hover:visible transition-all duration-300 
                         whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
-                                                View Office
-                                                <div
-                                                    class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
+                                                    View Office
+                                                    <div
+                                                        class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
                             border-l-4 border-l-gray-900 dark:border-l-gray-700
                             border-t-4 border-t-transparent border-b-4 border-b-transparent">
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <!-- Edit Button -->
-                                        <div class="relative group">
-                                            <a href="{{ route('staff.edit', $staff->id) }}"
-                                                class="text-edit hover-underline-edit hover:scale-115 transform transition duration-200">
-                                                <img src="{{ asset('icons/edit.png') }}" alt="Edit Icon"
-                                                    class="w-8 h-8 object-contain">
-                                            </a>
-                                            <!-- Tooltip -->
-                                            <div
-                                                class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
+                                            <!-- Edit Button -->
+                                            <div class="relative group">
+                                                <a href="{{ route('staff.edit', $staff->id) }}"
+                                                    class="text-edit hover-underline-edit hover:scale-115 transform transition duration-200">
+                                                    <img src="{{ asset('icons/edit.png') }}" alt="Edit Icon"
+                                                        class="w-8 h-8 object-contain">
+                                                </a>
+                                                <!-- Tooltip -->
+                                                <div
+                                                    class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
                         text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible
                         group-hover:opacity-100 group-hover:visible transition-all duration-300 
                         whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
-                                                Edit Office
-                                                <div
-                                                    class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
+                                                    Edit Office
+                                                    <div
+                                                        class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
                             border-l-4 border-l-gray-900 dark:border-l-gray-700
                             border-t-4 border-t-transparent border-b-4 border-b-transparent">
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <!-- Trash Button -->
-                                        <div class="relative group">
-                                            <button onclick="openModal('{{ $staff->id }}', '{{ $staff->full_name }}')"
-                                                class="text-secondary hover-underline-delete hover:scale-115 transform transition duration-200 cursor-pointer">
-                                                <img src="{{ asset('icons/trash.png') }}" alt="Trash Icon"
-                                                    class="w-8 h-8 object-contain">
-                                            </button>
-                                            <!-- Tooltip -->
-                                            <div
-                                                class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
+                                            <!-- Trash Button -->
+                                            <div class="relative group">
+                                                <button onclick="openModal('{{ $staff->id }}', '{{ $staff->full_name }}')"
+                                                    class="text-secondary hover-underline-delete hover:scale-115 transform transition duration-200 cursor-pointer">
+                                                    <img src="{{ asset('icons/trash.png') }}" alt="Trash Icon"
+                                                        class="w-8 h-8 object-contain">
+                                                </button>
+                                                <!-- Tooltip -->
+                                                <div
+                                                    class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
                         text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible
                         group-hover:opacity-100 group-hover:visible transition-all duration-300 
                         whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
-                                                Recycle Staff
-                                                <div
-                                                    class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
+                                                    Recycle Staff
+                                                    <div
+                                                        class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
                             border-l-4 border-l-gray-900 dark:border-l-gray-700
                             border-t-4 border-t-transparent border-b-4 border-b-transparent">
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
+                                    </td>
+                                </tr>
+                            @endcan
+                        @endforeach
+                        @if (!$hasVisibleStaff)
                             <tr class="dark:bg-gray-800">
                                 <td colspan="5" class="px-6 py-16 text-center">
                                     <div class="flex flex-col items-center justify-center space-y-4">
@@ -154,15 +160,20 @@
                                             <img src="{{ asset('icons/group.png') }}" alt="Group icon" class="w-11 h-10">
                                         </div>
                                         <div class="text-center">
-                                            <h3 class="text-lg font-medium dark:text-gray-300 text-gray-700 mb-2">No staff
-                                                members found</h3>
-                                            <p class="text-gray-500 text-sm dark:text-gray-400">Get started by adding your
-                                                first team member.</p>
+                                            <h3 class="text-lg font-medium dark:text-gray-300 text-gray-700 mb-2">
+                                                No staff members found
+                                            </h3>
+                                            @if (auth()->user()->hasRole('Admin'))
+                                                <p class="text-gray-500 text-sm dark:text-gray-400">Get started by adding
+                                                    your
+                                                    first team member.
+                                                </p>
+                                            @endif
                                         </div>
                                     </div>
                                 </td>
                             </tr>
-                        @endforelse
+                        @endif
                     </tbody>
                 </table>
             </div>
