@@ -86,10 +86,30 @@
 
     <!-- Office Hours -->
     <div class="mt-6">
-        <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200 text-center">Office Hours</h3>
-        <div
-            class="whitespace-pre-line bg-gray-50 dark:bg-gray-800 p-4 rounded-2xl border-2 border-primary text-gray-800 dark:text-gray-300">
-            {!! nl2br(e($room->formatted_office_hours)) !!}
+        <h3 class="text-3xl font-bold text-slate-800 mb-2 text-center dark:text-gray-300">Office Hours</h3>
+        <div class="bg-gray-50 p-4 rounded-2xl dark:bg-gray-800 border-2 border-primary">
+
+            @if ($room->grouped_office_hours && count($room->grouped_office_hours) > 0)
+                <div class="space-y-3">
+                    @foreach ($room->grouped_office_hours as $timeRange => $days)
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                            <div class="font-medium text-gray-800 min-w-0 flex-1 dark:text-gray-300">
+                                {{ $room->formatDaysGroup($days) }}
+                            </div>
+                            <div class="text-sm sm:text-right">
+                                @if (strtolower($timeRange) === 'closed')
+                                    <span class="text-red-600 font-medium">Closed</span>
+                                @else
+                                    <span class="text-gray-600 dark:text-gray-300">{{ $timeRange }}</span>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="text-gray-500 italic">No office hours specified</div>
+            @endif
+
         </div>
     </div>
 

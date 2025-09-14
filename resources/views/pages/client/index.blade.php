@@ -1,19 +1,33 @@
 @extends('layouts.guest')
 
 @section('content')
-    <div class="min-h-screen bg-white dark:bg-gray-900 flex flex-col">
+    <div class="min-h-screen dark:bg-gray-900 flex flex-col">
 
-        <!-- Sticky Top Bar -->
+        <!-- Top Bar -->
         <div
-            class="w-full flex justify-between items-center p-4 dark:border-primary bg-white dark:bg-gray-900 sticky top-0 z-50">
-            <!-- Left (empty for index) -->
-            <div></div>
+            class="w-full flex items-center p-4 border-b-2 border-primary dark:border-primary bg-white dark:bg-gray-900 sticky top-0 z-50">
+
+            <!-- Left: reserved space (same width as back button would occupy) -->
+            <div class="w-48 flex items-center">
+                <!-- No back button on index, but space is reserved for alignment -->
+            </div>
+
+            <!-- Center spacer -->
+            <div class="flex-1"></div>
 
             <!-- Right: About + Dark Mode -->
-            <div class="flex items-center space-x-4">
-                <x-about-page />
-                <x-dark-mode-toggle />
+            <div class="w-48 flex items-center">
+                <!-- Slot 1: About Page -->
+                <div class="flex-1 flex justify-end">
+                    <x-about-page />
+                </div>
+
+                <!-- Slot 2: Dark Mode Toggle -->
+                <div class="flex-1 flex justify-end">
+                    <x-dark-mode-toggle />
+                </div>
             </div>
+
         </div>
 
         <!-- Main Content -->

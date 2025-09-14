@@ -60,10 +60,20 @@
                 @endif
             </div>
 
-            <!-- Right: About + Dark Mode -->
-            <div class="flex items-center space-x-4">
-                <x-about-page />
-                <x-dark-mode-toggle />
+            <!-- Center spacer -->
+            <div class="flex-1"></div>
+
+            <!-- Right: fixed width container for About + Dark Mode -->
+            <div class="w-48 flex items-center">
+                <!-- Slot 1: About Page -->
+                <div class="flex-1 flex justify-end">
+                    <x-about-page />
+                </div>
+
+                <!-- Slot 2: Dark Mode Toggle -->
+                <div class="flex-1 flex justify-end">
+                    <x-dark-mode-toggle />
+                </div>
             </div>
         </div>
 
