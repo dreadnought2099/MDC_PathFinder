@@ -6,9 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Path;
 use App\Models\Room;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PathController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['auth', 'role:Admin'])->only(['index', 'show']);
+    }
     // Show all paths with their images
     public function index(Request $request)
     {

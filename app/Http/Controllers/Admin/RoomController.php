@@ -9,11 +9,25 @@ use App\Models\RoomImage;
 use App\Models\Staff;
 use App\Services\EntrancePointService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class RoomController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['auth', 'role:Admin'])->only([
+            'create',
+            'store',
+            'destroy',
+            'assign',
+            'assignStaff',
+            'restore',
+            'forceDelete',
+            'recycleBin'
+        ]);
+    }
     public function index(Request $request)
     {
         $sort = $request->get('sort', 'name');
@@ -156,7 +170,7 @@ class RoomController extends Controller
         }]);
 
         $this->authorize('update', $room); // uses RoomPolicy
-        
+
         // Transform officeHours relation to JSON structure expected by JS
         $officeHours = [];
         $existingOfficeHours = []; // Add this variable

@@ -48,7 +48,7 @@
                                 </div>
                                 <div>
                                     <p class="font-semibold text-gray-800 mb-1 dark:text-gray-300">Bio</p>
-                                    <p class="text-gray-600 leading-relaxed dark:text-gray-300">{{ $staff->bio ?? 'N/A' }}</p>
+                                    <p class="font-sofia text-gray-600 leading-relaxed dark:text-gray-300">{{ $staff->bio ?? 'N/A' }}</p>
                                 </div>
                             </div>
                         </div>
@@ -62,7 +62,7 @@
                                 </div>
                                 <div>
                                     <p class="font-semibold text-gray-800 dark:text-gray-300">Email</p>
-                                    <p class="text-gray-600 dark:text-gray-300">{{ $staff->email ?? 'N/A' }}</p>
+                                    <p class="font-sofia text-gray-600 dark:text-gray-300">{{ $staff->email ?? 'N/A' }}</p>
                                 </div>
                             </div>
                         </div>
@@ -76,7 +76,7 @@
                                 </div>
                                 <div>
                                     <p class="font-semibold text-gray-800 dark:text-gray-300">Position</p>
-                                    <p class="text-gray-600 dark:text-gray-300">{{ $staff->position ?? 'N/A' }}</p>
+                                    <p class="font-sofia text-gray-600 dark:text-gray-300">{{ $staff->position ?? 'N/A' }}</p>
                                 </div>
                             </div>
                         </div>
@@ -90,7 +90,7 @@
                                 </div>
                                 <div>
                                     <p class="font-semibold text-gray-800 dark:text-gray-300">Phone</p>
-                                    <p class="text-gray-600 dark:text-gray-300">{{ $staff->phone_num ?? 'N/A' }}</p>
+                                    <p class="font-sofia text-gray-600 dark:text-gray-300">{{ $staff->phone_num ?? 'N/A' }}</p>
                                 </div>
                             </div>
                         </div>

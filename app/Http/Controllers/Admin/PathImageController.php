@@ -6,10 +6,26 @@ use App\Http\Controllers\Controller;
 use App\Models\Path;
 use App\Models\PathImage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class PathImageController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['auth', 'role:Admin'])->only([
+            'create',
+            'store',
+            'edit',
+            'update',
+            'updateSingle',
+            'updateMultiple',
+            'destroySingle',
+            'destroyMultiple',
+            'updateOrder'
+        ]);
+    }
+
     // Show form to upload images
     public function create(Path $path = null)
     {

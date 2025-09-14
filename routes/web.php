@@ -181,7 +181,7 @@ Route::middleware('auth', 'role:Admin|Room Manager')->group(function () {
     Route::prefix('admin')->name('path-image.')->group(function () {
         // GENERIC ROUTES (no path parameter needed)
         Route::get('/path-images/create/{path?}', [PathImageController::class, 'create'])->name('create');
-        Route::post('/path-images', [PathImageController::class, 'store'])->name('store');
+        Route::post('/path-images/create', [PathImageController::class, 'store'])->name('store');
 
         // UNIFIED EDIT ROUTE (handles both single and multiple images)
         Route::get('/paths/{path}/images/edit/{pathImage?}', [PathImageController::class, 'edit'])->name('edit');

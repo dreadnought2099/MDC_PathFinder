@@ -27,7 +27,7 @@
                         <div>
                             <label class="block text-sm text-gray-800 mb-2">First Name</label>
                             <input type="text" name="first_name" value="{{ old('name', $staff->first_name) }}"
-                                class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300">
+                                class="w-full font-sofia border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300">
                             @error('name')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
@@ -37,7 +37,7 @@
                         <div>
                             <label class="block text-sm text-gray-800 mb-2">Middle Name</label>
                             <input type="text" name="middle_name" value="{{ old('name', $staff->middle_name) }}"
-                                class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300">
+                                class="w-full font-sofia border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300">
                             @error('name')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
@@ -47,7 +47,7 @@
                         <div>
                             <label class="block text-sm text-gray-800 mb-2">Last Name</label>
                             <input type="text" name="last_name" value="{{ old('name', $staff->last_name) }}"
-                                class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300">
+                                class="w-full font-sofia border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300">
                             @error('name')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
@@ -57,7 +57,7 @@
                         <div>
                             <label class="block text-sm text-gray-800 mb-2">Suffix</label>
                             <select name="suffix"
-                                class="w-full border border-gray-300 rounded-xl px-4 py-3 
+                                class="w-full font-sofia border border-gray-300 rounded-xl px-4 py-3 
                    focus:border-primary focus:ring-1 focus:ring-primary 
                    focus:outline-none transition-colors duration-300">
                                 <option value="">None</option>
@@ -86,7 +86,7 @@
                             </select>
 
                             @error('suffix')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                <p class="text-red-500 text-sm mt-1 font-sofia">{{ $message }}</p>
                             @enderror
                         </div>
 
@@ -95,7 +95,7 @@
                         <div>
                             <label class="block text-sm text-gray-800 mb-2">Credentials</label>
                             <input type="text" name="credentials" value="{{ old('credentials', $staff->credentials) }}"
-                                class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300">
+                                class="w-full font-sofia border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300">
                             @error('name')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
@@ -104,7 +104,7 @@
                         <div>
                             <label class="block text-sm text-gray-800 mb-2">Email</label>
                             <input type="email" name="email" value="{{ old('email', $staff->email) }}"
-                                class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300">
+                                class="w-full font-sofia border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300">
                             @error('email')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
@@ -114,14 +114,14 @@
                         <div>
                             <label class="block text-sm text-gray-800 mb-2">Position</label>
                             <input type="text" name="position" value="{{ old('position', $staff->position) }}"
-                                class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300">
+                                class="w-full font-sofia border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300">
                         </div>
 
                         <!-- Phone Number Field -->
                         <div>
                             <label class="block text-sm text-gray-800 mb-2">Phone Number</label>
                             <input type="text" name="phone_num" value="{{ old('phone_num', $staff->phone_num) }}"
-                                class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300">
+                                class="w-full font-sofia border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300">
                             @error('phone_num')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
@@ -131,7 +131,7 @@
                         <div>
                             <label class="block text-sm text-gray-800 mb-2">Bio</label>
                             <textarea name="bio" rows="4"
-                                class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300 resize-none">{{ old('bio', $staff->bio) }}</textarea>
+                                class="w-full font-sofia border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300 resize-none">{{ old('bio', $staff->bio) }}</textarea>
                         </div>
 
                         <!-- Photo Upload Field -->
@@ -139,7 +139,7 @@
                             <label class="block text-sm text-gray-800 mb-2">Photo</label>
                             <div class="space-y-4">
                                 <input type="file" name="photo_path" accept="image/*"
-                                    class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary file:text-white file:cursor-pointer hover:file:bg-blue-500">
+                                    class="w-full font-sofia border border-gray-300 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors duration-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary file:text-white file:cursor-pointer hover:file:bg-blue-500">
 
                                 @if ($staff->photo_path)
                                     <div class="flex items-center space-x-4">

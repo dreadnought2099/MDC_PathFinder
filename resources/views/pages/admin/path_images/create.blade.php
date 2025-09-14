@@ -3,61 +3,64 @@
 @section('title', 'Upload Path Images')
 
 @section('content')
-    <x-floating-actions />
+    @if (auth()->user()->hasRole('Admin'))
+        <x-floating-actions />
 
-    <div class="max-w-xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-6">
-        <h2 class="text-2xl text-center mb-6 dark:text-gray-300">
-            <span class="text-primary">Upload</span> Path Images
-        </h2>
-        
-        <form id="uploadForm" action="{{ route('path-image.store') }}" method="POST" enctype="multipart/form-data" data-upload>
-            @csrf
-            {{-- Path Selector --}}
-            <div class="mb-4 dark:text-gray-300">
-                <label for="path_id" class="block text-gray-700 mb-2 dark:text-gray-300">Select Path</label>
-                <select name="path_id" id="path_id" required
-                    class="w-full border border-primary rounded px-3 py-2 dark:bg-gray-800">
-                    @foreach ($paths as $p)
-                        <option value="{{ $p->id }}" {{ $p->id == $defaultPath->id ? 'selected' : '' }}>
-                            {{ $p->fromRoom->name ?? 'Room #' . $p->from_room_id }} →
-                            {{ $p->toRoom->name ?? 'Room #' . $p->to_room_id }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+        <div class="max-w-xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-6">
+            <h2 class="text-2xl text-center mb-6 dark:text-gray-300">
+                <span class="text-primary">Upload</span> Path Images
+            </h2>
 
-            {{-- Dropzone --}}
-            <label for="fileInput"
-                class="flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary dark:hover:bg-gray-800 transition-colors p-4 overflow-auto relative">
-                <span class="text-gray-600 dark:text-gray-300 mb-2">Drop images here or click to browse</span>
-                <span class="text-xs text-gray-400">
-                    JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 50MB each | multiple allowed
-                </span>
-                <input type="file" name="files[]" id="fileInput" multiple accept="image/*" class="hidden">
-            </label>
-
-            <div id="fileError" class="text-red-500 text-sm mt-2 hidden"></div>
-            <div id="selectedFiles" class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4"></div>
-
-            <button type="submit" id="submitBtn"
-                class="w-full bg-primary text-white px-4 py-2 rounded-md border-2 border-primary duration-300 transition-all ease-in-out mt-4 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer hover:bg-white hover:text-primary dark:hover:bg-gray-800 shadow-primary-hover"
-                disabled>
-                Upload Images
-            </button>
-        </form>
-
-        {{-- Upload Modal --}}
-        <div id="uploadModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
-            <div class="bg-white rounded p-6 w-96 shadow-lg">
-                <h2 class="text-lg mb-4">Uploading...</h2>
-                <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden relative">
-                    <div id="progressBar" class="h-4 rounded-full bg-primary transition-all duration-300 ease-out"
-                        style="width: 0%"></div>
+            <form id="uploadForm" action="{{ route('path-image.store') }}" method="POST" enctype="multipart/form-data"
+                data-upload>
+                @csrf
+                {{-- Path Selector --}}
+                <div class="mb-4 dark:text-gray-300">
+                    <label for="path_id" class="block text-gray-700 mb-2 dark:text-gray-300">Select Path</label>
+                    <select name="path_id" id="path_id" required
+                        class="w-full border border-primary rounded px-3 py-2 dark:bg-gray-800">
+                        @foreach ($paths as $p)
+                            <option value="{{ $p->id }}" {{ $p->id == $defaultPath->id ? 'selected' : '' }}>
+                                {{ $p->fromRoom->name ?? 'Room #' . $p->from_room_id }} →
+                                {{ $p->toRoom->name ?? 'Room #' . $p->to_room_id }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
-                <p id="progressText" class="mt-2 text-sm text-gray-600">0%</p>
+
+                {{-- Dropzone --}}
+                <label for="fileInput"
+                    class="flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary dark:hover:bg-gray-800 transition-colors p-4 overflow-auto relative">
+                    <span class="text-gray-600 dark:text-gray-300 mb-2">Drop images here or click to browse</span>
+                    <span class="text-xs text-gray-400">
+                        JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 50MB each | multiple allowed
+                    </span>
+                    <input type="file" name="files[]" id="fileInput" multiple accept="image/*" class="hidden">
+                </label>
+
+                <div id="fileError" class="text-red-500 text-sm mt-2 hidden"></div>
+                <div id="selectedFiles" class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4"></div>
+
+                <button type="submit" id="submitBtn"
+                    class="w-full bg-primary text-white px-4 py-2 rounded-md border-2 border-primary duration-300 transition-all ease-in-out mt-4 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer hover:bg-white hover:text-primary dark:hover:bg-gray-800 shadow-primary-hover"
+                    disabled>
+                    Upload Images
+                </button>
+            </form>
+
+            {{-- Upload Modal --}}
+            <div id="uploadModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+                <div class="bg-white rounded p-6 w-96 shadow-lg">
+                    <h2 class="text-lg mb-4">Uploading...</h2>
+                    <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden relative">
+                        <div id="progressBar" class="h-4 rounded-full bg-primary transition-all duration-300 ease-out"
+                            style="width: 0%"></div>
+                    </div>
+                    <p id="progressText" class="mt-2 text-sm text-gray-600">0%</p>
+                </div>
             </div>
         </div>
-    </div>
+    @endif
 @endsection
 
 @push('scripts')

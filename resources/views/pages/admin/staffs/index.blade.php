@@ -127,11 +127,15 @@
 
                                             <!-- Trash Button -->
                                             <div class="relative group">
-                                                <button onclick="openModal('{{ $staff->id }}', '{{ $staff->full_name }}')"
-                                                    class="text-secondary hover-underline-delete hover:scale-115 transform transition duration-200 cursor-pointer">
-                                                    <img src="{{ asset('icons/trash.png') }}" alt="Trash Icon"
-                                                        class="w-8 h-8 object-contain">
-                                                </button>
+                                                @if (auth()->user()->hasRole('Admin'))
+                                                    <button
+                                                        onclick="openModal('{{ $staff->id }}', '{{ $staff->full_name }}')"
+                                                        class="text-secondary hover-underline-delete hover:scale-115 transform transition duration-200 cursor-pointer">
+                                                        <img src="{{ asset('icons/trash.png') }}" alt="Trash Icon"
+                                                            class="w-8 h-8 object-contain">
+                                                    </button>
+                                                @endif
+                                                
                                                 <!-- Tooltip -->
                                                 <div
                                                     class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
