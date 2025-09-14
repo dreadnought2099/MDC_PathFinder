@@ -3,7 +3,7 @@
     <!-- Room Title -->
     <h1
         class="text-4xl font-extrabold text-gray-900 dark:text-gray-300 
-           dark:border-b-2 border-b-primary dark:border-b-primary text-center pb-3">
+           dark:border-b border-b-primary dark:border-b-primary text-center pb-3">
         {{ $room->name }}
     </h1>
 
