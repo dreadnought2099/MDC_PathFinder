@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ProfileController extends Controller
 {
@@ -27,10 +28,10 @@ class ProfileController extends Controller
             }
 
             // OPTION 1: By User ID (recommended)
-            $folderPath = 'profiles/' . $user->id;
+            // $folderPath = 'profiles/' . $user->id;
 
             // OPTION 2: By Username (if username is unique and URL-safe)
-            // $folderPath = 'profiles/' . Str::slug($user->username);
+            $folderPath = 'profiles/' . Str::slug($user->username);
 
             // OPTION 3: By Email domain (group users by organization)
             // $emailDomain = substr(strrchr($user->email, "@"), 1);
