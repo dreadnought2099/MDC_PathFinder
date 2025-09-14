@@ -77,20 +77,71 @@
                                 <!-- Actions -->
                                 <td class="px-6 py-4">
                                     <div class="flex items-center justify-end space-x-3">
-                                        <a href="{{ route('staff.show', $staff->id) }}"
-                                            class="text-primary hover-underline hover:scale-105 transform transition duration-200">
-                                            View
-                                        </a>
+                                        <!-- View Button -->
+                                        <div class="relative group">
+                                            <a href="{{ route('staff.show', $staff->id) }}"
+                                                class="text-primary hover-underline hover:scale-115 transform transition duration-200">
+                                                <img src="{{ asset('icons/view.png') }}" alt="View Icon"
+                                                    class="w-8 h-8 object-contain">
+                                            </a>
+                                            <!-- Tooltip -->
+                                            <div
+                                                class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
+                        text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible
+                        group-hover:opacity-100 group-hover:visible transition-all duration-300 
+                        whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
+                                                View Office
+                                                <div
+                                                    class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
+                            border-l-4 border-l-gray-900 dark:border-l-gray-700
+                            border-t-4 border-t-transparent border-b-4 border-b-transparent">
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                        <a href="{{ route('staff.edit', $staff->id) }}"
-                                            class="text-edit hover-underline-edit hover:scale-105 transform transition duration-200">
-                                            Edit
-                                        </a>
+                                        <!-- Edit Button -->
+                                        <div class="relative group">
+                                            <a href="{{ route('staff.edit', $staff->id) }}"
+                                                class="text-edit hover-underline-edit hover:scale-115 transform transition duration-200">
+                                                <img src="{{ asset('icons/edit.png') }}" alt="Edit Icon"
+                                                    class="w-8 h-8 object-contain">
+                                            </a>
+                                            <!-- Tooltip -->
+                                            <div
+                                                class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
+                        text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible
+                        group-hover:opacity-100 group-hover:visible transition-all duration-300 
+                        whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
+                                                Edit Office
+                                                <div
+                                                    class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
+                            border-l-4 border-l-gray-900 dark:border-l-gray-700
+                            border-t-4 border-t-transparent border-b-4 border-b-transparent">
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                        <button onclick="openModal('{{ $staff->id }}', '{{ $staff->full_name }}')"
-                                            class="text-secondary hover-underline-delete hover:scale-105 transform transition duration-200 cursor-pointer">
-                                            Delete
-                                        </button>
+                                        <!-- Trash Button -->
+                                        <div class="relative group">
+                                            <button onclick="openModal('{{ $staff->id }}', '{{ $staff->full_name }}')"
+                                                class="text-secondary hover-underline-delete hover:scale-115 transform transition duration-200 cursor-pointer">
+                                                <img src="{{ asset('icons/trash.png') }}" alt="Trash Icon"
+                                                    class="w-8 h-8 object-contain">
+                                            </button>
+                                            <!-- Tooltip -->
+                                            <div
+                                                class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
+                        text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible
+                        group-hover:opacity-100 group-hover:visible transition-all duration-300 
+                        whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
+                                                Recycle Staff
+                                                <div
+                                                    class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
+                            border-l-4 border-l-gray-900 dark:border-l-gray-700
+                            border-t-4 border-t-transparent border-b-4 border-b-transparent">
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>

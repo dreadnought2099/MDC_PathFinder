@@ -86,7 +86,7 @@
                     class="group card-shadow-hover shadow-primary-hover p-5 border-2 border-primary bg-white dark:bg-gray-800 rounded-lg transition-all duration-300">
                     <div class="flex flex-col items-center text-center space-y-3">
                         <div class="bg-primary-10 hover:bg-primary-20 p-3 rounded-full transition-all duration-300">
-                            <img src="{{ asset('icons/manage-office1.png') }}" alt="Manage Offices"
+                            <img src="{{ asset('icons/manage-office.png') }}" alt="Manage Offices"
                                 class="h-10 w-10 object-contain group-hover:scale-120 transition-transform duration-300" />
                         </div>
                         <div>
@@ -104,7 +104,7 @@
                     class="group card-shadow-hover shadow-primary-hover p-5 border-2 border-primary bg-white dark:bg-gray-800 rounded-lg transition-all duration-300">
                     <div class="flex flex-col items-center text-center space-y-3">
                         <div class="bg-primary-10 hover:bg-primary-20 p-3 rounded-full transition-all duration-300">
-                            <img src="{{ asset('icons/manager-1.png') }}" alt="Manage Staff"
+                            <img src="{{ asset('icons/manage-user.png') }}" alt="Manage Staff"
                                 class="h-10 w-10 object-contain group-hover:scale-120 transition-transform duration-300" />
                         </div>
                         <div>
