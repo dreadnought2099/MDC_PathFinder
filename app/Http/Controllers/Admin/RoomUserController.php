@@ -43,12 +43,14 @@ class RoomUserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'username' => 'required|string|max:255|unique:users,username',
+            'name' => 'nullable|string|max:20',
+            'username' => 'required|string|max:20|unique:users,username',
             'password' => 'required|string|confirmed|min:8',
             'room_id' => 'required|exists:rooms,id',
         ]);
 
         $user = User::create([
+            'name' => $request->name,
             'username' => $request->username,
             'password' => Hash::make($request->password),
             'room_id' => $request->room_id,

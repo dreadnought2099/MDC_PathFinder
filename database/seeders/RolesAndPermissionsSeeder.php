@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -49,6 +50,7 @@ class RolesAndPermissionsSeeder extends Seeder
             [
                 'name' => 'Administrator',           // optional but nice to have
                 'username' => 'Admin',                  // admin doesn't need username
+                'email_verified_at' => Carbon::now(),
                 'password' => Hash::make('iamp@thfinderadmin'),
             ]
         );

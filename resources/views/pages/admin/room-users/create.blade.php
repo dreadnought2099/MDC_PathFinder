@@ -2,7 +2,7 @@
 
 @section('content')
     <x-floating-actions />
-    
+
     <div class="container max-w-lg mx-auto mt-10">
         <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6">Create <span class="text-primary">Office
                 User</span></h1>
@@ -10,6 +10,15 @@
         <form action="{{ route('room-user.store') }}" method="POST" id="roomUserForm"
             class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
             @csrf
+
+            <!-- Name -->
+            <div class="mb-4">
+                <label for="name" class="block text-gray-700 dark:text-gray-200 mb-2">Name</label>
+                <input type="text" name="name" id="name" value="{{ old('name') }}"
+                    class="w-full font-sofia border-2 border-gray-300 dark:border-gray-700 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-900 dark:text-gray-100"
+                    required>
+                <p id="nameFeedback" class="text-sm mt-1"></p>
+            </div>
 
             <!-- Username -->
             <div class="mb-4">
@@ -65,6 +74,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const usernameInput = document.getElementById('username');
             const usernameFeedback = document.getElementById('usernameFeedback');
+            const nameFeedback = document.getElementById('nameFeedback');
 
             const passwordInput = document.getElementById('password');
             const confirmInput = document.getElementById('password_confirmation');
