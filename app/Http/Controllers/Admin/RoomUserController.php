@@ -120,14 +120,14 @@ class RoomUserController extends Controller
         $request->validate([
             'name' => 'nullable|string|max:20',
             'username' => 'required|string|max:20|unique:users,username,' . $user->id,
-            'password' => 'required|string|confirmed|min:8', // only required if changing password
-            'room_id' => 'required|exists:rooms,id',
+            'password' => 'nullable|string|confirmed|min:8', // only required if changing password
+            'room_id' => 'nullable|exists:rooms,id',
         ]);
 
         $data = [
             'name' => $request->name,
             'username' => $request->username,
-            'room_id' => $request->room_id,
+            'room_id' => $request->room_id ?: null,
         ];
 
         // Update password only if provided
