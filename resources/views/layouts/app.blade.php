@@ -210,23 +210,37 @@
     <!-- Spinner -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            function showSpinner() {
+            // Show overlay spinner
+            window.showSpinner = function() {
                 if (!document.getElementById("loading")) {
                     document.body.insertAdjacentHTML("beforeend",
                         '<div id="loading" class="fixed inset-0 flex items-center justify-center z-50">' +
                         '<div class="animate-spin border-4 border-blue-200 border-t-blue-600 rounded-full w-10 h-10"></div>' +
                         '</div>');
                 }
-            }
-            document.querySelectorAll('#sort-form select').forEach(sel => sel.addEventListener('change',
-                showSpinner));
+            };
+
+            // Hide overlay spinner
+            window.hideSpinner = function() {
+                const el = document.getElementById("loading");
+                if (el) el.remove();
+            };
+
+            // Existing bindings (optional, keep if needed)
+            document.querySelectorAll('#sort-form select').forEach(sel =>
+                sel.addEventListener('change', window.showSpinner)
+            );
+
             const assignRoomForm = document.getElementById("assign-staff-form");
-            if (assignRoomForm) assignRoomForm.querySelector("select")?.addEventListener("change", () => {
-                showSpinner();
-                assignRoomForm.submit();
-            });
-            document.getElementById("assignForm")?.addEventListener("submit", showSpinner);
-            document.getElementById("unassignForm")?.addEventListener("submit", showSpinner);
+            if (assignRoomForm) {
+                assignRoomForm.querySelector("select")?.addEventListener("change", () => {
+                    window.showSpinner();
+                    assignRoomForm.submit();
+                });
+            }
+
+            document.getElementById("assignForm")?.addEventListener("submit", window.showSpinner);
+            document.getElementById("unassignForm")?.addEventListener("submit", window.showSpinner);
         });
     </script>
 </body>

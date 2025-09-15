@@ -50,7 +50,7 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-600">
                         @php $hasVisibleStaff = false; @endphp
 
                         @foreach ($staffs as $staff)

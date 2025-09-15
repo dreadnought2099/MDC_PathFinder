@@ -11,7 +11,6 @@ use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ScannerController;
 use App\Http\Controllers\TokenController;
-use App\Models\Room;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web'])->group(function () {
@@ -125,6 +124,7 @@ Route::middleware('auth', 'role:Admin|Room Manager')->group(function () {
     */
 
     Route::prefix('admin')->name('room-user.')->group(function () {
+        
         Route::get('/room-users', [RoomUserController::class, 'index'])->middleware('permission:view room users')->name('index');
         Route::get('/room-users/create', [RoomUserController::class, 'create'])->middleware('permission:create room users')->name('create');
 

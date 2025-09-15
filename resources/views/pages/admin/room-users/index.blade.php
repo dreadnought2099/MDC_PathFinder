@@ -1,62 +1,96 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-floating-actions />
-    <div class="space-y-4">
-        <div class="mt-4 flex justify-center">
-            {{ $users->appends(request()->query())->links('pagination::tailwind') }}
+    <div class="max-w-7xl mx-auto mt-8">
+        <!-- Page Title -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white">
+                <span class="text-primary">Office User</span> Management
+            </h1>
+            <p class="text-base lg:text-lg text-gray-600 dark:text-gray-300">
+                Manage users across different offices and rooms.
+            </p>
         </div>
 
-        <!-- Room Filter -->
-        <div class="flex justify-start">
-            <select onchange="window.location='?roomId=' + this.value"
-                class="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary">
+        <!-- Filter Dropdown -->
+        <div class="flex justify-start mb-6" x-data="{
+            roomId: '{{ $roomId }}',
+            fetchUsers() {
+                window.showSpinner();
+                fetch(`{{ route('room-user.index') }}?roomId=${this.roomId}`, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    })
+                    .then(res => res.text())
+                    .then(html => {
+                        let parser = new DOMParser();
+                        let doc = parser.parseFromString(html, 'text/html');
+                        let table = doc.querySelector('#users-table');
+                        if (table) {
+                            document.querySelector('#users-table').innerHTML = table.innerHTML;
+                        }
+                    })
+                    .catch(err => console.error(err))
+                    .finally(() => window.hideSpinner());
+            }
+        }">
+            <select x-model="roomId" @change="fetchUsers"
+                class="border border-primary dark:bg-gray-800 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary dark:text-gray-300">
                 <option value="">All Office Users</option>
-                @foreach ($rooms as $room)
-                    <option value="{{ $room->id }}" {{ $roomId == $room->id ? 'selected' : '' }}>
-                        {{ $room->name }}
-                    </option>
-                @endforeach
+                @if (auth()->user()->hasRole('Admin') || auth()->user()->can('view room users'))
+                    @foreach ($rooms as $room)
+                        <option value="{{ $room->id }}" {{ $roomId == $room->id ? 'selected' : '' }}>
+                            {{ $room->name }}
+                        </option>
+                    @endforeach
+                @endif
             </select>
         </div>
 
-        <!-- Staff Table -->
-        <div class="overflow-x-auto bg-white rounded-lg shadow-md border border-gray-200">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">Name</th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">Username
-                        </th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">Room</th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">Position
-                        </th>
-                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">Actions
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200 font-sofia">
-                    @foreach ($users as $u)
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-gray-800 font-medium">{{ $u->name ?? '-' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{ $u->username }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{ $u->room->name ?? '-' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-gray-600">
-                                {{ $u->getRoleNames()->implode(', ') ?? '-' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap flex gap-2">
-                                <a href="{{ route('room-user.edit', $u->id) }}"
-                                    class="text-blue-600 hover:text-blue-800">Edit</a>
-                                <form action="{{ route('room-user.destroy', $u->id) }}" method="POST"
-                                    onsubmit="return confirm('Delete this user?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-800">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+        <!-- Table (dynamic reload zone) -->
+        <div id="users-table">
+            @include('pages.admin.room-users.partials.table', ['users' => $users])
         </div>
+
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        function openUserModal(id, username) {
+            const modal = document.getElementById('userDeleteModal');
+            const nameSpan = document.getElementById('userName');
+            const form = document.getElementById('userDeleteForm');
+
+            nameSpan.textContent = username;
+            form.action = "{{ route('room-user.destroy', ':id') }}".replace(':id', id);
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('.bg-white').classList.remove('scale-95');
+                modal.querySelector('.bg-white').classList.add('scale-100');
+            }, 10);
+
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeUserModal() {
+            const modal = document.getElementById('userDeleteModal');
+            const modalContent = modal.querySelector('.bg-white');
+
+            modal.classList.add('opacity-0');
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        // Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeUserModal();
+        });
+    </script>
+@endpush

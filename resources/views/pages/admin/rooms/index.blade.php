@@ -43,7 +43,7 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-600">
                         @forelse($rooms as $room)
                             @if (auth()->user()->hasRole('Admin') || auth()->user()->room_id == $room->id)
                                 <tr
@@ -65,7 +65,7 @@
                                             <div class="relative inline-block group">
                                                 @if (auth()->user()->hasRole('Admin') || auth()->user()->can('view rooms'))
                                                     <a href="{{ route('room.show', $room->id) }}"
-                                                        class=" text-primary hover-underline hover:scale-115 transform transition duration-200">
+                                                        class="hover-underline hover:scale-115 transform transition duration-200">
                                                         <img src="{{ asset('icons/view.png') }}" alt="View Icon"
                                                             class="w-8 h-8 object-contain">
                                                     </a>
@@ -90,7 +90,7 @@
                                                 {{-- Edit --}}
                                                 @if (auth()->user()->hasRole('Admin') || auth()->user()->can('edit rooms'))
                                                     <a href="{{ route('room.edit', $room->id) }}"
-                                                        class="text-edit hover-underline-edit hover:scale-115 transform transition duration-200">
+                                                        class="hover-underline-edit hover:scale-115 transform transition duration-200">
                                                         <img src="{{ asset('icons/edit.png') }}" alt="Edit Icon"
                                                             class="w-8 h-8 object-contain">
                                                     </a>
@@ -115,7 +115,7 @@
                                                 {{-- Assign Staff (Admin or Room Manager) --}}
                                                 @if (auth()->user()->hasRole('Admin'))
                                                     <a href="{{ route('room.assign', $room->id) }}"
-                                                        class="text-tertiary hover-underline hover:scale-115 transform transition duration-200">
+                                                        class="hover-underline hover:scale-115 transform transition duration-200">
                                                         <img src="{{ asset('icons/assign-staff.png') }}"
                                                             alt="Assign Staff Icon" class="w-8 h-8 object-contain">
                                                     </a>
@@ -141,7 +141,7 @@
                                                 @if (auth()->user()->hasRole('Admin'))
                                                     <button
                                                         onclick="openRoomModal('{{ $room->id }}', '{{ addslashes($room->name) }}')"
-                                                        class="text-secondary hover-underline-delete hover:scale-115 transform transition duration-200 cursor-pointer">
+                                                        class="hover-underline-delete hover:scale-115 transform transition duration-200 cursor-pointer">
                                                         <img src="{{ asset('icons/trash.png') }}" alt="Trash Icon"
                                                             class="w-8 h-8 object-contain">
                                                     </button>

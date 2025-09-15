@@ -60,15 +60,4 @@ class RoomPolicy
             ? Response::allow()
             : Response::deny('You cannot assign staff to this room.');
     }
-
-    /**
-     * Determine if the Admin can create room user account to a room.
-     */
-
-    public function createUser(User $user, Room $room): Response
-    {
-        return $user->hasRole('Admin')
-            ? Response::allow()
-            : Response::deny('You do not have permission to create room user accounts.');
-    }
 }
