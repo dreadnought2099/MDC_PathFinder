@@ -144,8 +144,9 @@
             e.preventDefault();
             if (!cropper) return;
             cropper.getCroppedCanvas({
-                width: 300,
-                height: 300
+                width: 600,
+                height: 600,
+                imageSmoothingQuality: 'high'
             }).toBlob(blob => {
                 const formData = new FormData();
                 formData.append('cropped_image', blob);
@@ -165,7 +166,7 @@
                         closeModal();
                     })
                     .catch(() => closeModal());
-            });
+            }, 'image/jpeg', 0.92);
         });
 
         const viewModal = document.getElementById('viewModal');
