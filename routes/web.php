@@ -126,9 +126,9 @@ Route::middleware('auth', 'role:Admin|Room Manager')->group(function () {
 
     Route::prefix('admin')->name('room-user.')->group(function () {
         Route::get('/room-users', [RoomUserController::class, 'index'])->middleware('permission:view room users')->name('index');
-        Route::get('/room-users/create/{room?}', [RoomUserController::class, 'create'])->middleware('permission:create room users')->name('create');
-        Route::post('/room-users', [RoomUserController::class, 'store'])->middleware('permission:create room users')->name('store');
+        Route::get('/room-users/create', [RoomUserController::class, 'create'])->middleware('permission:create room users')->name('create');
 
+        Route::post('/room-users', [RoomUserController::class, 'store'])->middleware('permission:create room users')->name('store');
         Route::get('/room-users/{user}/edit', [RoomUserController::class, 'edit'])->middleware('permission:edit room users')->name('edit');
         Route::put('/room-users/{user}', [RoomUserController::class, 'update'])->middleware('permission:edit room users')->name('update');
         Route::delete('/room-users/{user}', [RoomUserController::class, 'destroy'])->middleware('permission:delete room users')->name('destroy');

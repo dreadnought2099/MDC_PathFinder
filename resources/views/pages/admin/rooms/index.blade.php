@@ -139,7 +139,7 @@
                                             <div class="relative inline-block group">
                                                 {{-- Create User (Admin only) --}}
                                                 @if (auth()->user()->hasRole('Admin'))
-                                                    <a href="{{ route('room-user.create', $room->id) }}"
+                                                    <a href="{{ route('room-user.create', ['roomId' => $room->id]) }}"
                                                         class="text-green-600 hover-underline hover:scale-115 transform transition duration-200">
                                                         <img src="{{ asset('icons/manager.png') }}" alt="Create Room User"
                                                             class="w-8 h-8 object-contain">

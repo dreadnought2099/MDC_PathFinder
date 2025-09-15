@@ -19,23 +19,21 @@ class RoomUserController extends Controller
     }
 
     // Show form
-    public function create(Request $request, Room $room = null)
+    public function create(Request $request)
     {
-        // Load all rooms
         $rooms = Room::all();
 
-        // Decide active room
-        $room = $room
-            ?? $request->query('roomId')
-            ?? $rooms->first();
+        // Determine selected room: query parameter first, fallback to first room
+        $roomId = $request->query('roomId') ?? ($rooms->first()->id ?? null);
+        $selectedRoom = $roomId ? Room::find($roomId) : null;
 
         // Authorization
-        $this->authorize('createUser', $room);
+        $this->authorize('createUser', $selectedRoom);
 
-        // Staff list (optional)
-        $staff = Staff::with('room')->get();
+        // Staff list (paginated if needed)
+        $staff = Staff::with('room')->paginate(12);
 
-        return view('pages.admin.room-users.create', compact('rooms', 'room', 'staff'));
+        return view('pages.admin.room-users.create', compact('rooms', 'staff', 'selectedRoom'));
     }
 
 
