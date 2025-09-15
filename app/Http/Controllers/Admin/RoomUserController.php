@@ -18,6 +18,23 @@ class RoomUserController extends Controller
         $this->middleware(['auth', 'permission:delete room users'])->only(['destroy']);
     }
 
+    public function index(Request $request)
+    {
+        $rooms = Room::all(); // dropdown only
+        $roomId = $request->query('roomId');
+
+        $userQuery = User::with('room'); // assuming User has room_id
+
+        if ($roomId) {
+            $userQuery->where('room_id', $roomId);
+        }
+
+        $users = $userQuery->paginate(10)->withQueryString();
+
+        return view('pages.admin.room-users.index', compact('users', 'rooms', 'roomId'));
+    }
+
+
     // Show form
     public function create(Request $request)
     {
@@ -31,7 +48,7 @@ class RoomUserController extends Controller
         $this->authorize('createUser', $selectedRoom);
 
         // Staff list (paginated if needed)
-        $staff = Staff::with('room')->paginate(12);
+        $staff = Staff::with('room')->paginate(10);
 
         return view('pages.admin.room-users.create', compact('rooms', 'staff', 'selectedRoom'));
     }
@@ -57,7 +74,7 @@ class RoomUserController extends Controller
         // Assign Room Manager role
         $user->assignRole('Room Manager');
 
-        return redirect()->route('room.index')
+        return redirect()->route('room-user.index')
             ->with('success', 'Room user created successfully!');
     }
 }

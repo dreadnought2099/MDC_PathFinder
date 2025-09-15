@@ -36,6 +36,15 @@
                         </div>
                         <span class="text-sm text-gray-700 hover-underline dark:text-gray-300">Add Staff Member</span>
                     </a>
+
+                    {{-- Create User (Admin only) --}}
+                    <a href="{{ route('room-user.create') }}" class="group flex items-center space-x-2">
+                        <div
+                            class="flex items-center justify-center w-12 h-12 hover:scale-120 transition-all duration-300">
+                            <img src="{{ asset('icons/manager.png') }}" alt="Add Staff Member" />
+                        </div>
+                        <span class="text-sm text-gray-700 hover-underline dark:text-gray-300">Add Office User</span>
+                    </a>
                 </div>
             </template>
 
