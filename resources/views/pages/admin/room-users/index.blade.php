@@ -17,7 +17,12 @@
             roomId: '{{ $roomId }}',
             fetchUsers() {
                 window.showSpinner();
-                fetch(`{{ route('room-user.index') }}?roomId=${this.roomId}`, {
+                let url = `{{ route('room-user.index') }}?roomId=${this.roomId}`;
+                
+                // Push to browser history (so it stays on reload)
+                window.history.replaceState({}, '', url);
+        
+                fetch(url, {
                         headers: { 'X-Requested-With': 'XMLHttpRequest' }
                     })
                     .then(res => res.text())
