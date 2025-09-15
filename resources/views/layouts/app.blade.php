@@ -57,7 +57,7 @@
     <link rel="icon" href="{{ asset('images/mdc-logo.png') }}">
 
     <!-- Alpine.js (pinned v3.14.1) -->
-    <script src="https://unpkg.com/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
+    <script src="https://unpkg.com/alpinejs@3.15.0/dist/cdn.min.js" defer></script>
 
     <!-- FilePond CSS -->
     <link href="https://unpkg.com/filepond@4.31.1/dist/filepond.min.css" rel="stylesheet">
