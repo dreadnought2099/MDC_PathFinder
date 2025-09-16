@@ -8,6 +8,7 @@ use App\Models\Staff;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
@@ -119,7 +120,7 @@ class RoomUserController extends Controller
         if ($authUser->hasRole('Room Manager') && $user->room_id !== $authUser->room_id) {
             abort(403, 'You can only view users from your assigned office.');
         }
-            return view('pages.admin.room-users.show', compact('user'));
+        return view('pages.admin.room-users.show', compact('user'));
     }
 
     public function edit(User $user)
@@ -164,9 +165,19 @@ class RoomUserController extends Controller
      */
     public function destroy(User $user)
     {
-        // Delete the profile photo if it exists
-        if ($user->profile_photo_path && Storage::disk('public')->exists($user->profile_photo_path)) {
-            Storage::disk('public')->delete($user->profile_photo_path);
+        // Clear all active sessions for this user
+        DB::table('sessions')
+            ->where('user_id', $user->id)
+            ->delete();
+
+        // Clear remember token
+        $user->update(['remember_token' => null]);
+
+        // If user is currently logged in, log them out
+        if (Auth::id() === $user->id) {
+            Auth::logout();
+            request()->session()->invalidate();
+            request()->session()->regenerateToken();
         }
 
         // Soft delete the room user
@@ -184,6 +195,15 @@ class RoomUserController extends Controller
         $user = User::onlyTrashed()->find($id);
 
         if ($user) {
+            // Clear any existing sessions before restoring
+            DB::table('sessions')
+                ->where('user_id', $user->id)
+                ->delete();
+
+            // Clear remember token to force fresh login
+            $user->remember_token = null;
+            $user->save();
+
             $user->restore();
 
             return redirect()->route('recycle-bin')

@@ -6,7 +6,7 @@
     <div class="max-w-7xl mx-auto mt-8">
         <!-- Page Title -->
         <div class="text-center mb-8">
-            <h1 class="text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white">
+            <h1 class="text-3xl lg:text-3xl font-bold text-gray-800 dark:text-white">
                 <span class="text-primary">Office User</span> Management
             </h1>
             <p class="text-base lg:text-lg text-gray-600 dark:text-gray-300">
