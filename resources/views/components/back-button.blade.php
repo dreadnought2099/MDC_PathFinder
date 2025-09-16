@@ -5,6 +5,7 @@
     'pathFallback' => 'path.index',
     'roomUserFallback' => 'room-user.index',
     'landing' => 'admin.dashboard',
+    'tab' => 'rooms',
 ])
 
 @php
@@ -55,21 +56,17 @@
         }
     }
 
-    // Recycle bin pages → index
+    // Recycle bin pages → dynamic based on active tab
     elseif (str_contains($currentRouteName, 'recycle-bin')) {
-        switch ($tab ?? 'rooms') {
-            case 'rooms':
-                $backUrl = route('room.index');
-                break;
-            case 'staff':
-                $backUrl = route('staff.index');
-                break;
-            case 'users':
-                $backUrl = route('room-user.index');
-                break;
-            default:
-                $backUrl = url()->previous();
-        }
+        // Default URLs for each tab
+        $tabUrls = [
+            'rooms' => route('room.index'),
+            'staff' => route('staff.index'),
+            'users' => route('room-user.index'),
+        ];
+
+        // Use the current tab or default to 'rooms'
+        $backUrl = $tabUrls[$tab] ?? $tabUrls['rooms'];
     }
 
     // Assign pages → room.index
@@ -84,14 +81,30 @@
 @endphp
 
 @if ($backUrl)
-    <a href="{{ $backUrl }}"
-        class="flex items-center space-x-2 focus:outline-none cursor-pointer hover:text-primary transition-colors duration-200 dark:text-gray-300"
-        title="Go back">
-        <div class="flex items-center justify-center h-8 w-8 rounded-full bg-gray-100 dark:bg-gray-800">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-        </div>
-        <span class="text-sm font-medium">Back</span>
-    </a>
+    <div x-data="{
+        currentTab: '{{ $tab }}',
+        backUrl: '{{ $backUrl }}'
+    }" x-init="// Listen for tab changes from recycle bin page
+    window.addEventListener('tab-changed', (e) => {
+        if ('{{ str_contains($currentRouteName, 'recycle-bin') ? 'true' : 'false' }}' === 'true') {
+            currentTab = e.detail.tab;
+            const tabUrls = {
+                'rooms': '{{ route('room.index') }}',
+                'staff': '{{ route('staff.index') }}',
+                'users': '{{ route('room-user.index') }}'
+            };
+            backUrl = tabUrls[currentTab] || tabUrls['rooms'];
+        }
+    });">
+        <a :href="backUrl"
+            class="flex items-center space-x-2 focus:outline-none cursor-pointer hover:text-primary transition-colors duration-200 dark:text-gray-300"
+            title="Go back">
+            <div class="flex items-center justify-center h-8 w-8 rounded-full bg-gray-100 dark:bg-gray-800">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+            </div>
+            <span class="text-sm font-medium">Back</span>
+        </a>
+    </div>
 @endif

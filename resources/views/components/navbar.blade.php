@@ -2,9 +2,12 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 items-center">
             <!-- Left side (back button) -->
-            <div class="flex-shrink-0">
+            <div class="flex-shrink-0" x-data="{ currentTab: sessionStorage.getItem('activeTab') || 'rooms' }" x-init="// Listen for tab changes
+            window.addEventListener('tab-changed', (e) => {
+                currentTab = e.detail.tab;
+            });">
                 @unless (Route::is('admin.dashboard') || Route::is('landing.page'))
-                    <x-back-button fallback="room.index" landing="admin.dashboard" :tab="$tab ?? 'rooms' "/>
+                    <x-back-button fallback="room.index" landing="admin.dashboard" x-bind:tab="currentTab" />
                 @endunless
             </div>
 
@@ -17,7 +20,8 @@
 
                 <!-- Right side (profile) -->
                 <div class="relative" x-data="{ open: false }" x-cloak>
-                    <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none cursor-pointer dark:text-gray-300">
+                    <button @click="open = !open"
+                        class="flex items-center space-x-2 focus:outline-none cursor-pointer dark:text-gray-300">
                         <img x-ref="navbarProfile"
                             src="{{ Auth::user()->profile_photo_path ? Storage::url(Auth::user()->profile_photo_path) : asset('images/mdc-logo.png') }}"
                             alt="Profile" class="h-8 w-8 rounded-full">
