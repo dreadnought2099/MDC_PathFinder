@@ -15,9 +15,15 @@ class RoomUserController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth', 'permission:create room users'])->only(['create', 'store']);
-        $this->middleware(['auth', 'permission:edit room users'])->only(['edit', 'update']);
-        $this->middleware(['auth', 'permission:delete room users'])->only(['destroy']);
+        $this->middleware(['auth', 'role:Admin'])->only([
+            'create',
+            'store',
+            'edit',
+            'update',
+            'destroy',
+            'restore',
+            'forceDelete'
+        ]);
     }
 
     public function index(Request $request)
@@ -102,7 +108,18 @@ class RoomUserController extends Controller
         $user->assignRole('Room Manager');
 
         return redirect()->route('room-user.index')
-            ->with('success', 'Room user created successfully!');
+            ->with('success', 'Ofice user created successfully!');
+    }
+
+    public function show(User $user)
+    {
+        $authUser = Auth::user();
+
+        // Room Managers can only view users from their own room
+        if ($authUser->hasRole('Room Manager') && $user->room_id !== $authUser->room_id) {
+            abort(403, 'You can only view users from your assigned office.');
+        }
+            return view('pages.admin.room-users.show', compact('user'));
     }
 
     public function edit(User $user)
@@ -139,7 +156,7 @@ class RoomUserController extends Controller
         $user->update($data);
 
         return redirect()->route('room-user.index')
-            ->with('success', 'Room user updated successfully!');
+            ->with('success', 'Office user updated successfully!');
     }
 
     /**
@@ -156,7 +173,7 @@ class RoomUserController extends Controller
         $user->delete();
 
         return redirect()->route('room-user.index')
-            ->with('success', 'Room user deleted successfully. Data has been archived.');
+            ->with('success', 'Office user deleted successfully. Data has been archived.');
     }
 
     /**

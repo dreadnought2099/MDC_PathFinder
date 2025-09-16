@@ -42,7 +42,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $adminRole->syncPermissions(Permission::all());
 
         // Room Manager can only view + edit, no create
-        $managerRole->givePermissionTo(['view rooms', 'edit rooms', 'view staff', 'edit staff', 'view room users', 'edit room users']);
+        $managerRole->givePermissionTo(['view rooms', 'edit rooms', 'view staff', 'edit staff', 'view room users']);
 
         // Default Admin
         $admin = User::firstOrCreate(
