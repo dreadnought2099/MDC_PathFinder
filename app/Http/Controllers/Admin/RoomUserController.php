@@ -71,7 +71,7 @@ class RoomUserController extends Controller
         $selectedRoom = $roomId ? Room::find($roomId) : null;
 
         // Authorization
-        $this->authorize('createUser', $selectedRoom);
+        $this->authorize('create', $selectedRoom);
 
         // Staff list (paginated if needed)
         $staff = Staff::with('room')->paginate(10);

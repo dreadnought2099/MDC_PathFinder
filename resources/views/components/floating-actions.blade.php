@@ -5,7 +5,7 @@
         <!-- Buttons -->
         @if (auth()->user()->hasRole('Admin'))
             <template x-if="open">
-                <div class="flex flex-col space-y-2 mb-2">
+                <div class="bg-slate-300 rounded-md p-4 border border-primary dark:bg-gray-800 flex flex-col space-y-2 mb-2">
                     <a href="{{ route('room.create') }}" class="group flex items-center space-x-2">
                         <div
                             class="flex items-center justify-center w-12 h-12 hover:scale-120 transition-all duration-300">
