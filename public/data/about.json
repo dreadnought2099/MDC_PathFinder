@@ -1,13 +1,15 @@
 {
     "about": {
         "content": [
-            "MDC PathFinder jashdjashd jashdhasdhgsah hasgdhashdghsagdhgash hasgdhasd hsagdhsad hsgdhasdhg."
+            "MDC Pathfinder is a web-based platform designed to help students, staff, and visitors locate offices across the MDC campus with ease. Using clear visual guidance of hallways and office spaces, the website makes navigating the campus intuitive and stress-free—accessible from any device, anytime."
         ]
     },
 
     "overview": {
         "content": [
-            "jhasdjhasjhd ashdhas hdbsahdg hgsahdg hasgdhas vhasgdhasdhasjdh hashdghasgdhas hasgd hashdg."
+            "Guided Office Navigation: Find your way to any office through step-by-step visual directions.",
+            "Quick Search: Instantly locate staff offices or departments.",
+            "Office Directory: View essential information about offices and staff."
         ]
     }
 }

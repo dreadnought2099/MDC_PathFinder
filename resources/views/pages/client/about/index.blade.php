@@ -55,7 +55,7 @@
                     </h1>
                     <div class="mt-6 md:mt-8 space-y-6 text-lg text-gray-700 md:text-left text-center">
                         @foreach ($aboutData[$key]['content'] as $content)
-                            <p class="leading-relaxed md:leading-loose tracking-wide dark:text-gray-300">
+                            <p class="italic font-sofia leading-relaxed md:leading-loose tracking-wide dark:text-gray-300">
                                 {{ $content }}
                             </p>
                         @endforeach

@@ -201,7 +201,7 @@
                         }
 
                         if (data.exists) {
-                            this.showMessage(`Room found! Redirecting...`, 'success');
+                            this.showMessage(`Office found! Redirecting...`, 'success');
 
                             const returnParam = new URLSearchParams(window.location.search).get('return');
                             let roomUrl = `{{ route('scan.room', ['token' => 'TOKEN_PLACEHOLDER']) }}`
@@ -215,11 +215,11 @@
                                 window.location.href = roomUrl;
                             }, 1000);
                         } else {
-                            this.showMessage(`Room does not exist.`, 'error');
+                            this.showMessage(`Office does not exist.`, 'error');
                             setTimeout(() => this.restartScanner(), 2000);
                         }
                     } catch (error) {
-                        console.error('Room check error:', error);
+                        console.error('Office check error:', error);
                         this.showMessage(error.message || `Connection error. Please try again.`, 'error');
                         setTimeout(() => this.restartScanner(), 2000);
                     }
@@ -312,7 +312,7 @@
     @endif
     @if ($room)
         <script>
-            console.log('Room details loaded for room:', @json($room->id ?? null));
+            console.log('Office details loaded for room:', @json($room->id ?? null));
         </script>
     @endif
 @endsection

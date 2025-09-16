@@ -18,5 +18,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolesAndPermissionsSeeder::class,
         ]);
+
+        if (!app()->environment('production')) {
+            $this->call(FakeDataSeeder::class);
+        }
     }
 }
