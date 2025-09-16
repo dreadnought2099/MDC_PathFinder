@@ -11,35 +11,39 @@
                 class="px-4 py-2 text-sm font-medium transition-all duration-300 ease-in-out hover-underline cursor-pointer transform hover:scale-105 active:scale-95">
                 Trashed Rooms
             </button>
+
             <button @click="tab = 'staff'"
                 :class="{ 'text-primary border-b-2': tab === 'staff', 'text-gray-600 dark:text-gray-100 hover:text-primary': tab !== 'staff' }"
                 class="px-4 py-2 text-sm font-medium transition-all duration-300 ease-in-out hover-underline cursor-pointer transform hover:scale-105 active:scale-95">
                 Trashed Staff
             </button>
+
+            <button @click="tab = 'users'"
+                :class="{ 'text-primary border-b-2': tab === 'users', 'text-gray-600 dark:text-gray-100 hover:text-primary': tab !== 'users' }"
+                class="px-4 py-2 text-sm font-medium transition-all duration-300 ease-in-out hover-underline cursor-pointer transform hover:scale-105 active:scale-95">
+                Trashed Users
+            </button>
         </nav>
 
-        <!-- Content Container with smooth transitions -->
+        <!-- Content -->
         <div class="relative min-h-96">
-            <!-- Rooms Tab Content -->
-            <div x-show="tab === 'rooms'" x-transition:enter="transition ease-out duration-300"
-                x-transition:enter-start="opacity-0 transform translate-x-4"
-                x-transition:enter-end="opacity-100 transform translate-x-0"
-                x-transition:leave="transition ease-in duration-200"
-                x-transition:leave-start="opacity-100 transform translate-x-0"
-                x-transition:leave-end="opacity-0 transform -translate-x-4" class="absolute w-full">
+            <!-- Rooms Tab -->
+            <div x-show="tab === 'rooms'" x-transition class="absolute w-full">
                 <x-recycle-bin-table :items="$rooms" route-prefix="room" title="Trashed Rooms"
                     empty-message="No trashed rooms found." tab="rooms" />
             </div>
 
-            <!-- Staff Tab Content -->
-            <div x-show="tab === 'staff'" x-transition:enter="transition ease-out duration-300"
-                x-transition:enter-start="opacity-0 transform translate-x-4"
-                x-transition:enter-end="opacity-100 transform translate-x-0"
-                x-transition:leave="transition ease-in duration-200"
-                x-transition:leave-start="opacity-100 transform translate-x-0"
-                x-transition:leave-end="opacity-0 transform -translate-x-4" class="absolute w-full">
+            <!-- Staff Tab -->
+            <div x-show="tab === 'staff'" x-transition class="absolute w-full">
                 <x-recycle-bin-table :items="$staffs" route-prefix="staff" title="Trashed Staff Members"
                     empty-message="No trashed staff members found." tab="staff" />
+            </div>
+
+            <!-- Users Tab -->
+            <div x-show="tab === 'users'" x-transition class="absolute w-full">
+                <x-recycle-bin-table :items="$users" route-prefix="room-user" title="Trashed Office Users"
+                    empty-message="No trashed office users found." tab="users" />
+                    
             </div>
         </div>
     </div>

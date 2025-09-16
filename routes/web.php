@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\LogInController;
 use App\Http\Controllers\Admin\PathController;
 use App\Http\Controllers\Admin\PathImageController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\RecycleBinController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\RoomUserController;
 use App\Http\Controllers\Admin\StaffController;
@@ -78,6 +79,7 @@ Route::middleware('auth', 'role:Admin|Room Manager')->group(function () {
     Route::get('/admin/profile', [ProfileController::class, 'index'])->name('admin.profile');
     Route::post('/admin/profile/update-image', [ProfileController::class, 'updateImage'])->name('admin.profile.updateImage');
 
+    Route::get('/admin/recycle-bin', [RecycleBinController::class, 'index'])->middleware('permission: delete rooms|delete staff|delete room users')->name('recycle-bin');
 
     /*
     |--------------------------------------------------------------------------
@@ -90,7 +92,6 @@ Route::middleware('auth', 'role:Admin|Room Manager')->group(function () {
 
         // SPECIFIC ROUTES - These MUST come before {room} routes
         Route::get('/rooms/create', [RoomController::class, 'create'])->middleware('permission:create rooms')->name('create');
-        Route::get('/rooms/recycle-bin', [RoomController::class, 'recycleBin'])->middleware('permission:delete rooms')->name('recycle-bin');
 
         // Staff assignment routes (also specific)
         Route::get('/rooms/assign/{roomId?}', [RoomController::class, 'assign'])->middleware('permission:edit staff')->name('assign');
@@ -124,7 +125,7 @@ Route::middleware('auth', 'role:Admin|Room Manager')->group(function () {
     */
 
     Route::prefix('admin')->name('room-user.')->group(function () {
-        
+
         Route::get('/room-users', [RoomUserController::class, 'index'])->middleware('permission:view room users')->name('index');
         Route::get('/room-users/create', [RoomUserController::class, 'create'])->middleware('permission:create room users')->name('create');
 
@@ -132,11 +133,14 @@ Route::middleware('auth', 'role:Admin|Room Manager')->group(function () {
         Route::get('/room-users/{user}/edit', [RoomUserController::class, 'edit'])->middleware('permission:edit room users')->name('edit');
         Route::put('/room-users/{user}', [RoomUserController::class, 'update'])->middleware('permission:edit room users')->name('update');
         Route::delete('/room-users/{user}', [RoomUserController::class, 'destroy'])->middleware('permission:delete room users')->name('destroy');
+
+        Route::post('/room-users/{id}/restore', [RoomUserController::class, 'restore'])->middleware('permission:delete room users')->name('restore');
+        Route::delete('/room-users/{id}/force-delete', [RoomUserController::class, 'forceDelete'])->middleware('permission:delete room users')->name('forceDelete');
     });
 
     /*
     |--------------------------------------------------------------------------
-    | Staff
+    | Staff Routes
     |--------------------------------------------------------------------------
     */
 
@@ -147,7 +151,6 @@ Route::middleware('auth', 'role:Admin|Room Manager')->group(function () {
 
         // SPECIFIC ROUTES - These MUST come before {staff} routes
         Route::get('/staff/create', [StaffController::class, 'create'])->middleware('permission:create staff')->name('create');
-        Route::get('/staff/recycle-bin', [RoomController::class, 'recycleBin'])->middleware('permission:delete staff')->name('recycle-bin');
 
         // PARAMETERIZED ROUTES - These come after specific routes
         Route::get('/staff/{staff}', [StaffController::class, 'show'])->middleware('permission:view staff')->name('show');

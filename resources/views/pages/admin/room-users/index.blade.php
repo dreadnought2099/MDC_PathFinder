@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
+    <x-floating-actions />
+    
     <div class="max-w-7xl mx-auto mt-8">
         <!-- Page Title -->
         <div class="text-center mb-8">
@@ -18,7 +20,7 @@
             fetchUsers() {
                 window.showSpinner();
                 let url = `{{ route('room-user.index') }}?roomId=${this.roomId}`;
-                
+        
                 // Push to browser history (so it stays on reload)
                 window.history.replaceState({}, '', url);
         

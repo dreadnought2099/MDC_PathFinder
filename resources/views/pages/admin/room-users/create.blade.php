@@ -25,7 +25,7 @@
             <div class="relative mb-6">
                 <label for="room_id" class="block font-sofia text-gray-400 dark:text-gray-300 mb-2">Assign Office</label>
                 <select name="room_id" id="room_id"
-                    class="w-full border border-primary rounded-lg px-4 py-3 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+                    class="w-full font-sofia border border-primary rounded-lg px-4 py-3 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
                     required>
                     @foreach ($rooms as $room)
                         <option value="{{ $room->id }}"

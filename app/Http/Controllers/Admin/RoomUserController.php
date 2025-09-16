@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class RoomUserController extends Controller
 {
@@ -141,13 +142,62 @@ class RoomUserController extends Controller
             ->with('success', 'Room user updated successfully!');
     }
 
+    /**
+     * Soft delete a room user
+     */
     public function destroy(User $user)
     {
-        $this->authorize('delete', $user);
+        // Delete the profile photo if it exists
+        if ($user->profile_photo_path && Storage::disk('public')->exists($user->profile_photo_path)) {
+            Storage::disk('public')->delete($user->profile_photo_path);
+        }
 
+        // Soft delete the room user
         $user->delete();
 
         return redirect()->route('room-user.index')
-            ->with('success', 'Room user deleted successfully!');
+            ->with('success', 'Room user deleted successfully. Data has been archived.');
+    }
+
+    /**
+     * Restore a soft-deleted room user
+     */
+    public function restore($id)
+    {
+        $user = User::onlyTrashed()->find($id);
+
+        if ($user) {
+            $user->restore();
+
+            return redirect()->route('recycle-bin')
+                ->with('success', 'Room user restored successfully.');
+        }
+
+        return redirect()->route('recycle-bin')
+            ->with('error', 'Room user not found or not deleted.');
+    }
+
+    /**
+     * Permanently delete a soft-deleted room user
+     */
+    public function forceDelete($id)
+    {
+        $user = User::onlyTrashed()->find($id);
+
+        if ($user) {
+            // Delete profile photo if exists
+            if ($user->profile_photo_path && Storage::disk('public')->exists($user->profile_photo_path)) {
+                Storage::disk('public')->delete($user->profile_photo_path);
+            }
+
+            // Permanently delete user
+            $user->forceDelete();
+
+            return redirect()->route('room-user.recycle-bin')
+                ->with('success', 'Room user permanently deleted.');
+        }
+
+        return redirect()->route('room-user.recycle-bin')
+            ->with('error', 'Room user has not been soft deleted or does not exist.');
     }
 }

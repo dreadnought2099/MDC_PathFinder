@@ -33,7 +33,7 @@ class LogInController extends Controller
         ];
 
         if (!Auth::attempt($credentials)) {
-            return back()->with('error', 'Invalid credentials');
+            return back()->with('error', 'Invalid credentials. Please try again.');
         }
 
         $user = Auth::user();

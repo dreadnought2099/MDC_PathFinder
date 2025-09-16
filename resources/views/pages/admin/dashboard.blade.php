@@ -166,7 +166,7 @@
 
                 <!-- Recycle Bin Card -->
                 @if (auth()->user()->hasRole('Admin'))
-                    <a href="{{ route('room.recycle-bin') }}"
+                    <a href="{{ route('recycle-bin') }}"
                         class="group card-shadow-hover shadow-primary-hover p-5 border-2 border-primary bg-white dark:bg-gray-800 rounded-lg transition-all duration-300">
                         <div class="flex flex-col items-center text-center space-y-3">
                             <div class="bg-primary-10 hover:bg-primary-20 p-3 rounded-full transition-all duration-300">

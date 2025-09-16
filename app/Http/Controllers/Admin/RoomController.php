@@ -7,6 +7,7 @@ use App\Models\Path;
 use App\Models\Room;
 use App\Models\RoomImage;
 use App\Models\Staff;
+use App\Models\User;
 use App\Services\EntrancePointService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -344,14 +345,6 @@ class RoomController extends Controller
             ->with('success', 'Room deleted successfully.');
     }
 
-    public function recycleBin()
-    {
-        $rooms = Room::onlyTrashed()->get();
-        $staffs = Staff::onlyTrashed()->get();
-
-        return view('pages.admin.recycle-bin', compact('rooms', 'staffs'));
-    }
-
     public function restore($id, EntrancePointService $entrancePointService)
     {
         $room = Room::onlyTrashed()->findOrFail($id);
@@ -391,7 +384,7 @@ class RoomController extends Controller
             $entrancePointService->connectNewRoomToAllRooms($room);
         }
 
-        return redirect()->route('room.recycle-bin')
+        return redirect()->route('recycle-bin')
             ->with('success', 'Room and paths restored successfully, including connections to new rooms.');
     }
 
@@ -417,7 +410,7 @@ class RoomController extends Controller
 
         $room->forceDelete();
 
-        return redirect()->route('room.recycle-bin')
+        return redirect()->route('recycle-bin')
             ->with('success', 'Room permanently deleted.');
     }
 

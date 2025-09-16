@@ -4,7 +4,7 @@
             <!-- Left side (back button) -->
             <div class="flex-shrink-0">
                 @unless (Route::is('admin.dashboard') || Route::is('landing.page'))
-                    <x-back-button fallback="room.index" landing="admin.dashboard" />
+                    <x-back-button fallback="room.index" landing="admin.dashboard" :tab="$tab ?? 'rooms' "/>
                 @endunless
             </div>
 

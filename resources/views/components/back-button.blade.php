@@ -36,7 +36,7 @@
         } elseif ($currentRouteName === 'staff.edit') {
             $backUrl = route('staff.index');
         } elseif ($currentRouteName === 'room-user.edit') {
-            $backUrl = route('room-user.index');    
+            $backUrl = route('room-user.index');
         } elseif ($currentRouteName === 'path-image.edit') {
             $backUrl = $path ? route('path.show', $path) : route('path.index');
         }
@@ -57,10 +57,18 @@
 
     // Recycle bin pages → index
     elseif (str_contains($currentRouteName, 'recycle-bin')) {
-        if ($currentRouteName === 'room.recycle-bin') {
-            $backUrl = route('room.index');
-        } elseif ($currentRouteName === 'staff.recycle-bin') {
-            $backUrl = route('staff.index');
+        switch ($tab ?? 'rooms') {
+            case 'rooms':
+                $backUrl = route('room.index');
+                break;
+            case 'staff':
+                $backUrl = route('staff.index');
+                break;
+            case 'users':
+                $backUrl = route('room-user.index');
+                break;
+            default:
+                $backUrl = url()->previous();
         }
     }
 

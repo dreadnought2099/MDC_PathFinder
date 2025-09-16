@@ -150,7 +150,7 @@ class StaffController extends Controller
     {
         $staff = Staff::onlyTrashed()->findOrFail($id);
         $staff->restore();
-        return redirect()->route('staff.recycle-bin')->with('success', "{$staff->full_name} restored successfully.");
+        return redirect()->route('recycle-bin')->with('success', "{$staff->full_name} restored successfully.");
     }
 
     public function forceDelete($id)
@@ -163,6 +163,6 @@ class StaffController extends Controller
 
         $staff->forceDelete();
 
-        return redirect()->route('staff.recycle-bin')->with('success', "{$staff->full_name} permanently deleted.");
+        return redirect()->route('recycle-bin')->with('success', "{$staff->full_name} permanently deleted.");
     }
 }
