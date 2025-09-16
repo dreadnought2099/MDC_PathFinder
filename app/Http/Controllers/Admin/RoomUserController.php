@@ -170,11 +170,11 @@ class RoomUserController extends Controller
             $user->restore();
 
             return redirect()->route('recycle-bin')
-                ->with('success', 'Room user restored successfully.');
+                ->with('success', 'Office user restored successfully.');
         }
 
         return redirect()->route('recycle-bin')
-            ->with('error', 'Room user not found or not deleted.');
+            ->with('error', 'Office user not found or not deleted.');
     }
 
     /**
@@ -194,10 +194,10 @@ class RoomUserController extends Controller
             $user->forceDelete();
 
             return redirect()->route('room-user.recycle-bin')
-                ->with('success', 'Room user permanently deleted.');
+                ->with('success', 'Office user permanently deleted.');
         }
 
         return redirect()->route('room-user.recycle-bin')
-            ->with('error', 'Room user has not been soft deleted or does not exist.');
+            ->with('error', 'Office user has not been soft deleted or does not exist.');
     }
 }
