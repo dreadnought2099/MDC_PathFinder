@@ -2,66 +2,68 @@
 
 @section('content')
     <div class="min-h-screen dark:bg-gray-900 flex flex-col">
-        <!-- Top bar -->
+        <!-- Top bar - RESPONSIVE -->
         <div
-            class="w-full flex items-center p-4 dark:border-b border-b-primary dark:border-b-primary bg-white dark:bg-gray-900 sticky top-0 z-50">
-
-            <div class="w-48 flex items-center">
-                <!-- Left: Back button -->
+            class="w-full flex items-center p-2 sm:p-4 dark:border-b border-b-primary dark:border-b-primary bg-white dark:bg-gray-900 sticky top-0 z-50">
+            <!-- RESPONSIVE: Stack on mobile, side-by-side on larger screens -->
+            <div class="w-full sm:w-48 flex items-center justify-start">
+                <!-- Left: Back button - RESPONSIVE -->
                 <a href="{{ route('paths.select') }}"
-                    class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 dark:text-gray-300">
-                    <svg class="h-6 w-6 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 dark:text-gray-300 text-sm sm:text-base">
+                    <svg class="h-4 w-4 sm:h-6 sm:w-6 mr-1" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                     </svg>
-                    <span class="font-medium">Back to Selection</span>
+                    <span class="font-medium hidden sm:inline">Back to Selection</span>
+                    <span class="font-medium sm:hidden">Back</span>
                 </a>
             </div>
 
-            <div class="flex-1"></div>
+            <div class="flex-1 hidden sm:block"></div>
 
-            <!-- Right controls -->
-            <div class="w-48 flex items-center">
-                <div class="flex-1 flex justify-end">
-                    <x-about-page />
-                </div>
-                <div class="flex-1 flex justify-end">
-                    <x-dark-mode-toggle />
-                </div>
+            <!-- Right controls - RESPONSIVE -->
+            <div class="w-full sm:w-48 flex items-center justify-end gap-2">
+                <x-about-page />
+                <x-dark-mode-toggle />
             </div>
         </div>
 
-        <!-- Floating QR -->
+        <!-- Floating QR - RESPONSIVE positioning -->
         <x-floating-q-r href="{{ route('scan.index') }}" icon="{{ asset('icons/qr-code.png') }}" alt="Scan Office"
             title="Scan office to know more" />
 
-        <!-- Main content -->
-        <div class="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8">
-            <div class="w-full max-w-5xl bg-white border-2 border-primary dark:bg-gray-800 shadow-lg rounded-md p-6">
-                <h2 class="text-2xl mb-6 text-center text-primary">
-                    <div class="flex items-center justify-center gap-3">
-                        <span>{{ $fromRoom->name ?? ($fromRoom->room_name ?? 'Unknown Room') }}</span>
-                        <img src="{{ asset('icons/arrow.png') }}" alt="Arrow" class="w-6 h-6">
-                        <span>{{ $toRoom->name ?? ($toRoom->room_name ?? 'Unknown Room') }}</span>
+        <!-- Main content - RESPONSIVE -->
+        <div class="flex-grow flex items-center justify-center px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
+            <!-- RESPONSIVE: Full width on mobile, constrained on larger screens -->
+            <div
+                class="w-full max-w-sm sm:max-w-2xl lg:max-w-5xl bg-white border-2 border-primary dark:bg-gray-800 shadow-lg rounded-md p-3 sm:p-6">
+                <!-- RESPONSIVE: Smaller text on mobile -->
+                <h2 class="text-lg sm:text-2xl mb-4 sm:mb-6 text-center text-primary">
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
+                        <span class="text-center">{{ $fromRoom->name ?? ($fromRoom->room_name ?? 'Unknown Room') }}</span>
+                        <img src="{{ asset('icons/arrow.png') }}" alt="Arrow" class="w-4 h-4 sm:w-6 sm:h-6">
+                        <span class="text-center">{{ $toRoom->name ?? ($toRoom->room_name ?? 'Unknown Room') }}</span>
                     </div>
                 </h2>
 
                 @if ($paths->isEmpty())
-                    <p class="text-center text-gray-600 dark:text-gray-300">
+                    <p class="text-center text-gray-600 dark:text-gray-300 text-sm sm:text-base px-4">
                         No navigation path available between these rooms.
                     </p>
                 @else
                     @foreach ($paths as $path)
-                        <!-- Path Images Card -->
+                        <!-- Path Images Card - RESPONSIVE -->
                         <div
-                            class="bg-white dark:bg-gray-800 shadow rounded-lg p-5 mb-8 text-center border-2 border-primary">
-                            {{-- CHANGE: Updated title to use dynamic path name instead of static "Path Images (count)" --}}
-                            <h2 class="text-xl mb-4 dark:text-gray-300">
-                                <i class="fas fa-images mr-2"></i> <span
-                                    class="path-title">{{ $path->name ?? 'Path ' . $loop->iteration }}</span>
+                            class="bg-white dark:bg-gray-800 shadow rounded-lg p-3 sm:p-5 mb-4 sm:mb-8 text-center border-2 border-primary">
+                            {{-- RESPONSIVE: Smaller heading on mobile --}}
+                            <h2 class="text-base sm:text-xl mb-3 sm:mb-4 dark:text-gray-300">
+                                <i class="fas fa-images mr-1 sm:mr-2 text-sm sm:text-base"></i>
+                                <span class="path-title">{{ $path->name ?? 'Path ' . $loop->iteration }}</span>
                             </h2>
 
                             @if ($path->images->count() > 0)
-                                <div class="viewer relative w-full h-[500px] bg-black rounded-md overflow-hidden"
+                                <!-- RESPONSIVE: Dynamic height based on screen size -->
+                                <div class="viewer relative w-full h-[250px] xs:h-[300px] sm:h-[400px] lg:h-[500px] bg-black rounded-md overflow-hidden"
                                     data-index="{{ $loop->index }}">
                                     @php
                                         $images = $path->images->sortBy('image_order')->pluck('image_file')->toArray();
@@ -73,43 +75,45 @@
                                             alt="Path Image">
                                         <img src="" class="photo-layer" alt="Next Image">
 
-                                        {{-- CHANGE: Repositioned navigation buttons to bottom center with up/down arrows --}}
-                                        <!-- Navigation buttons (centered at bottom) -->
-                                        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-4 z-10">
+                                        {{-- CHANGE: Arrow up = next, Arrow down = prev, RESPONSIVE buttons --}}
+                                        <!-- Navigation buttons (centered at bottom) - RESPONSIVE -->
+                                        <div
+                                            class="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-2 sm:gap-4 z-10">
                                             <button
-                                                class="nav-btn prev-btn bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center shadow-md">
+                                                class="nav-btn prev-btn bg-primary text-white w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-md text-sm sm:text-xl">
                                                 ↓
                                             </button>
                                             <button
-                                                class="nav-btn next-btn bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center shadow-md">
+                                                class="nav-btn next-btn bg-primary text-white w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-md text-sm sm:text-xl">
                                                 ↑
                                             </button>
                                         </div>
 
-                                        {{-- CHANGE: Added image counter in top-right corner --}}
-                                        <!-- Image counter -->
+                                        {{-- RESPONSIVE: Image counter in top-right corner --}}
+                                        <!-- Image counter - RESPONSIVE -->
                                         <div
-                                            class="absolute top-4 right-4 bg-black bg-opacity-75 text-white px-3 py-1 rounded-md text-sm z-10">
+                                            class="absolute top-2 sm:top-4 right-2 sm:right-4 bg-black bg-opacity-75 text-white px-2 py-1 sm:px-3 sm:py-1 rounded-md text-xs sm:text-sm z-10">
                                             <span class="image-counter">1 / {{ count($images) }}</span>
                                         </div>
                                     @else
-                                        <p class="text-gray-400 text-center py-10">No Images Found</p>
+                                        <p class="text-gray-400 text-center py-10 text-sm sm:text-base">No Images Found</p>
                                     @endif
                                 </div>
                             @else
-                                <div class="text-center py-10 text-gray-400">
-                                    <i class="fas fa-image fa-3x mb-4"></i>
-                                    <h4 class="text-lg">No Images Found</h4>
-                                    <p class="text-sm">This path doesn't have any images yet.</p>
+                                <div class="text-center py-6 sm:py-10 text-gray-400">
+                                    <i class="fas fa-image fa-2x sm:fa-3x mb-2 sm:mb-4"></i>
+                                    <h4 class="text-base sm:text-lg">No Images Found</h4>
+                                    <p class="text-xs sm:text-sm">This path doesn't have any images yet.</p>
                                 </div>
                             @endif
                         </div>
                     @endforeach
                 @endif
 
-                <div class="mt-8 flex justify-center">
+                <!-- RESPONSIVE: Start new navigation button -->
+                <div class="mt-4 sm:mt-8 flex justify-center">
                     <a href="{{ route('paths.select') }}"
-                        class="px-6 py-2 rounded-md bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary dark:hover:bg-gray-800 shadow-primary-light transition-all cursor-pointer">
+                        class="px-4 py-2 sm:px-6 sm:py-2 text-sm sm:text-base rounded-md bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary dark:hover:bg-gray-800 shadow-primary-light transition-all cursor-pointer">
                         Start New Navigation
                     </a>
                 </div>
@@ -181,7 +185,8 @@
                 // CHANGE: Initialize the title on page load
                 updatePathTitle();
 
-                // Button navigation
+                // CHANGE: Arrow up = next, Arrow down = prev
+                // Button navigation - ↓ goes to previous, ↑ goes to next
                 viewer.querySelector('.prev-btn')?.addEventListener('click', () => {
                     if (currentIndex > 0) {
                         currentIndex--;
@@ -195,12 +200,44 @@
                         showImage(currentIndex, 'backward');
                     }
                 });
+
+                // RESPONSIVE: Add touch/swipe support for mobile
+                let touchStartX = 0;
+                let touchEndX = 0;
+
+                viewer.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                });
+
+                viewer.addEventListener('touchend', (e) => {
+                    touchEndX = e.changedTouches[0].screenX;
+                    const swipeThreshold = 50;
+
+                    if (Math.abs(touchStartX - touchEndX) > swipeThreshold) {
+                        if (touchStartX > touchEndX && currentIndex < imageSet.length - 1) {
+                            // Swipe left = next
+                            currentIndex++;
+                            showImage(currentIndex, 'backward');
+                        } else if (touchStartX < touchEndX && currentIndex > 0) {
+                            // Swipe right = previous
+                            currentIndex--;
+                            showImage(currentIndex, 'forward');
+                        }
+                    }
+                });
             });
         });
     </script>
 @endpush
 
 <style>
+    /* RESPONSIVE: Custom breakpoint for extra small screens */
+    @media (min-width: 360px) {
+        .xs\:h-\[300px\] {
+            height: 300px;
+        }
+    }
+
     /* Image layers */
     .photo-layer {
         position: absolute;
@@ -261,20 +298,18 @@
         opacity: 0;
     }
 
-    /* CHANGE: Updated button styles for better visibility and centering */
-    /* Buttons style */
+    /* RESPONSIVE: Button styles for all screen sizes */
     .nav-btn {
-        width: 48px;
-        height: 48px;
         border-radius: 50%;
         background-color: rgba(59, 130, 246, 0.9);
         color: white;
-        font-size: 1.5rem;
         font-weight: bold;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         cursor: pointer;
         transition: transform 0.2s ease, background-color 0.3s ease;
         border: 2px solid rgba(255, 255, 255, 0.2);
+        user-select: none;
+        -webkit-user-select: none;
     }
 
     .nav-btn:hover {
@@ -287,8 +322,26 @@
         transform: scale(0.95);
     }
 
+    /* RESPONSIVE: Mobile-specific adjustments */
+    @media (max-width: 640px) {
+        .nav-btn {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-btn:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+    }
+
     /* Optional: Hide buttons when there's only one image */
     .viewer[data-single-image] .nav-btn {
         display: none;
+    }
+
+    /* RESPONSIVE: Ensure proper spacing on all devices */
+    @media (max-width: 480px) {
+        .viewer {
+            min-height: 200px;
+        }
     }
 </style>
