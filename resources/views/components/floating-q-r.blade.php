@@ -40,10 +40,11 @@
                       lg:p-4 lg:w-16 lg:h-16
                       xl:p-4 xl:w-16 xl:h-16">
 
-                <!-- RESPONSIVE: Icon with Tailwind sizing -->
+                <!-- Fixed QR Code Icon with proper aspect ratio -->
                 <img src="{{ asset('icons/qr-code.png') }}" alt="Scan Office"
                     class="transition-all duration-300 ease-in-out 
                           group-hover:scale-110 group-hover:brightness-110
+                          object-contain object-center
                           w-5 h-5
                           sm:w-7 sm:h-7
                           md:w-8 md:h-8
@@ -51,7 +52,7 @@
                           xl:w-10 xl:h-10">
             </a>
 
-            <!-- RESPONSIVE: Tooltip using Tailwind -->
+            <!-- Tooltip using Tailwind -->
             <div
                 class="absolute right-full mr-2 sm:mr-3 top-1/2 -translate-y-1/2 
                         px-2 py-1 sm:px-3 sm:py-2 
