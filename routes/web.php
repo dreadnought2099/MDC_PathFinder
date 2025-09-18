@@ -81,9 +81,6 @@ Route::middleware('auth', 'role:Admin|Room Manager')->group(function () {
     Route::post('/admin/profile/update-image', [ProfileController::class, 'updateImage'])->name('admin.profile.updateImage');
 
     Route::get('/admin/recycle-bin', [RecycleBinController::class, 'index'])->middleware('permission: delete rooms|delete staff|delete room users')->name('recycle-bin');
-
-    Route::get('/2fa/enable', [TwoFactorController::class, 'enable'])->name('2fa.enable');
-    Route::post('/2fa/disable', [TwoFactorController::class, 'disable'])->name('2fa.disable');
     
     /*
     |--------------------------------------------------------------------------
