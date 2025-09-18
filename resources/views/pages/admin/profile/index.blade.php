@@ -39,6 +39,11 @@
 
         </div>
     </div>
+    <div class="max-w-lg mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border-2 border-primary relative">
+        <div class="border-2 border-primary mt-4 text-primary text-2xl text-center">
+            Two Factor Authentication
+        </div>
+    </div>
 
     <!-- Cropper Modal -->
     <div id="cropperModal"

@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+    <x-floating-actions />
     <div class="max-w-3xl mx-auto mt-10">
         <!-- Page Title -->
         <div class="text-center mb-8">
@@ -98,11 +99,11 @@
                 <!-- Action Buttons -->
                 <div class="flex justify-between items-center">
                     <a href="{{ route('room-user.index') }}"
-                        class="px-4 py-2 rounded-md bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                        class="px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover">
                         Cancel
                     </a>
                     <button type="submit"
-                        class="px-4 py-2 rounded-md bg-primary text-white hover:bg-blue-700 transition shadow">
+                        class="bg-primary text-white text-sm font-medium px-4 py-2 bg-primary rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
                         Update User
                     </button>
                 </div>
