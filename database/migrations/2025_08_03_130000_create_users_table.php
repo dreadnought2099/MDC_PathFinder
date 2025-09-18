@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('username')->unique()->nullable();
             $table->string('email')->unique()->nullable(); // required for admin, nullable for users
             $table->string('profile_photo_path')->nullable();
+            $table->string('google2fa_secret')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->softDeletes();

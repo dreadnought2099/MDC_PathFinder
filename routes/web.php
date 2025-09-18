@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\RecycleBinController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\RoomUserController;
 use App\Http\Controllers\Admin\StaffController;
+use App\Http\Controllers\Admin\TwoFactorController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ScannerController;
 use App\Http\Controllers\TokenController;
@@ -81,6 +82,9 @@ Route::middleware('auth', 'role:Admin|Room Manager')->group(function () {
 
     Route::get('/admin/recycle-bin', [RecycleBinController::class, 'index'])->middleware('permission: delete rooms|delete staff|delete room users')->name('recycle-bin');
 
+    Route::get('/2fa/enable', [TwoFactorController::class, 'enable'])->name('2fa.enable');
+    Route::post('/2fa/disable', [TwoFactorController::class, 'disable'])->name('2fa.disable');
+    
     /*
     |--------------------------------------------------------------------------
     | Room Routes
@@ -131,7 +135,7 @@ Route::middleware('auth', 'role:Admin|Room Manager')->group(function () {
 
         Route::post('/room-users', [RoomUserController::class, 'store'])->middleware('permission:create room users')->name('store');
         Route::get('/room-users/{user}', [RoomUserController::class, 'show'])->middleware('permission:view room users')->name('show');
-        
+
         Route::get('/room-users/{user}/edit', [RoomUserController::class, 'edit'])->middleware('permission:edit room users')->name('edit');
         Route::put('/room-users/{user}', [RoomUserController::class, 'update'])->middleware('permission:edit room users')->name('update');
         Route::delete('/room-users/{user}', [RoomUserController::class, 'destroy'])->middleware('permission:delete room users')->name('destroy');

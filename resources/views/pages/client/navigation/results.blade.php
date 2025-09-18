@@ -2,12 +2,11 @@
 
 @section('content')
     <div class="min-h-screen dark:bg-gray-900 flex flex-col">
-        <!-- Top bar - RESPONSIVE -->
+        <!-- Top bar -->
         <div
             class="w-full flex items-center p-2 sm:p-4 dark:border-b border-b-primary dark:border-b-primary bg-white dark:bg-gray-900 sticky top-0 z-50">
-            <!-- RESPONSIVE: Stack on mobile, side-by-side on larger screens -->
             <div class="w-full sm:w-48 flex items-center justify-start">
-                <!-- Left: Back button - RESPONSIVE -->
+                <!-- Left: Back button -->
                 <a href="{{ route('paths.select') }}"
                     class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 dark:text-gray-300 text-sm sm:text-base">
                     <svg class="h-4 w-4 sm:h-6 sm:w-6 mr-1" fill="none" stroke="currentColor" stroke-width="2"
@@ -21,23 +20,21 @@
 
             <div class="flex-1 hidden sm:block"></div>
 
-            <!-- Right controls - RESPONSIVE -->
+            <!-- Right controls -->
             <div class="w-full sm:w-48 flex items-center justify-end gap-2">
                 <x-about-page />
                 <x-dark-mode-toggle />
             </div>
         </div>
 
-        <!-- Floating QR - RESPONSIVE positioning -->
+        <!-- Floating QR -->
         <x-floating-q-r href="{{ route('scan.index') }}" icon="{{ asset('icons/qr-code.png') }}" alt="Scan Office"
             title="Scan office to know more" />
 
-        <!-- Main content - RESPONSIVE -->
+        <!-- Main content -->
         <div class="flex-grow flex items-center justify-center px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
-            <!-- RESPONSIVE: Full width on mobile, constrained on larger screens -->
             <div
                 class="w-full max-w-sm sm:max-w-2xl lg:max-w-5xl bg-white border-2 border-primary dark:bg-gray-800 shadow-lg rounded-md p-3 sm:p-6">
-                <!-- RESPONSIVE: Smaller text on mobile -->
                 <h2 class="text-lg sm:text-2xl mb-4 sm:mb-6 text-center text-primary">
                     <div class="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
                         <span class="text-center">{{ $fromRoom->name ?? ($fromRoom->room_name ?? 'Unknown Room') }}</span>
@@ -52,19 +49,18 @@
                     </p>
                 @else
                     @foreach ($paths as $path)
-                        <!-- Path Images Card - RESPONSIVE -->
+                        <!-- Path Images Card -->
                         <div
                             class="bg-white dark:bg-gray-800 shadow rounded-lg p-3 sm:p-5 mb-4 sm:mb-8 text-center border-2 border-primary">
-                            {{-- RESPONSIVE: Smaller heading on mobile --}}
                             <h2 class="text-base sm:text-xl mb-3 sm:mb-4 dark:text-gray-300">
                                 <i class="fas fa-images mr-1 sm:mr-2 text-sm sm:text-base"></i>
                                 <span class="path-title">{{ $path->name ?? 'Path ' . $loop->iteration }}</span>
                             </h2>
 
                             @if ($path->images->count() > 0)
-                                <!-- RESPONSIVE: Dynamic height based on screen size -->
-                                <div class="viewer relative w-full h-[250px] xs:h-[300px] sm:h-[400px] lg:h-[500px] bg-black rounded-md overflow-hidden"
-                                    data-index="{{ $loop->index }}">
+                                <!-- Image viewer with balanced responsive height -->
+                                <div class="viewer relative w-full bg-black rounded-md overflow-hidden"
+                                    style="height: clamp(240px, 30vw, 400px);" data-index="{{ $loop->index }}">
                                     @php
                                         $images = $path->images->sortBy('image_order')->pluck('image_file')->toArray();
                                     @endphp
@@ -75,45 +71,44 @@
                                             alt="Path Image">
                                         <img src="" class="photo-layer" alt="Next Image">
 
-                                        {{-- CHANGE: Arrow up = next, Arrow down = prev, RESPONSIVE buttons --}}
-                                        <!-- Navigation buttons (centered at bottom) - RESPONSIVE -->
+                                        <!-- Navigation buttons (centered at bottom) -->
                                         <div
                                             class="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-2 sm:gap-4 z-10">
                                             <button
-                                                class="nav-btn prev-btn bg-primary text-white w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-md text-sm sm:text-xl">
+                                                class="nav-btn prev-btn bg-primary hover:bg-primary/90 text-white w-8 h-8 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-full flex items-center justify-center shadow-md hover:shadow-lg text-sm sm:text-xl lg:text-2xl border-2 border-white/20 hover:scale-110 active:scale-95 transition-all duration-200 select-none">
                                                 ↓
                                             </button>
                                             <button
-                                                class="nav-btn next-btn bg-primary text-white w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-md text-sm sm:text-xl">
+                                                class="nav-btn next-btn bg-primary hover:bg-primary/90 text-white w-8 h-8 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-full flex items-center justify-center shadow-md hover:shadow-lg text-sm sm:text-xl lg:text-2xl border-2 border-white/20 hover:scale-110 active:scale-95 transition-all duration-200 select-none">
                                                 ↑
                                             </button>
                                         </div>
 
-                                        {{-- RESPONSIVE: Image counter in top-right corner --}}
-                                        <!-- Image counter - RESPONSIVE -->
+                                        <!-- Image counter -->
                                         <div
-                                            class="absolute top-2 sm:top-4 right-2 sm:right-4 bg-black bg-opacity-75 text-white px-2 py-1 sm:px-3 sm:py-1 rounded-md text-xs sm:text-sm z-10">
+                                            class="absolute top-2 sm:top-4 right-2 sm:right-4 bg-black/75 text-white px-2 py-1 sm:px-3 sm:py-1 lg:px-4 lg:py-2 rounded-md text-xs sm:text-sm lg:text-base z-10">
                                             <span class="image-counter">1 / {{ count($images) }}</span>
                                         </div>
                                     @else
-                                        <p class="text-gray-400 text-center py-10 text-sm sm:text-base">No Images Found</p>
+                                        <p class="text-gray-400 text-center py-8 sm:py-10 lg:py-12 text-sm sm:text-base">No
+                                            Images Found</p>
                                     @endif
                                 </div>
                             @else
-                                <div class="text-center py-6 sm:py-10 text-gray-400">
-                                    <i class="fas fa-image fa-2x sm:fa-3x mb-2 sm:mb-4"></i>
-                                    <h4 class="text-base sm:text-lg">No Images Found</h4>
-                                    <p class="text-xs sm:text-sm">This path doesn't have any images yet.</p>
+                                <div class="text-center py-6 sm:py-10 lg:py-12 text-gray-400">
+                                    <i class="fas fa-image text-2xl sm:text-3xl lg:text-4xl mb-2 sm:mb-4"></i>
+                                    <h4 class="text-base sm:text-lg lg:text-xl">No Images Found</h4>
+                                    <p class="text-xs sm:text-sm lg:text-base">This path doesn't have any images yet.</p>
                                 </div>
                             @endif
                         </div>
                     @endforeach
                 @endif
 
-                <!-- RESPONSIVE: Start new navigation button -->
+                <!-- Start new navigation button -->
                 <div class="mt-4 sm:mt-8 flex justify-center">
                     <a href="{{ route('paths.select') }}"
-                        class="px-4 py-2 sm:px-6 sm:py-2 text-sm sm:text-base rounded-md bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary dark:hover:bg-gray-800 shadow-primary-light transition-all cursor-pointer">
+                        class="px-4 py-2 sm:px-6 sm:py-3 lg:px-8 lg:py-4 text-sm sm:text-base lg:text-lg rounded-md bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary dark:hover:bg-gray-800 shadow-primary-light transition-all cursor-pointer">
                         Start New Navigation
                     </a>
                 </div>
@@ -140,18 +135,15 @@
                     pre.src = '/storage/' + src;
                 });
 
-                // CHANGE: Updated path title to show dynamic path number instead of "Path X - Image Y"
                 const updatePathTitle = () => {
                     const pathTitle = viewer.closest('.bg-white, .dark\\:bg-gray-800').querySelector(
                         '.path-title');
                     if (pathTitle && imageSet.length > 0) {
-                        const baseName = pathTitle.textContent.split(' - ')[0]; // Get base path name
-                        // CHANGE: Replace the path number with current image number (Path 1 -> Path 2, etc.)
+                        const baseName = pathTitle.textContent.split(' - ')[0];
                         pathTitle.textContent = `${baseName.replace(/\d+/, currentIndex + 1)}`;
                     }
                 };
 
-                // CHANGE: Added function to update image counter dynamically
                 const updateImageCounter = () => {
                     const counter = viewer.querySelector('.image-counter');
                     if (counter) {
@@ -177,16 +169,13 @@
                     });
 
                     showingA = !showingA;
-                    // CHANGE: Added calls to update both counter and title on navigation
                     updateImageCounter();
                     updatePathTitle();
                 };
 
-                // CHANGE: Initialize the title on page load
                 updatePathTitle();
 
-                // CHANGE: Arrow up = next, Arrow down = prev
-                // Button navigation - ↓ goes to previous, ↑ goes to next
+                // Button navigation
                 viewer.querySelector('.prev-btn')?.addEventListener('click', () => {
                     if (currentIndex > 0) {
                         currentIndex--;
@@ -201,7 +190,7 @@
                     }
                 });
 
-                // RESPONSIVE: Add touch/swipe support for mobile
+                // Touch/swipe support for mobile
                 let touchStartX = 0;
                 let touchEndX = 0;
 
@@ -215,11 +204,9 @@
 
                     if (Math.abs(touchStartX - touchEndX) > swipeThreshold) {
                         if (touchStartX > touchEndX && currentIndex < imageSet.length - 1) {
-                            // Swipe left = next
                             currentIndex++;
                             showImage(currentIndex, 'backward');
                         } else if (touchStartX < touchEndX && currentIndex > 0) {
-                            // Swipe right = previous
                             currentIndex--;
                             showImage(currentIndex, 'forward');
                         }
@@ -231,29 +218,47 @@
 @endpush
 
 <style>
-    /* RESPONSIVE: Custom breakpoint for extra small screens */
-    @media (min-width: 360px) {
-        .xs\:h-\[300px\] {
-            height: 300px;
-        }
-    }
-
-    /* Image layers */
+    /* Image layers - balanced sizing for good visibility */
     .photo-layer {
         position: absolute;
         inset: 0;
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain;
+        object-position: center;
         opacity: 0;
         z-index: 1;
         transition: transform 0.6s ease, opacity 0.6s ease;
         will-change: transform, opacity;
+        background: #000;
     }
 
     .photo-layer.active {
         opacity: 1;
         z-index: 2;
+    }
+
+    /* Balanced container - not too big, not too small */
+    .viewer {
+        /* Balanced: min(240px), preferred(30% of viewport width), max(400px) */
+        height: clamp(240px, 30vw, 400px);
+        max-height: 50vh;
+        /* Never exceed 50% of screen height */
+    }
+
+    /* Reasonable mobile sizing */
+    @media (max-width: 640px) {
+        .viewer {
+            height: clamp(200px, 35vw, 320px);
+            max-height: 45vh;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .viewer {
+            height: clamp(180px, 40vw, 280px);
+            max-height: 40vh;
+        }
     }
 
     /* Forward transition */
@@ -298,50 +303,5 @@
         opacity: 0;
     }
 
-    /* RESPONSIVE: Button styles for all screen sizes */
-    .nav-btn {
-        border-radius: 50%;
-        background-color: rgba(59, 130, 246, 0.9);
-        color: white;
-        font-weight: bold;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        cursor: pointer;
-        transition: transform 0.2s ease, background-color 0.3s ease;
-        border: 2px solid rgba(255, 255, 255, 0.2);
-        user-select: none;
-        -webkit-user-select: none;
-    }
-
-    .nav-btn:hover {
-        transform: scale(1.1);
-        background-color: rgba(59, 130, 246, 1);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-    }
-
-    .nav-btn:active {
-        transform: scale(0.95);
-    }
-
-    /* RESPONSIVE: Mobile-specific adjustments */
-    @media (max-width: 640px) {
-        .nav-btn {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        .nav-btn:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-        }
-    }
-
-    /* Optional: Hide buttons when there's only one image */
-    .viewer[data-single-image] .nav-btn {
-        display: none;
-    }
-
-    /* RESPONSIVE: Ensure proper spacing on all devices */
-    @media (max-width: 480px) {
-        .viewer {
-            min-height: 200px;
-        }
-    }
+    /* Custom breakpoint removed - using standard Tailwind breakpoints only */
 </style>
