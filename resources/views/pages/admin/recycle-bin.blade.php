@@ -19,7 +19,7 @@
             <button @click="setTab('rooms')"
                 :class="{ 'text-primary border-b-2': tab === 'rooms', 'text-gray-600 dark:text-gray-100 hover:text-primary': tab !== 'rooms' }"
                 class="px-4 py-2 text-sm font-medium transition-all duration-300 ease-in-out hover-underline cursor-pointer transform hover:scale-105 active:scale-95">
-                Trashed Rooms
+                Trashed Offices
             </button>
 
             <button @click="setTab('staff')"
@@ -39,8 +39,8 @@
         <div class="relative min-h-96">
             <!-- Rooms Tab -->
             <div x-show="tab === 'rooms'" x-transition class="absolute w-full">
-                <x-recycle-bin-table :items="$rooms" route-prefix="room" title="Trashed Rooms"
-                    empty-message="No trashed rooms found." tab="rooms" />
+                <x-recycle-bin-table :items="$rooms" route-prefix="room" title="Trashed Offices"
+                    empty-message="No trashed offices found." tab="rooms" />
             </div>
 
             <!-- Staff Tab -->

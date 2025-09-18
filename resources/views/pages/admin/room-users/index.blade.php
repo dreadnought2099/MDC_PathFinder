@@ -2,7 +2,7 @@
 
 @section('content')
     <x-floating-actions />
-    
+
     <div class="max-w-7xl mx-auto mt-8">
         <!-- Page Title -->
         <div class="text-center mb-8">
@@ -68,36 +68,82 @@
             const nameSpan = document.getElementById('userName');
             const form = document.getElementById('userDeleteForm');
 
+            // Set username in modal
             nameSpan.textContent = username;
+
+            // Set form action using Laravel route helper
             form.action = "{{ route('room-user.destroy', ':id') }}".replace(':id', id);
 
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                modal.querySelector('.bg-white').classList.remove('scale-95');
-                modal.querySelector('.bg-white').classList.add('scale-100');
-            }, 10);
+            // Show modal with smooth scale and opacity animation
+            modal.classList.remove('hidden', 'opacity-0');
+            const content = modal.querySelector('.bg-white');
+            content.classList.remove('scale-95');
+            content.classList.add('scale-100');
 
+            // Prevent background scrolling while modal is open
             document.body.style.overflow = 'hidden';
         }
 
         function closeUserModal() {
             const modal = document.getElementById('userDeleteModal');
-            const modalContent = modal.querySelector('.bg-white');
+            const content = modal.querySelector('.bg-white');
 
+            // Animate out: scale down and fade
             modal.classList.add('opacity-0');
-            modalContent.classList.remove('scale-100');
-            modalContent.classList.add('scale-95');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
 
+            // Hide after animation completes
             setTimeout(() => {
                 modal.classList.add('hidden');
                 document.body.style.overflow = 'auto';
-            }, 300);
+            }, 310); // duration matches CSS transition
         }
 
-        // Escape key
+        function openToggleModal(id, username, action) {
+            // Update modal text
+            document.getElementById('toggleUserName').textContent = username;
+            document.getElementById('toggleActionLabel').textContent = action.charAt(0).toUpperCase() + action.slice(1);
+            document.getElementById('toggleActionText').textContent = action;
+
+            // Use Laravel route helper instead of hardcoded URL
+            const form = document.getElementById('userToggleForm');
+            form.action = `/admin/room-users/${id}/toggle-status`;
+            // form.action = "{{ route('room-user.toggle-status', ['user' => ':id']) }}".replace(':id', id);
+
+
+            // Show modal with smooth scale and opacity animation
+            const modal = document.getElementById('userToggleModal');
+            modal.classList.remove('hidden', 'opacity-0');
+            const content = modal.querySelector('.bg-white');
+            content.classList.remove('scale-95');
+            content.classList.add('scale-100');
+
+            // Prevent background scrolling
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeToggleModal() {
+            const modal = document.getElementById('userToggleModal');
+            const content = modal.querySelector('.bg-white');
+
+            // Animate out: scale down and fade
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+
+            // Hide after animation completes
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 300); // duration matches CSS transition
+        }
+
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closeUserModal();
+            if (e.key === 'Escape') {
+                closeUserModal();
+                closeToggleModal();
+            }
         });
     </script>
 @endpush
