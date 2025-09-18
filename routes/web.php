@@ -70,7 +70,12 @@ Route::get('/admin', [LogInController::class, 'showLoginForm'])->name('login');
 Route::post('/admin', [LogInController::class, 'login']);
 
 
-Route::middleware('auth', 'role:Admin|Room Manager')->group(function () {
+Route::middleware(['auth', 'role:Admin|Room Manager'])->group(function () {
+    Route::post('/admin/profile/2fa/verify', [TwoFactorController::class, 'verify'])
+        ->name('admin.profile.2fa.verify');
+});
+
+Route::middleware('auth', 'role:Admin|Room Manager', '2fa')->group(function () {
     Route::post('/logout', [LogInController::class, 'logout'])->name('logout');
 
     // Admin dashboard - main landing page after login
@@ -80,8 +85,12 @@ Route::middleware('auth', 'role:Admin|Room Manager')->group(function () {
     Route::get('/admin/profile', [ProfileController::class, 'index'])->name('admin.profile');
     Route::post('/admin/profile/update-image', [ProfileController::class, 'updateImage'])->name('admin.profile.updateImage');
 
-    Route::get('/admin/recycle-bin', [RecycleBinController::class, 'index'])->middleware('permission: delete rooms|delete staff|delete room users')->name('recycle-bin');
+    Route::post('/admin/profile/2fa/enable', [TwoFactorController::class, 'enable'])->name('admin.profile.2fa.enable');
+    Route::post('/admin/profile/2fa/disable', [TwoFactorController::class, 'disable'])->name('admin.profile.2fa.disable');
+    Route::post('/admin/profile/2fa/regenerate', [TwoFactorController::class, 'regenerate'])->name('admin.profile.2fa.regenerate');
     
+    Route::get('/admin/recycle-bin', [RecycleBinController::class, 'index'])->middleware('permission: delete rooms|delete staff|delete room users')->name('recycle-bin');
+
     /*
     |--------------------------------------------------------------------------
     | Room Routes

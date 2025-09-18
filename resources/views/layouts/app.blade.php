@@ -113,6 +113,31 @@
         @endif
     </div>
 
+    <div x-data="{ open: {{ session('show_2fa_modal') ? 'true' : 'false' }} }" x-show="open" @close-2fa-modal.window="open = false" x-cloak
+        class="fixed inset-0 flex items-center justify-center bg-black/50 z-51">
+
+
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-md">
+            <h2 class="text-lg font-bold text-center">Two-Factor Authentication</h2>
+
+            <form id="twofa-form" method="POST" action="{{ route('admin.profile.2fa.verify') }}"
+                class="mt-4 space-y-3">
+                @csrf
+                <input type="text" name="otp" maxlength="6"
+                    class="w-full text-center px-4 py-3 border rounded-lg text-2xl tracking-widest
+                      focus:ring focus:ring-primary focus:outline-none"
+                    placeholder="123456" required autofocus>
+
+                <button type="submit"
+                    class="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-lg font-semibold">
+                    Verify
+                </button>
+            </form>
+
+            <div id="twofa-message" class="mt-3 text-center"></div>
+        </div>
+    </div>
+
     <!-- Navbar -->
     @include('components.navbar')
 
@@ -210,38 +235,80 @@
     <!-- Spinner -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Show overlay spinner
-            window.showSpinner = function() {
-                if (!document.getElementById("loading")) {
-                    document.body.insertAdjacentHTML("beforeend",
-                        '<div id="loading" class="fixed inset-0 flex items-center justify-center z-50">' +
-                        '<div class="animate-spin border-4 border-blue-200 border-t-blue-600 rounded-full w-10 h-10"></div>' +
-                        '</div>');
-                }
-            };
+            const form = document.getElementById('twofa-form');
+            if (!form) return;
 
-            // Hide overlay spinner
-            window.hideSpinner = function() {
-                const el = document.getElementById("loading");
-                if (el) el.remove();
-            };
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
 
-            // Existing bindings (optional, keep if needed)
-            document.querySelectorAll('#sort-form select').forEach(sel =>
-                sel.addEventListener('change', window.showSpinner)
-            );
+                let formData = new FormData(form);
 
-            const assignRoomForm = document.getElementById("assign-staff-form");
-            if (assignRoomForm) {
-                assignRoomForm.querySelector("select")?.addEventListener("change", () => {
-                    window.showSpinner();
-                    assignRoomForm.submit();
-                });
-            }
+                fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    })
+                    .then(async res => {
+                        let contentType = res.headers.get("content-type");
+                        if (contentType && contentType.includes("application/json")) {
+                            return res.json();
+                        } else {
+                            return {
+                                success: false,
+                                message: "Unexpected response (HTML instead of JSON)"
+                            };
+                        }
+                    })
+                    .then(data => {
+                        let msg = document.getElementById('twofa-message');
+                        if (data.success) {
+                            msg.innerHTML = `<span class="text-green-600">${data.message}</span>`;
 
-            document.getElementById("assignForm")?.addEventListener("submit", window.showSpinner);
-            document.getElementById("unassignForm")?.addEventListener("submit", window.showSpinner);
+                            setTimeout(() => {
+                                window.dispatchEvent(new CustomEvent('close-2fa-modal'));
+                            }, 1000);
+                        } else {
+                            msg.innerHTML = `<span class="text-red-600">${data.message}</span>`;
+                        }
+                    })
+                    .catch(err => console.error(err));
+            });
         });
+
+        // Show overlay spinner
+        window.showSpinner = function() {
+            if (!document.getElementById("loading")) {
+                document.body.insertAdjacentHTML("beforeend",
+                    '<div id="loading" class="fixed inset-0 flex items-center justify-center z-50">' +
+                    '<div class="animate-spin border-4 border-blue-200 border-t-blue-600 rounded-full w-10 h-10"></div>' +
+                    '</div>');
+            }
+        };
+
+        // Hide overlay spinner
+        window.hideSpinner = function() {
+            const el = document.getElementById("loading");
+            if (el) el.remove();
+        };
+
+        // Existing bindings (optional, keep if needed)
+        document.querySelectorAll('#sort-form select').forEach(sel =>
+            sel.addEventListener('change', window.showSpinner)
+        );
+
+        const assignRoomForm = document.getElementById("assign-staff-form");
+        if (assignRoomForm) {
+            assignRoomForm.querySelector("select")?.addEventListener("change", () => {
+                window.showSpinner();
+                assignRoomForm.submit();
+            });
+        }
+
+        document.getElementById("assignForm")?.addEventListener("submit", window.showSpinner);
+        document.getElementById("unassignForm")?.addEventListener("submit", window.showSpinner);
     </script>
 </body>
 

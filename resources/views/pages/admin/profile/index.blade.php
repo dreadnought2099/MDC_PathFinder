@@ -40,10 +40,79 @@
         </div>
     </div>
     <div class="max-w-lg mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border-2 border-primary relative">
-        <div class="border-2 border-primary mt-4 text-primary text-2xl text-center">
+        <div class="border-2 border-primary mt-4 text-primary text-2xl text-center font-semibold">
             Two Factor Authentication
         </div>
+
+        {{-- If 2FA already enabled --}}
+        @if ($user->google2fa_secret)
+            <p class="mt-4 text-green-600">✅ Two-Factor Authentication is enabled.</p>
+
+            {{-- Disable button --}}
+            <form method="POST" action="{{ route('admin.profile.2fa.disable') }}" class="mt-3">
+                @csrf
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg">
+                    Disable 2FA
+                </button>
+            </form>
+
+            {{-- Optional: Regenerate QR button --}}
+            <form method="POST" action="{{ route('admin.profile.2fa.regenerate') }}" class="mt-2">
+                @csrf
+                <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded-lg">
+                    Regenerate QR Code
+                </button>
+            </form>
+
+            {{-- Show QR if regenerate triggered --}}
+            @if (session('qrCode'))
+                <div class="mt-4 border rounded-lg p-4 bg-gray-50 dark:bg-gray-700">
+                    <p>📲 Scan this new QR code with your Authenticator app:</p>
+                    <div class="my-3 flex justify-center">{!! session('qrCode') !!}</div>
+                    <p><strong>Manual Key:</strong> {{ session('secret') }}</p>
+
+                    <form method="POST" action="{{ route('admin.profile.2fa.enable') }}" class="mt-3">
+                        @csrf
+                        <label class="block">Enter the 6-digit code:</label>
+                        <input type="text" name="otp" maxlength="6"
+                            class="w-full px-3 py-2 border rounded-lg mt-1 text-center text-lg" required>
+                        <button type="submit"
+                            class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg mt-2">
+                            Confirm & Save
+                        </button>
+                    </form>
+                </div>
+            @endif
+
+            {{-- If 2FA not enabled --}}
+        @else
+            <div x-data="{ showSetup: false }" class="mt-4">
+                <button @click="showSetup = !showSetup"
+                    class="w-full bg-primary hover:bg-primary-dark text-white py-2 rounded-lg">
+                    Enable 2FA
+                </button>
+
+                {{-- Setup section hidden until clicked --}}
+                <div x-show="showSetup" x-cloak class="mt-4 border rounded-lg p-4 bg-gray-50 dark:bg-gray-700">
+                    <p>Scan this QR code with your Authenticator app:</p>
+                    <div class="my-3 flex justify-center">{!! $qrCode !!}</div>
+                    <p><strong>Manual Key:</strong> {{ $secret }}</p>
+
+                    <form method="POST" action="{{ route('admin.profile.2fa.enable') }}" class="mt-3">
+                        @csrf
+                        <label class="block">Enter the 6-digit code:</label>
+                        <input type="text" name="otp" maxlength="6"
+                            class="w-full px-3 py-2 border rounded-lg mt-1 text-center text-lg" required>
+                        <button type="submit"
+                            class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg mt-2">
+                            Confirm & Enable
+                        </button>
+                    </form>
+                </div>
+            </div>
+        @endif
     </div>
+
 
     <!-- Cropper Modal -->
     <div id="cropperModal"

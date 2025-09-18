@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class RoomUserController extends Controller
@@ -231,13 +232,21 @@ class RoomUserController extends Controller
             return back()->with('error', 'You cannot permanently delete your own account.');
         }
 
-        if ($user->hasRole('Admin') && User::role('Admin')->count() === 1) {
-            return back()->with('error', 'You cannot delete the last remaining Admin.');
+        // Prevent deleting last Admin
+        if (method_exists($user, 'hasRole') && $user->hasRole('Admin')) {
+            $adminCount = User::role('Admin')->count();
+            if ($adminCount <= 1) {
+                return back()->with('error', 'You cannot delete the last remaining Admin.');
+            }
         }
 
         // Delete profile photo if exists
-        if ($user->profile_photo_path && Storage::disk('public')->exists($user->profile_photo_path)) {
-            Storage::disk('public')->delete($user->profile_photo_path);
+        try {
+            if ($user->profile_photo_path && Storage::disk('public')->exists($user->profile_photo_path)) {
+                Storage::disk('public')->delete($user->profile_photo_path);
+            }
+        } catch (\Exception $e) {
+            Log::error("Error deleting profile photo: " . $e->getMessage());
         }
 
         $user->forceDelete();

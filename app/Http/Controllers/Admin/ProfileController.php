@@ -3,19 +3,32 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use PragmaRX\Google2FA\Google2FA;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ProfileController extends Controller
 {
     public function index()
     {
-
         $user = Auth::user();
-        return view('pages.admin.profile.index', compact('user'));
+
+        $qrCode = null;
+        $secret = null;
+
+        if (!$user->google2fa_secret) {
+            $google2fa = new Google2FA();
+            $secret = $google2fa->generateSecretKey();
+            session(['2fa_secret' => $secret]);
+
+            $qrText = $google2fa->getQRCodeUrl(config('app.name'), $user->email, $secret);
+            $qrCode = QrCode::size(200)->generate($qrText);
+        }
+
+        return view('pages.admin.profile.index', compact('user', 'qrCode', 'secret'));
     }
 
     public function updateImage(Request $request)

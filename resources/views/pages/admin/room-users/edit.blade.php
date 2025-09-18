@@ -14,7 +14,7 @@
         </div>
 
         <!-- Edit User Form -->
-        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
+        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 border-2 border-primary">
             <form action="{{ route('room-user.update', $user->id) }}" method="POST" class="space-y-6">
                 @csrf
                 @method('PUT')
