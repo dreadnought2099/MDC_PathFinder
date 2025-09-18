@@ -176,7 +176,7 @@
                 <div>
                     <p class="text-gray-700 text-sm leading-relaxed dark:text-gray-300">
                         Are you sure you want to <span id="toggleActionText"></span> user <span id="toggleUserName"
-                            class="text-primary"></span>?
+                            class="text-secondary"></span>?
                     </p>
                 </div>
             </div>
@@ -186,11 +186,11 @@
                     @csrf
                     @method('PATCH')
                     <button type="button" onclick="closeToggleModal()"
-                        class="px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300">
+                        class="px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover">
                         Cancel
                     </button>
                     <button type="submit"
-                        class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-secondary rounded-md hover:bg-white hover:text-secondary transition-all duration-300 cursor-pointer dark:hover:bg-gray-800">
+                        class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-secondary rounded-md hover:bg-white hover:text-secondary transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover">
                         Confirm
                     </button>
                 </form>

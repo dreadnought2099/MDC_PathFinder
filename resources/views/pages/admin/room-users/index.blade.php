@@ -108,8 +108,7 @@
 
             // Use Laravel route helper instead of hardcoded URL
             const form = document.getElementById('userToggleForm');
-            form.action = `/admin/room-users/${id}/toggle-status`;
-            // form.action = "{{ route('room-user.toggle-status', ['user' => ':id']) }}".replace(':id', id);
+            form.action = "{{ route('room-user.toggle-status', ['user' => ':id']) }}".replace(':id', id);
 
 
             // Show modal with smooth scale and opacity animation

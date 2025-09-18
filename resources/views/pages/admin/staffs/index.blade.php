@@ -36,14 +36,17 @@
                                 class="px-6 py-4 text-left text-sm text-gray-700 uppercase tracking-wide dark:text-gray-300">
                                 Full Name
                             </th>
-                            <th
-                                class="px-6 py-4 text-left text-sm text-gray-700 uppercase tracking-wide dark:text-gray-300">
-                                Room ID
-                            </th>
+
                             <th
                                 class="px-6 py-4 text-left text-sm text-gray-700 uppercase tracking-wide dark:text-gray-300">
                                 Office Assigned
                             </th>
+
+                            <th
+                                class="px-6 py-4 text-left text-sm text-gray-700 uppercase tracking-wide dark:text-gray-300">
+                                Room ID
+                            </th>
+                            
                             <th
                                 class="px-6 py-4 text-right text-sm text-gray-700 uppercase tracking-wide dark:text-gray-300">
                                 Actions
@@ -68,14 +71,14 @@
                                         {{ $staff->full_name }}
                                     </td>
 
-                                    <!-- Room ID -->
-                                    <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-400">
-                                        {{ $staff->room_id ?? 'N/A' }}
-                                    </td>
-
                                     <!-- Office Name -->
                                     <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-400">
                                         {{ $staff->room->name ?? 'N/A' }}
+                                    </td>
+
+                                    <!-- Office ID -->
+                                    <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-400">
+                                        {{ $staff->room_id ?? 'N/A' }}
                                     </td>
 
                                     <!-- Actions -->
@@ -135,7 +138,7 @@
                                                             class="w-8 h-8 object-contain">
                                                     </button>
                                                 @endif
-                                                
+
                                                 <!-- Tooltip -->
                                                 <div
                                                     class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
