@@ -46,12 +46,13 @@
 
         {{-- If 2FA already enabled --}}
         @if ($user->google2fa_secret)
-            <p class="mt-4 text-green-600">✅ Two-Factor Authentication is enabled.</p>
+            <p class="mt-4 text-green-600">Two-Factor Authentication is enabled.</p>
 
             {{-- Disable button --}}
             <form method="POST" action="{{ route('admin.profile.2fa.disable') }}" class="mt-3">
                 @csrf
-                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg">
+                <button type="submit"
+                    class="w-full px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-secondary rounded-md hover:bg-white hover:text-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover">
                     Disable 2FA
                 </button>
             </form>
@@ -59,15 +60,16 @@
             {{-- Optional: Regenerate QR button --}}
             <form method="POST" action="{{ route('admin.profile.2fa.regenerate') }}" class="mt-2">
                 @csrf
-                <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded-lg">
+                <button type="submit"
+                    class="w-full px-4 py-2 text-sm font-medium bg-tertiary text-white hover:text-tertiary hover:bg-white cursor-pointer border-2 border-tertiary rounded-md transition-all duration-300 ease-in-out dark:hover:bg-gray-800 shadow-tertiary-hover">
                     Regenerate QR Code
                 </button>
             </form>
 
             {{-- Show QR if regenerate triggered --}}
             @if (session('qrCode'))
-                <div class="mt-4 border rounded-lg p-4 bg-gray-50 dark:bg-gray-700">
-                    <p>📲 Scan this new QR code with your Authenticator app:</p>
+                <div class="mt-4 border rounded-lg p-4 bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
+                    <p>Scan this new QR code with your Authenticator app:</p>
                     <div class="my-3 flex justify-center">{!! session('qrCode') !!}</div>
                     <p><strong>Manual Key:</strong> {{ session('secret') }}</p>
 
@@ -75,9 +77,9 @@
                         @csrf
                         <label class="block">Enter the 6-digit code:</label>
                         <input type="text" name="otp" maxlength="6"
-                            class="w-full px-3 py-2 border rounded-lg mt-1 text-center text-lg" required>
+                            class="w-full px-3 py-2 border rounded-lg mt-4 mb-4  text-center text-lg" required>
                         <button type="submit"
-                            class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg mt-2">
+                            class="w-full px-4 py-2 text-sm font-medium text-white bg-primary border-2 border-primary rounded-md hover:bg-white hover:text-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
                             Confirm & Save
                         </button>
                     </form>
@@ -88,23 +90,23 @@
         @else
             <div x-data="{ showSetup: false }" class="mt-4">
                 <button @click="showSetup = !showSetup"
-                    class="w-full bg-primary hover:bg-primary-dark text-white py-2 rounded-lg">
+                    class="w-full px-4 py-2 text-sm font-medium text-white bg-primary border-2 border-primary rounded-md hover:bg-white hover:text-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
                     Enable 2FA
                 </button>
 
                 {{-- Setup section hidden until clicked --}}
-                <div x-show="showSetup" x-cloak class="mt-4 border rounded-lg p-4 bg-gray-50 dark:bg-gray-700">
+                <div x-show="showSetup" x-cloak class="mt-4 border rounded-lg p-4 bg-white dark:bg-gray-800">
                     <p>Scan this QR code with your Authenticator app:</p>
-                    <div class="my-3 flex justify-center">{!! $qrCode !!}</div>
+                    <div class="my-3 flex justify-center bg-white">{!! $qrCode !!}</div>
                     <p><strong>Manual Key:</strong> {{ $secret }}</p>
 
                     <form method="POST" action="{{ route('admin.profile.2fa.enable') }}" class="mt-3">
                         @csrf
                         <label class="block">Enter the 6-digit code:</label>
                         <input type="text" name="otp" maxlength="6"
-                            class="w-full px-3 py-2 border rounded-lg mt-1 text-center text-lg" required>
+                            class="w-full px-3 py-2 border rounded-lg mt-4 mb-4 text-center text-lg" required>
                         <button type="submit"
-                            class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg mt-2">
+                            class="w-full px-4 py-2 text-sm font-medium text-white bg-primary border-2 border-primary rounded-md hover:bg-white hover:text-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
                             Confirm & Enable
                         </button>
                     </form>

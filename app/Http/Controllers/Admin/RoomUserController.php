@@ -140,7 +140,7 @@ class RoomUserController extends Controller
         $request->validate([
             'name' => 'nullable|string|max:20',
             'username' => 'required|string|max:20|unique:users,username,' . $user->id,
-            'password' => 'nullable|string|confirmed|min:8', // only required if changing password
+            'password' => 'nullable|string|confirmed|min:8',
             'room_id' => 'nullable|exists:rooms,id',
         ]);
 

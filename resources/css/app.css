@@ -39,8 +39,8 @@
         --color-secondary: #fb4141;
         --color-edit: #e1a224;
         --color-tertiary: #16c47f;
-        --color-purple: #9112BC;
-        --color-orange: #EF7722;
+        --color-purple: #9112bc;
+        --color-orange: #ef7722;
     }
 
     ::selection {
@@ -160,11 +160,17 @@
     .hover\:bg-secondary:hover {
         background-color: var(--color-secondary);
     }
+    .hover\:bg-tertiary:hover {
+        background-color: var(--color-tertiary);
+    }
     .hover\:border-primary:hover {
         border-color: var(--color-primary);
     }
     .hover\:border-secondary:hover {
         border-color: var(--color-secondary);
+    }
+    .hover\:border-tertiary:hover {
+        border-color: var(--color-tertiary);
     }
     .hover\:text-primary:hover {
         color: var(--color-primary);
@@ -172,6 +178,10 @@
     .hover\:text-secondary:hover {
         color: var(--color-secondary);
     }
+    .hover\:text-tertiary:hover {
+        color: var(--color-tertiary);
+    }
+
     .hover\:text-dark:hover {
         color: var(--color-dark);
     }
@@ -257,6 +267,22 @@
         box-shadow: 0 10px 40px rgba(209, 16, 55, 0.5);
     }
 
+    .shadow-tertiary-hover {
+        transition: all 0.3s ease;
+    }
+
+    .shadow-tertiary-hover:hover {
+        box-shadow: 0 10px 40px rgba(22, 196, 127, 0.5);
+    }
+
+    .shadow-edit-hover {
+        transition: all 0.3s ease;
+    }
+
+    .shadow-edit-hover:hover {
+        box-shadow: 0 10px 40px rgba(225, 162, 36, 0.3);
+    }
+
     .shadow-cancel-hover {
         transition: all 0.3s ease;
     }
@@ -293,16 +319,6 @@
     }
     .shadow-primary-strong:hover {
         box-shadow: 0 20px 50px rgba(21, 126, 225, 0.4);
-    }
-
-    .shadow-secondary-hover:hover {
-        box-shadow: 0 10px 40px rgba(163, 22, 33, 0.3);
-    }
-    .shadow-edit-hover:hover {
-        box-shadow: 0 10px 40px rgba(225, 162, 36, 0.3);
-    }
-    .shadow-tertiary-hover:hover {
-        box-shadow: 0 10px 40px rgba(247, 55, 79, 0.3);
     }
 }
 
