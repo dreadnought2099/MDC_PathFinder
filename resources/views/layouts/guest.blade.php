@@ -27,9 +27,6 @@
     <script src="https://unpkg.com/html5-qrcode@2.3.8"></script>
     <link rel="icon" href="{{ asset('images/mdc-logo.png') }}">
 
-    <!-- Pannellum CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
-
     <!-- GLightbox CSS -->
     <link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet">
 
@@ -112,9 +109,6 @@
     <main>
         @yield('content')
     </main>
-
-    <!-- Pannellum JS -->
-    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
 
     <!-- GLightbox -->
     <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>

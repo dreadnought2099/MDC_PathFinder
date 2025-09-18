@@ -27,7 +27,7 @@
             </div>
 
             <!-- Path Information -->
-            <div class="bg-white border-2 border-primary rounded-md shadow-sm p-6 dark:bg-gray-800">
+            <div class="bg-white border border-primary rounded-md shadow-sm p-6 dark:bg-gray-800">
                 <div class="flex items-center justify-center space-x-6">
                     <div class="text-center p-3 bg-primary text-white rounded-md">
                         <p class="text-sm">
@@ -69,7 +69,7 @@
                     <input type="hidden" name="path_id" value="{{ $path->id }}">
 
                     <!-- Bulk Actions -->
-                    <div class="bg-white rounded-md shadow-sm border p-6 mb-6 dark:bg-gray-800 border-2 border-primary">
+                    <div class="bg-white rounded-md shadow-sm border p-6 mb-6 dark:bg-gray-800 border-primary">
                         <div class="flex justify-between items-center">
                             <div class="flex items-center space-x-4">
                                 <label class="flex items-center space-x-2">
@@ -81,10 +81,6 @@
                                     image(s)</span>
                             </div>
                             <div class="flex space-x-3">
-                                <button type="submit"
-                                    class="bg-primary text-white text-sm font-medium px-4 py-2 bg-primary rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
-                                    Save Changes
-                                </button>
                                 <button type="button" id="bulkDeleteBtn"
                                     class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-secondary rounded-md hover:bg-white hover:text-secondary focus:ring-2 focus:ring-secondary focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover">
                                     Delete Selected
@@ -94,9 +90,9 @@
                     </div>
 
                     <!-- Images Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="imagesContainer">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 custom-time-input" id="imagesContainer">
                         @foreach ($pathImages as $index => $image)
-                            <div class="bg-white rounded-md shadow-sm p-4 image-card transition-all duration-300 dark:text-gray-300 dark:bg-gray-800"
+                            <div class="bg-white rounded-md shadow-sm p-4 image-card transition-all duration-300 dark:text-gray-300 dark:bg-gray-800 border border-primary"
                                 data-image-id="{{ $image->id }}">
                                 <div class="relative">
                                     <!-- Selection Checkbox -->

@@ -37,6 +37,13 @@
                             class="block px-4 py-2 text-sm text-primary hover:bg-gray-100 dark:hover:bg-gray-700">
                             Profile
                         </a>
+
+                        {{-- Settings --}}
+                        <a href="{{ route('admin.profile') }}"
+                            class="block px-4 py-2 text-sm text-primary hover:bg-gray-100 dark:hover:bg-gray-700">
+                            Settings
+                        </a>
+
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit"

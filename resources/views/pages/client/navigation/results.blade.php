@@ -17,23 +17,20 @@
                 </a>
             </div>
 
-            <!-- Center spacer -->
             <div class="flex-1"></div>
 
-            <!-- Right: fixed width container for About + Dark Mode -->
+            <!-- Right controls -->
             <div class="w-48 flex items-center">
-                <!-- Slot 1: About Page -->
                 <div class="flex-1 flex justify-end">
                     <x-about-page />
                 </div>
-
-                <!-- Slot 2: Dark Mode Toggle -->
                 <div class="flex-1 flex justify-end">
                     <x-dark-mode-toggle />
                 </div>
             </div>
         </div>
 
+        <!-- Floating QR -->
         <x-floating-q-r href="{{ route('scan.index') }}" icon="{{ asset('icons/qr-code.png') }}" alt="Scan Office"
             title="Scan office to know more" />
 
@@ -62,32 +59,32 @@
                             </h2>
 
                             @if ($path->images->count() > 0)
-                                <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                    @foreach ($path->images as $image)
-                                        <!-- GLightbox Wrapper -->
-                                        <a href="{{ asset('storage/' . $image->image_file) }}" class="glightbox"
-                                            data-gallery="path-{{ $path->id }}"
-                                            data-title="{{ $image->description ?? 'Path ' . $image->image_order }}">
-                                            <div
-                                                class="relative group overflow-hidden rounded shadow hover:shadow-lg transition">
-                                                <img src="{{ asset('storage/' . $image->image_file) }}"
-                                                    class="w-full h-48 object-cover transform group-hover:scale-105 transition"
-                                                    alt="Path Image {{ $image->image_order }}">
-                                                @if ($image->description)
-                                                    <div
-                                                        class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-sm p-2 truncate">
-                                                        {{ Str::limit($image->description, 40) }}
-                                                    </div>
-                                                @else
-                                                    <div
-                                                        class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-sm p-2 text-center">
-                                                        Path {{ $image->image_order }}
-                                                    </div>
-                                                @endif
-                                            </div>
-                                        </a>
-                                        <!-- End GLightbox Wrapper -->
-                                    @endforeach
+                                <div class="viewer relative w-full h-[500px] bg-black rounded-md overflow-hidden"
+                                    data-index="{{ $loop->index }}">
+                                    @php
+                                        $images = $path->images->sortBy('image_order')->pluck('image_file')->toArray();
+                                    @endphp
+
+                                    @if (count($images) > 0)
+                                        <!-- Double layer technique -->
+                                        <img src="{{ asset('storage/' . $images[0]) }}" class="photo-layer active"
+                                            alt="Path Image">
+                                        <img src="" class="photo-layer" alt="Next Image">
+
+                                        <!-- Navigation buttons (centered at bottom) -->
+                                        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-4 z-10">
+                                            <button
+                                                class="nav-btn prev-btn bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center shadow-md">
+                                                ↓
+                                            </button>
+                                            <button
+                                                class="nav-btn next-btn bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center shadow-md">
+                                                ↑
+                                            </button>
+                                        </div>
+                                    @else
+                                        <p class="text-gray-400 text-center py-10">No Images Found</p>
+                                    @endif
                                 </div>
                             @else
                                 <div class="text-center py-10 text-gray-400">
@@ -113,18 +110,149 @@
 
 @push('scripts')
     <script>
-        window.glightboxInstance = window.glightboxInstance || GLightbox({
-            selector: '.glightbox',
-            touchNavigation: true,
-            loop: true,
-            zoomable: true,
-            autoplayVideos: false,
-            moreText: 'View Image',
-            svg: {
-                close: '<img src="/icons/exit.png"/>',
-                next: '<img src="/icons/next.png"/>',
-                prev: '<img src="/icons/prev.png"/>'
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+            const allImageSets = @json($paths->map(fn($p) => $p->images->sortBy('image_order')->pluck('image_file')->toArray()));
+
+            document.querySelectorAll('.viewer').forEach((viewer, index) => {
+                const imageSet = allImageSets[index] || [];
+                let currentIndex = 0;
+
+                const [imgA, imgB] = viewer.querySelectorAll('.photo-layer');
+                let showingA = true;
+
+                // Preload images for smoother experience
+                imageSet.forEach(src => {
+                    const pre = new Image();
+                    pre.src = '/storage/' + src;
+                });
+
+                const showImage = (newIndex, direction = 'forward') => {
+                    if (!imageSet.length) return;
+
+                    const nextImg = showingA ? imgB : imgA;
+                    const currImg = showingA ? imgA : imgB;
+
+                    nextImg.src = '/storage/' + imageSet[newIndex];
+                    nextImg.className =
+                        `photo-layer ${direction === 'forward' ? 'forward-new' : 'backward-new'}`;
+
+                    requestAnimationFrame(() => {
+                        nextImg.classList.add('active');
+                        currImg.classList.remove('active');
+                        currImg.classList.add(direction === 'forward' ? 'forward-old' :
+                            'backward-old');
+                    });
+
+                    showingA = !showingA;
+                };
+
+                // Button navigation
+                viewer.querySelector('.prev-btn')?.addEventListener('click', () => {
+                    if (currentIndex > 0) {
+                        currentIndex--;
+                        showImage(currentIndex, 'forward');
+                    }
+                });
+
+                viewer.querySelector('.next-btn')?.addEventListener('click', () => {
+                    if (currentIndex < imageSet.length - 1) {
+                        currentIndex++;
+                        showImage(currentIndex, 'backward');
+                    }
+                });
+            });
         });
     </script>
 @endpush
+
+<style>
+    /* Image layers */
+    .photo-layer {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        z-index: 1;
+        transition: transform 0.6s ease, opacity 0.6s ease;
+        will-change: transform, opacity;
+    }
+
+    .photo-layer.active {
+        opacity: 1;
+        z-index: 2;
+    }
+
+    /* Forward transition */
+    .forward-new {
+        transform: scale(1.1);
+        opacity: 0;
+    }
+
+    .forward-new.active {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    .forward-old {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    .forward-old:not(.active) {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    /* Backward transition */
+    .backward-new {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    .backward-new.active {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    .backward-old {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    .backward-old:not(.active) {
+        transform: scale(1.1);
+        opacity: 0;
+    }
+
+    /* Buttons style */
+    .nav-btn {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background-color: rgba(59, 130, 246, 0.9);
+        color: white;
+        font-size: 1.5rem;
+        font-weight: bold;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        cursor: pointer;
+        transition: transform 0.2s ease, background-color 0.3s ease;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .nav-btn:hover {
+        transform: scale(1.1);
+        background-color: rgba(59, 130, 246, 1);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .nav-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* Optional: Hide buttons when there's only one image */
+    .viewer[data-single-image] .nav-btn {
+        display: none;
+    }
+</style>
