@@ -150,12 +150,25 @@ class RoomUserController extends Controller
             'room_id' => $request->room_id ?: null,
         ];
 
+        $passwordChanged = false;
+
         // Update password only if provided
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
+            $passwordChanged = true;
         }
 
         $user->update($data);
+
+
+        // If password was changed → log out the user everywhere
+        if ($passwordChanged) {
+            // Delete all user sessions
+            DB::table('sessions')->where('user_id', $user->id)->delete();
+
+            return redirect()->route('login')
+                ->with('success', 'Password changed successfully. Please log in again.');
+        }
 
         return redirect()->route('room-user.index')
             ->with('success', 'Office user updated successfully!');

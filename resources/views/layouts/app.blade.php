@@ -265,13 +265,13 @@
                     .then(data => {
                         let msg = document.getElementById('twofa-message');
                         if (data.success) {
-                            msg.innerHTML = `<span class="text-green-600">${data.message}</span>`;
+                            msg.innerHTML = `<span class="text-tertiary">${data.message}</span>`;
 
                             setTimeout(() => {
                                 window.dispatchEvent(new CustomEvent('close-2fa-modal'));
                             }, 1000);
                         } else {
-                            msg.innerHTML = `<span class="text-red-600">${data.message}</span>`;
+                            msg.innerHTML = `<span class="text-secondary">${data.message}</span>`;
                         }
                     })
                     .catch(err => console.error(err));
