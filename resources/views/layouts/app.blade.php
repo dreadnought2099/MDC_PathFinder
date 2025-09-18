@@ -114,7 +114,7 @@
     </div>
 
     <div x-data="{ open: {{ session('show_2fa_modal') ? 'true' : 'false' }} }" x-show="open" @close-2fa-modal.window="open = false" x-cloak
-        class="fixed inset-0 flex items-center justify-center bg-black/50 z-51">
+        class="fixed inset-0 flex items-center justify-center bg-black/50 z-51 dark:text-gray-300 dark:ring-gray-500 focus:ring-2 focus:ring-primary focus:border-primary outline-none">
 
 
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-md">

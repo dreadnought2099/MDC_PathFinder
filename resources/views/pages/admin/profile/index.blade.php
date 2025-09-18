@@ -95,9 +95,9 @@
                 </button>
 
                 {{-- Setup section hidden until clicked --}}
-                <div x-show="showSetup" x-cloak class="mt-4 border rounded-lg p-4 bg-white dark:bg-gray-800">
+                <div x-show="showSetup" x-cloak class="mt-4 border rounded-lg p-4 bg-white dark:bg-gray-800 dark:text-gray-300">
                     <p>Scan this QR code with your Authenticator app:</p>
-                    <div class="my-3 flex justify-center bg-white">{!! $qrCode !!}</div>
+                    <div class="my-3 flex justify-center py-4 bg-white">{!! $qrCode !!}</div>
                     <p><strong>Manual Key:</strong> {{ $secret }}</p>
 
                     <form method="POST" action="{{ route('admin.profile.2fa.enable') }}" class="mt-3">
