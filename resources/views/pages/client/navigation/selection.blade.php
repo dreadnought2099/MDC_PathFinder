@@ -74,8 +74,8 @@
                     </div>
 
                     <div class="flex justify-center">
-                        <button type="submit"
-                            class="px-6 py-2 rounded-md bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary dark:hover:bg-gray-800 shadow-primary-light transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                        <button type="submit" id="startBtn"
+                            class="px-6 py-2 rounded-md bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary dark:hover:bg-gray-800 shadow-primary-light transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" disabled>
                             Start Navigation
                         </button>
                     </div>
@@ -88,6 +88,7 @@
         <script>
             const fromSelect = document.getElementById('from_room');
             const toSelect = document.getElementById('to_room');
+            const startBtn = document.getElementById('startBtn');
 
             function updateDisabledOptions() {
                 const fromValue = fromSelect.value;
@@ -110,6 +111,8 @@
                         if (opt.value === fromValue) opt.disabled = true;
                     });
                 }
+
+                startBtn.disabled = !(fromValue && toValue);
             }
 
             fromSelect.addEventListener('change', updateDisabledOptions);
