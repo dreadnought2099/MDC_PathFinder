@@ -54,8 +54,10 @@
                         <!-- Path Images Card -->
                         <div
                             class="bg-white dark:bg-gray-800 shadow rounded-lg p-5 mb-8 text-center border-2 border-primary">
+                            {{-- CHANGE: Updated title to use dynamic path name instead of static "Path Images (count)" --}}
                             <h2 class="text-xl mb-4 dark:text-gray-300">
-                                <i class="fas fa-images mr-2"></i> Path Images ({{ $path->images->count() }})
+                                <i class="fas fa-images mr-2"></i> <span
+                                    class="path-title">{{ $path->name ?? 'Path ' . $loop->iteration }}</span>
                             </h2>
 
                             @if ($path->images->count() > 0)
@@ -71,6 +73,7 @@
                                             alt="Path Image">
                                         <img src="" class="photo-layer" alt="Next Image">
 
+                                        {{-- CHANGE: Repositioned navigation buttons to bottom center with up/down arrows --}}
                                         <!-- Navigation buttons (centered at bottom) -->
                                         <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-4 z-10">
                                             <button
@@ -81,6 +84,13 @@
                                                 class="nav-btn next-btn bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center shadow-md">
                                                 ↑
                                             </button>
+                                        </div>
+
+                                        {{-- CHANGE: Added image counter in top-right corner --}}
+                                        <!-- Image counter -->
+                                        <div
+                                            class="absolute top-4 right-4 bg-black bg-opacity-75 text-white px-3 py-1 rounded-md text-sm z-10">
+                                            <span class="image-counter">1 / {{ count($images) }}</span>
                                         </div>
                                     @else
                                         <p class="text-gray-400 text-center py-10">No Images Found</p>
@@ -126,6 +136,25 @@
                     pre.src = '/storage/' + src;
                 });
 
+                // CHANGE: Updated path title to show dynamic path number instead of "Path X - Image Y"
+                const updatePathTitle = () => {
+                    const pathTitle = viewer.closest('.bg-white, .dark\\:bg-gray-800').querySelector(
+                        '.path-title');
+                    if (pathTitle && imageSet.length > 0) {
+                        const baseName = pathTitle.textContent.split(' - ')[0]; // Get base path name
+                        // CHANGE: Replace the path number with current image number (Path 1 -> Path 2, etc.)
+                        pathTitle.textContent = `${baseName.replace(/\d+/, currentIndex + 1)}`;
+                    }
+                };
+
+                // CHANGE: Added function to update image counter dynamically
+                const updateImageCounter = () => {
+                    const counter = viewer.querySelector('.image-counter');
+                    if (counter) {
+                        counter.textContent = `${currentIndex + 1} / ${imageSet.length}`;
+                    }
+                };
+
                 const showImage = (newIndex, direction = 'forward') => {
                     if (!imageSet.length) return;
 
@@ -144,7 +173,13 @@
                     });
 
                     showingA = !showingA;
+                    // CHANGE: Added calls to update both counter and title on navigation
+                    updateImageCounter();
+                    updatePathTitle();
                 };
+
+                // CHANGE: Initialize the title on page load
+                updatePathTitle();
 
                 // Button navigation
                 viewer.querySelector('.prev-btn')?.addEventListener('click', () => {
@@ -226,6 +261,7 @@
         opacity: 0;
     }
 
+    /* CHANGE: Updated button styles for better visibility and centering */
     /* Buttons style */
     .nav-btn {
         width: 48px;
