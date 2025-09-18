@@ -25,6 +25,7 @@ class User extends Authenticatable
         'email',
         'password',
         'room_id',
+        'is_active',
     ];
 
     /**
@@ -47,6 +48,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is-active' => 'boolean',
         ];
     }
 

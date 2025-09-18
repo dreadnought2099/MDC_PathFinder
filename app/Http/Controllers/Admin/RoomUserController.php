@@ -165,20 +165,20 @@ class RoomUserController extends Controller
      */
     public function destroy(User $user)
     {
+        // Prevent admin from deleting their own account
+        if (Auth::id() === $user->id) {
+            return back()->with('error', 'You cannot delete your own account.');
+        }
+
+        if ($user->hasRole('Admin') && User::role('Admin')->count() === 1) {
+            return back()->with('error', 'You cannot delete the last remaining Admin.');
+        }
+
         // Clear all active sessions for this user
-        DB::table('sessions')
-            ->where('user_id', $user->id)
-            ->delete();
+        DB::table('sessions')->where('user_id', $user->id)->delete();
 
         // Clear remember token
         $user->update(['remember_token' => null]);
-
-        // If user is currently logged in, log them out
-        if (Auth::id() === $user->id) {
-            Auth::logout();
-            request()->session()->invalidate();
-            request()->session()->regenerateToken();
-        }
 
         // Soft delete the room user
         $user->delete();
@@ -221,20 +221,58 @@ class RoomUserController extends Controller
     {
         $user = User::onlyTrashed()->find($id);
 
-        if ($user) {
-            // Delete profile photo if exists
-            if ($user->profile_photo_path && Storage::disk('public')->exists($user->profile_photo_path)) {
-                Storage::disk('public')->delete($user->profile_photo_path);
-            }
-
-            // Permanently delete user
-            $user->forceDelete();
-
+        if (!$user) {
             return redirect()->route('room-user.recycle-bin')
-                ->with('success', 'Office user permanently deleted.');
+                ->with('error', 'Office user has not been soft deleted or does not exist.');
         }
 
+        // Prevent admin from force-deleting their own account
+        if (Auth::id() === $user->id) {
+            return back()->with('error', 'You cannot permanently delete your own account.');
+        }
+
+        if ($user->hasRole('Admin') && User::role('Admin')->count() === 1) {
+            return back()->with('error', 'You cannot delete the last remaining Admin.');
+        }
+
+        // Delete profile photo if exists
+        if ($user->profile_photo_path && Storage::disk('public')->exists($user->profile_photo_path)) {
+            Storage::disk('public')->delete($user->profile_photo_path);
+        }
+
+        $user->forceDelete();
+
         return redirect()->route('room-user.recycle-bin')
-            ->with('error', 'Office user has not been soft deleted or does not exist.');
+            ->with('success', 'Office user permanently deleted.');
+    }
+
+    /**
+     * Toggle a user's active status (enable/disable account).
+     */
+    public function toggleStatus(User $user)
+    {
+        // Prevent admin from disabling their own account
+        if (Auth::id() === $user->id) {
+            return back()->with('error', 'You cannot disable your own account.');
+        }
+
+        if ($user->hasRole('Admin') && User::role('Admin')->count() === 1) {
+            return back()->with('error', 'You cannot delete the last remaining Admin.');
+        }
+
+        // Flip the status: if active → disable, if disabled → enable
+        $user->is_active = !$user->is_active;
+        $user->save();
+
+        // If user is being disabled, kill all their active sessions
+        if (!$user->is_active) {
+            // Laravel stores sessions in the "sessions" table (if using database driver)
+            DB::table('sessions')->where('user_id', $user->id)->delete();
+        }
+
+        return back()->with(
+            'success',
+            "User {$user->name} has been " . ($user->is_active ? 'enabled' : 'disabled') . "."
+        );
     }
 }

@@ -139,6 +139,8 @@ Route::middleware('auth', 'role:Admin|Room Manager')->group(function () {
 
         Route::post('/room-users/{id}/restore', [RoomUserController::class, 'restore'])->middleware('permission:delete room users')->name('restore');
         Route::delete('/room-users/{id}/force-delete', [RoomUserController::class, 'forceDelete'])->middleware('permission:delete room users')->name('forceDelete');
+
+        Route::patch('/room-users/{user}/toggle-status', [RoomUserController::class, 'toggleStatus'])->middleware('role:Admin')->name('toggle-status');
     });
 
     /*

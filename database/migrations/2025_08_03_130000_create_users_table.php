@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('profile_photo_path')->nullable();
             $table->string('google2fa_secret')->nullable();
             $table->timestamp('email_verified_at')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->string('password');
             $table->softDeletes();
             $table->rememberToken();
