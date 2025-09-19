@@ -102,18 +102,22 @@ class TwoFactorController extends Controller
 
     public function verify(Request $request)
     {
+        // Validate the OTP input
         $request->validate([
             'otp' => 'required|digits:6',
         ]);
 
         $google2fa = new Google2FA();
         $user = auth()->user();
+        $secret = $user->google2fa_secret;
 
-        $valid = $google2fa->verifyKey($user->google2fa_secret, $request->otp);
+        // Attempt to verify the OTP
+        $valid = $google2fa->verifyKey($secret, $request->otp);
 
+        // If OTP is valid, set session and return response
         if ($valid) {
             session(['2fa_passed' => true]);
-            session()->forget('show_2fa_modal');
+            session()->forget('show_2fa_modal'); // Clear the modal session flag
 
             // AJAX request → return JSON
             if ($request->expectsJson()) {
@@ -128,6 +132,24 @@ class TwoFactorController extends Controller
                 ->with('success', '2FA verified successfully.');
         }
 
+        // Check if OTP has expired (default expiration time window is 30 seconds)
+        $otpExpirationWindow = config('google2fa.timeWindow', 30); // You can configure the time window in your config
+        $timeNow = time();
+        $otpTimestamp = $google2fa->getTimestamp($request->otp); // Get timestamp of the OTP
+
+        if ($timeNow - $otpTimestamp > $otpExpirationWindow) {
+            // OTP has expired
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'The OTP has expired. Please try again.',
+                ], 422);
+            }
+
+            return back()->withErrors(['otp' => 'The OTP has expired. Please try again.']);
+        }
+
+        // If OTP is invalid but not expired
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => false,

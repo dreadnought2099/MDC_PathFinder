@@ -91,11 +91,6 @@ Route::middleware('auth', 'role:Admin|Room Manager', '2fa')->group(function () {
     
     Route::get('/admin/recycle-bin', [RecycleBinController::class, 'index'])->middleware('permission: delete rooms|delete staff|delete room users')->name('recycle-bin');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Room Routes
-    |--------------------------------------------------------------------------
-    */
     Route::prefix('admin')->name('room.')->group(function () {
         // List all rooms
         Route::get('/rooms', [RoomController::class, 'index'])->middleware('permission:view rooms')->name('index');
@@ -128,12 +123,6 @@ Route::middleware('auth', 'role:Admin|Room Manager', '2fa')->group(function () {
         Route::delete('/rooms/staff/{id}/remove', [RoomController::class, 'removeFromRoom'])->middleware('permission:edit staff')->name('staff.remove');
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | Room Users (Managers)
-    |--------------------------------------------------------------------------
-    */
-
     Route::prefix('admin')->name('room-user.')->group(function () {
 
         Route::get('/room-users', [RoomUserController::class, 'index'])->middleware('permission:view room users')->name('index');
@@ -151,12 +140,6 @@ Route::middleware('auth', 'role:Admin|Room Manager', '2fa')->group(function () {
 
         Route::patch('/room-users/{user}/toggle-status', [RoomUserController::class, 'toggleStatus'])->middleware('role:Admin')->name('toggle-status');
     });
-
-    /*
-    |--------------------------------------------------------------------------
-    | Staff Routes
-    |--------------------------------------------------------------------------
-    */
 
     Route::prefix('admin')->name('staff.')->group(function () {
 
@@ -180,11 +163,6 @@ Route::middleware('auth', 'role:Admin|Room Manager', '2fa')->group(function () {
         Route::delete('/staff/{id}/force-delete', [StaffController::class, 'forceDelete'])->middleware('permission:delete staff')->name('forceDelete');
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | Paths & Images
-    |--------------------------------------------------------------------------
-    */
 
     Route::prefix('admin')->name('path.')->group(function () {
 

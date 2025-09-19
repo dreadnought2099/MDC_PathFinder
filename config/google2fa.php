@@ -3,6 +3,11 @@
 return [
 
     /*
+    * Time window for OTP expiration (in seconds)
+    */
+    'timeWindow' => 30,
+    
+    /*
      * Enable / disable Google2FA.
      */
     'enabled' => env('OTP_ENABLED', true),
