@@ -132,24 +132,7 @@ class TwoFactorController extends Controller
                 ->with('success', '2FA verified successfully.');
         }
 
-        // Check if OTP has expired (default expiration time window is 30 seconds)
-        $otpExpirationWindow = config('google2fa.timeWindow', 30); // You can configure the time window in your config
-        $timeNow = time();
-        $otpTimestamp = $google2fa->getTimestamp($request->otp); // Get timestamp of the OTP
-
-        if ($timeNow - $otpTimestamp > $otpExpirationWindow) {
-            // OTP has expired
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'The OTP has expired. Please try again.',
-                ], 422);
-            }
-
-            return back()->withErrors(['otp' => 'The OTP has expired. Please try again.']);
-        }
-
-        // If OTP is invalid but not expired
+        // If OTP is invalid, return the generic invalid message
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => false,
