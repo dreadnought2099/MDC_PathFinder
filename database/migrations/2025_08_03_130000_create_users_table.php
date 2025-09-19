@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('email')->unique()->nullable(); // required for admin, nullable for users
             $table->string('profile_photo_path')->nullable();
             $table->string('google2fa_secret')->nullable();
+            $table->json('two_factor_recovery_codes')->nullable(); // Use JSON to handle large characters
             $table->timestamp('email_verified_at')->nullable();
             $table->boolean('is_active')->default(true);
             $table->string('password');

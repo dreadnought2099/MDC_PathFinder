@@ -71,8 +71,18 @@ Route::post('/admin', [LogInController::class, 'login']);
 
 
 Route::middleware(['auth', 'role:Admin|Room Manager'])->group(function () {
-    Route::post('/admin/profile/2fa/verify', [TwoFactorController::class, 'verify'])
-        ->name('admin.profile.2fa.verify');
+    // 2FA verification routes - these MUST be accessible before 2FA is verified
+    Route::post('/admin/profile/2fa/verify', [TwoFactorController::class, 'verify'])->name('admin.2fa.verify');
+
+    // Recovery code routes
+    Route::post('/admin/2fa/recovery', [TwoFactorController::class, 'verifyRecoveryCode'])->name('admin.2fa.recovery.verify');
+    Route::get('/admin/2fa/recovery-codes/download', [TwoFactorController::class, 'downloadRecoveryCodes'])->name('admin.2fa.recovery.download');
+
+    // 2FA management routes - these should be accessible to enable/disable 2FA
+    Route::post('/admin/profile/2fa/enable', [TwoFactorController::class, 'enable'])->name('admin.profile.2fa.enable');
+    Route::post('/admin/profile/2fa/disable', [TwoFactorController::class, 'disable'])->name('admin.profile.2fa.disable');
+    Route::post('/admin/profile/2fa/regenerate', [TwoFactorController::class, 'regenerate'])->name('admin.profile.2fa.regenerate');
+    Route::post('/admin/profile/2fa/recovery/regenerate', [TwoFactorController::class, 'regenerateRecoveryCodes'])->name('admin.profile.2fa.recovery.regenerate');
 });
 
 Route::middleware('auth', 'role:Admin|Room Manager', '2fa')->group(function () {
@@ -84,11 +94,6 @@ Route::middleware('auth', 'role:Admin|Room Manager', '2fa')->group(function () {
     // Admin profile management
     Route::get('/admin/profile', [ProfileController::class, 'index'])->name('admin.profile');
     Route::post('/admin/profile/update-image', [ProfileController::class, 'updateImage'])->name('admin.profile.updateImage');
-
-    Route::post('/admin/profile/2fa/enable', [TwoFactorController::class, 'enable'])->name('admin.profile.2fa.enable');
-    Route::post('/admin/profile/2fa/disable', [TwoFactorController::class, 'disable'])->name('admin.profile.2fa.disable');
-    Route::post('/admin/profile/2fa/regenerate', [TwoFactorController::class, 'regenerate'])->name('admin.profile.2fa.regenerate');
-    
     Route::get('/admin/recycle-bin', [RecycleBinController::class, 'index'])->middleware('permission: delete rooms|delete staff|delete room users')->name('recycle-bin');
 
     Route::prefix('admin')->name('room.')->group(function () {

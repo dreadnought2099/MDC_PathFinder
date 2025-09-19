@@ -72,6 +72,9 @@ class LogInController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
+        // Just in case, explicitly clear 2FA flags
+        session()->forget(['2fa_passed', 'show_2fa_modal', '2fa_attempts', 'recovery_codes', '2fa_secret']);
+
         return redirect('/admin');
     }
 

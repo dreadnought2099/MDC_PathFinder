@@ -113,26 +113,66 @@
         @endif
     </div>
 
+    <!-- OTP Modal -->
     <div x-data="{ open: {{ session('show_2fa_modal') ? 'true' : 'false' }} }" x-show="open" @close-2fa-modal.window="open = false" x-cloak
-        class="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-2xl z-51 dark:ring-gray-500 focus:ring-2 focus:ring-primary focus:border-primary outline-none">
+        class="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-2xl z-51">
 
         <div class="bg-white dark:bg-gray-800 p-6 rounded-md w-full max-w-md">
             <h2 class="text-lg font-bold text-primary text-center">Two-Factor Authentication</h2>
 
-            <form id="twofa-form" method="POST" action="{{ route('admin.profile.2fa.verify') }}"
-                class="mt-4 space-y-3">
+            <form method="POST" action="{{ route('admin.2fa.verify') }}" class="mt-4 space-y-3">
                 @csrf
-                <input type="text" name="otp" maxlength="6"
+                <input type="text" name="otp" maxlength="6" inputmode="numeric" pattern="[0-9]*"
                     class="w-full py-4 text-center text-lg rounded-md dark:text-gray-300 text-gray-700 ring-1 px-4 ring-gray-400 focus:ring-2 focus:ring-primary focus:border-primary outline-none"
-                    placeholder="123456" required autofocus>
+                    placeholder="Enter 6-digit code" required autofocus>
 
-                <button type="submit"
-                    class="w-full bg-primary text-white px-4 py-2 bg-primary rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
+                @error('otp')
+                    <p class="text-red-600 text-sm text-center">{{ $message }}</p>
+                @enderror
+
+                <button type="submit" class="w-full bg-primary text-white px-4 py-2 rounded-md">
                     Verify
                 </button>
-            </form>
 
-            <div id="twofa-message" class="mt-3 text-center"></div>
+                <p class="mt-3 text-center text-sm">
+                    <button type="button" @click="open = false; $dispatch('open-recovery-modal')"
+                        class="text-primary hover:underline">
+                        Use a recovery code instead
+                    </button>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Recovery Code Modal -->
+    <div x-data="{ openRecoveryModal: {{ session('show_recovery_modal') ? 'true' : 'false' }} }" x-show="openRecoveryModal" @open-recovery-modal.window="openRecoveryModal = true"
+        @close-recovery-modal.window="openRecoveryModal = false" x-cloak
+        class="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-2xl z-51">
+
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-md w-full max-w-md">
+            <h2 class="text-lg font-bold text-primary text-center">Use Recovery Code</h2>
+
+            <form method="POST" action="{{ route('admin.2fa.recovery.verify') }}" class="mt-4 space-y-3">
+                @csrf
+                <input type="text" name="recovery_code"
+                    class="w-full py-4 text-center text-lg rounded-md dark:text-gray-300 text-gray-700 ring-1 px-4 ring-gray-400 focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                    placeholder="Enter recovery code" required>
+
+                @error('recovery_code')
+                    <p class="text-red-600 text-sm text-center">{{ $message }}</p>
+                @enderror
+
+                <button type="submit" class="w-full bg-primary text-white px-4 py-2 rounded-md">
+                    Verify Recovery Code
+                </button>
+
+                <p class="mt-3 text-center text-sm">
+                    <button type="button" @click="openRecoveryModal = false; $dispatch('open-2fa-modal')"
+                        class="text-primary hover:underline">
+                        ← Back to OTP
+                    </button>
+                </p>
+            </form>
         </div>
     </div>
 
@@ -232,50 +272,6 @@
 
     <!-- Spinner -->
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const form = document.getElementById('twofa-form');
-            if (!form) return;
-
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                let formData = new FormData(form);
-
-                fetch(form.action, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        },
-                        body: formData
-                    })
-                    .then(async res => {
-                        let contentType = res.headers.get("content-type");
-                        if (contentType && contentType.includes("application/json")) {
-                            return res.json();
-                        } else {
-                            return {
-                                success: false,
-                                message: "Unexpected response (HTML instead of JSON)"
-                            };
-                        }
-                    })
-                    .then(data => {
-                        let msg = document.getElementById('twofa-message');
-                        if (data.success) {
-                            msg.innerHTML = `<span class="text-tertiary">${data.message}</span>`;
-
-                            setTimeout(() => {
-                                window.dispatchEvent(new CustomEvent('close-2fa-modal'));
-                            }, 1000);
-                        } else {
-                            msg.innerHTML = `<span class="text-secondary">${data.message}</span>`;
-                        }
-                    })
-                    .catch(err => console.error(err));
-            });
-        });
-
         // Show overlay spinner
         window.showSpinner = function() {
             if (!document.getElementById("loading")) {

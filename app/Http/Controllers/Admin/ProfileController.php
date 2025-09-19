@@ -14,17 +14,24 @@ class ProfileController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
+        $user = Auth::user();   
 
         $qrCode = null;
         $secret = null;
 
         if (!$user->google2fa_secret) {
             $google2fa = new Google2FA();
+
             $secret = $google2fa->generateSecretKey();
+
             session(['2fa_secret' => $secret]);
 
-            $qrText = $google2fa->getQRCodeUrl(config('app.name'), $user->email, $secret);
+            $qrText = $google2fa->getQRCodeUrl(
+                config('app.name'),  // app name shown in authenticator
+                $user->email,        // identifier shown in authenticator
+                $secret              // the generated secret
+            );
+
             $qrCode = QrCode::size(200)->generate($qrText);
         }
 
