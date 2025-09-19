@@ -114,21 +114,20 @@
     </div>
 
     <div x-data="{ open: {{ session('show_2fa_modal') ? 'true' : 'false' }} }" x-show="open" @close-2fa-modal.window="open = false" x-cloak
-        class="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-4xl z-51 dark:text-gray-300 dark:ring-gray-500 focus:ring-2 focus:ring-primary focus:border-primary outline-none">
+        class="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-2xl z-51 dark:ring-gray-500 focus:ring-2 focus:ring-primary focus:border-primary outline-none">
 
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-md">
-            <h2 class="text-lg font-bold text-center">Two-Factor Authentication</h2>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-md w-full max-w-md">
+            <h2 class="text-lg font-bold text-primary text-center">Two-Factor Authentication</h2>
 
             <form id="twofa-form" method="POST" action="{{ route('admin.profile.2fa.verify') }}"
                 class="mt-4 space-y-3">
                 @csrf
                 <input type="text" name="otp" maxlength="6"
-                    class="w-full text-center px-4 py-3 border rounded-lg text-2xl tracking-widest
-                      focus:ring focus:ring-primary focus:outline-none"
+                    class="w-full py-4 text-center text-lg rounded-md dark:text-gray-300 text-gray-700 ring-1 px-4 ring-gray-400 focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                     placeholder="123456" required autofocus>
 
                 <button type="submit"
-                    class="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-lg font-semibold">
+                    class="w-full bg-primary text-white px-4 py-2 bg-primary rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
                     Verify
                 </button>
             </form>
