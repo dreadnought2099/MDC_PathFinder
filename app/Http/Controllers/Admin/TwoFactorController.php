@@ -165,8 +165,7 @@ class TwoFactorController extends Controller
                 ->with('error', 'No recovery codes available. Please regenerate recovery codes.');
         }
 
-        $content = "Your 2FA Recovery Codes for " . config('app.name') . "\n";
-        $content .= "Generated on: " . now()->format('Y-m-d H:i:s') . "\n\n";
+        $content = "Your 2FA Recovery Codes for " . config('app.name') . '.' . "\n";
         $content .= "IMPORTANT: Store these codes in a secure location.\n";
         $content .= "Each code can be used only once if you lose access to your authenticator app.\n\n";
 

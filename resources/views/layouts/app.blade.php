@@ -145,7 +145,7 @@
 
                     <div class="text-center">
                         <button type="button" @click="showOtpModal = false; showRecoveryModal = true"
-                            class="text-primary hover:underline text-sm">
+                            class="text-primary hover-underline text-sm cursor-pointer">
                             Use a recovery code instead
                         </button>
                     </div>
@@ -179,8 +179,8 @@
 
                     <div class="text-center">
                         <button type="button" @click="showRecoveryModal = false; showOtpModal = true"
-                            class="text-primary hover:underline text-sm">
-                            ← Back to OTP
+                            class="text-primary hover-underline text-sm cursor-pointer">
+                            Back to OTP
                         </button>
                     </div>
                 </form>
