@@ -167,10 +167,10 @@
                     };
 
                     const icons = {
-                        success: '/icons/success.png',
-                        error: '/icons/error.png',
-                        info: '/icons/information.png',
-                        warning: '/icons/warning.png'
+                        success: 'https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/success.png',
+                        error: 'https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/error.png',
+                        info: 'https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/information.png',
+                        warning: 'https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/warning.png'
                     };
 
                     resultsDiv.innerHTML = `

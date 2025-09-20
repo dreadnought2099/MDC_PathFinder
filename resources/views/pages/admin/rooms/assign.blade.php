@@ -75,7 +75,7 @@
                                             @if ($isSelectedRoom)
                                                 <span
                                                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 mb-3 dark:text-green-200">
-                                                    <img src="{{ asset('icons/success.png') }}" class="w-4 h-4 mr-2"
+                                                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/success.png" class="w-4 h-4 mr-2"
                                                         alt="Assigned">
                                                     Assigned
                                                 </span>
@@ -150,7 +150,7 @@
                     <div class="flex items-center space-x-3 mb-4">
                         <div class="flex-shrink-0">
                             <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                                <img src="{{ asset('icons/warning-red.png') }}" class="w-8 h-8" alt="Warning">
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/warning-red.png" class="w-8 h-8" alt="Warning">
                             </div>
                         </div>
                         <div>

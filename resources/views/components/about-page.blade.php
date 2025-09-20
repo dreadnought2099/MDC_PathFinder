@@ -1,7 +1,7 @@
 <div class="relative inline-block group">
     <!-- No surplus words or unnecessary actions. - Marcus Aurelius -->
     <a href="{{ route('about') }}" class="block">
-        <img src="{{ asset('icons/information.png') }}" alt="About MDC PathFinder"
+        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/information.png" alt="About MDC PathFinder"
             class="w-8 h-8 sm:w-10 sm:h-10 hover:scale-115 transition-transform duration-300">
     </a>
 

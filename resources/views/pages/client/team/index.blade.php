@@ -42,7 +42,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
                 <div
                     class="group card-shadow-hover bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-xl border border-primary transition-all p-8 flex flex-col items-center text-center shadow-primary-hover cursor-pointer">
-                    <img src="{{ asset('images/profile.jpeg') }}" alt="Profile"
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/profile.jpeg" alt="Profile"
                         class="w-36 h-36 group  rounded-full object-cover border border-primary group-hover:scale-110 transition-transform duration-300 ease-in-out">
 
                     <h2 class="mt-6 text-lg font-semibold text-gray-600 dark:text-gray-300">
@@ -56,18 +56,18 @@
                     <div class="mt-4 flex space-x-5">
                         <a href="https://www.instagram.com/skerm_art/" class="hover:scale-120 duration-300 transition-all"
                             target="_blank" rel="noopener noreferrer">
-                            <img src="{{ asset('icons/instagram.png') }}" alt="IG Logo" class="w-8 h-8 contain">
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/instagram.png" alt="IG Logo" class="w-8 h-8 contain">
                         </a>
                         <a href="https://letterboxd.com/RMAGALLANEZ/" class="hover:scale-120 duration-300 transition-all"
                             target="_blank" rel="noopener noreferrer">
-                            <img src="{{ asset('icons/letterboxd.png') }}" alt="Letterboxd Logo" class="w-8 h-8 contain">
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/letterboxd.png" alt="Letterboxd Logo" class="w-8 h-8 contain">
                         </a>
                     </div>
                 </div>
 
                 <div
                     class="group card-shadow-hover bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-xl border border-primary transition-all p-8 flex flex-col items-center text-center shadow-primary-hover cursor-pointer">
-                    <img src="{{ asset('images/profile.jpeg') }}" alt="Profile"
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/profile.jpeg" alt="Profile"
                         class="w-36 h-36 group  rounded-full object-cover border border-primary group-hover:scale-110 transition-transform duration-300 ease-in-out">
 
                     <h2 class="mt-6 text-lg font-semibold text-gray-600 dark:text-gray-300">
@@ -81,18 +81,18 @@
                     <div class="mt-4 flex space-x-5">
                         <a href="https://www.instagram.com/skerm_art/" class="hover:scale-120 duration-300 transition-all"
                             target="_blank" rel="noopener noreferrer">
-                            <img src="{{ asset('icons/instagram.png') }}" alt="IG Logo" class="w-8 h-8 contain">
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/instagram.png" alt="IG Logo" class="w-8 h-8 contain">
                         </a>
                         <a href="https://letterboxd.com/RMAGALLANEZ/" class="hover:scale-120 duration-300 transition-all"
                             target="_blank" rel="noopener noreferrer">
-                            <img src="{{ asset('icons/letterboxd.png') }}" alt="Letterboxd Logo" class="w-8 h-8 contain">
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/letterboxd.png" alt="Letterboxd Logo" class="w-8 h-8 contain">
                         </a>
                     </div>
                 </div>
 
                 <div
                     class="group card-shadow-hover bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-xl border border-primary transition-all p-8 flex flex-col items-center text-center shadow-primary-hover cursor-pointer">
-                    <img src="{{ asset('images/profile.jpeg') }}" alt="Profile"
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/profile.jpeg" alt="Profile"
                         class="w-36 h-36 group  rounded-full object-cover border border-primary group-hover:scale-110 transition-transform duration-300 ease-in-out">
 
                     <h2 class="mt-6 text-lg font-semibold text-gray-600 dark:text-gray-300">
@@ -106,18 +106,18 @@
                     <div class="mt-4 flex space-x-5">
                         <a href="https://www.instagram.com/skerm_art/" class="hover:scale-120 duration-300 transition-all"
                             target="_blank" rel="noopener noreferrer">
-                            <img src="{{ asset('icons/instagram.png') }}" alt="IG Logo" class="w-8 h-8 contain">
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/instagram.png" alt="IG Logo" class="w-8 h-8 contain">
                         </a>
                         <a href="https://letterboxd.com/RMAGALLANEZ/" class="hover:scale-120 duration-300 transition-all"
                             target="_blank" rel="noopener noreferrer">
-                            <img src="{{ asset('icons/letterboxd.png') }}" alt="Letterboxd Logo" class="w-8 h-8 contain">
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/letterboxd.png" alt="Letterboxd Logo" class="w-8 h-8 contain">
                         </a>
                     </div>
                 </div>
 
                 <div
                     class="group card-shadow-hover bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-xl border border-primary transition-all p-8 flex flex-col items-center text-center shadow-primary-hover cursor-pointer">
-                    <img src="{{ asset('images/profile.jpeg') }}" alt="Profile"
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/profile.jpeg" alt="Profile"
                         class="w-36 h-36 group  rounded-full object-cover border border-primary group-hover:scale-110 transition-transform duration-300 ease-in-out">
 
                     <h2 class="mt-6 text-lg font-semibold text-gray-600 dark:text-gray-300">
@@ -131,11 +131,11 @@
                     <div class="mt-4 flex space-x-5">
                         <a href="https://www.instagram.com/skerm_art/" class="hover:scale-120 duration-300 transition-all"
                             target="_blank" rel="noopener noreferrer">
-                            <img src="{{ asset('icons/instagram.png') }}" alt="IG Logo" class="w-8 h-8 contain">
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/instagram.png" alt="IG Logo" class="w-8 h-8 contain">
                         </a>
                         <a href="https://letterboxd.com/RMAGALLANEZ/" class="hover:scale-120 duration-300 transition-all"
                             target="_blank" rel="noopener noreferrer">
-                            <img src="{{ asset('icons/letterboxd.png') }}" alt="Letterboxd Logo"
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/letterboxd.png" alt="Letterboxd Logo"
                                 class="w-8 h-8 contain">
                         </a>
                     </div>

@@ -86,7 +86,7 @@
                                             <div class="relative inline-block group">
                                                 <a href="{{ route('path.show', $path->id) }}"
                                                     class="hover-underline hover:scale-115 transform transition duration-200">
-                                                    <img src="{{ asset('icons/view.png') }}" alt="View Icon"
+                                                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/view.png" alt="View Icon"
                                                         class="w-8 h-8 object-contain">
                                                 </a>
                                                 <div
@@ -102,7 +102,7 @@
                                             <div class="relative inline-block group">
                                                 <a href="{{ route('path-image.create', $path->id) }}"
                                                     class="hover-underline hover:scale-115 transform transition duration-200">
-                                                    <img src="{{ asset('icons/image.png') }}" alt="View Icon"
+                                                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png" alt="View Icon"
                                                         class="w-8 h-8 object-contain">
                                                 </a>
                                                 <div
@@ -118,7 +118,7 @@
                                             <div class="relative inline-block group">
                                                 <a href="{{ route('path-image.edit', $path->id) }}"
                                                     class="hover-underline hover:scale-115 transform transition duration-200">
-                                                    <img src="{{ asset('icons/edit.png') }}" alt="View Icon"
+                                                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/edit.png" alt="View Icon"
                                                         class="w-8 h-8 object-contain">
                                                 </a>
                                                 <div

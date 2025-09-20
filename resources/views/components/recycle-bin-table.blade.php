@@ -81,7 +81,7 @@
                                                     <div class="flex-shrink-0">
                                                         <div
                                                             class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                                                            <img src="{{ asset('icons/restore.png') }}" class="h-8 w-8"
+                                                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/restore.png" class="h-8 w-8"
                                                                 alt="Restore">
                                                         </div>
                                                     </div>
@@ -144,7 +144,7 @@
                                                     <div class="flex-shrink-0">
                                                         <div
                                                             class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                                                            <img src="{{ asset('icons/warning-red.png') }}"
+                                                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/warning-red.png"
                                                                 class="w-8 h-8" alt="Warning">
                                                         </div>
                                                     </div>

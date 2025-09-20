@@ -38,7 +38,7 @@
                 <h2 class="text-lg sm:text-2xl mb-4 sm:mb-6 text-center text-primary">
                     <div class="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
                         <span class="text-center">{{ $fromRoom->name ?? ($fromRoom->room_name ?? 'Unknown Room') }}</span>
-                        <img src="{{ asset('icons/arrow.png') }}" alt="Arrow" class="w-4 h-4 sm:w-6 sm:h-6">
+                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/arrow.png" alt="Arrow" class="w-4 h-4 sm:w-6 sm:h-6">
                         <span class="text-center">{{ $toRoom->name ?? ($toRoom->room_name ?? 'Unknown Room') }}</span>
                     </div>
                 </h2>

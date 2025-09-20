@@ -88,7 +88,7 @@
                                             <div class="relative group">
                                                 <a href="{{ route('staff.show', $staff->id) }}"
                                                     class="text-primary hover-underline hover:scale-115 transform transition duration-200">
-                                                    <img src="{{ asset('icons/view.png') }}" alt="View Icon"
+                                                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/view.png" alt="View Icon"
                                                         class="w-8 h-8 object-contain">
                                                 </a>
                                                 <!-- Tooltip -->
@@ -110,7 +110,7 @@
                                             <div class="relative group">
                                                 <a href="{{ route('staff.edit', $staff->id) }}"
                                                     class="text-edit hover-underline-edit hover:scale-115 transform transition duration-200">
-                                                    <img src="{{ asset('icons/edit.png') }}" alt="Edit Icon"
+                                                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/edit.png" alt="Edit Icon"
                                                         class="w-8 h-8 object-contain">
                                                 </a>
                                                 <!-- Tooltip -->
@@ -134,7 +134,7 @@
                                                     <button
                                                         onclick="openModal('{{ $staff->id }}', '{{ $staff->full_name }}')"
                                                         class="text-secondary hover-underline-delete hover:scale-115 transform transition duration-200 cursor-pointer">
-                                                        <img src="{{ asset('icons/trash.png') }}" alt="Trash Icon"
+                                                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/trash.png" alt="Trash Icon"
                                                             class="w-8 h-8 object-contain">
                                                     </button>
                                                 @endif
@@ -164,7 +164,7 @@
                                     <div class="flex flex-col items-center justify-center space-y-4">
                                         <div
                                             class="w-16 h-16 bg-primary-10 dark:bg-gray-800 rounded-full flex items-center justify-center">
-                                            <img src="{{ asset('icons/group.png') }}" alt="Group icon" class="w-11 h-10">
+                                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/group.png" alt="Group icon" class="w-11 h-10">
                                         </div>
                                         <div class="text-center">
                                             <h3 class="text-lg font-medium dark:text-gray-300 text-gray-700 mb-2">
@@ -213,7 +213,7 @@
                 <div class="flex items-center space-x-3 mb-4">
                     <div class="flex-shrink-0">
                         <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                            <img src="{{ asset('icons/warning-red.png') }}" class="w-8 h-8" alt="Warning">
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/warning-red.png" class="w-8 h-8" alt="Warning">
                         </div>
                     </div>
                     <div>

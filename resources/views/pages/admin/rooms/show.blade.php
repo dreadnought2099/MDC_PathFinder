@@ -121,7 +121,7 @@
             @else
                 <div class="text-center py-8">
                     <div class="rounded-2xl p-8 border-2 border-primary flex flex-col items-center dark:bg-gray-800">
-                        <img src="{{ asset('icons/group.png') }}" alt="Assigned Staff Icon" class="w-10 h-8">
+                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/group.png" alt="Assigned Staff Icon" class="w-10 h-8">
                         <p class="text-slate-500 text-lg font-medium">No staff assigned to this room yet.</p>
                     </div>
                 </div>
@@ -192,14 +192,14 @@
                 <!-- Download button -->
                 <a id="downloadBtn" href="#" download title="Download Image"
                     class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6">
-                    <img src="{{ asset('icons/download-button.png') }}" alt="Download Image" class="w-10 h-10">
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/download-button.png" alt="Download Image" class="w-10 h-10">
                 </a>
 
                 <!-- Close button -->
                 <button onclick="closeModal()"
                     class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6 cursor-pointer"
                     title="Close Modal">
-                    <img src="{{ asset('icons/exit.png') }}" alt="Close Modal" class="w-10 h-10">
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png" alt="Close Modal" class="w-10 h-10">
                 </button>
             </div>
 

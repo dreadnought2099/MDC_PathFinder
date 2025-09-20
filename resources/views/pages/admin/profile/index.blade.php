@@ -206,7 +206,7 @@
         <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative dark:bg-gray-800 border-2 border-primary">
             <button type="button" onclick="closeModal()"
                 class="absolute top-2 right-4 text-gray-500 hover:text-red-600">
-                <img src="{{ asset('icons/exit.png') }}" alt="Close" class="w-6 h-6">
+                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png" alt="Close" class="w-6 h-6">
             </button>
 
             <h3 class="text-xl mb-4 text-primary">Crop Image</h3>
@@ -249,7 +249,7 @@
                 <!-- Close button positioned relative to image wrapper -->
                 <button type="button" onclick="closeViewModal(); event.stopPropagation();"
                     class="absolute top-4 right-4 z-50 focus:outline-none">
-                    <img src="{{ asset('icons/exit.png') }}" alt="Exit Button"
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png" alt="Exit Button"
                         class="w-6 h-6 object-contain hover:scale-120 duration-300 transition-transform ease-in-out cursor-pointer">
                 </button>
             </div>

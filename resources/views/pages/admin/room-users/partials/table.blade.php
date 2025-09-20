@@ -42,8 +42,8 @@
                             @if (auth()->user()->hasRole('Admin') || auth()->user()->can('view room users'))
                                 <div class="relative inline-block group">
                                     <a href="{{ route('room-user.show', $user->id) }}"
-                                        class="hover-underline-edit hover:scale-115 transform transition duration-200">
-                                        <img src="{{ asset('icons/view.png') }}" alt="Edit Icon"
+                                        class="hover-underline hover:scale-115 transform transition duration-200">
+                                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/view.png" alt="Edit Icon"
                                             class="w-8 h-8 object-contain">
                                     </a>
                                     <!-- Tooltip -->
@@ -68,7 +68,7 @@
                                 <div class="relative inline-block group">
                                     <a href="{{ route('room-user.edit', $user->id) }}"
                                         class="hover-underline-edit hover:scale-115 transform transition duration-200">
-                                        <img src="{{ asset('icons/edit.png') }}" alt="Edit Icon"
+                                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/edit.png" alt="Edit Icon"
                                             class="w-8 h-8 object-contain">
                                     </a>
                                     <!-- Tooltip -->
@@ -94,7 +94,7 @@
                                     <button type="button"
                                         onclick="openToggleModal('{{ $user->id }}', '{{ $user->username }}', '{{ $user->is_active ? 'disable' : 'enable' }}')"
                                         class="hover:scale-115 transform transition duration-200 cursor-pointer">
-                                        <img src="{{ asset('images/mdc.png') }}"
+                                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png"
                                             alt="{{ $user->is_active ? 'Disable' : 'Enable' }} Icon"
                                             class="w-8 h-8 object-contain">
                                     </button>
@@ -121,7 +121,7 @@
                                     <button
                                         onclick="openUserModal('{{ $user->id }}', '{{ addslashes($user->username) }}')"
                                         class="hover-underline-delete hover:scale-115 transform transition duration-200 cursor-pointer">
-                                        <img src="{{ asset('icons/trash.png') }}" alt="Delete Icon"
+                                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/trash.png" alt="Delete Icon"
                                             class="w-8 h-8 object-contain">
                                     </button>
                                     <!-- Tooltip -->
@@ -170,7 +170,7 @@
             <div class="flex items-center space-x-3 mb-4">
                 <div class="flex-shrink-0">
                     <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                        <img src="{{ asset('icons/warning-red.png') }}" class="w-8 h-8" alt="Warning">
+                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/warning-red.png" class="w-8 h-8" alt="Warning">
                     </div>
                 </div>
                 <div>

@@ -62,7 +62,7 @@
             {{-- Right - Logo --}}
             <div
                 class="w-full md:w-1/2 bg-gradient-to-tr from-blue-400 to-white text-white p-6 flex flex-col items-center justify-center">
-                <img src="{{ asset('images/mdc-logo.png') }}" class="w-36 h-36 rounded-full" />
+                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png" class="w-36 h-36 rounded-full" alt="MDC Logo"/>
                 <h3 class="text-lg text-center mt-4">{{ config('app.name') }} <br>Management System</h3>
             </div>
         </div>

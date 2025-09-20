@@ -41,7 +41,7 @@
                       xl:p-4 xl:w-16 xl:h-16">
 
                 <!-- Fixed QR Code Icon with proper aspect ratio -->
-                <img src="{{ asset('icons/qr-code.png') }}" alt="Scan Office"
+                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/qr-code.png" alt="Scan Office"
                     class="transition-all duration-300 ease-in-out 
                           group-hover:scale-110 group-hover:brightness-110
                           object-contain object-center

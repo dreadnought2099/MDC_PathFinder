@@ -2,8 +2,8 @@
     <!-- Nothing worth having comes easy. - Theodore Roosevelt -->
     <button id="darkModeToggle" class="toggle-switch" aria-label="Toggle dark mode">
         <div class="toggle-slider">
-            <img src="{{ asset('icons/sun.png') }}" alt="Light mode" class="sun-icon">
-            <img src="{{ asset('icons/moon.png') }}" alt="Dark mode" class="moon-icon">
+            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/sun.png" alt="Light mode" class="sun-icon">
+            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/moon.png" alt="Dark mode" class="moon-icon">
         </div>
     </button>
 

@@ -131,9 +131,9 @@
             autoplayVideos: false,
             moreText: 'View Image',
             svg: {
-                close: '<img src="/icons/exit.png"/>',
-                next: '<img src="/icons/next.png"/>',
-                prev: '<img src="/icons/prev.png"/>'
+                close: '<img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png"/>',
+                next: '<img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/next.png"/>',
+                prev: '<img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/prev.png"/>'
             }
         });
     </script>

@@ -54,7 +54,7 @@
     </style>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link rel="icon" href="{{ asset('images/mdc.png') }}">
+    <link rel="icon" href="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png">
 
     <!-- Alpine.js (pinned v3.14.1) -->
     <script src="https://unpkg.com/alpinejs@3.15.0/dist/cdn.min.js" defer></script>
@@ -139,7 +139,7 @@
                     @enderror
 
                     <button type="submit"
-                        class="w-full bg-primary hover:bg-primary/90 text-white px-4 py-3 rounded-md transition-colors duration-200 font-medium">
+                        class="w-full bg-primary text-white px-6 py-3 rounded-md hover:bg-white hover:text-primary dark:hover:bg-gray-800 border-2 border-primary transition-all duration-300 cursor-pointer shadow-primary-hover">
                         Verify Code
                     </button>
 
@@ -173,7 +173,7 @@
                     @enderror
 
                     <button type="submit"
-                        class="w-full bg-primary hover:bg-primary/90 text-white px-4 py-3 rounded-md transition-colors duration-200 font-medium">
+                        class="w-full bg-primary text-white px-6 py-3 rounded-md hover:bg-white hover:text-primary dark:hover:bg-gray-800 border-2 border-primary transition-all duration-300 cursor-pointer shadow-primary-hover">
                         Verify Recovery Code
                     </button>
 
