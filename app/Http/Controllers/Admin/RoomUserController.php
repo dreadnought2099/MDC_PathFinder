@@ -236,7 +236,7 @@ class RoomUserController extends Controller
         $user = User::onlyTrashed()->find($id);
 
         if (!$user) {
-            return redirect()->route('room-user.recycle-bin')
+            return redirect()->route('recycle-bin')
                 ->with('error', 'Office user has not been soft deleted or does not exist.');
         }
 
@@ -264,7 +264,7 @@ class RoomUserController extends Controller
 
         $user->forceDelete();
 
-        return redirect()->route('room-user.recycle-bin')
+        return redirect()->route('recycle-bin')
             ->with('success', 'Office user permanently deleted.');
     }
 

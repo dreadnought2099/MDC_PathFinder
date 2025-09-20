@@ -13,7 +13,7 @@
 
                 <!-- Profile Image (click to view) -->
                 <img id="profile-page-image"
-                    src="{{ $user->profile_photo_path ? asset('storage/' . $user->profile_photo_path) . '?v=' . time() : asset('images/mdc-logo.png') }}"
+                    src="{{ $user->profile_photo_path ? asset('storage/' . $user->profile_photo_path) . '?v=' . time() : asset('images/mdc.png') }}"
                     alt="Profile"
                     class="w-40 h-40 rounded-full object-cover border-2 border-primary cursor-pointer hover:scale-105 duration-300 ease-in-out transition-all"
                     onclick="openViewModal()">
