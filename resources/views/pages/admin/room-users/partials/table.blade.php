@@ -94,7 +94,7 @@
                                     <button type="button"
                                         onclick="openToggleModal('{{ $user->id }}', '{{ $user->username }}', '{{ $user->is_active ? 'disable' : 'enable' }}')"
                                         class="hover:scale-115 transform transition duration-200 cursor-pointer">
-                                        <img src="{{ asset('images/mdc-logo.png') }}"
+                                        <img src="{{ asset('images/mdc.png') }}"
                                             alt="{{ $user->is_active ? 'Disable' : 'Enable' }} Icon"
                                             class="w-8 h-8 object-contain">
                                     </button>

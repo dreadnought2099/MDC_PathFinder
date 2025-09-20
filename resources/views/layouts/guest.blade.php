@@ -25,7 +25,7 @@
     <!-- Libraries -->
     <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8"></script>
-    <link rel="icon" href="{{ asset('images/mdc-logo.png') }}">
+    <link rel="icon" href="{{ asset('images/mdc.png') }}">
 
     <!-- GLightbox CSS -->
     <link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet">
