@@ -4,32 +4,26 @@
     <div class="min-h-screen dark:bg-gray-900 flex flex-col">
         <!-- Top bar -->
         <div
-            class="w-full flex items-center p-4 dark:border-b border-b-primary dark:border-b-primary bg-white dark:bg-gray-900 sticky top-0 z-50">
-
-            <div class="w-48 flex items-center">
+            class="w-full flex items-center p-2 sm:p-4 dark:border-b border-b-primary dark:border-b-primary bg-white dark:bg-gray-900 sticky top-0 z-50">
+            <div class="w-full sm:w-48 flex items-center justify-start">
                 <!-- Left: Back button -->
                 <a href="{{ route('index') }}"
-                    class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 dark:text-gray-300">
-                    <svg class="h-6 w-6 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 dark:text-gray-300 text-sm sm:text-base">
+                    <svg class="h-4 w-4 sm:h-6 sm:w-6 mr-1" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                     </svg>
-                    <span class="font-medium">Back to Home</span>
+                    <span class="font-medium hidden sm:inline">Back to Home</span>
+                    <span class="font-medium sm:hidden">Back</span>
                 </a>
             </div>
 
-            <div class="flex-1"></div>
+            <div class="flex-1 hidden sm:block"></div>
 
-            <!-- Right: fixed width container for About + Dark Mode -->
-            <div class="w-48 flex items-center">
-                <!-- Slot 1: About Page -->
-                <div class="flex-1 flex justify-end">
-                    <x-about-page />
-                </div>
-
-                <!-- Slot 2: Dark Mode Toggle -->
-                <div class="flex-1 flex justify-end">
-                    <x-dark-mode-toggle />
-                </div>
+            <!-- Right controls -->
+            <div class="w-full sm:w-48 flex items-center justify-end gap-2">
+                <x-about-page />
+                <x-dark-mode-toggle />
             </div>
         </div>
 
@@ -75,7 +69,8 @@
 
                     <div class="flex justify-center">
                         <button type="submit" id="startBtn"
-                            class="px-6 py-2 rounded-md bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary dark:hover:bg-gray-800 shadow-primary-light transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            class="px-6 py-2 rounded-md bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary dark:hover:bg-gray-800 shadow-primary-light transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled>
                             Start Navigation
                         </button>
                     </div>
