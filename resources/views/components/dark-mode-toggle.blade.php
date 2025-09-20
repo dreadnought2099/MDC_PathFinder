@@ -2,8 +2,10 @@
     <!-- Nothing worth having comes easy. - Theodore Roosevelt -->
     <button id="darkModeToggle" class="toggle-switch" aria-label="Toggle dark mode">
         <div class="toggle-slider">
-            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/sun.png" alt="Light mode" class="sun-icon">
-            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/moon.png" alt="Dark mode" class="moon-icon">
+            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/sun.png" alt="Light mode"
+                class="sun-icon">
+            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/moon.png" alt="Dark mode"
+                class="moon-icon">
         </div>
     </button>
 
@@ -95,46 +97,44 @@
     }
 </style>
 
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const toggle = document.getElementById("darkModeToggle");
-        const root = document.documentElement;
+@push('scripts')
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const toggle = document.getElementById("darkModeToggle");
+            const root = document.documentElement;
 
-        if (!toggle) return;
+            if (!toggle) return;
 
-        // Function to update toggle appearance
-        function updateToggleState() {
-            if (root.classList.contains("dark")) {
-                toggle.classList.add("active");
-            } else {
-                toggle.classList.remove("active");
+            // Function to sync the toggle UI with current dark mode
+            function updateToggleState() {
+                toggle.classList.toggle("active", root.classList.contains("dark"));
             }
-        }
 
-        // Set initial toggle state based on current theme
-        updateToggleState();
-
-        // Handle toggle click
-        toggle.addEventListener("click", () => {
-            root.classList.toggle("dark");
+            // Set initial toggle state
             updateToggleState();
 
-            localStorage.setItem(
-                "theme",
-                root.classList.contains("dark") ? "dark" : "light"
-            );
-        });
-
-        // Listen for system theme changes (when no manual preference is set)
-        window.matchMedia("(prefers-color-scheme: dark)").addEventListener('change', (e) => {
-            if (!localStorage.getItem("theme")) {
-                if (e.matches) {
-                    root.classList.add("dark");
-                } else {
-                    root.classList.remove("dark");
-                }
+            // Handle toggle click
+            toggle.addEventListener("click", () => {
+                root.classList.toggle("dark");
                 updateToggleState();
-            }
+
+                localStorage.setItem(
+                    "theme",
+                    root.classList.contains("dark") ? "dark" : "light"
+                );
+            });
+
+            // Listen for system theme changes (when no manual preference is set)
+            window.matchMedia("(prefers-color-scheme: dark)").addEventListener('change', (e) => {
+                if (!localStorage.getItem("theme")) {
+                    if (e.matches) {
+                        root.classList.add("dark");
+                    } else {
+                        root.classList.remove("dark");
+                    }
+                    updateToggleState();
+                }
+            });
         });
-    });
-</script>
+    </script>
+@endpush
