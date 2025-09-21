@@ -54,9 +54,10 @@ class RoomController extends Controller
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'room_type' => 'required|in:regular,entrance_point',
-                'image_path' => 'nullable|image|max:51200',
-                'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:102400',
-                'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:102400',
+                'image_path' => 'nullable|image|max:5120', // 5 MB
+                'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200', // 50 MB
+                'carousel_images'   => 'nullable|array|max:50',  // MAX 50 files allowed
+                'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:5120', // 5 MB each
 
                 // Office hours
                 'office_hours' => 'nullable|array',
@@ -198,10 +199,10 @@ class RoomController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'room_type' => 'required|in:regular,entrance_point',
-            'image_path' => 'nullable|image|max:51200',
-            'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:102400',
-            'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:102400',
-
+            'image_path' => 'nullable|image|max:5120', // 5 MB
+            'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200', // 50 MB
+            'carousel_images'   => 'nullable|array|max:50',  // MAX 50 files allowed
+            'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:5120', // 5 MB each
             'office_hours' => 'nullable|array',
         ]);
 

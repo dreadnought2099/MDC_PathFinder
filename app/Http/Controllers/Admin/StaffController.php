@@ -42,7 +42,7 @@ class StaffController extends Controller
             'bio'       => 'nullable|string',
             'email'     => 'nullable|email|max:255|unique:staff,email',
             'phone_num' => 'nullable|string|max:20',
-            'photo_path' => 'nullable|image|max:51200',
+            'photo_path' => 'nullable|image|max:5120',
         ]);
 
         // Create staff first
@@ -106,7 +106,7 @@ class StaffController extends Controller
                 Rule::unique('staff', 'email')->ignore($staff->id),
             ],
             'phone_num' => 'nullable|string|max:20',
-            'photo_path' => 'nullable|image|max:51200',
+            'photo_path' => 'nullable|image|max:5120',
         ]);
 
         // Remove photo_path from validated data to handle it separately

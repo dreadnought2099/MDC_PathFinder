@@ -54,7 +54,8 @@
                             hover:border-primary hover:bg-gray-50 
                             dark:hover:border-primary dark:hover:bg-gray-800
                             transition-colors overflow-hidden relative">
-                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png" alt="Image Icon" class="w-8 h-8">
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
+                        alt="Image Icon" class="w-8 h-8">
                     <span id="uploadText" class="text-gray-500 dark:text-gray-300">
                         Click to upload cover image
                     </span>
@@ -76,9 +77,10 @@
                             hover:border-primary hover:bg-gray-50 
                             dark:hover:border-primary dark:hover:bg-gray-800
                             transition-colors overflow-hidden relative">
-                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png" alt="Image Icon" class="w-8 h-8">
-                    <span id="carouselUploadText" class="text-gray-500 mb-4 dark:text-gray-300">Click to upload images (max
-                        50)</span>
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
+                        alt="Image Icon" class="w-8 h-8">
+                    <span id="carouselUploadText" class="text-gray-500 mb-4 dark:text-gray-300">
+                        Click to upload images (max 50, 5MB each)</span>
 
                     <input type="file" name="carousel_images[]" id="carousel_images" class="hidden" accept="image/*"
                         multiple />
@@ -88,6 +90,7 @@
                 </label>
             </div>
 
+            {{-- Short Video  --}}
             <div class="mb-4 max-w-xl mx-auto conditional-field" id="video-section">
                 <label class="block mb-2 dark:text-gray-300">Short Video (optional)</label>
 
@@ -98,7 +101,8 @@
                             hover:border-primary hover:bg-gray-50 
                             dark:hover:border-primary dark:hover:bg-gray-800
                             transition-colors overflow-hidden relative">
-                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/video.png" alt="Video Icon" class="w-9 h-9">
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/video.png"
+                        alt="Video Icon" class="w-9 h-9">
                     <p class="mb-2 dark:text-gray-300">Drag & drop a video file here or click to select</p>
                     <p class="text-xs text-gray-400 dark:text-gray-300">(mp4, avi, mpeg | max 100MB)</p>
 
@@ -307,7 +311,11 @@
                 }
             });
 
+
+
             // Carousel images functionality
+            const maxFiles = 50;
+            const maxSizeMB = 5;
             const carouselInput = document.getElementById('carousel_images');
             const carouselPreviewContainer = document.getElementById('carouselPreviewContainer');
             let selectedFiles = [];
@@ -364,12 +372,21 @@
             }
 
             carouselInput.addEventListener('change', () => {
-                const newFiles = Array.from(carouselInput.files);
+                const newFiles = Array.from(carouselInput.files || []); // fallback empty array
                 carouselInput.value = '';
 
-                if (selectedFiles.length + newFiles.length > 50) {
-                    alert('You can upload max 50 images.');
+                // Check number of files
+                if (selectedFiles.length + newFiles.length > maxFiles) {
+                    alert(`You can upload max ${maxFiles} images.`);
                     return;
+                }
+
+                // Check file sizes
+                for (let file of newFiles) {
+                    if (file.size / 1024 / 1024 > maxSizeMB) {
+                        alert(`"${file.name}" is too large. Max size is ${maxSizeMB} MB.`);
+                        return;
+                    }
                 }
 
                 selectedFiles = selectedFiles.concat(newFiles);
@@ -379,7 +396,12 @@
 
             updateUploadIconVisibility();
 
+
+
             // Video upload functionality
+            const maxVideoSizeMB = 50;
+            const allowedVideoTypes = ['video/mp4', 'video/avi', 'video/mpeg'];
+
             const dropZone = document.getElementById('videoDropZone');
             const videoInput = document.getElementById('video_path');
             const videoPreviewContainer = document.getElementById('videoPreviewContainer');
@@ -420,6 +442,23 @@
             });
 
             function showVideoPreview(file) {
+                // Size check
+                if (file.size / 1024 / 1024 > maxVideoSizeMB) {
+                    alert(`"${file.name}" is too large. Max size is ${maxVideoSizeMB} MB.`);
+                    clearVideo();
+                    videoInput.value = '';
+                    return;
+                }
+
+                // Type check
+                if (!allowedVideoTypes.includes(file.type)) {
+                    alert(`"${file.name}" is not a valid format. Only MP4, AVI, or MPEG allowed.`);
+                    clearVideo();
+                    videoInput.value = '';
+                    return;
+                }
+
+                // Show preview if valid
                 const url = URL.createObjectURL(file);
                 videoPreview.src = url;
                 videoPreviewContainer.classList.remove('hidden');
@@ -429,6 +468,8 @@
                 videoPreview.src = '';
                 videoPreviewContainer.classList.add('hidden');
             }
+
+
 
             // ================= Enhanced Office Hours with Day.js =================
             const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -704,17 +745,17 @@
                                 <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                             </div>
                             ${rangeKey !== "closed" ? `
-                                        <div class="flex gap-2 ml-4">
-                                            <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                    data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                                Edit
-                                            </button>
-                                            <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                    data-days='${JSON.stringify(group.days)}'>
-                                                Delete
-                                            </button>
-                                        </div>
-                                    ` : ''}
+                                                                    <div class="flex gap-2 ml-4">
+                                                                        <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                                            Edit
+                                                                        </button>
+                                                                        <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                data-days='${JSON.stringify(group.days)}'>
+                                                                            Delete
+                                                                        </button>
+                                                                    </div>
+                                                                ` : ''}
                         </div>
                     `;
 
@@ -799,6 +840,8 @@
                     });
                 });
             }
+
+
 
             // FIXED: Enhanced formatDaysGroup function with precise pattern matching
             function formatDaysGroup(days) {

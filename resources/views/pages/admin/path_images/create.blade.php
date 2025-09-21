@@ -33,7 +33,7 @@
                     class="flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary dark:hover:bg-gray-800 transition-colors p-4 overflow-auto relative">
                     <span class="text-gray-600 dark:text-gray-300 mb-2">Drop images here or click to browse</span>
                     <span class="text-xs text-gray-400">
-                        JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 50MB each | multiple allowed
+                        JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 5 MB each | multiple allowed
                     </span>
                     <input type="file" name="files[]" id="fileInput" multiple accept="image/*" class="hidden">
                 </label>
