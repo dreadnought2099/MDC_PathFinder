@@ -49,11 +49,11 @@
 
                 <label for="image_path" id="uploadBox"
                     class="flex flex-col items-center justify-center w-full h-40 
-               border-2 border-dashed border-gray-300 dark:border-gray-600 
-               rounded cursor-pointer 
-               hover:border-primary hover:bg-gray-50 
-               dark:hover:border-primary dark:hover:bg-gray-800
-               transition-colors overflow-hidden relative">
+                            border-2 border-dashed border-gray-300 dark:border-gray-600 
+                            rounded cursor-pointer 
+                            hover:border-primary hover:bg-gray-50 
+                            dark:hover:border-primary dark:hover:bg-gray-800
+                            transition-colors overflow-hidden relative">
                     <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png" alt="Image Icon" class="w-8 h-8">
                     <span id="uploadText" class="text-gray-500 dark:text-gray-300">
                         Click to upload cover image
@@ -71,11 +71,11 @@
 
                 <label for="carousel_images" id="carouselUploadBox"
                     class="flex flex-col items-center justify-center w-full h-40 
-               border-2 border-dashed border-gray-300 dark:border-gray-600 
-               rounded cursor-pointer 
-               hover:border-primary hover:bg-gray-50 
-               dark:hover:border-primary dark:hover:bg-gray-800
-               transition-colors overflow-hidden relative">
+                            border-2 border-dashed border-gray-300 dark:border-gray-600 
+                            rounded cursor-pointer 
+                            hover:border-primary hover:bg-gray-50 
+                            dark:hover:border-primary dark:hover:bg-gray-800
+                            transition-colors overflow-hidden relative">
                     <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png" alt="Image Icon" class="w-8 h-8">
                     <span id="carouselUploadText" class="text-gray-500 mb-4 dark:text-gray-300">Click to upload images (max
                         50)</span>
@@ -93,11 +93,11 @@
 
                 <div id="videoDropZone"
                     class="flex flex-col items-center justify-center w-full h-40 
-               border-2 border-dashed border-gray-300 dark:border-gray-600 
-               rounded cursor-pointer 
-               hover:border-primary hover:bg-gray-50 
-               dark:hover:border-primary dark:hover:bg-gray-800
-               transition-colors overflow-hidden relative">
+                            border-2 border-dashed border-gray-300 dark:border-gray-600 
+                            rounded cursor-pointer 
+                            hover:border-primary hover:bg-gray-50 
+                            dark:hover:border-primary dark:hover:bg-gray-800
+                            transition-colors overflow-hidden relative">
                     <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/video.png" alt="Video Icon" class="w-9 h-9">
                     <p class="mb-2 dark:text-gray-300">Drag & drop a video file here or click to select</p>
                     <p class="text-xs text-gray-400 dark:text-gray-300">(mp4, avi, mpeg | max 100MB)</p>
