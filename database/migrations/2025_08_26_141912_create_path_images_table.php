@@ -24,7 +24,7 @@ return new class extends Migration
 
             // File path (can store relative path or full URL)
             $table->string('image_file');
-            
+            $table->string('fallback_file')->nullable();
             $table->timestamps();
         });
     }

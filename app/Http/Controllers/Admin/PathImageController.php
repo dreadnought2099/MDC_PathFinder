@@ -7,9 +7,9 @@ use App\Models\Path;
 use App\Models\PathImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Laravel\Facades\Image;
+use Intervention\Image\ImageManager;
 use Intervention\Image\Encoders\WebpEncoder;
-use Illuminate\Support\Str;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class PathImageController extends Controller
 {
@@ -49,12 +49,6 @@ class PathImageController extends Controller
     public function store(Request $request)
     {
         if (!$request->hasFile('files') || count($request->file('files')) === 0) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'errors' => ['files' => ['Please select at least one image file.']]
-                ], 422);
-            }
-
             return back()->withErrors(['files' => 'Please select at least one image file.']);
         }
 
@@ -68,33 +62,36 @@ class PathImageController extends Controller
         $files = $request->file('files');
         $nextOrder = PathImage::where('path_id', $path->id)->max('image_order') ?? 0;
 
+        $manager = new ImageManager(new Driver());
+
         foreach ($files as $file) {
-            $filename = uniqid('', true) . '.webp';
-            $folder   = "path_images/{$path->id}";
-            $fullPath = "{$folder}/{$filename}";
+            // Get original extension
+            $originalExt = strtolower($file->getClientOriginalExtension());
+            $baseName    = uniqid('', true);
 
-            // Convert to WebP with quality 90
-            $image = Image::read($file)->encode(new WebpEncoder(quality: 90));
+            $folder      = "path_images/{$path->id}";
+            $webpPath    = "{$folder}/{$baseName}.webp";
+            $fallbackPath = "{$folder}/{$baseName}.{$originalExt}";
 
-            Storage::disk('public')->put($fullPath, (string) $image);
+            // Save original file (fallback)
+            Storage::disk('public')->putFileAs($folder, $file, "{$baseName}.{$originalExt}");
 
+            // Convert and save WebP
+            $image = $manager->read($file)->encode(new WebpEncoder(90));
+            Storage::disk('public')->put($webpPath, (string) $image);
+
+            // Store both WebP + fallback in DB
             PathImage::create([
-                'path_id'     => $path->id,
-                'image_file'  => $fullPath,
-                'image_order' => ++$nextOrder,
+                'path_id'       => $path->id,
+                'image_file'    => $webpPath,     // WebP
+                'fallback_file' => $fallbackPath, // Original
+                'image_order'   => ++$nextOrder,
             ]);
         }
 
-        $successMessage = "Images for Path {$path->fromRoom->name} → {$path->toRoom->name} uploaded successfully.";
-        session()->flash('success', $successMessage);
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                'redirect' => route('path.show', $path),
-            ], 200);
-        }
-
-        return redirect()->route('path.show', $path)->with('success', $successMessage);
+        return redirect()
+            ->route('path.show', $path)
+            ->with('success', "Images uploaded successfully with WebP + fallback.");
     }
 
 
@@ -138,9 +135,33 @@ class PathImageController extends Controller
         }
 
         if ($request->hasFile('image_file')) {
+            // Delete old files
             Storage::disk('public')->delete($pathImage->image_file);
-            $newImagePath = $request->file('image_file')->store('path_images', 'public');
-            $pathImage->update(['image_file' => $newImagePath]);
+            if ($pathImage->fallback_file) {
+                Storage::disk('public')->delete($pathImage->fallback_file);
+            }
+
+            // Process new upload (save original + webp)
+            $manager = new ImageManager(new Driver());
+            $file = $request->file('image_file');
+            $originalExt = $file->getClientOriginalExtension();
+            $baseName = uniqid('', true);
+
+            $folder   = "path_images/{$pathImage->path_id}";
+            $webpPath = "{$folder}/{$baseName}.webp";
+            $origPath = "{$folder}/{$baseName}.{$originalExt}";
+
+            // Save fallback
+            Storage::disk('public')->putFileAs($folder, $file, "{$baseName}.{$originalExt}");
+
+            // Save webp
+            $image = $manager->read($file)->encode(new WebpEncoder(90));
+            Storage::disk('public')->put($webpPath, (string) $image);
+
+            $pathImage->update([
+                'image_file'    => $webpPath,
+                'fallback_file' => $origPath,
+            ]);
         }
 
         $path = $pathImage->path;
@@ -170,13 +191,14 @@ class PathImageController extends Controller
                 ->where('path_id', $path->id)
                 ->first();
 
-            if (!$pathImage) {
-                continue; // Skip if image doesn't exist or doesn't belong to this path
-            }
+            if (!$pathImage) continue;
 
-            // Check if image should be deleted
+            // Handle deletion
             if (!empty($imageData['delete'])) {
                 Storage::disk('public')->delete($pathImage->image_file);
+                if ($pathImage->fallback_file) {
+                    Storage::disk('public')->delete($pathImage->fallback_file);
+                }
                 $pathImage->delete();
                 $deletedCount++;
                 continue;
@@ -184,20 +206,38 @@ class PathImageController extends Controller
 
             $updateData = [];
 
-            // Update image order if provided
             if (isset($imageData['image_order']) && $imageData['image_order'] !== null) {
                 $updateData['image_order'] = $imageData['image_order'];
             }
 
-            // Replace image file if new one is uploaded
+            // Replace image file
             if ($request->hasFile("images.{$imageData['id']}.image_file")) {
-                // Delete old image
-                Storage::disk('public')->delete($pathImage->image_file);
+                $file = $request->file("images.{$imageData['id']}.image_file");
 
-                // Store new image
-                $newImagePath = $request->file("images.{$imageData['id']}.image_file")
-                    ->store('path_images', 'public');
-                $updateData['image_file'] = $newImagePath;
+                // Delete old files
+                Storage::disk('public')->delete($pathImage->image_file);
+                if ($pathImage->fallback_file) {
+                    Storage::disk('public')->delete($pathImage->fallback_file);
+                }
+
+                // Process new upload
+                $manager = new ImageManager(new Driver());
+                $originalExt = $file->getClientOriginalExtension();
+                $baseName = uniqid('', true);
+
+                $folder   = "path_images/{$path->id}";
+                $webpPath = "{$folder}/{$baseName}.webp";
+                $origPath = "{$folder}/{$baseName}.{$originalExt}";
+
+                // Save fallback
+                Storage::disk('public')->putFileAs($folder, $file, "{$baseName}.{$originalExt}");
+
+                // Save webp
+                $image = $manager->read($file)->encode(new WebpEncoder(90));
+                Storage::disk('public')->put($webpPath, (string) $image);
+
+                $updateData['image_file']    = $webpPath;
+                $updateData['fallback_file'] = $origPath;
             }
 
             if (!empty($updateData)) {
@@ -207,12 +247,8 @@ class PathImageController extends Controller
         }
 
         $message = [];
-        if ($updatedCount > 0) {
-            $message[] = "{$updatedCount} image(s) updated";
-        }
-        if ($deletedCount > 0) {
-            $message[] = "{$deletedCount} image(s) deleted";
-        }
+        if ($updatedCount > 0) $message[] = "{$updatedCount} image(s) updated";
+        if ($deletedCount > 0) $message[] = "{$deletedCount} image(s) deleted";
 
         $successMessage = implode(' and ', $message) . ' successfully.';
 
@@ -228,11 +264,18 @@ class PathImageController extends Controller
         return redirect()->route('path.show', $path)->with('success', $successMessage);
     }
 
+
     // Delete a specific image
     public function destroySingle(PathImage $pathImage)
     {
         $path = $pathImage->path;
+
+        // Delete both webp and fallback if exist
         Storage::disk('public')->delete($pathImage->image_file);
+        if ($pathImage->fallback_file) {
+            Storage::disk('public')->delete($pathImage->fallback_file);
+        }
+
         $pathImage->delete();
 
         if (request()->expectsJson()) {
@@ -260,7 +303,12 @@ class PathImageController extends Controller
                 ->first();
 
             if ($pathImage) {
+                // Delete both webp and fallback
                 Storage::disk('public')->delete($pathImage->image_file);
+                if ($pathImage->fallback_file) {
+                    Storage::disk('public')->delete($pathImage->fallback_file);
+                }
+
                 $pathImage->delete();
                 $deletedCount++;
             }
@@ -278,6 +326,7 @@ class PathImageController extends Controller
 
         return redirect()->route('path.show', $path)->with('success', $successMessage);
     }
+
 
     // Bulk update image orders
     public function updateOrder(Request $request, Path $path)
