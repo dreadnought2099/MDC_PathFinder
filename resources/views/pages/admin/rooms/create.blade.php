@@ -220,22 +220,19 @@
 
             function toggleConditionalFields() {
                 const isEntrancePoint = roomTypeSelect.value === 'entrance_point';
-                
+
                 conditionalFields.forEach(field => {
                     if (isEntrancePoint) {
                         field.style.display = 'none';
-                        // Disable all inputs within the field
                         const inputs = field.querySelectorAll('input, textarea, select');
                         inputs.forEach(input => {
                             input.disabled = true;
-                            // Clear file inputs only when manually changing (not on page load)
                             if (input.type === 'file' && !isPageLoad) {
                                 input.value = '';
                             }
                         });
                     } else {
                         field.style.display = 'block';
-                        // Re-enable all inputs within the field
                         const inputs = field.querySelectorAll('input, textarea, select');
                         inputs.forEach(input => {
                             input.disabled = false;
@@ -243,9 +240,7 @@
                     }
                 });
 
-                // Clear previews only when manually switching to entrance point (not on page load)
                 if (isEntrancePoint && !isPageLoad) {
-                    // Clear cover image preview
                     const coverPreview = document.getElementById('previewImage');
                     const coverUploadText = document.getElementById('uploadText');
                     const uploadBox = document.getElementById('uploadBox');
@@ -257,53 +252,42 @@
                     const uploadIcon = uploadBox?.querySelector('img');
                     if (uploadIcon) uploadIcon.style.display = '';
 
-                    // Clear carousel previews
                     const carouselContainer = document.getElementById('carouselPreviewContainer');
                     if (carouselContainer) carouselContainer.innerHTML = '';
                     selectedFiles = [];
                     updateUploadIconVisibility();
 
-                    // Clear video preview
                     clearVideo();
                     const videoInput = document.getElementById('video_path');
                     if (videoInput) videoInput.value = '';
 
-                    // Clear office hours
                     officeHoursData = {};
                     renderOfficeHours();
                 }
-                
-                // Store the current room type in sessionStorage
+
                 sessionStorage.setItem('room_type', roomTypeSelect.value);
             }
 
-            // Check if this is page load or manual change
             let isPageLoad = true;
-
-            // Restore room type from sessionStorage on page load
             const savedRoomType = sessionStorage.getItem('room_type');
             if (savedRoomType && savedRoomType !== roomTypeSelect.value) {
                 roomTypeSelect.value = savedRoomType;
             }
 
-            // Initialize on page load
             toggleConditionalFields();
-            
-            // Set isPageLoad to false after initial load
+
             setTimeout(() => {
                 isPageLoad = false;
             }, 100);
-            
-            // Add event listener for room type changes
+
             roomTypeSelect.addEventListener('change', () => {
-                isPageLoad = false; // Ensure this is treated as manual change
+                isPageLoad = false;
                 toggleConditionalFields();
             });
 
             // Cover image upload preview
             const coverInput = document.getElementById('image_path');
             const coverPreview = document.getElementById('previewImage');
-            const coverUploadText = document.getElementById('uploadText');
 
             coverInput.addEventListener('change', () => {
                 if (coverInput.files && coverInput.files[0]) {
@@ -312,7 +296,6 @@
                     reader.onload = e => {
                         coverPreview.src = e.target.result;
                         coverPreview.classList.remove('hidden');
-                        // Hide the upload text and icon when image is shown
                         const uploadBox = document.getElementById('uploadBox');
                         const icon = uploadBox.querySelector('img');
                         const text = uploadBox.querySelector('span');
@@ -327,23 +310,15 @@
             // Carousel images functionality
             const carouselInput = document.getElementById('carousel_images');
             const carouselPreviewContainer = document.getElementById('carouselPreviewContainer');
-            const carouselUploadText = document.getElementById('carouselUploadText');
-
             let selectedFiles = [];
 
             function updateUploadIconVisibility() {
-                // Get the carousel upload box elements
                 const carouselUploadBox = document.getElementById('carouselUploadBox');
                 const icon = carouselUploadBox.querySelector('img');
                 const text = carouselUploadBox.querySelector('span');
 
-                // Hide/show icon and text based on selected files
-                if (icon) {
-                    icon.style.display = selectedFiles.length > 0 ? 'none' : '';
-                }
-                if (text) {
-                    text.style.display = selectedFiles.length > 0 ? 'none' : '';
-                }
+                if (icon) icon.style.display = selectedFiles.length > 0 ? 'none' : '';
+                if (text) text.style.display = selectedFiles.length > 0 ? 'none' : '';
             }
 
             function updateInputFiles() {
@@ -390,7 +365,7 @@
 
             carouselInput.addEventListener('change', () => {
                 const newFiles = Array.from(carouselInput.files);
-                carouselInput.value = ''; // so same file can be reselected
+                carouselInput.value = '';
 
                 if (selectedFiles.length + newFiles.length > 50) {
                     alert('You can upload max 50 images.');
@@ -411,19 +386,14 @@
             const videoPreview = document.getElementById('videoPreview');
             const removeVideoBtn = document.getElementById('removeVideoBtn');
 
-            // Click drop zone triggers file input
-            dropZone.addEventListener('click', () => {
-                videoInput.click();
-            });
+            dropZone.addEventListener('click', () => videoInput.click());
 
-            // Handle file selection
             videoInput.addEventListener('change', () => {
                 if (videoInput.files && videoInput.files[0]) {
                     showVideoPreview(videoInput.files[0]);
                 }
             });
 
-            // Handle drag and drop
             dropZone.addEventListener('dragover', e => {
                 e.preventDefault();
                 dropZone.classList.add('border-primary', 'bg-gray-50');
@@ -444,7 +414,6 @@
                 }
             });
 
-            // Remove video
             removeVideoBtn.addEventListener('click', () => {
                 clearVideo();
                 videoInput.value = '';
@@ -461,9 +430,91 @@
                 videoPreviewContainer.classList.add('hidden');
             }
 
-            // ================= Enhanced Office Hours =================
+            // ================= Enhanced Office Hours with Day.js =================
             const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-            let officeHoursData = {}; // stores applied ranges per day
+            let officeHoursData = {};
+
+            // Day.js Enhanced Time Functions
+            function formatTime12Hour(time24) {
+                try {
+                    if (!time24 || !time24.match(/^\d{2}:\d{2}$/)) {
+                        return time24;
+                    }
+
+                    const timeObj = dayjs(`2000-01-01 ${time24}:00`);
+                    return timeObj.isValid() ? timeObj.format('h:mm A') : time24;
+                } catch (error) {
+                    console.warn('Time formatting error:', error);
+                    return time24;
+                }
+            }
+
+            function validateTimeRange(startTime, endTime) {
+                try {
+                    const start = dayjs(`2000-01-01 ${startTime}:00`);
+                    const end = dayjs(`2000-01-01 ${endTime}:00`);
+
+                    if (!start.isValid() || !end.isValid()) {
+                        return {
+                            valid: false,
+                            error: 'Invalid time format'
+                        };
+                    }
+
+                    if (start.isAfter(end) || start.isSame(end)) {
+                        return {
+                            valid: false,
+                            error: 'End time must be after start time'
+                        };
+                    }
+
+                    return {
+                        valid: true
+                    };
+                } catch (error) {
+                    return {
+                        valid: false,
+                        error: 'Time validation failed'
+                    };
+                }
+            }
+
+            function hasOverlapDayJs(ranges) {
+                const sortedRanges = ranges.map(range => ({
+                    start: dayjs(`2000-01-01 ${range.start}:00`),
+                    end: dayjs(`2000-01-01 ${range.end}:00`),
+                    original: range
+                })).sort((a, b) => a.start.isBefore(b.start) ? -1 : 1);
+
+                for (let i = 0; i < sortedRanges.length - 1; i++) {
+                    const current = sortedRanges[i];
+                    const next = sortedRanges[i + 1];
+
+                    if (current.end.isAfter(next.start)) {
+                        return {
+                            hasOverlap: true,
+                            conflictingRanges: [current.original, next.original]
+                        };
+                    }
+                }
+
+                return {
+                    hasOverlap: false
+                };
+            }
+
+            function formatDuration(startTime, endTime) {
+                const start = dayjs(`2000-01-01 ${startTime}:00`);
+                const end = dayjs(`2000-01-01 ${endTime}:00`);
+
+                const diffMinutes = end.diff(start, 'minute');
+                const hours = Math.floor(diffMinutes / 60);
+                const minutes = diffMinutes % 60;
+
+                if (hours === 0) return `${minutes}m`;
+                if (minutes === 0) return `${hours}h`;
+                return `${hours}h ${minutes}m`;
+            }
 
             // Quick select functionality
             document.querySelectorAll('.quick-select').forEach(btn => {
@@ -479,12 +530,11 @@
                 });
             });
 
-            // Clear all selection
             document.querySelector('.clear-select').addEventListener('click', () => {
                 document.querySelectorAll('.bulk-day-checkbox').forEach(cb => cb.checked = false);
             });
 
-            // Apply bulk changes
+            // Apply bulk changes with proper edit handling
             document.querySelector('.apply-bulk').addEventListener('click', function() {
                 const selectedDays = Array.from(document.querySelectorAll('.bulk-day-checkbox:checked'))
                     .map(cb => cb.value);
@@ -493,6 +543,15 @@
                 const ranges = collectBulkRanges();
                 if (!ranges) return;
 
+                // Check if we're in edit mode (if any existing schedule matches current selection)
+                const isEditMode = checkIfEditMode(selectedDays, ranges);
+
+                if (isEditMode) {
+                    // In edit mode: Clear old schedule and apply new one
+                    clearExistingScheduleForEdit(selectedDays, ranges);
+                }
+
+                // Apply the new schedule to selected days
                 selectedDays.forEach(day => {
                     officeHoursData[day] = ranges;
                 });
@@ -501,6 +560,48 @@
                 showTemporaryFeedback(this, "Applied Successfully!");
                 showTemporaryMessage("Office hours updated for selected days!", "success");
             });
+
+            // Helper function to check if we're editing an existing schedule
+            function checkIfEditMode(selectedDays, newRanges) {
+                // Check if any selected day already has office hours
+                return selectedDays.some(day => officeHoursData[day] && officeHoursData[day].length > 0);
+            }
+
+            // Helper function to clear existing schedules when editing
+            function clearExistingScheduleForEdit(selectedDays, newRanges) {
+                // Find all days that have the same schedule as what we're trying to apply
+                const newRangeKey = newRanges.map(r => `${r.start}-${r.end}`).join(",");
+
+                // Find existing grouped schedules
+                const existingGroups = {};
+                daysOfWeek.forEach(day => {
+                    const ranges = officeHoursData[day] || [];
+                    const rangeKey = ranges.length ? ranges.map(r => `${r.start}-${r.end}`).join(",") :
+                        "closed";
+
+                    if (!existingGroups[rangeKey]) {
+                        existingGroups[rangeKey] = [];
+                    }
+                    existingGroups[rangeKey].push(day);
+                });
+
+                // Clear days that are not in the new selection but were part of existing groups
+                Object.entries(existingGroups).forEach(([rangeKey, groupDays]) => {
+                    if (rangeKey !== "closed") {
+                        // Check if any of the selected days belong to this group
+                        const hasOverlap = groupDays.some(day => selectedDays.includes(day));
+
+                        if (hasOverlap) {
+                            // Clear all days in this group that are NOT in the new selection
+                            groupDays.forEach(day => {
+                                if (!selectedDays.includes(day)) {
+                                    delete officeHoursData[day];
+                                }
+                            });
+                        }
+                    }
+                });
+            }
 
             // Clear time input when X is clicked
             document.addEventListener('click', e => {
@@ -514,7 +615,7 @@
                 }
             });
 
-            // Helper Functions
+            // Enhanced collectBulkRanges with Day.js validation
             function collectBulkRanges() {
                 const ranges = [];
                 let valid = true;
@@ -525,11 +626,14 @@
                     clearError(row);
 
                     if (start && end) {
-                        if (start >= end) {
-                            showError(row, "End must be later than start");
+                        const validation = validateTimeRange(start, end);
+
+                        if (!validation.valid) {
+                            showError(row, validation.error);
                             valid = false;
                             return;
                         }
+
                         ranges.push({
                             start,
                             end
@@ -542,7 +646,9 @@
                     alert("Please enter at least one valid time range.");
                     return null;
                 }
-                if (hasOverlap(ranges)) {
+
+                const overlapCheck = hasOverlapDayJs(ranges);
+                if (overlapCheck.hasOverlap) {
                     alert("Time ranges overlap. Fix them first.");
                     return null;
                 }
@@ -550,21 +656,11 @@
                 return ranges;
             }
 
-            // Convert 24-hour time to 12-hour format
-            function formatTime12Hour(time24) {
-                const [hours, minutes] = time24.split(':');
-                const hour = parseInt(hours);
-                const ampm = hour >= 12 ? 'PM' : 'AM';
-                const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
-                return `${hour12}:${minutes} ${ampm}`;
-            }
-
-            // Enhanced renderOfficeHours with edit/delete functionality
+            // Enhanced renderOfficeHours
             function renderOfficeHours() {
                 const container = document.getElementById("officeHoursDisplay");
                 container.innerHTML = "";
 
-                // Group days by their time ranges
                 const groupedSchedule = {};
 
                 daysOfWeek.forEach(day => {
@@ -582,7 +678,6 @@
                     groupedSchedule[rangeKey].days.push(day);
                 });
 
-                // Render grouped schedule
                 Object.entries(groupedSchedule).forEach(([rangeKey, group]) => {
                     const li = document.createElement("li");
                     li.className =
@@ -594,31 +689,34 @@
                     if (rangeKey === "closed") {
                         timeText = "Closed";
                     } else {
-                        timeText = group.ranges.map(r =>
-                            `${formatTime12Hour(r.start)} - ${formatTime12Hour(r.end)}`
-                        ).join(", ");
+                        timeText = group.ranges.map(r => {
+                            const timeRange =
+                                `${formatTime12Hour(r.start)} - ${formatTime12Hour(r.end)}`;
+                            const duration = formatDuration(r.start, r.end);
+                            return `${timeRange} <span class="text-gray-500 text-xs">(${duration})</span>`;
+                        }).join(", ");
                     }
 
                     li.innerHTML = `
-                <div class="flex justify-between items-start">
-                    <div class="flex-1">
-                        <div class="font-medium text-gray-800 dark:text-gray-300">${daysText}</div>
-                        <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
-                    </div>
-                    ${rangeKey !== "closed" ? `
-                                            <div class="flex gap-2 ml-4">
-                                                <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                        data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                                    Edit
-                                                </button>
-                                                <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                        data-days='${JSON.stringify(group.days)}'>
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        ` : ''}
-                </div>
-            `;
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="font-medium text-gray-800 dark:text-gray-300">${daysText}</div>
+                                <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
+                            </div>
+                            ${rangeKey !== "closed" ? `
+                                        <div class="flex gap-2 ml-4">
+                                            <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                    data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                Edit
+                                            </button>
+                                            <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                    data-days='${JSON.stringify(group.days)}'>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    ` : ''}
+                        </div>
+                    `;
 
                     // Add hidden inputs for form submission
                     group.days.forEach(day => {
@@ -641,7 +739,6 @@
                     container.appendChild(li);
                 });
 
-                // Add event listeners for edit and delete buttons
                 attachScheduleActionListeners();
             }
 
@@ -688,8 +785,7 @@
                         });
 
                         const bulkSection = document.querySelector(
-                            '.mb-6.p-4.border.border-primary.rounded'
-                        );
+                            '.mb-6.p-4.border.border-primary.rounded');
                         if (bulkSection) {
                             bulkSection.classList.add('ring-2', 'ring-blue-400');
                             setTimeout(() => {
@@ -704,13 +800,32 @@
                 });
             }
 
-            // Format consecutive days into ranges (e.g., "Mon - Wed" or "Mon, Wed, Fri")
+            // FIXED: Enhanced formatDaysGroup function with precise pattern matching
             function formatDaysGroup(days) {
                 if (days.length === 0) return "";
                 if (days.length === 1) return days[0];
 
                 // Sort days by their order in the week
                 const sortedDays = days.sort((a, b) => daysOfWeek.indexOf(a) - daysOfWeek.indexOf(b));
+
+                // Use array comparison for exact matching to prevent the "Daily" bug
+                const isExactMatch = (pattern) => {
+                    return sortedDays.length === pattern.length &&
+                        sortedDays.every((day, index) => day === pattern[index]);
+                };
+
+                // Special cases for common patterns - EXACT matching
+                if (isExactMatch(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])) {
+                    return "Daily";
+                }
+
+                if (isExactMatch(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'])) {
+                    return "Weekdays";
+                }
+
+                if (isExactMatch(['Sat', 'Sun'])) {
+                    return "Weekends";
+                }
 
                 // Check if days are consecutive
                 const isConsecutive = () => {
@@ -722,10 +837,12 @@
                     return true;
                 };
 
+                // Only format as range if consecutive AND more than 2 days (but not the special cases above)
                 if (isConsecutive() && sortedDays.length > 2) {
                     return `${sortedDays[0]} - ${sortedDays[sortedDays.length - 1]}`;
                 }
 
+                // Otherwise, return comma-separated list
                 return sortedDays.join(", ");
             }
 
@@ -753,14 +870,6 @@
                     div.style.opacity = "0";
                     setTimeout(() => div.remove(), 500);
                 }, 3000);
-            }
-
-            function hasOverlap(ranges) {
-                const sorted = ranges.slice().sort((a, b) => a.start.localeCompare(b.start));
-                for (let i = 0; i < sorted.length - 1; i++) {
-                    if (sorted[i].end > sorted[i + 1].start) return true;
-                }
-                return false;
             }
 
             function showTemporaryFeedback(button, text) {

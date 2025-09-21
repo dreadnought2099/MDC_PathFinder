@@ -280,6 +280,9 @@
     {{-- Cropper JS --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
+    {{-- Day.js CDN --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js"></script>
+
     @stack('scripts')
 
     <!-- Spinner -->
