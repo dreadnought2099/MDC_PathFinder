@@ -289,39 +289,66 @@
                 toggleConditionalFields();
             });
 
-            // Cover image upload preview
+            // Cover image upload preview + drag and drop
             const coverInput = document.getElementById('image_path');
             const coverPreview = document.getElementById('previewImage');
+            const coverUploadBox = document.getElementById('uploadBox');
+
+            coverUploadBox.addEventListener('click', () => coverInput.click());
 
             coverInput.addEventListener('change', () => {
                 if (coverInput.files && coverInput.files[0]) {
-                    const reader = new FileReader();
-
-                    reader.onload = e => {
-                        coverPreview.src = e.target.result;
-                        coverPreview.classList.remove('hidden');
-                        const uploadBox = document.getElementById('uploadBox');
-                        const icon = uploadBox.querySelector('img');
-                        const text = uploadBox.querySelector('span');
-                        if (icon) icon.style.display = 'none';
-                        if (text) text.style.display = 'none';
-                    };
-
-                    reader.readAsDataURL(coverInput.files[0]);
+                    showCoverPreview(coverInput.files[0]);
                 }
             });
 
+            coverUploadBox.addEventListener('dragover', e => {
+                e.preventDefault();
+                coverUploadBox.classList.add('border-primary', 'bg-gray-50');
+            });
+
+            coverUploadBox.addEventListener('dragleave', e => {
+                e.preventDefault();
+                coverUploadBox.classList.remove('border-primary', 'bg-gray-50');
+            });
+
+            coverUploadBox.addEventListener('drop', e => {
+                e.preventDefault();
+                coverUploadBox.classList.remove('border-primary', 'bg-gray-50');
+
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    coverInput.files = e.dataTransfer.files;
+                    showCoverPreview(e.dataTransfer.files[0]);
+                }
+            });
+
+            function showCoverPreview(file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    coverPreview.src = e.target.result;
+                    coverPreview.classList.remove('hidden');
+
+                    const icon = coverUploadBox.querySelector('img');
+                    const text = coverUploadBox.querySelector('span');
+                    if (icon) icon.style.display = 'none';
+                    if (text) text.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
 
 
-            // Carousel images functionality
+
+            // Carousel images functionality + drag and drop
             const maxFiles = 50;
             const maxSizeMB = 5;
             const carouselInput = document.getElementById('carousel_images');
+            const carouselUploadBox = document.getElementById('carouselUploadBox');
             const carouselPreviewContainer = document.getElementById('carouselPreviewContainer');
             let selectedFiles = [];
 
+            carouselUploadBox.addEventListener('click', () => carouselInput.click());
+
             function updateUploadIconVisibility() {
-                const carouselUploadBox = document.getElementById('carouselUploadBox');
                 const icon = carouselUploadBox.querySelector('img');
                 const text = carouselUploadBox.querySelector('span');
 
@@ -371,8 +398,29 @@
                 updateUploadIconVisibility();
             }
 
-            carouselInput.addEventListener('change', () => {
-                const newFiles = Array.from(carouselInput.files || []); // fallback empty array
+            carouselInput.addEventListener('change', () => handleCarouselFiles(Array.from(carouselInput.files ||
+            [])));
+
+            carouselUploadBox.addEventListener('dragover', e => {
+                e.preventDefault();
+                carouselUploadBox.classList.add('border-primary', 'bg-gray-50');
+            });
+
+            carouselUploadBox.addEventListener('dragleave', e => {
+                e.preventDefault();
+                carouselUploadBox.classList.remove('border-primary', 'bg-gray-50');
+            });
+
+            carouselUploadBox.addEventListener('drop', e => {
+                e.preventDefault();
+                carouselUploadBox.classList.remove('border-primary', 'bg-gray-50');
+
+                if (e.dataTransfer.files) {
+                    handleCarouselFiles(Array.from(e.dataTransfer.files));
+                }
+            });
+
+            function handleCarouselFiles(newFiles) {
                 carouselInput.value = '';
 
                 // Check number of files
@@ -392,7 +440,7 @@
                 selectedFiles = selectedFiles.concat(newFiles);
                 renderPreviews();
                 updateInputFiles();
-            });
+            }
 
             updateUploadIconVisibility();
 
@@ -745,17 +793,17 @@
                                 <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                             </div>
                             ${rangeKey !== "closed" ? `
-                                                                    <div class="flex gap-2 ml-4">
-                                                                        <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                                                            Edit
-                                                                        </button>
-                                                                        <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                data-days='${JSON.stringify(group.days)}'>
-                                                                            Delete
-                                                                        </button>
-                                                                    </div>
-                                                                ` : ''}
+                                                                            <div class="flex gap-2 ml-4">
+                                                                                <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                        data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                                                    Edit
+                                                                                </button>
+                                                                                <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                        data-days='${JSON.stringify(group.days)}'>
+                                                                                    Delete
+                                                                                </button>
+                                                                            </div>
+                                                                        ` : ''}
                         </div>
                     `;
 
