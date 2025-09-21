@@ -54,7 +54,7 @@
                hover:border-primary hover:bg-gray-50 
                dark:hover:border-primary dark:hover:bg-gray-800
                transition-colors overflow-hidden relative">
-                    <img src="{{ asset('icons/image.png') }}" alt="Image Icon" class="w-8 h-8">
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png" alt="Image Icon" class="w-8 h-8">
                     <span id="uploadText" class="text-gray-500 dark:text-gray-300">
                         Click to upload cover image
                     </span>
@@ -76,7 +76,7 @@
                hover:border-primary hover:bg-gray-50 
                dark:hover:border-primary dark:hover:bg-gray-800
                transition-colors overflow-hidden relative">
-                    <img src="{{ asset('icons/image.png') }}" alt="Image Icon" class="w-8 h-8">
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png" alt="Image Icon" class="w-8 h-8">
                     <span id="carouselUploadText" class="text-gray-500 mb-4 dark:text-gray-300">Click to upload images (max
                         50)</span>
 
@@ -98,7 +98,7 @@
                hover:border-primary hover:bg-gray-50 
                dark:hover:border-primary dark:hover:bg-gray-800
                transition-colors overflow-hidden relative">
-                    <img src="{{ asset('icons/video.png') }}" alt="Video Icon" class="w-9 h-9">
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/video.png" alt="Video Icon" class="w-9 h-9">
                     <p class="mb-2 dark:text-gray-300">Drag & drop a video file here or click to select</p>
                     <p class="text-xs text-gray-400 dark:text-gray-300">(mp4, avi, mpeg | max 100MB)</p>
 
@@ -167,7 +167,7 @@
                                     <button type="button"
                                         class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
                                         title="Clear">
-                                        <img src="{{ asset('icons/exit.png') }}"
+                                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png"
                                             class="w-3 h-3 cursor-pointer hover:scale-120 transition-all duration-300 ease-in-out"
                                             alt="Clear">
                                     </button>
@@ -178,7 +178,7 @@
                                     <button type="button"
                                         class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
                                         title="Clear">
-                                        <img src="{{ asset('icons/exit.png') }}"
+                                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png"
                                             class="w-3 h-3 cursor-pointer hover:scale-120 transition-all duration-300 ease-in-out"
                                             alt="Clear">
                                     </button>
