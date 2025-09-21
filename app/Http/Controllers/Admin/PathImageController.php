@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Path;
 use App\Models\PathImage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Laravel\Facades\Image;
+use Intervention\Image\Encoders\WebpEncoder;
+use Illuminate\Support\Str;
 
 class PathImageController extends Controller
 {
@@ -46,7 +48,6 @@ class PathImageController extends Controller
     // Store multiple images for a path
     public function store(Request $request)
     {
-        // CRITICAL: Early return for empty file requests to prevent double processing
         if (!$request->hasFile('files') || count($request->file('files')) === 0) {
             if ($request->expectsJson()) {
                 return response()->json([
@@ -60,27 +61,31 @@ class PathImageController extends Controller
         $request->validate([
             'path_id' => 'required|exists:paths,id',
             'files'   => 'required|array|min:1',
-            'files.*' => 'required|image|max:51200',
+            'files.*' => 'required|image|max:51200', // 50MB
         ]);
 
         $path = Path::findOrFail($request->path_id);
-
         $files = $request->file('files');
         $nextOrder = PathImage::where('path_id', $path->id)->max('image_order') ?? 0;
 
         foreach ($files as $file) {
-            $imagePath = $file->store('path_images/' . $path->id, 'public');
+            $filename = uniqid('', true) . '.webp';
+            $folder   = "path_images/{$path->id}";
+            $fullPath = "{$folder}/{$filename}";
+
+            // Convert to WebP with quality 90
+            $image = Image::read($file)->encode(new WebpEncoder(quality: 90));
+
+            Storage::disk('public')->put($fullPath, (string) $image);
 
             PathImage::create([
-                'path_id' => $path->id,
-                'image_file' => $imagePath,
+                'path_id'     => $path->id,
+                'image_file'  => $fullPath,
                 'image_order' => ++$nextOrder,
             ]);
         }
 
         $successMessage = "Images for Path {$path->fromRoom->name} → {$path->toRoom->name} uploaded successfully.";
-
-        // Flash the message to the session for both JSON and non-JSON requests
         session()->flash('success', $successMessage);
 
         if ($request->expectsJson()) {
@@ -89,8 +94,9 @@ class PathImageController extends Controller
             ], 200);
         }
 
-        return redirect()->route('path.show', $path)->with('success', $path);
+        return redirect()->route('path.show', $path)->with('success', $successMessage);
     }
+
 
     // Show form to edit single or multiple images
     public function edit(Request $request, Path $path, PathImage $pathImage = null)
