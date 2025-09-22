@@ -3,7 +3,7 @@
 @section('content')
     <x-floating-actions />
 
-    <div class="max-w-4xl mx-auto mt-10 p-10 bg-white border-2 border-primary rounded-lg shadow">
+    <div class="max-w-4xl mx-auto mt-10 p-10 bg-white border-2 border-primary rounded-lg shadow dark:bg-gray-800 dark:text-gray-300">
 
         <h2 class="text-3xl font-bold text-center text-gray-800 mb-2"><span class="text-primary">Edit</span>
             {{ $room->name }}</h2>

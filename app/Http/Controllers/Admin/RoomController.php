@@ -7,12 +7,14 @@ use App\Models\Path;
 use App\Models\Room;
 use App\Models\RoomImage;
 use App\Models\Staff;
-use App\Models\User;
 use App\Services\EntrancePointService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Encoders\WebpEncoder;
+use Intervention\Image\Drivers\Gd\Driver;
+
 
 class RoomController extends Controller
 {
@@ -85,16 +87,24 @@ class RoomController extends Controller
                 }
             }
 
+            $manager = new ImageManager(new Driver());
+
             // Cover image
             if ($request->hasFile('image_path')) {
-                $path = $request->file('image_path')->store('rooms/' . $room->id . '/cover_images', 'public');
-                $room->image_path = $path;
+                $baseName = uniqid('', true);
+                $folder   = "offices/{$room->id}/cover_images";
+                $webpPath = "{$folder}/{$baseName}.webp";
+
+                $image = $manager->read($request->file('image_path'))->encode(new WebpEncoder(90));
+                Storage::disk('public')->put($webpPath, (string) $image);
+
+                $room->image_path = $webpPath;
                 $room->save();
             }
 
             // Video
             if ($request->hasFile('video_path')) {
-                $path = $request->file('video_path')->store('rooms/' . $room->id . '/videos', 'public');
+                $path = $request->file('video_path')->store('offices/' . $room->id . '/videos', 'public');
                 $room->video_path = $path;
                 $room->save();
             }
@@ -102,7 +112,7 @@ class RoomController extends Controller
             // Generate QR code
             $marker_id = 'room_' . $room->id;
             $qrImage = QrCode::format('svg')->size(300)->generate($room->token);
-            $qrPath = 'rooms/' . $room->id . '/qrcodes/' . $marker_id . '.svg';
+            $qrPath = 'offices/' . $room->id . '/qrcodes/' . $marker_id . '.svg';
             Storage::disk('public')->put($qrPath, $qrImage);
 
             $room->update([
@@ -113,10 +123,16 @@ class RoomController extends Controller
             // Carousel images
             if ($request->hasFile('carousel_images')) {
                 foreach ($request->file('carousel_images') as $carouselImage) {
-                    $path = $carouselImage->store('rooms/' . $room->id . '/carousel', 'public');
+                    $baseName = uniqid('', true);
+                    $folder   = "offices/{$room->id}/carousel";
+                    $webpPath = "{$folder}/{$baseName}.webp";
+
+                    $image = $manager->read($carouselImage)->encode(new WebpEncoder(90));
+                    Storage::disk('public')->put($webpPath, (string) $image);
+
                     RoomImage::create([
                         'room_id' => $room->id,
-                        'image_path' => $path
+                        'image_path' => $webpPath
                     ]);
                 }
             }
@@ -219,7 +235,7 @@ class RoomController extends Controller
             Path::where('from_room_id', $room->id)
                 ->orWhere('to_room_id', $room->id)
                 ->delete();
-            $entranceService = app(\App\Services\EntrancePointService::class);
+            $entranceService = app(EntrancePointService::class);
 
             if ($room->room_type === 'entrance_point') {
                 $entranceService->reconnectEntrancePoint($room);
@@ -251,6 +267,8 @@ class RoomController extends Controller
             $room->save();
         }
 
+        $manager = new ImageManager(new Driver());
+
         // Update cover image (permanently delete old one)
         if ($request->hasFile('image_path')) {
             // Permanently delete old cover image file
@@ -258,9 +276,15 @@ class RoomController extends Controller
                 Storage::disk('public')->delete($room->image_path);
             }
 
+            $baseName = uniqid('', true);
+            $folder   = "offices/{$room->id}/cover_images";
+            $webpPath = "{$folder}/{$baseName}.webp";
+
+            $image = $manager->read($request->file('image_path'))->encode(new WebpEncoder(90));
+            Storage::disk('public')->put($webpPath, (string) $image);
+
             // Store new cover image
-            $newImagePath = $request->file('image_path')->store('rooms/' . $room->id . '/cover_images', 'public');
-            $room->image_path = $newImagePath;
+            $room->image_path = $webpPath;
             $room->save();
         }
 
@@ -281,7 +305,7 @@ class RoomController extends Controller
             }
 
             // Store new video
-            $newVideoPath = $request->file('video_path')->store('rooms/' . $room->id . '/videos', 'public');
+            $newVideoPath = $request->file('video_path')->store('offices/' . $room->id . '/videos', 'public');
             $room->video_path = $newVideoPath;
             $room->save();
         }
@@ -303,10 +327,16 @@ class RoomController extends Controller
         // Add new carousel images
         if ($request->hasFile('carousel_images')) {
             foreach ($request->file('carousel_images') as $carouselImage) {
-                $path = $carouselImage->store('rooms/' . $room->id . '/carousel', 'public');
+                $baseName = uniqid('', true);
+                $folder   = "offices/{$room->id}/carousel";
+                $webpPath = "{$folder}/{$baseName}.webp";
+
+                $image = $manager->read($carouselImage)->encode(new WebpEncoder(90));
+                Storage::disk('public')->put($webpPath, (string) $image);
+
                 RoomImage::create([
                     'room_id' => $room->id,
-                    'image_path' => $path
+                    'image_path' => $webpPath
                 ]);
             }
         }
@@ -367,7 +397,7 @@ class RoomController extends Controller
         if (!$room->qr_code_path || !Storage::disk('public')->exists($room->qr_code_path)) {
             $marker_id = 'room_' . $room->id;
             $qrImage = QrCode::format('svg')->size(300)->generate($room->token);
-            $qrPath = 'rooms/' . $room->id . '/qrcodes/' . $marker_id . '.svg';
+            $qrPath = 'offices/' . $room->id . '/qrcodes/' . $marker_id . '.svg';
             Storage::disk('public')->put($qrPath, $qrImage);
 
             $room->update([
