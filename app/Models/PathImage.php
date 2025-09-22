@@ -10,7 +10,6 @@ class PathImage extends Model
         'path_id',
         'image_order',
         'image_file',
-        'fallback_file',
     ];
 
     public function path() {
