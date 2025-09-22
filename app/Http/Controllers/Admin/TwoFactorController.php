@@ -115,7 +115,7 @@ class TwoFactorController extends Controller
         return back()->with('message', 'Scan the new QR code to reconfigure your authenticator app.');
     }
 
-    public function verify(Request $request)
+    public function verifyOTP(Request $request)
     {
         $request->validate(['otp' => 'required|digits:6']);
 

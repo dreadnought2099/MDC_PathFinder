@@ -179,16 +179,19 @@
                         Download Codes
                     </a>
 
-                    <a href="{{ route('admin.profile.2fa.recovery.regenerate') }}"
-                        class="flex-1 text-center px-4 py-2 bg-tertiary text-white rounded hover:bg-tertiary-dark border-2 border-tertiary hover:bg-white hover:text-tertiary transition-all duration-300"
-                        title="Generate and display new recovery codes">
-                        <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
-                                clip-rule="evenodd"></path>
-                        </svg>
-                        New Codes
-                    </a>
+                    <form method="POST" action="{{ route('admin.profile.2fa.recovery.regenerate') }}" class="flex-1">
+                        @csrf
+                        <button type="submit"
+                            class="w-full text-center px-4 py-2 bg-tertiary text-white rounded hover:bg-tertiary-dark border-2 border-tertiary hover:bg-white hover:text-tertiary transition-all duration-300"
+                            title="Generate and display new recovery codes">
+                            <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                            New Codes
+                        </button>
+                    </form>
                 </div>
 
                 <p class="text-xs text-amber-600 dark:text-amber-400 mt-3 text-center">
@@ -198,7 +201,7 @@
             </div>
         @endif
     </div>
-    
+
     <!-- Cropper Modal -->
     <div id="cropperModal"
         class="modal fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex justify-center items-center cursor-pointer"
@@ -206,7 +209,8 @@
         <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative dark:bg-gray-800 border-2 border-primary">
             <button type="button" onclick="closeModal()"
                 class="absolute top-2 right-4 text-gray-500 hover:text-red-600">
-                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png" alt="Close" class="w-6 h-6">
+                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png" alt="Close"
+                    class="w-6 h-6">
             </button>
 
             <h3 class="text-xl mb-4 text-primary">Crop Image</h3>
@@ -249,7 +253,8 @@
                 <!-- Close button positioned relative to image wrapper -->
                 <button type="button" onclick="closeViewModal(); event.stopPropagation();"
                     class="absolute top-4 right-4 z-50 focus:outline-none">
-                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png" alt="Exit Button"
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png"
+                        alt="Exit Button"
                         class="w-6 h-6 object-contain hover:scale-120 duration-300 transition-transform ease-in-out cursor-pointer">
                 </button>
             </div>

@@ -69,24 +69,38 @@ Route::middleware(['web'])->group(function () {
 Route::get('/admin', [LogInController::class, 'showLoginForm'])->name('login');
 Route::post('/admin', [LogInController::class, 'login']);
 
-
+// Routes accessible after login, before 2FA verification
 Route::middleware(['auth', 'role:Admin|Room Manager'])->group(function () {
-    // 2FA verification routes - these MUST be accessible before 2FA is verified
-    Route::post('/admin/profile/2fa/verify', [TwoFactorController::class, 'verify'])->name('admin.2fa.verify');
+    // Verify 2FA OTP
+    Route::post('/admin/profile/2fa/verify', [TwoFactorController::class, 'verifyOTP'])
+        ->name('admin.2fa.verifyOTP');
 
-    // Recovery code routes
-    Route::post('/admin/2fa/recovery', [TwoFactorController::class, 'verifyRecoveryCode'])->name('admin.2fa.recovery.verify');
-    Route::get('/admin/2fa/recovery-codes/download', [TwoFactorController::class, 'downloadRecoveryCodes'])->name('admin.2fa.recovery.download');
-
-    // 2FA management routes - these should be accessible to enable/disable 2FA
-    Route::post('/admin/profile/2fa/enable', [TwoFactorController::class, 'enable'])->name('admin.profile.2fa.enable');
-    Route::post('/admin/profile/2fa/disable', [TwoFactorController::class, 'disable'])->name('admin.profile.2fa.disable');
-    Route::post('/admin/profile/2fa/regenerate', [TwoFactorController::class, 'regenerate'])->name('admin.profile.2fa.regenerate');
-    Route::post('/admin/profile/2fa/recovery/regenerate', [TwoFactorController::class, 'regenerateRecoveryCodes'])->name('admin.profile.2fa.recovery.regenerate');
+    // Recovery codes verification
+    Route::post('/admin/2fa/recovery', [TwoFactorController::class, 'verifyRecoveryCode'])
+        ->name('admin.2fa.recovery.verify');
 });
 
 Route::middleware('auth', 'role:Admin|Room Manager', '2fa')->group(function () {
     Route::post('/logout', [LogInController::class, 'logout'])->name('logout');
+
+    // 2FA Management
+    Route::prefix('admin/profile/2fa')->group(function () {
+        Route::post('/enable', [TwoFactorController::class, 'enable'])
+            ->name('admin.profile.2fa.enable');
+
+        Route::post('/disable', [TwoFactorController::class, 'disable'])
+            ->name('admin.profile.2fa.disable');
+
+        Route::post('/regenerate', [TwoFactorController::class, 'regenerate'])
+            ->name('admin.profile.2fa.regenerate');
+
+        Route::post('/recovery/regenerate', [TwoFactorController::class, 'regenerateRecoveryCodes'])
+            ->name('admin.profile.2fa.recovery.regenerate');
+    });
+
+    // Recovery code download
+    Route::get('/admin/2fa/recovery-codes/download', [TwoFactorController::class, 'downloadRecoveryCodes'])
+        ->name('admin.2fa.recovery.download');
 
     // Admin dashboard - main landing page after login
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');

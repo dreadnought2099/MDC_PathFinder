@@ -126,7 +126,7 @@
             <div class="bg-white dark:bg-gray-800 p-6 rounded-md w-full max-w-md mx-4 shadow-xl">
                 <h2 class="text-lg font-bold text-primary text-center mb-4">Two-Factor Authentication</h2>
 
-                <form method="POST" action="{{ route('admin.2fa.verify') }}" class="space-y-4">
+                <form method="POST" action="{{ route('admin.2fa.verifyOTP') }}" class="space-y-4">
                     @csrf
                     <div>
                         <input type="text" name="otp" maxlength="6" inputmode="numeric" pattern="[0-9]*"
