@@ -9,12 +9,15 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use PragmaRX\Google2FA\Google2FA;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Encoders\WebpEncoder;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class ProfileController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();   
+        $user = Auth::user();
 
         $qrCode = null;
         $secret = null;
@@ -48,28 +51,22 @@ class ProfileController extends Controller
                 Storage::disk('public')->delete($user->profile_photo_path);
             }
 
-            // OPTION 1: By User ID (recommended)
-            // $folderPath = 'profiles/' . $user->id;
-
             // OPTION 2: By Username (if username is unique and URL-safe)
             $folderPath = 'profiles/' . Str::slug($user->username);
 
-            // OPTION 3: By Email domain (group users by organization)
-            // $emailDomain = substr(strrchr($user->email, "@"), 1);
-            // $folderPath = 'profiles/' . $emailDomain . '/' . $user->id;
+            $manager = new ImageManager(new Driver());
 
-            // OPTION 4: By User Role (if you have roles)
-            // $folderPath = 'profiles/' . $user->role . '/' . $user->id;
+            $baseName = uniqid('', true);
+            $webpPath = "{$folderPath}/{$baseName}.webp";
 
-            // OPTION 5: By Year/Month for time-based organization
-            // $folderPath = 'profiles/' . date('Y/m') . '/' . $user->id;
+            // Read uploaded image and encode as WebP (quality 90)
+            $image = $manager->read($request->file('cropped_image'))->encode(new WebpEncoder(90));
 
-            // OPTION 6: Hierarchical by user ID (for large user bases)
-            // $userId = str_pad($user->id, 6, '0', STR_PAD_LEFT); // e.g., 000123
-            // $folderPath = 'profiles/' . substr($userId, 0, 2) . '/' . substr($userId, 2, 2) . '/' . $user->id;
+            // Save to storage
+            Storage::disk('public')->put($webpPath, (string) $image);
 
-            $path = $request->file('cropped_image')->store($folderPath, 'public');
-            $user->profile_photo_path = $path;
+            // Update user profile path
+            $user->profile_photo_path = $webpPath;
             $user->save();
 
             return response()->json([
