@@ -54,10 +54,10 @@ class RoomController extends Controller
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'room_type' => 'required|in:regular,entrance_point',
-                'image_path' => 'nullable|image|max:5120', // 5 MB
+                'image_path' => 'nullable|image|max:10240', // 10 MB
                 'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200', // 50 MB
                 'carousel_images'   => 'nullable|array|max:50',  // MAX 50 files allowed
-                'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:5120', // 5 MB each
+                'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:10240', // 5 MB each
 
                 // Office hours
                 'office_hours' => 'nullable|array',
@@ -69,7 +69,7 @@ class RoomController extends Controller
             // Always auto-connect this new room to all other rooms
             $connectionResult = $entrancePointService->connectNewRoomToAllRooms($room);
 
-            $successMessage = "{$room->name} created and connected to {$connectionResult['rooms_connected']} rooms with {$connectionResult['paths_created']} paths.";
+            $successMessage = "{$room->name} created and connected to {$connectionResult['rooms_connected']} office with {$connectionResult['paths_created']} paths.";
 
             if ($request->has('office_hours')) {
                 foreach ($request->office_hours as $day => $ranges) {

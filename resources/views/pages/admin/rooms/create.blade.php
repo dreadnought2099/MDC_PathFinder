@@ -47,68 +47,60 @@
             <div class="mb-4 conditional-field" id="cover-image-section">
                 <label class="block mb-2 dark:text-gray-300">Cover Image (optional)</label>
 
-                <label for="image_path" id="uploadBox"
+                <div id="uploadBox"
                     class="flex flex-col items-center justify-center w-full h-40 
-                            border-2 border-dashed border-gray-300 dark:border-gray-600 
-                            rounded cursor-pointer 
-                            hover:border-primary hover:bg-gray-50 
-                            dark:hover:border-primary dark:hover:bg-gray-800
-                            transition-colors overflow-hidden relative">
+                border-2 border-dashed border-gray-300 dark:border-gray-600 
+                rounded cursor-pointer 
+                hover:border-primary hover:bg-gray-50 
+                dark:hover:border-primary dark:hover:bg-gray-800
+                transition-colors overflow-hidden relative">
                     <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
                         alt="Image Icon" class="w-8 h-8">
                     <span id="uploadText" class="text-gray-500 dark:text-gray-300">
-                        Click to upload cover image
+                        Click to upload cover image(Max 10MB)
                     </span>
 
-                    <input type="file" name="image_path" id="image_path" class="hidden" accept="image/*" />
-
                     <img id="previewImage" class="absolute inset-0 object-cover w-full h-full hidden" alt="Image preview" />
-                </label>
+                </div>
+
+                {{-- Hidden input placed outside --}}
+                <input type="file" name="image_path" id="image_path" class="hidden" accept="image/*" />
             </div>
 
             {{-- Carousel Images --}}
             <div class="mb-4 max-w-xl mx-auto conditional-field" id="carousel-images-section">
                 <label class="block mb-2 dark:text-gray-300">Carousel Images (optional)</label>
-
-                <label for="carousel_images" id="carouselUploadBox"
+                <div id="carouselUploadBox"
                     class="flex flex-col items-center justify-center w-full h-40 
-                            border-2 border-dashed border-gray-300 dark:border-gray-600 
-                            rounded cursor-pointer 
-                            hover:border-primary hover:bg-gray-50 
-                            dark:hover:border-primary dark:hover:bg-gray-800
-                            transition-colors overflow-hidden relative">
+                        border-2 border-dashed border-gray-300 dark:border-gray-600 
+                        rounded cursor-pointer hover:border-primary hover:bg-gray-50 
+                        dark:hover:border-primary dark:hover:bg-gray-800 transition-colors overflow-hidden relative">
                     <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
                         alt="Image Icon" class="w-8 h-8">
                     <span id="carouselUploadText" class="text-gray-500 mb-4 dark:text-gray-300">
-                        Click to upload images (max 50, 5MB each)</span>
-
-                    <input type="file" name="carousel_images[]" id="carousel_images" class="hidden" accept="image/*"
-                        multiple />
-
-                    {{-- Preview Container --}}
+                        Click to upload images (max 50, 10MB each)
+                    </span>
                     <div id="carouselPreviewContainer" class="flex flex-wrap gap-3 w-full justify-start"></div>
-                </label>
+                </div>
+                <input type="file" name="carousel_images[]" id="carousel_images" class="hidden" accept="image/*"
+                    multiple />
             </div>
 
             {{-- Short Video  --}}
             <div class="mb-4 max-w-xl mx-auto conditional-field" id="video-section">
                 <label class="block mb-2 dark:text-gray-300">Short Video (optional)</label>
-
                 <div id="videoDropZone"
                     class="flex flex-col items-center justify-center w-full h-40 
-                            border-2 border-dashed border-gray-300 dark:border-gray-600 
-                            rounded cursor-pointer 
-                            hover:border-primary hover:bg-gray-50 
-                            dark:hover:border-primary dark:hover:bg-gray-800
-                            transition-colors overflow-hidden relative">
+                        border-2 border-dashed border-gray-300 dark:border-gray-600 
+                        rounded cursor-pointer hover:border-primary hover:bg-gray-50 
+                        dark:hover:border-primary dark:hover:bg-gray-800 transition-colors overflow-hidden relative">
                     <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/video.png"
                         alt="Video Icon" class="w-9 h-9">
                     <p class="mb-2 dark:text-gray-300">Drag & drop a video file here or click to select</p>
-                    <p class="text-xs text-gray-400 dark:text-gray-300">(mp4, avi, mpeg | max 100MB)</p>
-
-                    <input type="file" id="video_path" name="video_path" accept="video/mp4,video/avi,video/mpeg"
-                        class="hidden" />
+                    <p class="text-xs text-gray-400 dark:text-gray-300">(mp4, avi, mpeg | max 50MB)</p>
                 </div>
+                <input type="file" id="video_path" name="video_path" accept="video/mp4,video/avi,video/mpeg"
+                    class="hidden" />
 
                 <div id="videoPreviewContainer" class="mt-4 hidden relative rounded border border-gray-300 overflow-hidden">
                     <video id="videoPreview" controls class="w-full h-auto bg-black"></video>
@@ -340,7 +332,7 @@
 
             // Carousel images functionality + drag and drop
             const maxFiles = 50;
-            const maxSizeMB = 5;
+            const maxSizeMB = 10;
             const carouselInput = document.getElementById('carousel_images');
             const carouselUploadBox = document.getElementById('carouselUploadBox');
             const carouselPreviewContainer = document.getElementById('carouselPreviewContainer');
@@ -429,9 +421,9 @@
                     return;
                 }
 
-                // Check file sizes
+                // Limit file sizes per file
                 for (let file of newFiles) {
-                    if (file.size / 1024 / 1024 > maxSizeMB) {
+                    if (file.size > maxSizeMB * 1024 * 1024) {
                         alert(`"${file.name}" is too large. Max size is ${maxSizeMB} MB.`);
                         return;
                     }
@@ -793,17 +785,17 @@
                                 <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                             </div>
                             ${rangeKey !== "closed" ? `
-                                                                            <div class="flex gap-2 ml-4">
-                                                                                <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                        data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                                                                    Edit
-                                                                                </button>
-                                                                                <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                        data-days='${JSON.stringify(group.days)}'>
-                                                                                    Delete
-                                                                                </button>
-                                                                            </div>
-                                                                        ` : ''}
+                                                                                        <div class="flex gap-2 ml-4">
+                                                                                            <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                    data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                                                                Edit
+                                                                                            </button>
+                                                                                            <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                    data-days='${JSON.stringify(group.days)}'>
+                                                                                                Delete
+                                                                                            </button>
+                                                                                        </div>
+                                                                                    ` : ''}
                         </div>
                     `;
 

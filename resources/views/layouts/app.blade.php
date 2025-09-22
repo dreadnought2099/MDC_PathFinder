@@ -202,76 +202,139 @@
     <!-- FilePond -->
     <script src="https://unpkg.com/filepond@4.31.1/dist/filepond.min.js"></script>
     <script>
-        if (document.querySelector('.filepond')) FilePond.parse(document.body);
+        document.querySelectorAll('input[type="file"].filepond').forEach(input => {
+            FilePond.create(input, {
+                allowMultiple: input.hasAttribute('multiple'),
+                storeAsFile: true
+            });
+        });
     </script>
 
     <!-- Upload Form Handler -->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            function clearErrors(form) {
-                form.querySelectorAll('.field-error').forEach(el => el.remove());
-                form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-            }
+        document.querySelectorAll('form[data-upload]').forEach(form => {
+            let filesCache = {}; // persistent cache per form
 
-            function showErrors(form, errors) {
-                for (let key in errors) {
-                    let input = form.querySelector(`[name="${key}"], [name="${key}[]"]`);
-                    if (input) {
-                        input.classList.add('is-invalid');
-                        const small = document.createElement('small');
-                        small.className = 'field-error text-red-600';
-                        small.innerText = errors[key][0];
-                        input.insertAdjacentElement('afterend', small);
+            // Cache files immediately when selected
+            form.querySelectorAll('input[type="file"]').forEach(input => {
+                input.addEventListener('change', () => {
+                    if (input.files.length) {
+                        filesCache[input.name] = Array.from(input.files);
                     }
-                }
-            }
-            document.querySelectorAll('form[data-upload]').forEach(form => {
-                form.addEventListener('submit', e => {
-                    e.preventDefault();
-                    clearErrors(form);
-                    const xhr = new XMLHttpRequest();
-                    const data = new FormData(form);
-                    window.dispatchEvent(new CustomEvent('upload-start'));
-                    const token = document.head.querySelector('meta[name="csrf-token"]')?.content;
-                    xhr.open(form.method || 'POST', form.action);
-                    if (token) xhr.setRequestHeader('X-CSRF-TOKEN', token);
-                    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-                    xhr.setRequestHeader('Accept', 'application/json');
-                    xhr.upload.addEventListener('progress', e => {
-                        if (e.lengthComputable) {
-                            window.dispatchEvent(new CustomEvent('upload-progress', {
-                                detail: {
-                                    progress: Math.round((e.loaded / e.total) *
-                                        100)
-                                }
-                            }));
-                        }
-                    });
-                    xhr.onload = () => {
-                        window.dispatchEvent(new CustomEvent('upload-finish'));
-                        if (xhr.status >= 200 && xhr.status < 300) {
-                            try {
-                                const json = JSON.parse(xhr.responseText);
-                                if (json.redirect) return window.location.href = json.redirect;
-                            } catch {}
-                            return window.location.reload();
-                        }
-                        if (xhr.status === 422) {
-                            try {
-                                const json = JSON.parse(xhr.responseText);
-                                if (json.errors) return showErrors(form, json.errors);
-                            } catch {}
-                        }
-                        alert('Upload failed. Please try again.');
-                    };
-                    xhr.onerror = () => {
-                        window.dispatchEvent(new CustomEvent('upload-finish'));
-                        alert('Network error.');
-                    };
-                    xhr.send(data);
                 });
             });
+
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+
+                const formData = new FormData(form);
+
+                // Always re-attach cached files into FormData
+                Object.keys(filesCache).forEach(name => {
+                    filesCache[name].forEach(file => {
+                        formData.append(name, file);
+                    });
+                });
+
+                const xhr = new XMLHttpRequest();
+                xhr.open(form.method, form.action, true);
+                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="csrf-token"]')
+                    .content);
+
+                // Show modal
+                window.dispatchEvent(new CustomEvent('upload-start'));
+
+                // Update progress
+                xhr.upload.addEventListener('progress', (event) => {
+                    if (event.lengthComputable) {
+                        const percent = Math.round((event.loaded / event.total) * 100);
+                        window.dispatchEvent(new CustomEvent('upload-progress', {
+                            detail: {
+                                progress: percent
+                            }
+                        }));
+                    }
+                });
+
+                xhr.onload = function() {
+                    // Hide modal
+                    window.dispatchEvent(new CustomEvent('upload-finish'));
+
+                    if (xhr.status === 422) {
+                        try {
+                            const json = JSON.parse(xhr.responseText);
+                            if (json.errors) {
+                                showErrors(form, json.errors);
+
+                                // Restore previews from cached files
+                                Object.keys(filesCache).forEach(name => {
+                                    const preview = form.querySelector(`#${name}-preview`);
+                                    if (preview) {
+                                        preview.innerHTML = '';
+                                        filesCache[name].forEach(file => {
+                                            const reader = new FileReader();
+                                            reader.onload = e => {
+                                                const img = document.createElement(
+                                                    'img');
+                                                img.src = e.target.result;
+                                                img.className =
+                                                    "h-24 w-24 object-cover rounded-lg border-2 border-gray-300";
+                                                preview.appendChild(img);
+                                            };
+                                            reader.readAsDataURL(file);
+                                        });
+                                    }
+                                });
+
+                                alert(
+                                    "Validation failed. Please fix inputs — files are still attached.");
+                                return;
+                            }
+                        } catch (err) {
+                            console.error("Validation parse error", err);
+                        }
+                    } else if (xhr.status >= 200 && xhr.status < 300) {
+                        try {
+                            const json = JSON.parse(xhr.responseText);
+                            if (json.redirect) {
+                                window.location.href = json.redirect; // go to show page
+                                return;
+                            }
+                        } catch (err) {
+                            console.error("Success response parse error", err);
+                        }
+                        window.location.reload(); // fallback if no redirect returned
+                    } else {
+                        alert("Unexpected error, please try again.");
+                    }
+                };
+
+                xhr.onerror = function() {
+                    // Hide modal
+                    window.dispatchEvent(new CustomEvent('upload-finish'));
+                    alert("Network error, please try again.");
+                };
+
+                xhr.send(formData);
+            });
         });
+
+        // Helper: Show errors beside inputs
+        function showErrors(form, errors) {
+            // Clear old errors
+            form.querySelectorAll('.error-message').forEach(el => el.remove());
+
+            Object.keys(errors).forEach(name => {
+                const input = form.querySelector(`[name="${name}"]`);
+                if (input) {
+                    const msg = document.createElement('div');
+                    msg.className = 'error-message text-red-600 text-sm mt-1';
+                    msg.innerText = errors[name][0];
+                    input.closest('div').appendChild(msg);
+                }
+            });
+        }
     </script>
 
     <!-- GLightbox -->
