@@ -33,6 +33,13 @@ class TwoFactorController extends Controller
         ]);
     }
 
+    // Show the 2FA verification page
+    public function showVerifyForm()
+    {
+        session()->flash('show_2fa_modal', true);
+        return view('pages.admin.2fa-verify');
+    }
+
     /**
      * Enable 2FA (confirm OTP and generate recovery codes).
      */
@@ -129,7 +136,10 @@ class TwoFactorController extends Controller
             return redirect()->route('admin.dashboard')->with('success', '2FA verified successfully.');
         }
 
-        return back()->withErrors(['otp' => 'Invalid code. Please try again.']);
+        return redirect()->route('admin.2fa.showVerifyForm')
+            ->withInput()
+            ->withErrors(['otp' => 'Invalid code. Please try again.'])
+            ->with('show_2fa_modal', true);
     }
 
 
@@ -145,7 +155,7 @@ class TwoFactorController extends Controller
 
             return redirect()->route('admin.dashboard')->with('success', 'Recovery successful.');
         }
-        
+
         // Failure: make sure recovery modal opens, NOT OTP
         session()->flash('show_recovery_modal', true);
 

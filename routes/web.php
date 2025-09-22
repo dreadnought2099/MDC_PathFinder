@@ -71,13 +71,23 @@ Route::post('/admin', [LogInController::class, 'login']);
 
 // Routes accessible after login, before 2FA verification
 Route::middleware(['auth', 'role:Admin|Room Manager'])->group(function () {
+
+    Route::get('/admin/2fa/verify', [TwoFactorController::class, 'showVerifyForm'])
+        ->name('admin.2fa.showVerifyForm');
+
     // Verify 2FA OTP
-    Route::post('/admin/profile/2fa/verify', [TwoFactorController::class, 'verifyOTP'])
+    Route::post('/admin/2fa/verify', [TwoFactorController::class, 'verifyOTP'])
         ->name('admin.2fa.verifyOTP');
 
     // Recovery codes verification
     Route::post('/admin/2fa/recovery', [TwoFactorController::class, 'verifyRecoveryCode'])
         ->name('admin.2fa.recovery.verify');
+
+        // --- PLACE CATCH-ALL AT THE END ---
+    Route::match(['get', 'post', 'put', 'patch', 'delete'], '/admin/{any}', [TwoFactorController::class, 'showVerifyForm'])
+        ->where('any', '.*')
+        ->middleware(['auth', 'role:Admin|Room Manager'])
+        ->name('admin.2fa.fallback');
 });
 
 Route::middleware('auth', 'role:Admin|Room Manager', '2fa')->group(function () {
