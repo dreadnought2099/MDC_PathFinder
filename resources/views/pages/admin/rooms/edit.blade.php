@@ -3,35 +3,37 @@
 @section('content')
     <x-floating-actions />
 
-    <div
-        class="max-w-4xl mx-auto mt-10 p-10 bg-white border-2 border-primary rounded-lg shadow dark:bg-gray-800 dark:text-gray-300">
+    <div class="max-w-xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-6 dark:bg-gray-800">
+        <h2 class="text-2xl text-center mb-6 dark:text-gray-300"><span class="text-primary">Edit</span> {{ $room->name }}
+        </h2>
 
-        <h2 class="text-3xl font-bold text-center text-gray-800 mb-2"><span class="text-primary">Edit</span>
-            {{ $room->name }}</h2>
-
-        <form action="{{ route('room.update', $room->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6"
-            data-upload>
+        <form action="{{ route('room.update', $room->id) }}" method="POST" enctype="multipart/form-data" data-upload>
             @csrf
             @method('PUT')
 
-            {{-- Name --}}
-            <div>
-                <label for="name" class="block font-semibold mb-1">Name</label>
-                <input type="text" id="name" name="name" value="{{ old('name', $room->name) }}" required
-                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200" />
+            @php
+                $inputClasses =
+                    'peer py-3 w-full placeholder-transparent font-sofia rounded-md text-gray-700 dark:text-gray-300 ring-1 px-4 ring-gray-500 dark:ring-gray-500 focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-white dark:bg-gray-800';
+
+                $labelClasses =
+                    'absolute cursor-text left-0 -top-3 text-sm font-sofia text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 mx-1 px-1 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3 peer-focus:text-primary peer-focus:text-sm peer-focus:bg-white dark:peer-focus:bg-gray-800 peer-focus:px-2 peer-focus:rounded-md';
+            @endphp
+
+            <div class="relative mb-4">
+                <input type="text" name="name" placeholder="Office Name" class="{{ $inputClasses }}"
+                    value="{{ old('name', $room->name) }}" required>
+                <label class="{{ $labelClasses }}">Office Name</label>
             </div>
 
-            {{-- Description --}}
-            <div>
-                <label for="description" class="block font-semibold mb-1">Description</label>
-                <textarea id="description" name="description" rows="4"
-                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200">{{ old('description', $room->description) }}</textarea>
+            <div class="relative mb-4">
+                <textarea name="description" placeholder="Description" class="{{ $inputClasses }}" rows="3">{{ old('description', $room->description) }}</textarea>
+                <label class="{{ $labelClasses }}">Description</label>
             </div>
 
             <div class="mb-4">
                 <label class="block mb-2 font-medium dark:text-gray-300">Room Type</label>
-                <select name="room_type"
-                    class="w-full border dark:text-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent border-primary dark:bg-gray-800"
+                <select name="room_type" id="room_type"
+                    class="w-full border dark:text-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent border-gray-500 dark:bg-gray-800"
                     required>
                     <option value="regular" {{ old('room_type', $room->room_type) === 'regular' ? 'selected' : '' }}>
                         Regular Office
@@ -46,153 +48,56 @@
                 </p>
             </div>
 
-
             {{-- Current Cover Image --}}
-            @if ($room->image_path && Storage::disk('public')->exists($room->image_path))
-                <div>
-                    <label class="block font-semibold mb-1">Current Cover Image</label>
-                    <img src="{{ Storage::url($room->image_path) }}" alt="Cover Image" class="w-48 rounded mb-2 border" />
-                    <label class="inline-flex items-center space-x-2">
-                        <input type="checkbox" name="remove_image_path" value="1" id="remove_image_path"
-                            class="form-checkbox" />
-                        <span>Remove Cover Image</span>
-                    </label>
-                </div>
-            @endif
-
-            {{-- Cover Image Upload --}}
-            <div>
-                <label for="image_path" class="block font-semibold mb-1">Upload New Cover Image</label>
-                <input type="file" id="image_path" name="image_path" accept="image/*" class="block" />
-            </div>
-
-            {{-- Current Video --}}
-            @if ($room->video_path && Storage::disk('public')->exists($room->video_path))
-                <div>
-                    <label class="block font-semibold mb-1">Current Video</label>
-                    <video controls class="w-64 rounded mb-2 border">
-                        <source src="{{ Storage::url($room->video_path) }}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                    <label class="inline-flex items-center space-x-2">
-                        <input type="checkbox" name="remove_video_path" value="1" id="remove_video_path"
-                            class="form-checkbox" />
-                        <span>Remove Video</span>
-                    </label>
-                </div>
-            @endif
-
-            {{-- Video Upload --}}
-            <div>
-                <label for="video_path" class="block font-semibold mb-1">Upload New Video (mp4, avi, mpeg)</label>
-                <input type="file" id="video_path" name="video_path" accept="video/mp4,video/avi,video/mpeg"
-                    class="block" />
-            </div>
-
-            {{-- Enhanced Office Hours Section --}}
-            <div class="mb-6">
-                <label class="block font-semibold mb-2">Office Hours</label>
-
-                {{-- Bulk Day Selection Section --}}
-                <div class="mb-6 p-4 border rounded bg-blue-50">
-                    <p class="font-semibold mb-3">Set Time Range for Multiple Days</p>
-
-                    {{-- Day Selection --}}
+            <div class="mb-4 conditional-field" id="cover-image-section">
+                @if ($room->image_path && Storage::disk('public')->exists($room->image_path))
                     <div class="mb-4">
-                        <label class="block text-sm font-medium mb-2">Select Days:</label>
-                        <div class="flex gap-2 flex-wrap">
-                            @php
-                                $daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                            @endphp
-                            @foreach ($daysOfWeek as $day)
-                                <label
-                                    class="flex items-center bg-white border rounded px-3 py-2 cursor-pointer hover:bg-gray-50">
-                                    <input type="checkbox"
-                                        class="bulk-day-checkbox mr-2 text-primary focus:ring-primary dark:focus:ring-primary"
-                                        value="{{ $day }}">
-                                    <span class="text-sm">{{ $day }}</span>
-                                </label>
-                            @endforeach
-                        </div>
-
-                        {{-- Quick Select Buttons --}}
-                        <div class="mt-2 flex gap-2 flex-wrap">
-                            <button type="button"
-                                class="quick-select bg-gray-500 text-white px-3 py-1 rounded text-sm cursor-pointer"
-                                data-days="Mon,Tue,Wed,Thu,Fri">Weekdays</button>
-                            <button type="button"
-                                class="quick-select bg-gray-500 text-white px-3 py-1 rounded text-sm cursor-pointer"
-                                data-days="Sat,Sun">Weekends</button>
-                            <button type="button"
-                                class="quick-select bg-gray-500 text-white px-3 py-1 rounded text-sm cursor-pointer"
-                                data-days="Mon,Tue,Wed,Thu,Fri,Sat,Sun">All Days</button>
-                            <button type="button"
-                                class="clear-select bg-gray-300 text-gray-700 px-3 py-1 rounded text-sm cursor-pointer">Clear
-                                All</button>
-                        </div>
+                        <label class="block mb-2 font-medium dark:text-gray-300">Current Cover Image</label>
+                        <img src="{{ Storage::url($room->image_path) }}" alt="Cover Image"
+                            class="w-48 rounded mb-2 border" />
+                        <label class="inline-flex items-center space-x-2">
+                            <input type="checkbox" name="remove_image_path" value="1" id="remove_image_path"
+                                class="form-checkbox" />
+                            <span class="dark:text-gray-300">Remove Cover Image</span>
+                        </label>
                     </div>
+                @endif
 
-                    {{-- Time Range Input (Single Row Only) --}}
-                    <div class="bulk-time-ranges mb-4">
-                        <label class="block text-sm font-medium mb-2">Time Range:</label>
-                        <div class="bulk-ranges-container">
-                            <div class="flex gap-2 mb-2 bulk-range-row">
-                                <div class="relative flex-1">
-                                    <input type="time"
-                                        class="custom-time-input bulk-start-time border rounded p-2 w-full pr-8">
-                                    <button type="button"
-                                        class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500"
-                                        title="Clear">
-                                        <img src="{{ asset('icons/exit.png') }}"
-                                            class="w-3 h-3 cursor-pointer hover:scale-120 transition-all duration-300 ease-in-out"
-                                            alt="Clear">
-                                    </button>
-                                </div>
-                                <div class="relative flex-1">
-                                    <input type="time"
-                                        class="custom-time-input bulk-end-time border rounded p-2 w-full pr-8">
-                                    <button type="button"
-                                        class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500"
-                                        title="Clear">
-                                        <img src="{{ asset('icons/exit.png') }}"
-                                            class="w-3 h-3 cursor-pointer hover:scale-120 transition-all duration-300 ease-in-out"
-                                            alt="Clear">
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <label class="block mb-2 dark:text-gray-300">Cover Image (optional)</label>
 
-                    {{-- Apply Button --}}
-                    <button type="button"
-                        class="apply-bulk bg-primary text-center text-white px-4 py-2 rounded-md hover:text-primary border-2 border-primary hover:bg-white duration-300 ease-in-out transition-all cursor-pointer">
-                        Apply to Selected Days
-                    </button>
+                <div id="uploadBox"
+                    class="flex flex-col items-center justify-center w-full h-40 
+                border-2 border-dashed border-gray-300 dark:border-gray-600 
+                rounded cursor-pointer 
+                hover:border-primary hover:bg-gray-50 
+                dark:hover:border-primary dark:hover:bg-gray-800
+                transition-colors overflow-hidden relative">
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
+                        alt="Image Icon" class="w-8 h-8">
+                    <span id="uploadText" class="text-gray-500 dark:text-gray-300">
+                        Click to upload cover image(Max 10MB)
+                    </span>
+
+                    <img id="previewImage" class="absolute inset-0 object-cover w-full h-full hidden" alt="Image preview" />
                 </div>
 
-                {{-- Display Saved Hours --}}
-                <div class="p-4 border rounded bg-gray-50">
-                    <p class="font-semibold mb-3">Saved Office Hours</p>
-                    <ul id="officeHoursDisplay" class="space-y-2 text-sm text-gray-700"></ul>
-                </div>
+                {{-- Hidden input placed outside --}}
+                <input type="file" name="image_path" id="image_path" class="hidden" accept="image/*" />
             </div>
 
-            {{-- Current Carousel Images --}}
-            <div class="mb-4 text-gray-600 max-w-xl mx-auto">
-                <label class="block mb-2 font-semibold text-gray-700">Carousel Images (optional)</label>
-
-                <label for="carousel_images" id="carouselUploadBox"
-                    class="flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors p-4 overflow-auto relative">
-
-                    <svg id="carouselUploadIcon" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-400 mb-2"
-                        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                    </svg>
-                    <span id="carouselUploadText" class="text-gray-500 mb-4">Click to upload images</span>
-
-                    <input type="file" name="carousel_images[]" id="carousel_images" class="hidden" accept="image/*"
-                        multiple />
-
+            {{-- Carousel Images --}}
+            <div class="mb-4 max-w-xl mx-auto conditional-field" id="carousel-images-section">
+                <label class="block mb-2 dark:text-gray-300">Carousel Images (optional)</label>
+                <div id="carouselUploadBox"
+                    class="flex flex-col items-center justify-center w-full h-40 
+                        border-2 border-dashed border-gray-300 dark:border-gray-600 
+                        rounded cursor-pointer hover:border-primary hover:bg-gray-50 
+                        dark:hover:border-primary dark:hover:bg-gray-800 transition-colors overflow-hidden relative">
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
+                        alt="Image Icon" class="w-8 h-8">
+                    <span id="carouselUploadText" class="text-gray-500 mb-4 dark:text-gray-300">
+                        Click to upload images (max 50, 10MB each)
+                    </span>
                     <div id="carouselPreviewContainer" class="flex flex-wrap gap-3 w-full justify-start">
                         {{-- Existing images --}}
                         @if ($room->images && $room->images->count() > 0)
@@ -206,26 +111,155 @@
                                             <span
                                                 class="absolute top-1 left-1 bg-yellow-600 text-white rounded px-1 text-xs">Deleted</span>
                                         @else
-                                            <label
-                                                class="absolute top-1 right-1 bg-red-600 text-white rounded px-1 text-xs cursor-pointer opacity-0 hover:opacity-100 transition-opacity"
+                                            <button type="button"
+                                                class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow"
+                                                onclick="toggleImageRemoval(this, {{ $image->id }})"
                                                 title="Remove this image">
-                                                <input type="checkbox" name="remove_images[]"
-                                                    value="{{ $image->id }}" class="hidden" />
-                                                ✕
-                                            </label>
+                                                &times;
+                                            </button>
+                                            <input type="checkbox" name="remove_images[]" value="{{ $image->id }}"
+                                                class="hidden" />
                                         @endif
                                     </div>
                                 @endif
                             @endforeach
                         @endif
                     </div>
-                </label>
+                </div>
+                <input type="file" name="carousel_images[]" id="carousel_images" class="hidden" accept="image/*"
+                    multiple />
             </div>
 
-            {{-- Submit --}}
+            {{-- Current Video --}}
+            <div class="mb-4 max-w-xl mx-auto conditional-field" id="video-section">
+                @if ($room->video_path && Storage::disk('public')->exists($room->video_path))
+                    <div class="mb-4">
+                        <label class="block mb-2 font-medium dark:text-gray-300">Current Video</label>
+                        <video controls class="w-64 rounded mb-2 border">
+                            <source src="{{ Storage::url($room->video_path) }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <label class="inline-flex items-center space-x-2">
+                            <input type="checkbox" name="remove_video_path" value="1" id="remove_video_path"
+                                class="form-checkbox" />
+                            <span class="dark:text-gray-300">Remove Video</span>
+                        </label>
+                    </div>
+                @endif
+
+                <label class="block mb-2 dark:text-gray-300">Short Video (optional)</label>
+                <div id="videoDropZone"
+                    class="flex flex-col items-center justify-center w-full h-40 
+                        border-2 border-dashed border-gray-300 dark:border-gray-600 
+                        rounded cursor-pointer hover:border-primary hover:bg-gray-50 
+                        dark:hover:border-primary dark:hover:bg-gray-800 transition-colors overflow-hidden relative">
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/video.png"
+                        alt="Video Icon" class="w-9 h-9">
+                    <p class="mb-2 dark:text-gray-300">Drag & drop a video file here or click to select</p>
+                    <p class="text-xs text-gray-400 dark:text-gray-300">(mp4, avi, mpeg | max 50MB)</p>
+                </div>
+                <input type="file" id="video_path" name="video_path" accept="video/mp4,video/avi,video/mpeg"
+                    class="hidden" />
+
+                <div id="videoPreviewContainer"
+                    class="mt-4 hidden relative rounded border border-gray-300 overflow-hidden">
+                    <video id="videoPreview" controls class="w-full h-auto bg-black"></video>
+                    <button type="button" id="removeVideoBtn"
+                        class="absolute top-2 right-2 bg-secondary text-white rounded-full p-1 hover:bg-red-700 transition-colors"
+                        title="Remove video">&times;</button>
+                </div>
+            </div>
+
+            <div class="mb-6 conditional-field" id="office-hours-section">
+                <label class="block font-semibold mb-2 dark:text-gray-300">Office Hours</label>
+
+                {{-- Bulk Day Selection Section --}}
+                <div class="mb-6 p-4 border border-primary rounded dark:bg-gray-800">
+                    <p class="font-semibold mb-3 dark:text-gray-300">Set Time Range for Multiple Days</p>
+
+                    {{-- Day Selection --}}
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2 dark:text-gray-300">Select Days:</label>
+                        <div class="flex gap-2 flex-wrap">
+                            @php
+                                $daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                            @endphp
+                            @foreach ($daysOfWeek as $day)
+                                <label
+                                    class="flex items-center bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                                    <input type="checkbox"
+                                        class="bulk-day-checkbox mr-2 text-primary focus:ring-primary dark:focus:ring-primary"
+                                        value="{{ $day }}">
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">{{ $day }}</span>
+                                </label>
+                            @endforeach
+                        </div>
+
+                        {{-- Quick Select Buttons --}}
+                        <div class="mt-2 flex gap-2 flex-wrap">
+                            <button type="button"
+                                class="quick-select bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white px-3 py-1 rounded text-sm transition-colors"
+                                data-days="Mon,Tue,Wed,Thu,Fri">Weekdays</button>
+                            <button type="button"
+                                class="quick-select bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white px-3 py-1 rounded text-sm transition-colors"
+                                data-days="Sat,Sun">Weekends</button>
+                            <button type="button"
+                                class="quick-select bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white px-3 py-1 rounded text-sm transition-colors"
+                                data-days="Mon,Tue,Wed,Thu,Fri,Sat,Sun">All Days</button>
+                            <button type="button"
+                                class="clear-select bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300 px-3 py-1 rounded text-sm transition-colors">Clear
+                                All</button>
+                        </div>
+                    </div>
+
+                    {{-- Time Range Input (Single Row Only) --}}
+                    <div class="bulk-time-ranges mb-4">
+                        <label class="block text-sm font-medium mb-2 dark:text-gray-300">Time Range:</label>
+                        <div class="bulk-ranges-container">
+                            <div class="flex gap-2 mb-2 bulk-range-row">
+                                <div class="relative flex-1">
+                                    <input type="time"
+                                        class="custom-time-input bulk-start-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary dark:focus:border-primary">
+                                    <button type="button"
+                                        class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
+                                        title="Clear">
+                                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png"
+                                            class="w-3 h-3 cursor-pointer hover:scale-120 transition-all duration-300 ease-in-out"
+                                            alt="Clear">
+                                    </button>
+                                </div>
+                                <div class="relative flex-1">
+                                    <input type="time"
+                                        class="custom-time-input bulk-end-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary dark:focus:border-primary">
+                                    <button type="button"
+                                        class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
+                                        title="Clear">
+                                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png"
+                                            class="w-3 h-3 cursor-pointer hover:scale-120 transition-all duration-300 ease-in-out"
+                                            alt="Clear">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Apply Button --}}
+                    <button type="button"
+                        class="apply-bulk bg-primary text-center text-white px-4 py-2 rounded-md hover:text-primary border-2 border-primary hover:bg-white dark:hover:bg-gray-800 duration-300 ease-in-out transition-all cursor-pointer shadow-primary-hover">
+                        Apply to Selected Days
+                    </button>
+                </div>
+
+                {{-- Display Saved Hours --}}
+                <div class="p-4 border border-primary rounded dark:bg-gray-800">
+                    <p class="mb-3 dark:text-gray-300">Saved Office Hours</p>
+                    <ul id="officeHoursDisplay" class="space-y-2 text-sm text-gray-700 dark:text-gray-300"></ul>
+                </div>
+            </div>
+
             <div>
                 <button type="submit"
-                    class="w-full bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary transition-all duration-300 px-6 py-3 rounded-md shadow-md hover:shadow-lg cursor-pointer">
+                    class="w-full bg-primary text-white px-4 py-2 bg-primary rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
                     Update Room
                 </button>
             </div>
@@ -235,192 +269,165 @@
 
 @push('scripts')
     <script>
-        // Enhanced Edit Form Script with Drag & Drop Support and File Size Validation
-        document.addEventListener('DOMContentLoaded', () => {
-            // File size limits (in MB)
-            const MAX_IMAGE_SIZE_MB = 10;
-            const MAX_VIDEO_SIZE_MB = 50;
-            const MAX_CAROUSEL_IMAGES = 50;
+        document.addEventListener('DOMContentLoaded', function() {
+            // Room type change handler with same logic as create
+            const roomTypeSelect = document.getElementById('room_type');
+            const conditionalFields = document.querySelectorAll('.conditional-field');
 
-            // Carousel image handling with drag & drop
-            const carouselInput = document.getElementById('carousel_images');
-            const carouselPreviewContainer = document.getElementById('carouselPreviewContainer');
-            const carouselUploadBox = document.getElementById('carouselUploadBox');
-            const carouselUploadIcon = document.getElementById('carouselUploadIcon');
-            const carouselUploadText = document.getElementById('carouselUploadText');
+            function toggleConditionalFields() {
+                const isEntrancePoint = roomTypeSelect.value === 'entrance_point';
 
-            let selectedCarouselFiles = [];
+                conditionalFields.forEach(field => {
+                    if (isEntrancePoint) {
+                        field.style.display = 'none';
+                        const inputs = field.querySelectorAll('input, textarea, select');
+                        inputs.forEach(input => {
+                            input.disabled = true;
+                            if (input.type === 'file' && !isPageLoad) {
+                                input.value = '';
+                            }
+                        });
+                    } else {
+                        field.style.display = 'block';
+                        const inputs = field.querySelectorAll('input, textarea, select');
+                        inputs.forEach(input => {
+                            input.disabled = false;
+                        });
+                    }
+                });
 
-            // Cover image drag & drop functionality
+                if (isEntrancePoint && !isPageLoad) {
+                    const coverPreview = document.getElementById('previewImage');
+                    const coverUploadText = document.getElementById('uploadText');
+                    const uploadBox = document.getElementById('uploadBox');
+                    if (coverPreview) {
+                        coverPreview.classList.add('hidden');
+                        coverPreview.src = '';
+                    }
+                    if (coverUploadText) coverUploadText.style.display = '';
+                    const uploadIcon = uploadBox?.querySelector('img');
+                    if (uploadIcon) uploadIcon.style.display = '';
+
+                    const carouselContainer = document.getElementById('carouselPreviewContainer');
+                    if (carouselContainer) {
+                        // Only clear new files, not existing images
+                        [...carouselContainer.children].forEach(div => {
+                            if (!div.querySelector('input[type="checkbox"]')) {
+                                div.remove();
+                            }
+                        });
+                    }
+                    selectedFiles = [];
+                    updateUploadIconVisibility();
+
+                    clearVideo();
+                    const videoInput = document.getElementById('video_path');
+                    if (videoInput) videoInput.value = '';
+
+                    officeHoursData = {};
+                    renderOfficeHours();
+                }
+
+                sessionStorage.setItem('room_type', roomTypeSelect.value);
+            }
+
+            let isPageLoad = true;
+            const savedRoomType = sessionStorage.getItem('room_type');
+            if (savedRoomType && savedRoomType !== roomTypeSelect.value) {
+                roomTypeSelect.value = savedRoomType;
+            }
+
+            toggleConditionalFields();
+
+            setTimeout(() => {
+                isPageLoad = false;
+            }, 100);
+
+            roomTypeSelect.addEventListener('change', () => {
+                isPageLoad = false;
+                toggleConditionalFields();
+            });
+
+            // Cover image upload preview + drag and drop
             const coverInput = document.getElementById('image_path');
-            const coverUploadBox = coverInput?.closest('.mb-4')?.querySelector('label');
+            const coverPreview = document.getElementById('previewImage');
+            const coverUploadBox = document.getElementById('uploadBox');
 
-            if (coverUploadBox && coverInput) {
-                // Add drag & drop styles to cover upload box
-                coverUploadBox.classList.add('cursor-pointer', 'transition-colors');
+            coverUploadBox.addEventListener('click', () => coverInput.click());
 
-                // Cover image drag & drop events
-                coverUploadBox.addEventListener('dragover', handleCoverDragOver);
-                coverUploadBox.addEventListener('dragleave', handleCoverDragLeave);
-                coverUploadBox.addEventListener('drop', handleCoverDrop);
+            coverInput.addEventListener('change', () => {
+                if (coverInput.files && coverInput.files[0]) {
+                    showCoverPreview(coverInput.files[0]);
+                }
+            });
 
-                // Cover image file input change
-                coverInput.addEventListener('change', handleCoverInputChange);
-            }
-
-            // Video upload drag & drop functionality
-            const videoInput = document.getElementById('video_path');
-            const videoUploadBox = videoInput?.closest('.mb-4')?.querySelector('label');
-
-            if (videoUploadBox && videoInput) {
-                // Add drag & drop styles to video upload box
-                videoUploadBox.classList.add('cursor-pointer', 'transition-colors');
-
-                // Video drag & drop events
-                videoUploadBox.addEventListener('dragover', handleVideoDragOver);
-                videoUploadBox.addEventListener('dragleave', handleVideoDragLeave);
-                videoUploadBox.addEventListener('drop', handleVideoDrop);
-
-                // Video file input change
-                videoInput.addEventListener('change', handleVideoInputChange);
-            }
-
-            // Cover Image Functions
-            function handleCoverDragOver(e) {
+            coverUploadBox.addEventListener('dragover', e => {
                 e.preventDefault();
-                e.stopPropagation();
-                this.classList.add('border-primary', 'bg-gray-50', 'dark:bg-gray-700');
-            }
+                coverUploadBox.classList.add('border-primary', 'bg-gray-50');
+            });
 
-            function handleCoverDragLeave(e) {
+            coverUploadBox.addEventListener('dragleave', e => {
                 e.preventDefault();
-                e.stopPropagation();
-                this.classList.remove('border-primary', 'bg-gray-50', 'dark:bg-gray-700');
-            }
+                coverUploadBox.classList.remove('border-primary', 'bg-gray-50');
+            });
 
-            function handleCoverDrop(e) {
+            coverUploadBox.addEventListener('drop', e => {
                 e.preventDefault();
-                e.stopPropagation();
-                this.classList.remove('border-primary', 'bg-gray-50', 'dark:bg-gray-700');
+                coverUploadBox.classList.remove('border-primary', 'bg-gray-50');
 
-                const files = e.dataTransfer.files;
-                if (files && files[0]) {
-                    validateAndSetCoverImage(files[0]);
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    coverInput.files = e.dataTransfer.files;
+                    showCoverPreview(e.dataTransfer.files[0]);
                 }
+            });
+
+            function showCoverPreview(file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    coverPreview.src = e.target.result;
+                    coverPreview.classList.remove('hidden');
+
+                    const icon = coverUploadBox.querySelector('img');
+                    const text = coverUploadBox.querySelector('span');
+                    if (icon) icon.style.display = 'none';
+                    if (text) text.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
             }
 
-            function handleCoverInputChange(e) {
-                if (e.target.files && e.target.files[0]) {
-                    validateAndSetCoverImage(e.target.files[0]);
-                }
-            }
+            // Carousel images functionality + drag and drop
+            const maxFiles = 50;
+            const maxSizeMB = 10;
+            const carouselInput = document.getElementById('carousel_images');
+            const carouselUploadBox = document.getElementById('carouselUploadBox');
+            const carouselPreviewContainer = document.getElementById('carouselPreviewContainer');
+            let selectedFiles = [];
 
-            function validateAndSetCoverImage(file) {
-                // Check if it's an image
-                if (!file.type.startsWith('image/')) {
-                    showTemporaryMessage('Please select a valid image file.', 'error');
-                    coverInput.value = '';
-                    return;
-                }
+            carouselUploadBox.addEventListener('click', () => carouselInput.click());
 
-                // Check file size
-                if (file.size > MAX_IMAGE_SIZE_MB * 1024 * 1024) {
-                    showTemporaryMessage(
-                        `Image size must be less than ${MAX_IMAGE_SIZE_MB}MB. Selected file is ${(file.size / 1024 / 1024).toFixed(1)}MB.`,
-                        'error');
-                    coverInput.value = '';
-                    return;
-                }
-
-                // Create a new FileList with the validated file
-                const dt = new DataTransfer();
-                dt.items.add(file);
-                coverInput.files = dt.files;
-
-                showTemporaryMessage('Cover image updated successfully!', 'success');
-            }
-
-            // Video Functions
-            function handleVideoDragOver(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                this.classList.add('border-primary', 'bg-gray-50', 'dark:bg-gray-700');
-            }
-
-            function handleVideoDragLeave(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                this.classList.remove('border-primary', 'bg-gray-50', 'dark:bg-gray-700');
-            }
-
-            function handleVideoDrop(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                this.classList.remove('border-primary', 'bg-gray-50', 'dark:bg-gray-700');
-
-                const files = e.dataTransfer.files;
-                if (files && files[0]) {
-                    validateAndSetVideo(files[0]);
-                }
-            }
-
-            function handleVideoInputChange(e) {
-                if (e.target.files && e.target.files[0]) {
-                    validateAndSetVideo(e.target.files[0]);
-                }
-            }
-
-            function validateAndSetVideo(file) {
-                const allowedVideoTypes = ['video/mp4', 'video/avi', 'video/mpeg'];
-
-                // Check if it's a valid video type
-                if (!allowedVideoTypes.includes(file.type)) {
-                    showTemporaryMessage('Please select a valid video file (MP4, AVI, or MPEG).', 'error');
-                    videoInput.value = '';
-                    return;
-                }
-
-                // Check file size
-                if (file.size > MAX_VIDEO_SIZE_MB * 1024 * 1024) {
-                    showTemporaryMessage(
-                        `Video size must be less than ${MAX_VIDEO_SIZE_MB}MB. Selected file is ${(file.size / 1024 / 1024).toFixed(1)}MB.`,
-                        'error');
-                    videoInput.value = '';
-                    return;
-                }
-
-                // Create a new FileList with the validated file
-                const dt = new DataTransfer();
-                dt.items.add(file);
-                videoInput.files = dt.files;
-
-                showTemporaryMessage('Video updated successfully!', 'success');
-            }
-
-            // Enhanced Carousel Functions
             function updateUploadIconVisibility() {
+                const icon = carouselUploadBox.querySelector('img');
+                const text = carouselUploadBox.querySelector('span');
+
+                // Count existing images that aren't marked for removal
                 const existingImages = [...carouselPreviewContainer.children].filter(div => {
                     const checkbox = div.querySelector('input[type="checkbox"]');
                     return !checkbox || !checkbox.checked;
                 });
 
-                const totalVisible = existingImages.length + selectedCarouselFiles.length;
+                const totalVisible = existingImages.length + selectedFiles.length;
 
-                if (carouselUploadIcon) {
-                    carouselUploadIcon.style.display = totalVisible > 0 ? 'none' : 'block';
-                }
-                if (carouselUploadText) {
-                    carouselUploadText.style.display = totalVisible > 0 ? 'none' : 'block';
-                }
+                if (icon) icon.style.display = totalVisible > 0 ? 'none' : '';
+                if (text) text.style.display = totalVisible > 0 ? 'none' : '';
             }
 
-            function updateCarouselInputFiles() {
+            function updateInputFiles() {
                 const dt = new DataTransfer();
-                selectedCarouselFiles.forEach(file => dt.items.add(file));
+                selectedFiles.forEach(file => dt.items.add(file));
                 carouselInput.files = dt.files;
             }
 
-            function renderCarouselPreviews() {
+            function renderPreviews() {
                 // Remove only the new file previews (not existing images)
                 [...carouselPreviewContainer.children].forEach(div => {
                     if (!div.querySelector('input[type="checkbox"]')) {
@@ -428,7 +435,7 @@
                     }
                 });
 
-                selectedCarouselFiles.forEach((file, index) => {
+                selectedFiles.forEach((file, index) => {
                     const reader = new FileReader();
                     reader.onload = e => {
                         const container = document.createElement('div');
@@ -440,16 +447,14 @@
                         img.className = 'w-full h-full object-cover rounded';
 
                         const removeBtn = document.createElement('button');
-                        removeBtn.type = 'button';
+                        removeBtn.innerHTML = '&times;';
                         removeBtn.className =
-                            'absolute top-1 right-1 bg-red-600 text-white rounded px-1 text-xs cursor-pointer opacity-0 hover:opacity-100 transition-opacity';
-                        removeBtn.title = 'Remove this image';
-                        removeBtn.innerHTML = '✕';
-                        removeBtn.onclick = (ev) => {
+                            'absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow';
+                        removeBtn.onclick = ev => {
                             ev.preventDefault();
-                            selectedCarouselFiles.splice(index, 1);
-                            renderCarouselPreviews();
-                            updateCarouselInputFiles();
+                            selectedFiles.splice(index, 1);
+                            renderPreviews();
+                            updateInputFiles();
                             updateUploadIconVisibility();
                         };
 
@@ -463,6 +468,28 @@
                 updateUploadIconVisibility();
             }
 
+            carouselInput.addEventListener('change', () => handleCarouselFiles(Array.from(carouselInput.files ||
+            [])));
+
+            carouselUploadBox.addEventListener('dragover', e => {
+                e.preventDefault();
+                carouselUploadBox.classList.add('border-primary', 'bg-gray-50');
+            });
+
+            carouselUploadBox.addEventListener('dragleave', e => {
+                e.preventDefault();
+                carouselUploadBox.classList.remove('border-primary', 'bg-gray-50');
+            });
+
+            carouselUploadBox.addEventListener('drop', e => {
+                e.preventDefault();
+                carouselUploadBox.classList.remove('border-primary', 'bg-gray-50');
+
+                if (e.dataTransfer.files) {
+                    handleCarouselFiles(Array.from(e.dataTransfer.files));
+                }
+            });
+
             function handleCarouselFiles(newFiles) {
                 carouselInput.value = '';
 
@@ -472,145 +499,291 @@
                     return checkbox && !checkbox.checked;
                 }).length;
 
-                // Check total count
-                if (existingCount + selectedCarouselFiles.length + newFiles.length > MAX_CAROUSEL_IMAGES) {
-                    showTemporaryMessage(`You can upload maximum ${MAX_CAROUSEL_IMAGES} images in total.`, 'error');
+                // Check number of files
+                if (existingCount + selectedFiles.length + newFiles.length > maxFiles) {
+                    alert(`You can upload max ${maxFiles} images.`);
                     return;
                 }
 
-                // Validate each file
+                // Limit file sizes per file
                 for (let file of newFiles) {
-                    if (!file.type.startsWith('image/')) {
-                        showTemporaryMessage(`"${file.name}" is not a valid image file.`, 'error');
-                        return;
-                    }
-
-                    if (file.size > MAX_IMAGE_SIZE_MB * 1024 * 1024) {
-                        showTemporaryMessage(`"${file.name}" is too large. Maximum size is ${MAX_IMAGE_SIZE_MB}MB.`,
-                            'error');
+                    if (file.size > maxSizeMB * 1024 * 1024) {
+                        alert(`"${file.name}" is too large. Max size is ${maxSizeMB} MB.`);
                         return;
                     }
                 }
 
-                selectedCarouselFiles = selectedCarouselFiles.concat(newFiles);
-                renderCarouselPreviews();
-                updateCarouselInputFiles();
-
-                showTemporaryMessage(`${newFiles.length} image(s) added successfully!`, 'success');
+                selectedFiles = selectedFiles.concat(newFiles);
+                renderPreviews();
+                updateInputFiles();
             }
 
-            // Carousel event listeners
-            if (carouselInput && carouselUploadBox) {
-                // Drag & drop for carousel
-                carouselUploadBox.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    carouselUploadBox.classList.add('border-primary', 'bg-gray-50', 'dark:bg-gray-700');
-                });
+            // Function to toggle image removal for existing images
+            window.toggleImageRemoval = function(button, imageId) {
+                const container = button.parentElement;
+                const checkbox = container.querySelector('input[type="checkbox"]');
 
-                carouselUploadBox.addEventListener('dragleave', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    carouselUploadBox.classList.remove('border-primary', 'bg-gray-50', 'dark:bg-gray-700');
-                });
+                if (checkbox.checked) {
+                    checkbox.checked = false;
+                    container.style.opacity = '1';
+                    button.innerHTML = '&times;';
+                } else {
+                    checkbox.checked = true;
+                    container.style.opacity = '0.4';
+                    button.innerHTML = '↶';
+                }
+                updateUploadIconVisibility();
+            };
 
-                carouselUploadBox.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    carouselUploadBox.classList.remove('border-primary', 'bg-gray-50', 'dark:bg-gray-700');
+            updateUploadIconVisibility();
 
-                    if (e.dataTransfer.files) {
-                        handleCarouselFiles(Array.from(e.dataTransfer.files));
-                    }
-                });
+            // Video upload functionality
+            const maxVideoSizeMB = 50;
+            const allowedVideoTypes = ['video/mp4', 'video/avi', 'video/mpeg'];
 
-                carouselInput.addEventListener('change', () => {
-                    if (carouselInput.files) {
-                        handleCarouselFiles(Array.from(carouselInput.files));
-                    }
-                });
-            }
+            const dropZone = document.getElementById('videoDropZone');
+            const videoInput = document.getElementById('video_path');
+            const videoPreviewContainer = document.getElementById('videoPreviewContainer');
+            const videoPreview = document.getElementById('videoPreview');
+            const removeVideoBtn = document.getElementById('removeVideoBtn');
 
-            // Handle existing image removal checkboxes
-            carouselPreviewContainer?.addEventListener('change', e => {
-                if (e.target.matches('input[type="checkbox"]')) {
-                    const parentDiv = e.target.closest('div');
-                    parentDiv.style.opacity = e.target.checked ? '0.4' : '1';
-                    updateUploadIconVisibility();
+            dropZone.addEventListener('click', () => videoInput.click());
+
+            videoInput.addEventListener('change', () => {
+                if (videoInput.files && videoInput.files[0]) {
+                    showVideoPreview(videoInput.files[0]);
                 }
             });
 
-            // Show temporary message function
-            function showTemporaryMessage(message, type = "info") {
-                const existing = document.getElementById("temp-message");
-                if (existing) existing.remove();
+            dropZone.addEventListener('dragover', e => {
+                e.preventDefault();
+                dropZone.classList.add('border-primary', 'bg-gray-50');
+            });
 
-                const div = document.createElement("div");
-                div.id = "temp-message";
-                div.textContent = message;
+            dropZone.addEventListener('dragleave', e => {
+                e.preventDefault();
+                dropZone.classList.remove('border-primary', 'bg-gray-50');
+            });
 
-                const base =
-                    "fixed top-24 right-4 p-3 rounded shadow-lg z-50 transition-opacity duration-500 border-l-4";
-                const colors = {
-                    success: "bg-green-100 text-green-700 border border-green-300 dark:bg-green-800 dark:text-green-200 dark:border-green-600",
-                    error: "bg-red-100 text-red-700 border border-red-300 dark:bg-red-800 dark:text-red-200 dark:border-red-600",
-                    info: "bg-yellow-100 text-yellow-700 border border-yellow-300 dark:bg-yellow-700 dark:text-yellow-200 dark:border-yellow-500"
-                };
+            dropZone.addEventListener('drop', e => {
+                e.preventDefault();
+                dropZone.classList.remove('border-primary', 'bg-gray-50');
 
-                div.className = `${base} ${colors[type] || colors.info}`;
-                document.body.appendChild(div);
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    videoInput.files = e.dataTransfer.files;
+                    showVideoPreview(e.dataTransfer.files[0]);
+                }
+            });
 
-                setTimeout(() => {
-                    div.style.opacity = "0";
-                    setTimeout(() => div.remove(), 500);
-                }, 3000);
+            removeVideoBtn.addEventListener('click', () => {
+                clearVideo();
+                videoInput.value = '';
+            });
+
+            function showVideoPreview(file) {
+                // Size check
+                if (file.size / 1024 / 1024 > maxVideoSizeMB) {
+                    alert(`"${file.name}" is too large. Max size is ${maxVideoSizeMB} MB.`);
+                    clearVideo();
+                    videoInput.value = '';
+                    return;
+                }
+
+                // Type check
+                if (!allowedVideoTypes.includes(file.type)) {
+                    alert(`"${file.name}" is not a valid format. Only MP4, AVI, or MPEG allowed.`);
+                    clearVideo();
+                    videoInput.value = '';
+                    return;
+                }
+
+                // Show preview if valid
+                const url = URL.createObjectURL(file);
+                videoPreview.src = url;
+                videoPreviewContainer.classList.remove('hidden');
             }
 
-            // Initialize
-            updateUploadIconVisibility();
+            function clearVideo() {
+                videoPreview.src = '';
+                videoPreviewContainer.classList.add('hidden');
+            }
 
-            // Office Hours Management (existing code continues...)
+            // ================= Enhanced Office Hours with Day.js =================
             const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
             let officeHoursData = {};
 
             // Populate existing data from the room model
             officeHoursData = @json($existingOfficeHours);
 
-            // Function to find the most common time range across all days
-            function getMostCommonTimeRange() {
-                const timeRangeCount = {};
-                let mostCommon = null;
-                let maxCount = 0;
+            // Day.js Enhanced Time Functions
+            function formatTime12Hour(time24) {
+                try {
+                    if (!time24 || !time24.match(/^\d{2}:\d{2}$/)) {
+                        return time24;
+                    }
 
-                Object.values(officeHoursData).forEach(dayRanges => {
-                    if (dayRanges && dayRanges.length > 0) {
-                        const range = dayRanges[0];
-                        const key = `${range.start}-${range.end}`;
-                        timeRangeCount[key] = (timeRangeCount[key] || 0) + 1;
+                    const timeObj = dayjs(`2000-01-01 ${time24}:00`);
+                    return timeObj.isValid() ? timeObj.format('h:mm A') : time24;
+                } catch (error) {
+                    console.warn('Time formatting error:', error);
+                    return time24;
+                }
+            }
 
-                        if (timeRangeCount[key] > maxCount) {
-                            maxCount = timeRangeCount[key];
-                            mostCommon = range;
+            function validateTimeRange(startTime, endTime) {
+                try {
+                    const start = dayjs(`2000-01-01 ${startTime}:00`);
+                    const end = dayjs(`2000-01-01 ${endTime}:00`);
+
+                    if (!start.isValid() || !end.isValid()) {
+                        return {
+                            valid: false,
+                            error: 'Invalid time format'
+                        };
+                    }
+
+                    if (start.isAfter(end) || start.isSame(end)) {
+                        return {
+                            valid: false,
+                            error: 'End time must be after start time'
+                        };
+                    }
+
+                    return {
+                        valid: true
+                    };
+                } catch (error) {
+                    return {
+                        valid: false,
+                        error: 'Time validation failed'
+                    };
+                }
+            }
+
+            function hasOverlapDayJs(ranges) {
+                const sortedRanges = ranges.map(range => ({
+                    start: dayjs(`2000-01-01 ${range.start}:00`),
+                    end: dayjs(`2000-01-01 ${range.end}:00`),
+                    original: range
+                })).sort((a, b) => a.start.isBefore(b.start) ? -1 : 1);
+
+                for (let i = 0; i < sortedRanges.length - 1; i++) {
+                    const current = sortedRanges[i];
+                    const next = sortedRanges[i + 1];
+
+                    if (current.end.isAfter(next.start)) {
+                        return {
+                            hasOverlap: true,
+                            conflictingRanges: [current.original, next.original]
+                        };
+                    }
+                }
+
+                return {
+                    hasOverlap: false
+                };
+            }
+
+            function formatDuration(startTime, endTime) {
+                const start = dayjs(`2000-01-01 ${startTime}:00`);
+                const end = dayjs(`2000-01-01 ${endTime}:00`);
+
+                const diffMinutes = end.diff(start, 'minute');
+                const hours = Math.floor(diffMinutes / 60);
+                const minutes = diffMinutes % 60;
+
+                if (hours === 0) return `${minutes}m`;
+                if (minutes === 0) return `${hours}h`;
+                return `${hours}h ${minutes}m`;
+            }
+
+            // Quick select functionality
+            document.querySelectorAll('.quick-select').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const days = btn.dataset.days.split(',');
+                    document.querySelectorAll('.bulk-day-checkbox').forEach(cb => cb.checked =
+                        false);
+                    days.forEach(day => {
+                        const cb = document.querySelector(
+                            `.bulk-day-checkbox[value="${day}"]`);
+                        if (cb) cb.checked = true;
+                    });
+                    updateBulkInputsForSelectedDays();
+                });
+            });
+
+            document.querySelector('.clear-select').addEventListener('click', () => {
+                document.querySelectorAll('.bulk-day-checkbox').forEach(cb => cb.checked = false);
+                updateBulkInputsForSelectedDays();
+            });
+
+            // Apply bulk changes with proper edit handling
+            document.querySelector('.apply-bulk').addEventListener('click', function() {
+                const selectedDays = Array.from(document.querySelectorAll('.bulk-day-checkbox:checked'))
+                    .map(cb => cb.value);
+                if (!selectedDays.length) return alert("Please select at least one day.");
+
+                const ranges = collectBulkRanges();
+                if (!ranges) return;
+
+                // Check if we're in edit mode (if any existing schedule matches current selection)
+                const isEditMode = checkIfEditMode(selectedDays, ranges);
+
+                if (isEditMode) {
+                    // In edit mode: Clear old schedule and apply new one
+                    clearExistingScheduleForEdit(selectedDays, ranges);
+                }
+
+                // Apply the new schedule to selected days
+                selectedDays.forEach(day => {
+                    officeHoursData[day] = ranges;
+                });
+
+                renderOfficeHours();
+                showTemporaryFeedback(this, "Applied Successfully!");
+                showTemporaryMessage("Office hours updated for selected days!", "success");
+            });
+
+            // Helper function to check if we're editing an existing schedule
+            function checkIfEditMode(selectedDays, newRanges) {
+                // Check if any selected day already has office hours
+                return selectedDays.some(day => officeHoursData[day] && officeHoursData[day].length > 0);
+            }
+
+            // Helper function to clear existing schedules when editing
+            function clearExistingScheduleForEdit(selectedDays, newRanges) {
+                // Find all days that have the same schedule as what we're trying to apply
+                const newRangeKey = newRanges.map(r => `${r.start}-${r.end}`).join(",");
+
+                // Find existing grouped schedules
+                const existingGroups = {};
+                daysOfWeek.forEach(day => {
+                    const ranges = officeHoursData[day] || [];
+                    const rangeKey = ranges.length ? ranges.map(r => `${r.start}-${r.end}`).join(",") :
+                        "closed";
+
+                    if (!existingGroups[rangeKey]) {
+                        existingGroups[rangeKey] = [];
+                    }
+                    existingGroups[rangeKey].push(day);
+                });
+
+                // Clear days that are not in the new selection but were part of existing groups
+                Object.entries(existingGroups).forEach(([rangeKey, groupDays]) => {
+                    if (rangeKey !== "closed") {
+                        // Check if any of the selected days belong to this group
+                        const hasOverlap = groupDays.some(day => selectedDays.includes(day));
+
+                        if (hasOverlap) {
+                            // Clear all days in this group that are NOT in the new selection
+                            groupDays.forEach(day => {
+                                if (!selectedDays.includes(day)) {
+                                    delete officeHoursData[day];
+                                }
+                            });
                         }
                     }
                 });
-
-                return mostCommon;
-            }
-
-            // Function to pre-populate bulk time inputs with existing data
-            function prePopulateBulkTimeInputs() {
-                const commonRange = getMostCommonTimeRange();
-
-                if (commonRange) {
-                    const startInput = document.querySelector('.bulk-start-time');
-                    const endInput = document.querySelector('.bulk-end-time');
-
-                    if (startInput && endInput) {
-                        startInput.value = commonRange.start;
-                        endInput.value = commonRange.end;
-                    }
-                }
             }
 
             // Function to update bulk inputs when days are selected
@@ -666,45 +839,6 @@
                 checkbox.addEventListener('change', updateBulkInputsForSelectedDays);
             });
 
-            // Quick select functionality
-            document.querySelectorAll('.quick-select').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const days = btn.dataset.days.split(',');
-                    document.querySelectorAll('.bulk-day-checkbox').forEach(cb => cb.checked =
-                        false);
-                    days.forEach(day => {
-                        const cb = document.querySelector(
-                            `.bulk-day-checkbox[value="${day}"]`);
-                        if (cb) cb.checked = true;
-                    });
-                    updateBulkInputsForSelectedDays();
-                });
-            });
-
-            // Clear all selection
-            document.querySelector('.clear-select').addEventListener('click', () => {
-                document.querySelectorAll('.bulk-day-checkbox').forEach(cb => cb.checked = false);
-                updateBulkInputsForSelectedDays();
-            });
-
-            // Apply bulk changes with enhanced validation
-            document.querySelector('.apply-bulk').addEventListener('click', function() {
-                const selectedDays = Array.from(document.querySelectorAll('.bulk-day-checkbox:checked'))
-                    .map(cb => cb.value);
-                if (!selectedDays.length) return alert("Please select at least one day.");
-
-                const ranges = collectBulkRanges();
-                if (!ranges) return;
-
-                selectedDays.forEach(day => {
-                    officeHoursData[day] = ranges;
-                });
-
-                renderOfficeHours();
-                showTemporaryFeedback(this, "Applied Successfully!");
-                showTemporaryMessage("Office hours updated for selected days!", "success");
-            });
-
             // Clear time input when X is clicked
             document.addEventListener('click', e => {
                 if (e.target.classList.contains('clear-time') || e.target.closest('.clear-time')) {
@@ -717,21 +851,52 @@
                 }
             });
 
-            // Convert 24-hour time to 12-hour format
-            function formatTime12Hour(time24) {
-                const [hours, minutes] = time24.split(':');
-                const hour = parseInt(hours);
-                const ampm = hour >= 12 ? 'PM' : 'AM';
-                const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
-                return `${hour12}:${minutes} ${ampm}`;
+            // Enhanced collectBulkRanges with Day.js validation
+            function collectBulkRanges() {
+                const ranges = [];
+                let valid = true;
+
+                document.querySelectorAll('.bulk-range-row').forEach(row => {
+                    const start = row.querySelector('.bulk-start-time').value;
+                    const end = row.querySelector('.bulk-end-time').value;
+                    clearError(row);
+
+                    if (start && end) {
+                        const validation = validateTimeRange(start, end);
+
+                        if (!validation.valid) {
+                            showError(row, validation.error);
+                            valid = false;
+                            return;
+                        }
+
+                        ranges.push({
+                            start,
+                            end
+                        });
+                    }
+                });
+
+                if (!valid) return null;
+                if (!ranges.length) {
+                    alert("Please enter at least one valid time range.");
+                    return null;
+                }
+
+                const overlapCheck = hasOverlapDayJs(ranges);
+                if (overlapCheck.hasOverlap) {
+                    alert("Time ranges overlap. Fix them first.");
+                    return null;
+                }
+
+                return ranges;
             }
 
-            // Enhanced renderOfficeHours with table layout for edit and delete
+            // Enhanced renderOfficeHours
             function renderOfficeHours() {
                 const container = document.getElementById("officeHoursDisplay");
                 container.innerHTML = "";
 
-                // Group days by their time ranges
                 const groupedSchedule = {};
 
                 daysOfWeek.forEach(day => {
@@ -749,11 +914,10 @@
                     groupedSchedule[rangeKey].days.push(day);
                 });
 
-                // Render grouped schedule in table format
                 Object.entries(groupedSchedule).forEach(([rangeKey, group]) => {
-                    const scheduleItem = document.createElement("div");
-                    scheduleItem.className =
-                        "mb-3 p-3 bg-white rounded border dark:bg-gray-800 dark:border-gray-600 border-primary";
+                    const li = document.createElement("li");
+                    li.className =
+                        "mb-3 p-3 bg-white rounded border relative dark:bg-gray-800 border border-primary";
 
                     const daysText = formatDaysGroup(group.days);
                     let timeText;
@@ -761,33 +925,34 @@
                     if (rangeKey === "closed") {
                         timeText = "Closed";
                     } else {
-                        timeText = group.ranges.map(r =>
-                            `${formatTime12Hour(r.start)} - ${formatTime12Hour(r.end)}`).join(", ");
+                        timeText = group.ranges.map(r => {
+                            const timeRange =
+                                `${formatTime12Hour(r.start)} - ${formatTime12Hour(r.end)}`;
+                            const duration = formatDuration(r.start, r.end);
+                            return `${timeRange} <span class="text-gray-500 text-xs">(${duration})</span>`;
+                        }).join(", ");
                     }
 
-                    scheduleItem.innerHTML = `
-                <div class="flex justify-between items-start">
-                    <div class="flex-1">
-                        <div class="font-medium text-gray-800 dark:text-gray-300 mb-1">${daysText}</div>
-                        <div class="text-sm text-gray-600 dark:text-gray-400">${timeText}</div>
-                    </div>
-                    ${rangeKey !== "closed" ? `
-                            <div class="flex gap-2 ml-4">
-                                <button type="button" 
-                                        class="edit-schedule-btn text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm px-3 py-1 rounded border border-blue-300 dark:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900 transition-colors cursor-pointer" 
-                                        data-days='${JSON.stringify(group.days)}' 
-                                        data-ranges='${JSON.stringify(group.ranges)}'>
-                                    Edit
-                                </button>
-                                <button type="button" 
-                                        class="delete-schedule-btn text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-sm px-3 py-1 rounded border border-red-300 dark:border-red-600 hover:bg-red-50 dark:hover:bg-red-900 transition-colors cursor-pointer" 
-                                        data-days='${JSON.stringify(group.days)}'>
-                                    Delete
-                                </button>
+                    li.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="font-medium text-gray-800 dark:text-gray-300">${daysText}</div>
+                                <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                             </div>
-                        ` : ''}
-                </div>
-            `;
+                            ${rangeKey !== "closed" ? `
+                                    <div class="flex gap-2 ml-4">
+                                        <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                            Edit
+                                        </button>
+                                        <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                data-days='${JSON.stringify(group.days)}'>
+                                            Delete
+                                        </button>
+                                    </div>
+                                ` : ''}
+                        </div>
+                    `;
 
                     // Add hidden inputs for form submission
                     group.days.forEach(day => {
@@ -802,15 +967,14 @@
                             endInput.name = `office_hours[${day}][${idx}][end]`;
                             endInput.value = range.end;
 
-                            scheduleItem.appendChild(startInput);
-                            scheduleItem.appendChild(endInput);
+                            li.appendChild(startInput);
+                            li.appendChild(endInput);
                         });
                     });
 
-                    container.appendChild(scheduleItem);
+                    container.appendChild(li);
                 });
 
-                // Add event listeners for edit and delete buttons
                 attachScheduleActionListeners();
             }
 
@@ -856,9 +1020,8 @@
                             block: 'center'
                         });
 
-                        // Add visual highlight
                         const bulkSection = document.querySelector(
-                            '.mb-6.p-4.border.rounded.bg-blue-50');
+                            '.mb-6.p-4.border.border-primary.rounded');
                         if (bulkSection) {
                             bulkSection.classList.add('ring-2', 'ring-blue-400');
                             setTimeout(() => {
@@ -873,13 +1036,32 @@
                 });
             }
 
-            // Format consecutive days into ranges (e.g., "Mon - Wed" or "Mon, Wed, Fri")
+            // FIXED: Enhanced formatDaysGroup function with precise pattern matching
             function formatDaysGroup(days) {
                 if (days.length === 0) return "";
                 if (days.length === 1) return days[0];
 
                 // Sort days by their order in the week
                 const sortedDays = days.sort((a, b) => daysOfWeek.indexOf(a) - daysOfWeek.indexOf(b));
+
+                // Use array comparison for exact matching to prevent the "Daily" bug
+                const isExactMatch = (pattern) => {
+                    return sortedDays.length === pattern.length &&
+                        sortedDays.every((day, index) => day === pattern[index]);
+                };
+
+                // Special cases for common patterns - EXACT matching
+                if (isExactMatch(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])) {
+                    return "Daily";
+                }
+
+                if (isExactMatch(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'])) {
+                    return "Weekdays";
+                }
+
+                if (isExactMatch(['Sat', 'Sun'])) {
+                    return "Weekends";
+                }
 
                 // Check if days are consecutive
                 const isConsecutive = () => {
@@ -891,54 +1073,39 @@
                     return true;
                 };
 
+                // Only format as range if consecutive AND more than 2 days (but not the special cases above)
                 if (isConsecutive() && sortedDays.length > 2) {
                     return `${sortedDays[0]} - ${sortedDays[sortedDays.length - 1]}`;
                 }
 
+                // Otherwise, return comma-separated list
                 return sortedDays.join(", ");
             }
 
-            function collectBulkRanges() {
-                const ranges = [];
-                let valid = true;
+            // Show temporary message notifications
+            function showTemporaryMessage(message, type = "info") {
+                const existing = document.getElementById("temp-message");
+                if (existing) existing.remove();
 
-                document.querySelectorAll('.bulk-range-row').forEach(row => {
-                    const start = row.querySelector('.bulk-start-time').value;
-                    const end = row.querySelector('.bulk-end-time').value;
-                    clearError(row);
+                const div = document.createElement("div");
+                div.id = "temp-message";
+                div.textContent = message;
 
-                    if (start && end) {
-                        if (start >= end) {
-                            showError(row, "End must be later than start");
-                            valid = false;
-                            return;
-                        }
-                        ranges.push({
-                            start,
-                            end
-                        });
-                    }
-                });
+                const base =
+                    "fixed top-24 right-4 p-3 rounded shadow-lg z-50 transition-opacity duration-500 border-l-4";
+                const colors = {
+                    success: "bg-green-100 text-green-700 border border-green-300 dark:bg-green-800 dark:text-green-200 dark:border-green-600",
+                    error: "bg-red-100 text-red-700 border border-red-300 dark:bg-red-800 dark:text-red-200 dark:border-red-600",
+                    info: "bg-yellow-100 text-yellow-700 border border-yellow-300 dark:bg-yellow-700 dark:text-yellow-200 dark:border-yellow-500"
+                };
 
-                if (!valid) return null;
-                if (!ranges.length) {
-                    alert("Please enter at least one valid time range.");
-                    return null;
-                }
-                if (hasOverlap(ranges)) {
-                    alert("Time ranges overlap. Fix them first.");
-                    return null;
-                }
+                div.className = `${base} ${colors[type] || colors.info}`;
+                document.body.appendChild(div);
 
-                return ranges;
-            }
-
-            function hasOverlap(ranges) {
-                const sorted = ranges.slice().sort((a, b) => a.start.localeCompare(b.start));
-                for (let i = 0; i < sorted.length - 1; i++) {
-                    if (sorted[i].end > sorted[i + 1].start) return true;
-                }
-                return false;
+                setTimeout(() => {
+                    div.style.opacity = "0";
+                    setTimeout(() => div.remove(), 500);
+                }, 3000);
             }
 
             function showTemporaryFeedback(button, text) {
@@ -969,8 +1136,7 @@
                 if (msg) msg.remove();
             }
 
-            // Initialize all functionality
-            prePopulateBulkTimeInputs();
+            // Initial render
             renderOfficeHours();
         });
     </script>
