@@ -9,12 +9,13 @@ use App\Models\RoomImage;
 use App\Models\Staff;
 use App\Services\EntrancePointService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Encoders\WebpEncoder;
 use Intervention\Image\Drivers\Gd\Driver;
-
 
 class RoomController extends Controller
 {
@@ -48,23 +49,27 @@ class RoomController extends Controller
         return view('pages.admin.rooms.create');
     }
 
-    public function store(Request $request, EntrancePointService $entrancePointService)
+    public function store(Request $request, EntrancePointService $entrancePointService, Room $room)
     {
+        $validated = $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('rooms')->whereNull('deleted_at'),
+            ],
+            'description' => 'nullable|string',
+            'room_type' => 'required|in:regular,entrance_point',
+            'image_path' => 'nullable|image|max:10240', // 10 MB
+            'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200', // 50 MB
+            'carousel_images'   => 'nullable|array|max:50',  // MAX 50 files allowed
+            'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:10240', // 5 MB each
+
+            // Office hours
+            'office_hours' => 'nullable|array',
+        ]);
 
         try {
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'description' => 'nullable|string',
-                'room_type' => 'required|in:regular,entrance_point',
-                'image_path' => 'nullable|image|max:10240', // 10 MB
-                'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200', // 50 MB
-                'carousel_images'   => 'nullable|array|max:50',  // MAX 50 files allowed
-                'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:10240', // 5 MB each
-
-                // Office hours
-                'office_hours' => 'nullable|array',
-            ]);
-
             // Create the room (regular or entrance gate)
             $room = Room::create(collect($validated)->except('office_hours')->toArray());
 
@@ -130,7 +135,7 @@ class RoomController extends Controller
                     $image = $manager->read($carouselImage)->encode(new WebpEncoder(90));
                     Storage::disk('public')->put($webpPath, (string) $image);
 
-                    RoomImage::create([
+                    RoomImage::firstOrCreate([
                         'room_id' => $room->id,
                         'image_path' => $webpPath
                     ]);
@@ -148,7 +153,7 @@ class RoomController extends Controller
             return redirect()->route('room.show', $room->id)
                 ->with('success', $successMessage);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Room creation error: ' . $e->getMessage(), [
+            Log::error('Room creation error: ' . $e->getMessage(), [
                 'request' => $request->all()
             ]);
             return back()->withInput()->with('error', 'Failed to create room: ' . $e->getMessage());
@@ -212,7 +217,12 @@ class RoomController extends Controller
         $this->authorize('update', $room); // uses RoomPolicy
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('rooms')->ignore($room->id)->whereNull('deleted_at'),
+            ],
             'description' => 'nullable|string',
             'room_type' => 'required|in:regular,entrance_point',
             'image_path' => 'nullable|image|max:5120', // 5 MB
@@ -334,7 +344,7 @@ class RoomController extends Controller
                 $image = $manager->read($carouselImage)->encode(new WebpEncoder(90));
                 Storage::disk('public')->put($webpPath, (string) $image);
 
-                RoomImage::create([
+                RoomImage::firstOrCreate([
                     'room_id' => $room->id,
                     'image_path' => $webpPath
                 ]);

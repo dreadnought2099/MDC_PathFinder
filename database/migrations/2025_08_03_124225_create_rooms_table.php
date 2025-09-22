@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('image_path')->nullable();
             $table->string('video_path')->nullable();
             $table->enum('room_type', ['regular', 'entrance_point'])->default('regular');
+            $table->unique(['name', 'deleted_at']);
             $table->softDeletes();
             $table->timestamps();
         });

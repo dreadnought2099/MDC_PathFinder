@@ -7,7 +7,7 @@
         <h2 class="text-2xl text-center mb-6 dark:text-gray-300"><span class="text-primary">Edit</span> {{ $room->name }}
         </h2>
 
-        <form action="{{ route('room.update', $room->id) }}" method="POST" enctype="multipart/form-data" data-upload>
+        <form action="{{ route('room.update', $room->id) }}" method="POST" enctype="multipart/form-data" data-upload onsubmit="this.querySelector('button[type=submit]').disabled=true;">
             @csrf
             @method('PUT')
 

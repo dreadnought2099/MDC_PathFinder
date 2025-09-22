@@ -6,7 +6,7 @@
     <div class="max-w-xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-6 dark:bg-gray-800">
         <h2 class="text-2xl text-center mb-6 dark:text-gray-300"><span class="text-primary">Add</span> New Office</h2>
 
-        <form action="{{ route('room.store') }}" method="POST" enctype="multipart/form-data" data-upload>
+        <form action="{{ route('room.store') }}" method="POST" enctype="multipart/form-data" data-upload onsubmit="this.querySelector('button[type=submit]').disabled=true;">
             @csrf
 
             @php
@@ -417,14 +417,14 @@
 
                 // Check number of files
                 if (selectedFiles.length + newFiles.length > maxFiles) {
-                    alert(`You can upload max ${maxFiles} images.`);
+                    showTemporaryMessage(`You can upload max ${maxFiles} images.`);
                     return;
                 }
 
                 // Limit file sizes per file
                 for (let file of newFiles) {
                     if (file.size > maxSizeMB * 1024 * 1024) {
-                        alert(`"${file.name}" is too large. Max size is ${maxSizeMB} MB.`);
+                        showTemporaryMessage(`"${file.name}" is too large. Max size is ${maxSizeMB} MB.`);
                         return;
                     }
                 }
@@ -484,7 +484,7 @@
             function showVideoPreview(file) {
                 // Size check
                 if (file.size / 1024 / 1024 > maxVideoSizeMB) {
-                    alert(`"${file.name}" is too large. Max size is ${maxVideoSizeMB} MB.`);
+                    showTemporaryMessage(`"${file.name}" is too large. Max size is ${maxVideoSizeMB} MB.`);
                     clearVideo();
                     videoInput.value = '';
                     return;
@@ -492,7 +492,7 @@
 
                 // Type check
                 if (!allowedVideoTypes.includes(file.type)) {
-                    alert(`"${file.name}" is not a valid format. Only MP4, AVI, or MPEG allowed.`);
+                    showTemporaryMessage(`"${file.name}" is not a valid format. Only MP4, AVI, or MPEG allowed.`);
                     clearVideo();
                     videoInput.value = '';
                     return;
@@ -619,7 +619,7 @@
             document.querySelector('.apply-bulk').addEventListener('click', function() {
                 const selectedDays = Array.from(document.querySelectorAll('.bulk-day-checkbox:checked'))
                     .map(cb => cb.value);
-                if (!selectedDays.length) return alert("Please select at least one day.");
+                if (!selectedDays.length) return showTemporaryMessage("Please select at least one day.");
 
                 const ranges = collectBulkRanges();
                 if (!ranges) return;
@@ -724,13 +724,13 @@
 
                 if (!valid) return null;
                 if (!ranges.length) {
-                    alert("Please enter at least one valid time range.");
+                    showTemporaryMessage("Please enter at least one valid time range.");
                     return null;
                 }
 
                 const overlapCheck = hasOverlapDayJs(ranges);
                 if (overlapCheck.hasOverlap) {
-                    alert("Time ranges overlap. Fix them first.");
+                    showTemporaryMessage("Time ranges overlap. Fix them first.");
                     return null;
                 }
 
