@@ -44,7 +44,7 @@
                             class="border border-primary rounded-xl p-4 hover:scale-110 transition-all duration-250 ease-in-out">
                             <div class="flex items-start space-x-3">
                                 <div class="bg-blue-100 p-2 rounded-lg">
-                                    <img src="{{ asset('icons/user.png') }}" alt="User" class="h-6 w-6">
+                                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/user.png" alt="User" class="h-6 w-6">
                                 </div>
                                 <div>
                                     <p class="font-semibold text-gray-800 mb-1 dark:text-gray-300">Bio</p>
@@ -58,7 +58,7 @@
                             class="border border-primary rounded-xl p-4 hover:scale-110 transition-all duration-250 ease-in-out">
                             <div class="flex items-center space-x-3">
                                 <div class="bg-orange-100 p-2 rounded-lg">
-                                    <img src="{{ asset('icons/email.png') }}" alt="User" class="h-6 w-6">
+                                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/email.png" alt="User" class="h-6 w-6">
                                 </div>
                                 <div>
                                     <p class="font-semibold text-gray-800 dark:text-gray-300">Email</p>
@@ -72,7 +72,7 @@
                             class="border border-primary rounded-xl p-4 hover:scale-110 transition-all duration-250 ease-in-out">
                             <div class="flex items-center space-x-3">
                                 <div class="bg-purple-200 p-2 rounded-lg">
-                                    <img src="{{ asset('icons/hierarchy.png') }}" alt="User" class="h-6 w-6">
+                                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/hierarchy.png" alt="User" class="h-6 w-6">
                                 </div>
                                 <div>
                                     <p class="font-semibold text-gray-800 dark:text-gray-300">Position</p>
@@ -86,7 +86,7 @@
                             class="border border-primary rounded-xl p-4 hover:scale-110 transition-all duration-250 ease-in-out">
                             <div class="flex items-center space-x-3">
                                 <div class="bg-green-100 p-2 rounded-lg">
-                                    <img src="{{ asset('icons/phone.png') }}" alt="User" class="h-6 w-6">
+                                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/phone.png" alt="User" class="h-6 w-6">
                                 </div>
                                 <div>
                                     <p class="font-semibold text-gray-800 dark:text-gray-300">Phone</p>
@@ -106,14 +106,14 @@
                 <!-- Download button -->
                 <a id="downloadBtn" href="#" download title="Download Image"
                     class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6">
-                    <img src="{{ asset('icons/download-button.png') }}" alt="Download Image" class="w-10 h-10">
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/download-button.png" alt="Download Image" class="w-10 h-10">
                 </a>
 
                 <!-- Close button -->
                 <button onclick="closeModal()"
                     class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6"
                     title="Close Modal">
-                    <img src="{{ asset('icons/exit.png') }}" alt="Close Modal" class="w-10 h-10">
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png" alt="Close Modal" class="w-10 h-10">
                 </button>
             </div>
 
