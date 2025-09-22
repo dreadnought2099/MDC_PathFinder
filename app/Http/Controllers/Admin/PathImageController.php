@@ -66,7 +66,7 @@ class PathImageController extends Controller
 
         foreach ($files as $file) {
             // Get original extension
-            $originalExt = strtolower($file->getClientOriginalExtension());
+            strtolower($file->getClientOriginalExtension());
             $baseName    = uniqid('', true);
 
             $folder      = "path_images/{$path->id}";
@@ -136,7 +136,7 @@ class PathImageController extends Controller
             // Process new upload (save original + webp)
             $manager = new ImageManager(new Driver());
             $file = $request->file('image_file');
-            $originalExt = $file->getClientOriginalExtension();
+            $file->getClientOriginalExtension();
             $baseName = uniqid('', true);
 
             $folder   = "path_images/{$pathImage->path_id}";
@@ -204,7 +204,7 @@ class PathImageController extends Controller
 
                 // Process new upload
                 $manager = new ImageManager(new Driver());
-                $originalExt = $file->getClientOriginalExtension();
+                $file->getClientOriginalExtension();
                 $baseName = uniqid('', true);
 
                 $folder   = "path_images/{$path->id}";
