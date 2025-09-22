@@ -8,6 +8,9 @@ use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\Encoders\WebpEncoder;
+use Intervention\Image\ImageManager;
 
 class StaffController extends Controller
 {
@@ -47,12 +50,19 @@ class StaffController extends Controller
 
         // Create staff first
         $staff = Staff::create($validated);
+        $manager = new ImageManager(new Driver());
 
         // Then handle photo upload
         if ($request->hasFile('photo_path')) {
-            $path = $request->file('photo_path')
-                ->store('staffs/' . $staff->id, 'public');
-            $staff->update(['photo_path' => $path]);
+
+            $baseName = uniqid('', true);
+            $folder   = "staffs/{$staff->id}";
+            $webpPath = "{$folder}/{$baseName}.webp";
+
+            $image = $manager->read($request->file('photo_path'))->encode(new WebpEncoder(90));
+            Storage::disk('public')->put($webpPath, (string) $image);
+
+            $staff->update(['photo_path' => $webpPath]);
         }
 
         session()->flash('success', "{$staff->full_name} was added successfully.");
@@ -111,6 +121,7 @@ class StaffController extends Controller
 
         // Remove photo_path from validated data to handle it separately
         unset($validated['photo_path']);
+        $manager = new ImageManager(new Driver());
 
         // Handle photo upload
         if ($request->hasFile('photo_path')) {
@@ -120,11 +131,15 @@ class StaffController extends Controller
             }
 
             // Store new photo under staffs/{staff_id}/
-            $path = $request->file('photo_path')
-                ->store('staffs/' . $staff->id, 'public');
+            $baseName = uniqid('', true);
+            $folder   = "staffs/{$staff->id}";
+            $webpPath = "{$folder}/{$baseName}.webp";
+
+            $image = $manager->read($request->file('photo_path'))->encode(new WebpEncoder(90));
+            Storage::disk('public')->put($webpPath, (string) $image);
 
             // Add the new path to the data to be updated
-            $validated['photo_path'] = $path;
+            $validated['photo_path'] = $webpPath;
         }
 
         // Update staff with all validated data (including photo_path if uploaded)
