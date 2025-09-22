@@ -6,7 +6,8 @@
     <div class="max-w-xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-6 dark:bg-gray-800">
         <h2 class="text-2xl text-center mb-6 dark:text-gray-300"><span class="text-primary">Add</span> New Office</h2>
 
-        <form action="{{ route('room.store') }}" method="POST" enctype="multipart/form-data" data-upload onsubmit="this.querySelector('button[type=submit]').disabled=true;">
+        <form action="{{ route('room.store') }}" method="POST" enctype="multipart/form-data" data-upload
+            onsubmit="this.querySelector('button[type=submit]').disabled=true;">
             @csrf
 
             @php
@@ -18,8 +19,10 @@
             @endphp
 
             <div class="relative mb-4">
-                <input type="text" name="name" placeholder="Office Name" class="{{ $inputClasses }}" required>
+                <input type="text" name="name" id="name" placeholder="Office Name" class="{{ $inputClasses }}"
+                    required>
                 <label class="{{ $labelClasses }}">Office Name</label>
+                <span id="name-feedback" class="text-red-500 text-sm"></span>
             </div>
 
             <div class="relative mb-4">
@@ -198,7 +201,7 @@
             </div>
 
             <div>
-                <button type="submit"
+                <button type="submit" id="submit-btn"
                     class="w-full bg-primary text-white px-4 py-2 bg-primary rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
                     Save Room
                 </button>
@@ -210,6 +213,41 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
+            const nameInput = document.querySelector('#name');
+            const feedback = document.querySelector('#name-feedback');
+            const submitBtn = document.querySelector('#submit-btn');
+
+            let typingTimer;
+            const typingDelay = 500; // wait 0.5s after user stops typing
+
+            nameInput.addEventListener('input', () => {
+                clearTimeout(typingTimer);
+                typingTimer = setTimeout(async () => {
+                    const name = nameInput.value.trim();
+                    if (!name) {
+                        feedback.textContent = '';
+                        submitBtn.disabled = false;
+                        return;
+                    }
+
+                    const response = await fetch(
+                        `/admin/rooms/check-name?name=${encodeURIComponent(name)}`);
+                    const data = await response.json();
+
+                    if (data.exists) {
+                        feedback.textContent = 'This office name is already taken!';
+                        submitBtn.disabled = true;
+                    } else {
+                        feedback.textContent = '';
+                        submitBtn.disabled = false;
+                    }
+                }, typingDelay);
+            });
+
+            // Cancel the timer if user keeps typing
+            nameInput.addEventListener('keydown', () => clearTimeout(typingTimer));
+
             // Room type change handler
             const roomTypeSelect = document.getElementById('room_type');
             const conditionalFields = document.querySelectorAll('.conditional-field');
@@ -785,17 +823,17 @@
                                 <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                             </div>
                             ${rangeKey !== "closed" ? `
-                                                                                        <div class="flex gap-2 ml-4">
-                                                                                            <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                                    data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                                                                                Edit
-                                                                                            </button>
-                                                                                            <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                                    data-days='${JSON.stringify(group.days)}'>
-                                                                                                Delete
-                                                                                            </button>
-                                                                                        </div>
-                                                                                    ` : ''}
+                                                                                            <div class="flex gap-2 ml-4">
+                                                                                                <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                        data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                                                                    Edit
+                                                                                                </button>
+                                                                                                <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                        data-days='${JSON.stringify(group.days)}'>
+                                                                                                    Delete
+                                                                                                </button>
+                                                                                            </div>
+                                                                                        ` : ''}
                         </div>
                     `;
 

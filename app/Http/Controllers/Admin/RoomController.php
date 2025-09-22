@@ -554,4 +554,10 @@ class RoomController extends Controller
             ->with('success', "{$name} was successfully removed from {$room->name}.")
             ->withInput(['roomId' => $room->id, 'page' => $page]);
     }
+
+    public function checkName(Request $request)
+    {
+        $exists = Room::where('name', $request->name)->exists();
+        return response()->json(['exists' => $exists]);
+    }
 }

@@ -97,6 +97,9 @@ Route::middleware('auth', 'role:Admin|Room Manager', '2fa')->group(function () {
     Route::get('/admin/recycle-bin', [RecycleBinController::class, 'index'])->middleware('permission: delete rooms|delete staff|delete room users')->name('recycle-bin');
 
     Route::prefix('admin')->name('room.')->group(function () {
+        // Check office name to prevent duplicates to be inserted
+        Route::get('/rooms/check-name', [RoomController::class, 'checkName'])->name('check-name');
+
         // List all rooms
         Route::get('/rooms', [RoomController::class, 'index'])->middleware('permission:view rooms')->name('index');
 
