@@ -3,7 +3,8 @@
 @section('content')
     <x-floating-actions />
 
-    <div class="max-w-4xl mx-auto mt-10 p-10 bg-white border-2 border-primary rounded-lg shadow dark:bg-gray-800 dark:text-gray-300">
+    <div
+        class="max-w-4xl mx-auto mt-10 p-10 bg-white border-2 border-primary rounded-lg shadow dark:bg-gray-800 dark:text-gray-300">
 
         <h2 class="text-3xl font-bold text-center text-gray-800 mb-2"><span class="text-primary">Edit</span>
             {{ $room->name }}</h2>
@@ -234,44 +235,200 @@
 
 @push('scripts')
     <script>
+        // Enhanced Edit Form Script with Drag & Drop Support and File Size Validation
         document.addEventListener('DOMContentLoaded', () => {
-            // Carousel image handling (existing code)
+            // File size limits (in MB)
+            const MAX_IMAGE_SIZE_MB = 10;
+            const MAX_VIDEO_SIZE_MB = 50;
+            const MAX_CAROUSEL_IMAGES = 50;
+
+            // Carousel image handling with drag & drop
             const carouselInput = document.getElementById('carousel_images');
             const carouselPreviewContainer = document.getElementById('carouselPreviewContainer');
+            const carouselUploadBox = document.getElementById('carouselUploadBox');
             const carouselUploadIcon = document.getElementById('carouselUploadIcon');
             const carouselUploadText = document.getElementById('carouselUploadText');
 
+            let selectedCarouselFiles = [];
+
+            // Cover image drag & drop functionality
+            const coverInput = document.getElementById('image_path');
+            const coverUploadBox = coverInput?.closest('.mb-4')?.querySelector('label');
+
+            if (coverUploadBox && coverInput) {
+                // Add drag & drop styles to cover upload box
+                coverUploadBox.classList.add('cursor-pointer', 'transition-colors');
+
+                // Cover image drag & drop events
+                coverUploadBox.addEventListener('dragover', handleCoverDragOver);
+                coverUploadBox.addEventListener('dragleave', handleCoverDragLeave);
+                coverUploadBox.addEventListener('drop', handleCoverDrop);
+
+                // Cover image file input change
+                coverInput.addEventListener('change', handleCoverInputChange);
+            }
+
+            // Video upload drag & drop functionality
+            const videoInput = document.getElementById('video_path');
+            const videoUploadBox = videoInput?.closest('.mb-4')?.querySelector('label');
+
+            if (videoUploadBox && videoInput) {
+                // Add drag & drop styles to video upload box
+                videoUploadBox.classList.add('cursor-pointer', 'transition-colors');
+
+                // Video drag & drop events
+                videoUploadBox.addEventListener('dragover', handleVideoDragOver);
+                videoUploadBox.addEventListener('dragleave', handleVideoDragLeave);
+                videoUploadBox.addEventListener('drop', handleVideoDrop);
+
+                // Video file input change
+                videoInput.addEventListener('change', handleVideoInputChange);
+            }
+
+            // Cover Image Functions
+            function handleCoverDragOver(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.classList.add('border-primary', 'bg-gray-50', 'dark:bg-gray-700');
+            }
+
+            function handleCoverDragLeave(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.classList.remove('border-primary', 'bg-gray-50', 'dark:bg-gray-700');
+            }
+
+            function handleCoverDrop(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.classList.remove('border-primary', 'bg-gray-50', 'dark:bg-gray-700');
+
+                const files = e.dataTransfer.files;
+                if (files && files[0]) {
+                    validateAndSetCoverImage(files[0]);
+                }
+            }
+
+            function handleCoverInputChange(e) {
+                if (e.target.files && e.target.files[0]) {
+                    validateAndSetCoverImage(e.target.files[0]);
+                }
+            }
+
+            function validateAndSetCoverImage(file) {
+                // Check if it's an image
+                if (!file.type.startsWith('image/')) {
+                    showTemporaryMessage('Please select a valid image file.', 'error');
+                    coverInput.value = '';
+                    return;
+                }
+
+                // Check file size
+                if (file.size > MAX_IMAGE_SIZE_MB * 1024 * 1024) {
+                    showTemporaryMessage(
+                        `Image size must be less than ${MAX_IMAGE_SIZE_MB}MB. Selected file is ${(file.size / 1024 / 1024).toFixed(1)}MB.`,
+                        'error');
+                    coverInput.value = '';
+                    return;
+                }
+
+                // Create a new FileList with the validated file
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                coverInput.files = dt.files;
+
+                showTemporaryMessage('Cover image updated successfully!', 'success');
+            }
+
+            // Video Functions
+            function handleVideoDragOver(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.classList.add('border-primary', 'bg-gray-50', 'dark:bg-gray-700');
+            }
+
+            function handleVideoDragLeave(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.classList.remove('border-primary', 'bg-gray-50', 'dark:bg-gray-700');
+            }
+
+            function handleVideoDrop(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.classList.remove('border-primary', 'bg-gray-50', 'dark:bg-gray-700');
+
+                const files = e.dataTransfer.files;
+                if (files && files[0]) {
+                    validateAndSetVideo(files[0]);
+                }
+            }
+
+            function handleVideoInputChange(e) {
+                if (e.target.files && e.target.files[0]) {
+                    validateAndSetVideo(e.target.files[0]);
+                }
+            }
+
+            function validateAndSetVideo(file) {
+                const allowedVideoTypes = ['video/mp4', 'video/avi', 'video/mpeg'];
+
+                // Check if it's a valid video type
+                if (!allowedVideoTypes.includes(file.type)) {
+                    showTemporaryMessage('Please select a valid video file (MP4, AVI, or MPEG).', 'error');
+                    videoInput.value = '';
+                    return;
+                }
+
+                // Check file size
+                if (file.size > MAX_VIDEO_SIZE_MB * 1024 * 1024) {
+                    showTemporaryMessage(
+                        `Video size must be less than ${MAX_VIDEO_SIZE_MB}MB. Selected file is ${(file.size / 1024 / 1024).toFixed(1)}MB.`,
+                        'error');
+                    videoInput.value = '';
+                    return;
+                }
+
+                // Create a new FileList with the validated file
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                videoInput.files = dt.files;
+
+                showTemporaryMessage('Video updated successfully!', 'success');
+            }
+
+            // Enhanced Carousel Functions
             function updateUploadIconVisibility() {
-                const visiblePreviews = [...carouselPreviewContainer.children].filter(div => {
+                const existingImages = [...carouselPreviewContainer.children].filter(div => {
                     const checkbox = div.querySelector('input[type="checkbox"]');
                     return !checkbox || !checkbox.checked;
                 });
-                carouselUploadIcon.style.display = visiblePreviews.length > 0 ? 'none' : 'block';
-                carouselUploadText.style.display = visiblePreviews.length > 0 ? 'none' : 'block';
+
+                const totalVisible = existingImages.length + selectedCarouselFiles.length;
+
+                if (carouselUploadIcon) {
+                    carouselUploadIcon.style.display = totalVisible > 0 ? 'none' : 'block';
+                }
+                if (carouselUploadText) {
+                    carouselUploadText.style.display = totalVisible > 0 ? 'none' : 'block';
+                }
             }
 
-            updateUploadIconVisibility();
+            function updateCarouselInputFiles() {
+                const dt = new DataTransfer();
+                selectedCarouselFiles.forEach(file => dt.items.add(file));
+                carouselInput.files = dt.files;
+            }
 
-            carouselInput?.addEventListener('change', () => {
+            function renderCarouselPreviews() {
+                // Remove only the new file previews (not existing images)
                 [...carouselPreviewContainer.children].forEach(div => {
                     if (!div.querySelector('input[type="checkbox"]')) {
                         div.remove();
                     }
                 });
 
-                const newFiles = Array.from(carouselInput.files);
-
-                const existingCount = [...carouselPreviewContainer.children].filter(div => {
-                    const checkbox = div.querySelector('input[type="checkbox"]');
-                    return checkbox && !checkbox.checked;
-                }).length;
-
-                if (existingCount + newFiles.length > 50) {
-                    alert('You can upload max 50 images in total.');
-                    return;
-                }
-
-                newFiles.forEach(file => {
+                selectedCarouselFiles.forEach((file, index) => {
                     const reader = new FileReader();
                     reader.onload = e => {
                         const container = document.createElement('div');
@@ -282,15 +439,99 @@
                         img.src = e.target.result;
                         img.className = 'w-full h-full object-cover rounded';
 
-                        container.appendChild(img);
-                        carouselPreviewContainer.appendChild(container);
+                        const removeBtn = document.createElement('button');
+                        removeBtn.type = 'button';
+                        removeBtn.className =
+                            'absolute top-1 right-1 bg-red-600 text-white rounded px-1 text-xs cursor-pointer opacity-0 hover:opacity-100 transition-opacity';
+                        removeBtn.title = 'Remove this image';
+                        removeBtn.innerHTML = '✕';
+                        removeBtn.onclick = (ev) => {
+                            ev.preventDefault();
+                            selectedCarouselFiles.splice(index, 1);
+                            renderCarouselPreviews();
+                            updateCarouselInputFiles();
+                            updateUploadIconVisibility();
+                        };
 
-                        updateUploadIconVisibility();
+                        container.appendChild(img);
+                        container.appendChild(removeBtn);
+                        carouselPreviewContainer.appendChild(container);
                     };
                     reader.readAsDataURL(file);
                 });
-            });
 
+                updateUploadIconVisibility();
+            }
+
+            function handleCarouselFiles(newFiles) {
+                carouselInput.value = '';
+
+                // Count existing images that aren't marked for removal
+                const existingCount = [...carouselPreviewContainer.children].filter(div => {
+                    const checkbox = div.querySelector('input[type="checkbox"]');
+                    return checkbox && !checkbox.checked;
+                }).length;
+
+                // Check total count
+                if (existingCount + selectedCarouselFiles.length + newFiles.length > MAX_CAROUSEL_IMAGES) {
+                    showTemporaryMessage(`You can upload maximum ${MAX_CAROUSEL_IMAGES} images in total.`, 'error');
+                    return;
+                }
+
+                // Validate each file
+                for (let file of newFiles) {
+                    if (!file.type.startsWith('image/')) {
+                        showTemporaryMessage(`"${file.name}" is not a valid image file.`, 'error');
+                        return;
+                    }
+
+                    if (file.size > MAX_IMAGE_SIZE_MB * 1024 * 1024) {
+                        showTemporaryMessage(`"${file.name}" is too large. Maximum size is ${MAX_IMAGE_SIZE_MB}MB.`,
+                            'error');
+                        return;
+                    }
+                }
+
+                selectedCarouselFiles = selectedCarouselFiles.concat(newFiles);
+                renderCarouselPreviews();
+                updateCarouselInputFiles();
+
+                showTemporaryMessage(`${newFiles.length} image(s) added successfully!`, 'success');
+            }
+
+            // Carousel event listeners
+            if (carouselInput && carouselUploadBox) {
+                // Drag & drop for carousel
+                carouselUploadBox.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    carouselUploadBox.classList.add('border-primary', 'bg-gray-50', 'dark:bg-gray-700');
+                });
+
+                carouselUploadBox.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    carouselUploadBox.classList.remove('border-primary', 'bg-gray-50', 'dark:bg-gray-700');
+                });
+
+                carouselUploadBox.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    carouselUploadBox.classList.remove('border-primary', 'bg-gray-50', 'dark:bg-gray-700');
+
+                    if (e.dataTransfer.files) {
+                        handleCarouselFiles(Array.from(e.dataTransfer.files));
+                    }
+                });
+
+                carouselInput.addEventListener('change', () => {
+                    if (carouselInput.files) {
+                        handleCarouselFiles(Array.from(carouselInput.files));
+                    }
+                });
+            }
+
+            // Handle existing image removal checkboxes
             carouselPreviewContainer?.addEventListener('change', e => {
                 if (e.target.matches('input[type="checkbox"]')) {
                     const parentDiv = e.target.closest('div');
@@ -299,10 +540,37 @@
                 }
             });
 
-            // Enhanced Office Hours Management
-            const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+            // Show temporary message function
+            function showTemporaryMessage(message, type = "info") {
+                const existing = document.getElementById("temp-message");
+                if (existing) existing.remove();
 
-            // Initialize with existing office hours data
+                const div = document.createElement("div");
+                div.id = "temp-message";
+                div.textContent = message;
+
+                const base =
+                    "fixed top-24 right-4 p-3 rounded shadow-lg z-50 transition-opacity duration-500 border-l-4";
+                const colors = {
+                    success: "bg-green-100 text-green-700 border border-green-300 dark:bg-green-800 dark:text-green-200 dark:border-green-600",
+                    error: "bg-red-100 text-red-700 border border-red-300 dark:bg-red-800 dark:text-red-200 dark:border-red-600",
+                    info: "bg-yellow-100 text-yellow-700 border border-yellow-300 dark:bg-yellow-700 dark:text-yellow-200 dark:border-yellow-500"
+                };
+
+                div.className = `${base} ${colors[type] || colors.info}`;
+                document.body.appendChild(div);
+
+                setTimeout(() => {
+                    div.style.opacity = "0";
+                    setTimeout(() => div.remove(), 500);
+                }, 3000);
+            }
+
+            // Initialize
+            updateUploadIconVisibility();
+
+            // Office Hours Management (existing code continues...)
+            const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
             let officeHoursData = {};
 
             // Populate existing data from the room model
@@ -314,10 +582,8 @@
                 let mostCommon = null;
                 let maxCount = 0;
 
-                // Count occurrences of each time range
                 Object.values(officeHoursData).forEach(dayRanges => {
                     if (dayRanges && dayRanges.length > 0) {
-                        // For simplicity, we'll use the first range of each day
                         const range = dayRanges[0];
                         const key = `${range.start}-${range.end}`;
                         timeRangeCount[key] = (timeRangeCount[key] || 0) + 1;
@@ -353,28 +619,23 @@
                     .map(cb => cb.value);
 
                 if (selectedDays.length === 0) {
-                    // Clear inputs if no days selected
                     document.querySelector('.bulk-start-time').value = '';
                     document.querySelector('.bulk-end-time').value = '';
                     return;
                 }
 
-                // Find common time range among selected days
                 let commonRange = null;
 
                 if (selectedDays.length === 1) {
-                    // Single day selected - use its first time range
                     const dayRanges = officeHoursData[selectedDays[0]];
                     if (dayRanges && dayRanges.length > 0) {
                         commonRange = dayRanges[0];
                     }
                 } else {
-                    // Multiple days - find common time range
                     const firstDayRanges = officeHoursData[selectedDays[0]];
                     if (firstDayRanges && firstDayRanges.length > 0) {
                         const candidateRange = firstDayRanges[0];
 
-                        // Check if all selected days have this same time range
                         const allHaveSameRange = selectedDays.every(day => {
                             const dayRanges = officeHoursData[day];
                             return dayRanges && dayRanges.length > 0 &&
@@ -388,7 +649,6 @@
                     }
                 }
 
-                // Update the bulk input fields
                 const startInput = document.querySelector('.bulk-start-time');
                 const endInput = document.querySelector('.bulk-end-time');
 
@@ -396,7 +656,6 @@
                     startInput.value = commonRange.start;
                     endInput.value = commonRange.end;
                 } else {
-                    // No common range found, clear inputs
                     startInput.value = '';
                     endInput.value = '';
                 }
@@ -407,7 +666,7 @@
                 checkbox.addEventListener('change', updateBulkInputsForSelectedDays);
             });
 
-            // Quick select functionality with updated bulk inputs
+            // Quick select functionality
             document.querySelectorAll('.quick-select').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const days = btn.dataset.days.split(',');
@@ -418,8 +677,6 @@
                             `.bulk-day-checkbox[value="${day}"]`);
                         if (cb) cb.checked = true;
                     });
-
-                    // Update bulk inputs after selection
                     updateBulkInputsForSelectedDays();
                 });
             });
@@ -430,7 +687,7 @@
                 updateBulkInputsForSelectedDays();
             });
 
-            // Apply bulk changes (existing code)
+            // Apply bulk changes with enhanced validation
             document.querySelector('.apply-bulk').addEventListener('click', function() {
                 const selectedDays = Array.from(document.querySelectorAll('.bulk-day-checkbox:checked'))
                     .map(cb => cb.value);
@@ -445,43 +702,8 @@
 
                 renderOfficeHours();
                 showTemporaryFeedback(this, "Applied Successfully!");
+                showTemporaryMessage("Office hours updated for selected days!", "success");
             });
-
-            // Helper functions
-            function collectBulkRanges() {
-                const ranges = [];
-                let valid = true;
-
-                document.querySelectorAll('.bulk-range-row').forEach(row => {
-                    const start = row.querySelector('.bulk-start-time').value;
-                    const end = row.querySelector('.bulk-end-time').value;
-                    clearError(row);
-
-                    if (start && end) {
-                        if (start >= end) {
-                            showError(row, "End must be later than start");
-                            valid = false;
-                            return;
-                        }
-                        ranges.push({
-                            start,
-                            end
-                        });
-                    }
-                });
-
-                if (!valid) return null;
-                if (!ranges.length) {
-                    alert("Please enter at least one valid time range.");
-                    return null;
-                }
-                if (hasOverlap(ranges)) {
-                    alert("Time ranges overlap. Fix them first.");
-                    return null;
-                }
-
-                return ranges;
-            }
 
             // Clear time input when X is clicked
             document.addEventListener('click', e => {
@@ -504,7 +726,7 @@
                 return `${hour12}:${minutes} ${ampm}`;
             }
 
-            // Enhanced renderOfficeHours with delete functionality
+            // Enhanced renderOfficeHours with table layout for edit and delete
             function renderOfficeHours() {
                 const container = document.getElementById("officeHoursDisplay");
                 container.innerHTML = "";
@@ -527,10 +749,11 @@
                     groupedSchedule[rangeKey].days.push(day);
                 });
 
-                // Render grouped schedule
+                // Render grouped schedule in table format
                 Object.entries(groupedSchedule).forEach(([rangeKey, group]) => {
-                    const li = document.createElement("li");
-                    li.className = "mb-3 p-3 bg-white rounded border relative";
+                    const scheduleItem = document.createElement("div");
+                    scheduleItem.className =
+                        "mb-3 p-3 bg-white rounded border dark:bg-gray-800 dark:border-gray-600 border-primary";
 
                     const daysText = formatDaysGroup(group.days);
                     let timeText;
@@ -542,26 +765,29 @@
                             `${formatTime12Hour(r.start)} - ${formatTime12Hour(r.end)}`).join(", ");
                     }
 
-                    li.innerHTML = `
-                        <div class="flex justify-between items-start">
-                            <div class="flex-1">
-                                <div class="font-medium text-gray-800">${daysText}</div>
-                                <div class="text-sm text-gray-600 mt-1">${timeText}</div>
+                    scheduleItem.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <div class="font-medium text-gray-800 dark:text-gray-300 mb-1">${daysText}</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">${timeText}</div>
+                    </div>
+                    ${rangeKey !== "closed" ? `
+                            <div class="flex gap-2 ml-4">
+                                <button type="button" 
+                                        class="edit-schedule-btn text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm px-3 py-1 rounded border border-blue-300 dark:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900 transition-colors cursor-pointer" 
+                                        data-days='${JSON.stringify(group.days)}' 
+                                        data-ranges='${JSON.stringify(group.ranges)}'>
+                                    Edit
+                                </button>
+                                <button type="button" 
+                                        class="delete-schedule-btn text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-sm px-3 py-1 rounded border border-red-300 dark:border-red-600 hover:bg-red-50 dark:hover:bg-red-900 transition-colors cursor-pointer" 
+                                        data-days='${JSON.stringify(group.days)}'>
+                                    Delete
+                                </button>
                             </div>
-                            ${rangeKey !== "closed" ? `
-                                                            <div class="flex gap-2 ml-4">
-                                                                <button type="button" class="edit-schedule-btn text-blue-600 hover:text-blue-800 text-sm px-2 py-1 rounded-md border border-blue-300 hover:bg-blue-50 transition-colors" 
-                                                                        data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                                                    Edit
-                                                                </button>
-                                                                <button type="button" class="delete-schedule-btn text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded-md border border-red-300 hover:bg-red-50 transition-colors" 
-                                                                        data-days='${JSON.stringify(group.days)}'>
-                                                                    Delete
-                                                                </button>
-                                                            </div>
-                                                            ` : ''}
-                        </div>
-                    `;
+                        ` : ''}
+                </div>
+            `;
 
                     // Add hidden inputs for form submission
                     group.days.forEach(day => {
@@ -576,65 +802,17 @@
                             endInput.name = `office_hours[${day}][${idx}][end]`;
                             endInput.value = range.end;
 
-                            li.appendChild(startInput);
-                            li.appendChild(endInput);
+                            scheduleItem.appendChild(startInput);
+                            scheduleItem.appendChild(endInput);
                         });
                     });
 
-                    container.appendChild(li);
+                    container.appendChild(scheduleItem);
                 });
 
                 // Add event listeners for edit and delete buttons
                 attachScheduleActionListeners();
-
-                // Update day statuses if function exists
-                if (typeof updateDayStatuses === 'function') {
-                    updateDayStatuses();
-                }
             }
-
-            function showTemporaryMessage(message, type = "info") {
-                const existing = document.getElementById("temp-message");
-                if (existing) existing.remove();
-
-                const div = document.createElement("div");
-                div.id = "temp-message";
-                div.textContent = message;
-
-                const base =
-                    "fixed top-24 right-4 p-3 rounded shadow-lg z-49 transition-opacity duration-500 p-3 rounded-md shadow-lg border-l-4";
-                const colors = {
-                    success: "bg-green-100 text-green-700 border border-green-300 dark:bg-green-800 dark:text-green-200 dark:border-green-600",
-                    error: "bg-red-100 text-red-700 border border-red-300 dark:bg-red-800 dark:text-red-200 dark:border-red-600",
-                    info: "bg-yellow-100 text-yellow-700 border border-yellow-300 dark:bg-yellow-700 dark:text-yellow-200 dark:border-yellow-500"
-                };
-
-                div.className = `${base} ${colors[type] || colors.info}`;
-                document.body.appendChild(div);
-
-                setTimeout(() => {
-                    div.style.opacity = "0";
-                    setTimeout(() => div.remove(), 500);
-                }, 5000);
-            }
-
-            // Apply bulk changes
-            document.querySelector('.apply-bulk').addEventListener('click', function() {
-                const selectedDays = Array.from(document.querySelectorAll('.bulk-day-checkbox:checked'))
-                    .map(cb => cb.value);
-                if (!selectedDays.length) return alert("Please select at least one day.");
-
-                const ranges = collectBulkRanges();
-                if (!ranges) return;
-
-                selectedDays.forEach(day => {
-                    officeHoursData[day] = ranges;
-                });
-
-                renderOfficeHours();
-                showTemporaryFeedback(this, "Applied Successfully!");
-                showTemporaryMessage("Office hours updated for selected days!", "success");
-            });
 
             // Function to attach event listeners to edit and delete buttons
             function attachScheduleActionListeners() {
@@ -645,7 +823,7 @@
                         const daysText = formatDaysGroup(days);
 
                         if (confirm(
-                                `Are you sure you want to remove office hours for ${daysText}?`)) {
+                            `Are you sure you want to remove office hours for ${daysText}?`)) {
                             days.forEach(day => {
                                 delete officeHoursData[day];
                             });
@@ -681,32 +859,17 @@
                         // Add visual highlight
                         const bulkSection = document.querySelector(
                             '.mb-6.p-4.border.rounded.bg-blue-50');
-                        bulkSection.classList.add('ring-2', 'ring-blue-400');
-                        setTimeout(() => {
-                            bulkSection.classList.remove('ring-2', 'ring-blue-400');
-                        }, 2000);
+                        if (bulkSection) {
+                            bulkSection.classList.add('ring-2', 'ring-blue-400');
+                            setTimeout(() => {
+                                bulkSection.classList.remove('ring-2', 'ring-blue-400');
+                            }, 2000);
+                        }
 
                         showTemporaryMessage(
                             "Schedule loaded for editing. Modify time and click 'Apply'.",
                             "info");
                     });
-                });
-            }
-
-            // Function to update individual day status displays
-            function updateDayStatuses() {
-                document.querySelectorAll('.day-status').forEach(statusDiv => {
-                    const day = statusDiv.dataset.day;
-                    const ranges = officeHoursData[day];
-
-                    if (ranges && ranges.length > 0) {
-                        const timeText = ranges.map(r => `${r.start}-${r.end}`).join(', ');
-                        statusDiv.textContent = timeText;
-                        statusDiv.className = 'day-status text-xs mb-2 text-green-600';
-                    } else {
-                        statusDiv.textContent = 'Closed';
-                        statusDiv.className = 'day-status text-xs mb-2 text-gray-500';
-                    }
                 });
             }
 
@@ -733,6 +896,41 @@
                 }
 
                 return sortedDays.join(", ");
+            }
+
+            function collectBulkRanges() {
+                const ranges = [];
+                let valid = true;
+
+                document.querySelectorAll('.bulk-range-row').forEach(row => {
+                    const start = row.querySelector('.bulk-start-time').value;
+                    const end = row.querySelector('.bulk-end-time').value;
+                    clearError(row);
+
+                    if (start && end) {
+                        if (start >= end) {
+                            showError(row, "End must be later than start");
+                            valid = false;
+                            return;
+                        }
+                        ranges.push({
+                            start,
+                            end
+                        });
+                    }
+                });
+
+                if (!valid) return null;
+                if (!ranges.length) {
+                    alert("Please enter at least one valid time range.");
+                    return null;
+                }
+                if (hasOverlap(ranges)) {
+                    alert("Time ranges overlap. Fix them first.");
+                    return null;
+                }
+
+                return ranges;
             }
 
             function hasOverlap(ranges) {
