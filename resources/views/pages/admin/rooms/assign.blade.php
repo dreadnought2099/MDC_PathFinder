@@ -8,10 +8,10 @@
             <!-- Page Title -->
             <div class="text-center mb-8">
                 <h1 class="text-3xl lg:text-3xl font-bold text-gray-800 dark:text-white">
-                    <span class="text-primary">Assign</span> Staff to Room
+                    <span class="text-primary">Assign</span> Staff to Office
                 </h1>
                 <p class="text-base lg:text-lg text-gray-600 dark:text-gray-300">
-                    Select a room and assign staff members to it.
+                    Select an office and assign staff members to it.
                 </p>
             </div>
 
