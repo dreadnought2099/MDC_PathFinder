@@ -150,17 +150,18 @@ Route::middleware(['auth', 'role:Admin|Room Manager', '2fa'])->prefix('admin')->
     Route::prefix('paths')->name('path.')->group(function () {
         Route::get('/', [PathController::class, 'index'])->name('index');
         Route::get('/{path}', [PathController::class, 'show'])->name('show');
-
-        // Path Images
-        Route::get('/{path}/images/edit/{pathImage?}', [PathImageController::class, 'edit'])->name('path-image.edit');
-        Route::put('/{path}/images/order', [PathImageController::class, 'updateOrder'])->name('path-image.update-order');
-        Route::patch('/{path}/images', [PathImageController::class, 'updateMultiple'])->name('path-image.update-multiple');
-        Route::delete('/{path}/images/bulk', [PathImageController::class, 'destroyMultiple'])->name('path-image.destroy-multiple');
     });
 
     Route::prefix('path-images')->name('path-image.')->group(function () {
         Route::get('/create/{path?}', [PathImageController::class, 'create'])->name('create');
         Route::post('/create', [PathImageController::class, 'store'])->name('store');
+
+        // Path Images
+        Route::get('/{path}/images/edit/{pathImage?}', [PathImageController::class, 'edit'])->name('edit');
+        Route::put('/{path}/images/order', [PathImageController::class, 'updateOrder'])->name('update-order');
+        Route::patch('/{path}/images', [PathImageController::class, 'updateMultiple'])->name('update-multiple');
+        Route::delete('/{path}/images/bulk', [PathImageController::class, 'destroyMultiple'])->name('destroy-multiple');
+        
         Route::put('/{pathImage}', [PathImageController::class, 'updateSingle'])->name('update-single');
         Route::delete('/{pathImage}', [PathImageController::class, 'destroySingle'])->name('destroy-single');
     });
