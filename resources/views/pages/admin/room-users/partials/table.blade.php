@@ -81,10 +81,14 @@
                                 <div class="relative inline-block group">
                                     <button type="button"
                                         onclick="openToggleModal('{{ $user->id }}', '{{ $user->username }}', '{{ $user->is_active ? 'disable' : 'enable' }}')"
-                                        class="hover:scale-110 transform transition duration-200 cursor-pointer">
-                                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png"
+                                        class="hover:scale-110 transform transition duration-200 cursor-pointer
+                                                {{ $user->is_active ? 'hover-underline-delete' : 'hover-underline' }}">
+                                        <img src="{{ $user->is_active
+                                            ? 'https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/off.png'
+                                            : 'https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/on.png' }}"
                                             alt="Toggle Active" class="w-6 sm:w-8 h-6 sm:h-8 object-contain">
                                     </button>
+
                                     <!-- Tooltip -->
                                     <div
                                         class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
@@ -169,11 +173,11 @@
                     @csrf
                     @method('PATCH')
                     <button type="button" onclick="closeToggleModal()"
-                        class="px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300">
+                        class="px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover">
                         Cancel
                     </button>
                     <button type="submit"
-                        class="px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white bg-secondary border-2 border-secondary rounded-md hover:bg-white hover:text-secondary transition-all duration-300 cursor-pointer dark:hover:bg-gray-800">
+                        class="px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white bg-secondary border-2 border-secondary rounded-md hover:bg-white hover:text-secondary transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover">
                         Confirm
                     </button>
                 </form>
@@ -203,8 +207,8 @@
             <div class="flex items-center space-x-2 sm:space-x-3 mb-3">
                 <div class="flex-shrink-0">
                     <div class="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 rounded-full flex items-center justify-center">
-                        <img src="{{ asset('icons/warning-red.png') }}" class="w-6 sm:w-8 h-6 sm:h-8"
-                            alt="Warning">
+                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/warning-red.png"
+                            class="w-6 sm:w-8 h-6 sm:h-8" alt="Warning">
                     </div>
                 </div>
                 <p class="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
@@ -219,11 +223,11 @@
                     @csrf
                     @method('DELETE')
                     <button type="button" onclick="closeUserModal()"
-                        class="px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300">
+                        class="px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover">
                         Cancel
                     </button>
                     <button type="submit"
-                        class="px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white bg-secondary border-2 border-secondary rounded-md hover:bg-white hover:text-secondary transition-all duration-300 cursor-pointer dark:hover:bg-gray-800">
+                        class="px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white bg-secondary border-2 border-secondary rounded-md hover:bg-white hover:text-secondary transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover">
                         Delete
                     </button>
                 </form>
