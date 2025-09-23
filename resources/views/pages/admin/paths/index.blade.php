@@ -56,24 +56,34 @@
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
                         @forelse($paths as $path)
                             @if ($path->fromRoom && $path->toRoom)
+                                @php
+                                    $hasImage = $path->images->isNotEmpty();
+                                @endphp
                                 <tr
-                                    class="hover:bg-gray-50 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-800">
+                                    class="hover:bg-gray-50 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-800 {{ $hasImage ? 'bg-primary\10 dark:bg-yellow-900' : '' }}">
+                                    
                                     <td class="px-6 py-4">
-                                        <span
-                                            class="px-2 py-1 bg-blue-100 text-primary rounded-full text-sm">{{ $path->id }}</span>
+                                        <span class="text-gray-500 rounded-full text-sm">{{ $path->id }}</span>
                                     </td>
+                                    
                                     <td class="px-6 py-4">
-                                        <span
-                                            class="px-2 py-1 bg-blue-100 text-primary rounded-full text-sm">{{ $path->fromRoom->name }}</span>
+                                        <span class="text-primary text-sm">{{ $path->fromRoom->name }}</span>
                                     </td>
+                                    
                                     <td class="px-6 py-4">
-                                        <span
-                                            class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">{{ $path->toRoom->name }}</span>
+                                        <span class="text-primary text-sm">{{ $path->toRoom->name }}</span>
                                     </td>
+                                    
                                     <td class="px-6 py-4">
-                                        <i class="fas fa-arrow-right text-gray-400 mr-1"></i>
                                         <small class="text-gray-500">{{ $path->fromRoom->name }} →
-                                            {{ $path->toRoom->name }}</small>
+                                            {{ $path->toRoom->name }}
+                                        </small>
+                                        @if ($hasImage)
+                                            <span
+                                                class="ml-2 px-2 py-0.5 text-xs font-semibold text-white bg-primary rounded-full">
+                                                Image Uploaded
+                                            </span>
+                                        @endif
                                     </td>
                                     <td class="px-6 py-4">
                                         <small
@@ -86,8 +96,8 @@
                                             <div class="relative inline-block group">
                                                 <a href="{{ route('path.show', $path->id) }}"
                                                     class="hover-underline hover:scale-115 transform transition duration-200">
-                                                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/view.png" alt="View Icon"
-                                                        class="w-8 h-8 object-contain">
+                                                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/view.png"
+                                                        alt="View Icon" class="w-8 h-8 object-contain">
                                                 </a>
                                                 <div
                                                     class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
@@ -102,8 +112,8 @@
                                             <div class="relative inline-block group">
                                                 <a href="{{ route('path-image.create', $path->id) }}"
                                                     class="hover-underline hover:scale-115 transform transition duration-200">
-                                                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png" alt="View Icon"
-                                                        class="w-8 h-8 object-contain">
+                                                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
+                                                        alt="Add Image Icon" class="w-8 h-8 object-contain">
                                                 </a>
                                                 <div
                                                     class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
@@ -118,8 +128,8 @@
                                             <div class="relative inline-block group">
                                                 <a href="{{ route('path-image.edit', $path->id) }}"
                                                     class="hover-underline hover:scale-115 transform transition duration-200">
-                                                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/edit.png" alt="View Icon"
-                                                        class="w-8 h-8 object-contain">
+                                                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/edit.png"
+                                                        alt="Edit Icon" class="w-8 h-8 object-contain">
                                                 </a>
                                                 <div
                                                     class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
