@@ -1,11 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
+    <x-floating-actions />
     <div class="container mx-auto px-4 py-8 max-w-6xl">
         <!-- Header -->
         <div class="mb-8">
             <div class="text-center">
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-300">
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-300">
                     <span class="text-primary">Edit</span> Path Images
                 </h1>
                 <p class="text-gray-600 dark:text-gray-400 mt-1">
@@ -74,19 +75,21 @@
             </div>
 
             <!-- Actions -->
-            <div class="flex justify-between items-center">
+            <div
+                class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sticky bottom-0 p-4 bg-white dark:bg-gray-800 rounded-md border border-primary">
+
                 <button type="button" onclick="toggleAllDeletes()"
-                    class="px-4 py-2 text-sm font-medium border-2 border-secondary text-white bg-secondary hover:text-secondary hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-secondary shadow-secondary-hover">
+                    class="px-4 py-2 text-sm border-2 border-secondary text-white bg-secondary hover:text-secondary hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-secondary shadow-secondary-hover w-full sm:w-auto">
                     Toggle All Deletes
                 </button>
 
-                <div class="flex gap-3">
+                <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                     <a href="{{ route('path.show', $path) }}"
-                        class="px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover">
+                        class="px-4 py-2 text-sm border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover w-full sm:w-auto text-center">
                         Cancel
                     </a>
                     <button type="submit"
-                        class="bg-primary text-white px-4 py-2 bg-primary rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
+                        class="px-4 py-2 text-sm border-2 border-primary text-white bg-primary hover:text-primary hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-primary shadow-primary-hover w-full sm:w-auto">
                         Save Changes
                     </button>
                 </div>
