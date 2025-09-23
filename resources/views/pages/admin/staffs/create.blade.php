@@ -51,7 +51,7 @@
                 </select>
                 <label
                     class="absolute cursor-text left-0 -top-3 text-sm text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 mx-1 px-1 transition-all peer-focus:-top-3 peer-focus:text-primary peer-focus:text-sm peer-focus:bg-white dark:peer-focus:bg-gray-800 peer-focus:px-2 peer-focus:rounded-md">
-                     Suffix (Optional)
+                    Suffix (Optional)
                 </label>
 
                 <!-- Custom dropdown arrow -->
@@ -80,23 +80,26 @@
             </div>
 
             <div class="relative mb-4">
-                <input type="email" placeholder="Email" name="email" class="{{ $inputClasses }}">
+                <input type="email" placeholder="Email" name="email" id="email" class="{{ $inputClasses }}">
                 <label class="{{ $labelClasses }}">Email</label>
+                <p id="email_error" class="text-red-500 text-sm mt-1 invisible">This email is already taken.</p>
             </div>
 
-            <div class="relative mb-4">
+            <div class="relative mb-6">
                 <input type="number" name="phone_num" placeholder="Phone Number" class="{{ $inputClasses }}"
                     placeholder="0900 000 0000">
                 <label class="{{ $labelClasses }}">Phone Number</label>
             </div>
 
             <div class="relative mb-4">
-                <input type="file" name="photo_path" class="peer py-3 w-full placeholder-transparent rounded-md text-gray-500 dark:text-gray-300 ring-1 px-4 ring-gray-400 dark:ring-gray-500 focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-white dark:bg-gray-800">
+                <input type="file" name="photo_path" id="photo_path" accept="image/*"
+                    class="peer py-3 w-full placeholder-transparent rounded-md text-gray-500 dark:text-gray-300 ring-1 px-4 ring-gray-400 dark:ring-gray-500 focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-white dark:bg-gray-800">
                 <label class="{{ $labelClasses }}">Photo</label>
+                <p id="photo_error" class="text-red-500 text-sm mt-1 hidden">File size must not exceed 5MB.</p>
             </div>
 
             <div>
-                <button type="submit"
+                <button id="submitBtn" type="submit"
                     class="w-full bg-primary text-white px-4 py-2 bg-primary rounded-md shadow-cancel-hover hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
                     Save Staff
                 </button>
@@ -104,3 +107,61 @@
         </form>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const emailInput = document.getElementById('email');
+            const emailError = document.getElementById('email_error');
+            const fileInput = document.getElementById("photo_path");
+            const fileFeedback = document.getElementById("photo_error");
+            const submitBtn = document.getElementById("submitBtn");
+            const maxSize = 5 * 1024 * 1024; // 5 MB
+
+            // ===== File size validation =====
+            fileInput?.addEventListener("change", function() {
+                if (this.files.length > 0) {
+                    let file = this.files[0];
+                    if (file.size > maxSize) {
+                        fileFeedback.classList.remove("hidden");
+                        submitBtn.disabled = true;
+                        submitBtn.classList.add("opacity-50", "cursor-not-allowed");
+                    } else {
+                        fileFeedback.classList.add("hidden");
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove("opacity-50", "cursor-not-allowed");
+                    }
+                }
+            });
+
+            // ===== Live email check =====
+            emailInput.addEventListener('input', function() {
+                const email = emailInput.value.trim();
+
+                if (email.length > 0) {
+                    fetch(`/admin/staff/check-email?email=${encodeURIComponent(email)}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.exists) {
+                                emailError.classList.remove('invisible');
+                                submitBtn.disabled = true;
+                                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                            } else {
+                                emailError.classList.add('invisible');
+                                submitBtn.disabled = false;
+                                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                            }
+                        })
+                        .catch(() => {
+                            // fallback: hide error
+                            emailError.classList.add('invisible');
+                        });
+                } else {
+                    emailError.classList.add('invisible');
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            });
+        });
+    </script>
+@endpush

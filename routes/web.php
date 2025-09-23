@@ -135,6 +135,7 @@ Route::middleware(['auth', 'role:Admin|Room Manager', '2fa'])->prefix('admin')->
 
     // Staff
     Route::prefix('staff')->name('staff.')->group(function () {
+        Route::get('/check-email', [StaffController::class, 'checkEmail'])->name('checkEmail');
         Route::get('/', [StaffController::class, 'index'])->middleware('permission:view staff')->name('index');
         Route::get('/create', [StaffController::class, 'create'])->middleware('permission:create staff')->name('create');
         Route::get('/{staff}', [StaffController::class, 'show'])->middleware('permission:view staff')->name('show');
@@ -161,7 +162,7 @@ Route::middleware(['auth', 'role:Admin|Room Manager', '2fa'])->prefix('admin')->
         Route::put('/{path}/images/order', [PathImageController::class, 'updateOrder'])->name('update-order');
         Route::patch('/{path}/images', [PathImageController::class, 'updateMultiple'])->name('update-multiple');
         Route::delete('/{path}/images/bulk', [PathImageController::class, 'destroyMultiple'])->name('destroy-multiple');
-        
+
         Route::put('/{pathImage}', [PathImageController::class, 'updateSingle'])->name('update-single');
         Route::delete('/{pathImage}', [PathImageController::class, 'destroySingle'])->name('destroy-single');
     });

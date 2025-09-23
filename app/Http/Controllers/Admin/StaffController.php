@@ -180,4 +180,10 @@ class StaffController extends Controller
 
         return redirect()->route('recycle-bin')->with('success', "{$staff->full_name} permanently deleted.");
     }
+
+    public function checkEmail(Request $request)
+    {
+        $exists = Staff::where('email', $request->query('email'))->exists();
+        return response()->json(['exists' => $exists]);
+    }
 }

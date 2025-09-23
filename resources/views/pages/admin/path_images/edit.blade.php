@@ -2,7 +2,7 @@
 
 @section('content')
     <x-floating-actions />
-    <div class="container mx-auto px-4 py-8 max-w-6xl">
+    <div class="container mx-auto px-4 py-8 max-w-6xl dark:text-gray-300">
         <!-- Header -->
         <div class="mb-8">
             <div class="text-center">
@@ -67,7 +67,7 @@
                                 <input type="file" name="images[{{ $image->id }}][image_file]" accept="image/*"
                                     class="w-full text-sm border border-gray-300 rounded px-3 py-2 
                                       file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 
-                                      file:bg-[#157ee1] file:text-white file:text-sm">
+                                      file:bg-[#157ee1] fle:hover:bg-white file:text-white file:text-sm">
                             </div>
                         </div>
                     </div>
