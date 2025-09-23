@@ -60,7 +60,7 @@
                                     $hasImage = $path->images->isNotEmpty();
                                 @endphp
                                 <tr
-                                    class="hover:bg-gray-50 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-800 {{ $hasImage ? 'bg-primary\10 dark:bg-yellow-900' : '' }}">
+                                    class="hover:bg-gray-50 transition-colors duration-200 dark:hover:bg-gray-800 {{ $hasImage ? 'bg-primary-10' : '' }}">
                                     
                                     <td class="px-6 py-4">
                                         <span class="text-gray-500 rounded-full text-sm">{{ $path->id }}</span>
@@ -80,7 +80,7 @@
                                         </small>
                                         @if ($hasImage)
                                             <span
-                                                class="ml-2 px-2 py-0.5 text-xs font-semibold text-white bg-primary rounded-full">
+                                                class="ml-2 px-2 py-0.5 text-xs text-white bg-primary rounded-full">
                                                 Image Uploaded
                                             </span>
                                         @endif
