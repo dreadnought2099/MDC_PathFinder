@@ -63,7 +63,7 @@ class RoomController extends Controller
             'image_path' => 'nullable|image|max:10240', // 10 MB
             'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200', // 50 MB
             'carousel_images'   => 'nullable|array|max:50',  // MAX 50 files allowed
-            'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:10240', // 5 MB each
+            'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:10240', // 10 MB each
 
             // Office hours
             'office_hours' => 'nullable|array',
