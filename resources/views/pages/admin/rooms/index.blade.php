@@ -67,46 +67,82 @@
 
                                     <!-- Actions -->
                                     <td class="px-4 sm:px-6 py-3 sm:py-4">
-                                        <div class="flex flex-wrap justify-end gap-2 sm:gap-3">
+                                        <div class="flex flex-wrap justify-end gap-2 sm:gap-3 items-center">
                                             {{-- View --}}
                                             @if (auth()->user()->hasRole('Admin') || auth()->user()->can('view rooms'))
-                                                <a href="{{ route('room.show', $room->id) }}"
-                                                    class="p-2 rounded-lg hover:scale-110 transition duration-200">
-                                                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/view.png"
-                                                        alt="View Icon"
-                                                        class="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 object-contain">
-                                                </a>
+                                                <div class="relative inline-block group">
+                                                    <a href="{{ route('room.show', $room->id) }}"
+                                                        class="hover-underline inline-flex items-center justify-center p-2 rounded-lg hover:scale-110 transition duration-200">
+                                                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/view.png"
+                                                            alt="View Icon"
+                                                            class="block w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 object-contain">
+                                                    </a>
+                                                    <div
+                                                        class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
+                                                        View
+                                                        <div
+                                                            class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-l-gray-900 dark:border-l-gray-700 border-t-4 border-t-transparent border-b-4 border-b-transparent">
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             @endif
 
                                             {{-- Edit --}}
                                             @if (auth()->user()->hasRole('Admin') || auth()->user()->can('edit rooms'))
-                                                <a href="{{ route('room.edit', $room->id) }}"
-                                                    class="p-2 rounded-lg hover:scale-110 transition duration-200">
-                                                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/edit.png"
-                                                        alt="Edit Icon"
-                                                        class="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 object-contain">
-                                                </a>
+                                                <div class="relative inline-block group">
+                                                    <a href="{{ route('room.edit', $room->id) }}"
+                                                        class="hover-underline-edit inline-flex items-center justify-center p-2 rounded-lg hover:scale-110 transition duration-200">
+                                                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/edit.png"
+                                                            alt="Edit Icon"
+                                                            class="block w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 object-contain">
+                                                    </a>
+                                                    <div
+                                                        class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
+                                                        Edit
+                                                        <div
+                                                            class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-l-gray-900 dark:border-l-gray-700 border-t-4 border-t-transparent border-b-4 border-b-transparent">
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             @endif
 
                                             {{-- Assign --}}
                                             @if (auth()->user()->hasRole('Admin'))
-                                                <a href="{{ route('room.assign', $room->id) }}"
-                                                    class="p-2 rounded-lg hover:scale-110 transition duration-200">
-                                                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/assign-staff.png"
-                                                        alt="Assign Staff Icon"
-                                                        class="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 object-contain">
-                                                </a>
+                                                <div class="relative inline-block group">
+                                                    <a href="{{ route('room.assign', $room->id) }}"
+                                                        class="hover-underline inline-flex items-center justify-center p-2 rounded-lg hover:scale-110 transition duration-200">
+                                                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/assign-staff.png"
+                                                            alt="Assign Staff Icon"
+                                                            class="block w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 object-contain">
+                                                    </a>
+                                                    <div
+                                                        class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
+                                                        Assign Staff
+                                                        <div
+                                                            class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-l-gray-900 dark:border-l-gray-700 border-t-4 border-t-transparent border-b-4 border-b-transparent">
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             @endif
 
                                             {{-- Delete --}}
                                             @if (auth()->user()->hasRole('Admin'))
-                                                <button
-                                                    onclick="openRoomModal('{{ $room->id }}', '{{ addslashes($room->name) }}')"
-                                                    class="p-2 rounded-lg hover:scale-110 transition duration-200">
-                                                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/trash.png"
-                                                        alt="Trash Icon"
-                                                        class="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 object-contain">
-                                                </button>
+                                                <div class="relative inline-block group">
+                                                    <button type="button"
+                                                        onclick="openRoomModal('{{ $room->id }}', '{{ addslashes($room->name) }}')"
+                                                        class="hover-underline-delete inline-flex items-center justify-center p-2 rounded-lg hover:scale-110 transition duration-200 appearance-none bg-transparent border-0 cursor-pointer">
+                                                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/trash.png"
+                                                            alt="Trash Icon"
+                                                            class="block w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 object-contain">
+                                                    </button>
+                                                    <div
+                                                        class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
+                                                        Delete
+                                                        <div
+                                                            class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-l-gray-900 dark:border-l-gray-700 border-t-4 border-t-transparent border-b-4 border-b-transparent">
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             @endif
                                         </div>
                                     </td>
