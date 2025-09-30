@@ -4,10 +4,15 @@
     <x-floating-actions />
 
     <div class="max-w-xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-6 dark:bg-gray-800">
-        <h2 class="text-2xl text-center mb-6 dark:text-gray-300"><span class="text-primary">Edit</span> {{ $room->name }}
-        </h2>
+        <div class="text-center mb-8">
+            <h2 class="text-2xl text-center mb-2 dark:text-gray-300"><span class="text-primary">Edit</span>
+                {{ $room->name }}
+            </h2>
+            <p class="text-gray-400">Update office information</p>
+        </div>
 
-        <form action="{{ route('room.update', $room->id) }}" method="POST" enctype="multipart/form-data" data-upload onsubmit="this.querySelector('button[type=submit]').disabled=true;">
+        <form action="{{ route('room.update', $room->id) }}" method="POST" enctype="multipart/form-data" data-upload
+            onsubmit="this.querySelector('button[type=submit]').disabled=true;">
             @csrf
             @method('PUT')
 
@@ -940,17 +945,17 @@
                                 <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                             </div>
                             ${rangeKey !== "closed" ? `
-                                    <div class="flex gap-2 ml-4">
-                                        <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                            Edit
-                                        </button>
-                                        <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                data-days='${JSON.stringify(group.days)}'>
-                                            Delete
-                                        </button>
-                                    </div>
-                                ` : ''}
+                                            <div class="flex gap-2 ml-4">
+                                                <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                        data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                    Edit
+                                                </button>
+                                                <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                        data-days='${JSON.stringify(group.days)}'>
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        ` : ''}
                         </div>
                     `;
 
@@ -987,7 +992,7 @@
                         const daysText = formatDaysGroup(days);
 
                         if (confirm(
-                            `Are you sure you want to remove office hours for ${daysText}?`)) {
+                                `Are you sure you want to remove office hours for ${daysText}?`)) {
                             days.forEach(day => {
                                 delete officeHoursData[day];
                             });
