@@ -18,7 +18,8 @@
             @can('update', $user)
                 <div class="absolute top-0 right-0 flex space-x-3">
                     <div class="relative inline-block group">
-                        <a href="{{ route('room-user.edit', $user->id) }}" class="hover-underline-delete inline-flex items-center justify-center p-2 rounded-lg hover:scale-125 transition duration-200 appearance-none bg-transparent border-0 cursor-pointer">
+                        <a href="{{ route('room-user.edit', $user->id) }}"
+                            class="hover-underline-delete inline-flex items-center justify-center p-2 rounded-lg hover:scale-125 transition duration-200 appearance-none bg-transparent border-0 cursor-pointer">
                             <img src="{{ asset('icons/edit.png') }}" alt="Edit Icon"
                                 class="block w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 object-contain">
                         </a>
@@ -41,9 +42,8 @@
                 </div>
             @endcan
         </div>
-        
-        <div
-            class="bg-white dark:bg-gray-800 shadow-sm rounded-lg border-2 border-primary overflow-hidden">
+
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg border-2 border-primary overflow-hidden">
             <div class="bg-gradient-to-r from-primary to-primary-dark px-6 py-8">
                 <div class="flex flex-col sm:flex-row sm:items-center">
                     <div class="mt-4 sm:mt-0 sm:ml-6">
@@ -61,24 +61,24 @@
                 <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
                     <!-- Name -->
                     <div>
-                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Full Name</dt>
-                        <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                        <dt class="text-sm font-medium dark:text-gray-300">Full Name</dt>
+                        <dd class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                             {{ $user->name ?? 'Not provided' }}
                         </dd>
                     </div>
 
                     <!-- Username -->
                     <div>
-                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Username</dt>
-                        <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                        <dt class="text-sm font-medium dark:text-gray-300">Username</dt>
+                        <dd class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                             {{ $user->username }}
                         </dd>
                     </div>
 
                     <!-- Room -->
                     <div>
-                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Assigned Office</dt>
-                        <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                        <dt class="text-sm font-medium dark:text-gray-300">Assigned Office</dt>
+                        <dd>
                             @if ($user->room)
                                 <div class="flex items-center">
                                     <span
@@ -86,20 +86,20 @@
                                         {{ $user->room->name }}
                                     </span>
                                     @if ($user->room->description)
-                                        <span class="ml-2 text-gray-500 dark:text-gray-400">
+                                        <span class="ml-2  dark:text-gray-400">
                                             {{ $user->room->description }}
                                         </span>
                                     @endif
                                 </div>
                             @else
-                                <span class="text-gray-500 dark:text-gray-400 italic">No office assigned</span>
+                                <span class=" dark:text-gray-400 italic">No office assigned</span>
                             @endif
                         </dd>
                     </div>
 
                     <!-- Role -->
                     <div>
-                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Role</dt>
+                        <dt class="text-sm font-medium dark:text-gray-300">Role</dt>
                         <dd class="mt-1 text-sm text-gray-900 dark:text-white">
                             @if ($user->roles->count() > 0)
                                 <div class="flex flex-wrap gap-1">
@@ -116,14 +116,14 @@
                                     @endforeach
                                 </div>
                             @else
-                                <span class="text-gray-500 dark:text-gray-400 italic">No roles assigned</span>
+                                <span class=" dark:text-gray-400 italic">No roles assigned</span>
                             @endif
                         </dd>
                     </div>
 
                     <!-- Email Verification -->
                     <div>
-                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Email Status</dt>
+                        <dt class="text-sm font-medium dark:text-gray-300">Email Status</dt>
                         <dd class="mt-1 text-sm">
                             @if ($user->email_verified_at)
                                 <span
@@ -148,7 +148,7 @@
 
                     <!-- Account Status -->
                     <div>
-                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Account Status</dt>
+                        <dt class="text-sm font-medium dark:text-gray-300">Account Status</dt>
                         <dd class="mt-1 text-sm">
                             @if ($user->deleted_at)
                                 <span
@@ -174,6 +174,17 @@
                         </dd>
                     </div>
                 </dl>
+            </div>
+
+            <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-t border-gray-200 dark:border-gray-600">
+                <div class="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2 text-sm">
+                    <div>
+                        <span class="font-medium  dark:text-gray-400">Created:</span>
+                        <span class="ml-2 text-gray-900 dark:text-white">
+                            {{ $user->created_at ? $user->created_at->format('F d, Y') : 'N/A' }}
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
