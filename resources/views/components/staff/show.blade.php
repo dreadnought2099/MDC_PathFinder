@@ -7,7 +7,7 @@
         <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-primary dark:bg-gray-800">
 
             <!-- Header -->
-            <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 md:px-8 md:py-6">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-700 px-6 py-4 md:px-8 md:py-6">
                 <h3 class="text-xl md:text-2xl text-white font-semibold break-words">
                     {{ $staff->first_name }}
                     @if ($staff->middle_name)
