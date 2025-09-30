@@ -6,7 +6,7 @@
             <!-- Centered Header -->
             <div class="text-center">
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-300">
-                    {{-- Auth::user() is only used for permission checks, not for displaying the target user’s info. --}}
+                    {{-- Auth::user() is only used for permission checks, not for displaying the target user's info. --}}
                     <span class="text-primary">{{ $user->name ?? $user->username }}</span> User
                 </h1>
                 <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
@@ -14,12 +14,12 @@
                 </p>
             </div>
 
-            <!-- Edit Button (absolute right) -->
+            <!-- Edit Button - Absolute positioning for larger screens, centered for mobile -->
             @can('update', $user)
-                <div class="absolute top-0 right-0 flex space-x-3">
+                <div class="flex justify-center mt-4 sm:mt-0 sm:absolute sm:top-0 sm:right-0">
                     <div class="relative inline-block group">
                         <a href="{{ route('room-user.edit', $user->id) }}"
-                            class="hover-underline-delete inline-flex items-center justify-center p-2 rounded-lg hover:scale-125 transition duration-200 appearance-none bg-transparent border-0 cursor-pointer">
+                            class="hover-underline-edit inline-flex items-center justify-center p-2 rounded-lg hover:scale-125 transition duration-200 appearance-none bg-transparent border-0 cursor-pointer">
                             <img src="{{ asset('icons/edit.png') }}" alt="Edit Icon"
                                 class="block w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 object-contain">
                         </a>
