@@ -37,8 +37,8 @@ class UserPolicy
             return Response::allow();
         }
 
-        // Room Managers can delete users only in their own room
-        if ($authUser->hasRole('Room Manager') && $authUser->room_id === $model->room_id) {
+        // Office Managers can delete users only in their own room
+        if ($authUser->hasRole('Office Manager') && $authUser->room_id === $model->room_id) {
             return Response::allow();
         }
 

@@ -39,7 +39,7 @@
             <!-- Name -->
             <div class="relative mb-4">
                 <input type="text" name="name" id="name" value="{{ old('name') }}" placeholder="Name"
-                    class="{{ $inputClasses }}" required>
+                    class="{{ $inputClasses }}">
                 <p id="nameFeedback" class="text-sm mt-1"></p>
                 <label for="name" class="{{ $labelClasses }}">Name</label>
             </div>

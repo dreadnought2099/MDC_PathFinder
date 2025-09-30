@@ -56,7 +56,7 @@ Route::get('/admin', [LogInController::class, 'showLoginForm'])->name('login');
 Route::post('/admin', [LogInController::class, 'login']);
 
 // Routes available after login, before 2FA
-Route::middleware(['auth', 'role:Admin|Room Manager'])->group(function () {
+Route::middleware(['auth', 'role:Admin|Office Manager'])->group(function () {
     Route::get('/admin/2fa/verify', [TwoFactorController::class, 'showVerifyForm'])
         ->name('admin.2fa.showVerifyForm');
     Route::post('/admin/2fa/verify', [TwoFactorController::class, 'verifyOTP'])
@@ -66,7 +66,7 @@ Route::middleware(['auth', 'role:Admin|Room Manager'])->group(function () {
 });
 
 // Routes protected by auth + role + 2FA
-Route::middleware(['auth', 'role:Admin|Room Manager', '2fa'])->prefix('admin')->group(function () {
+Route::middleware(['auth', 'role:Admin|Office Manager', '2fa'])->prefix('admin')->group(function () {
 
     // Logout
     Route::post('/logout', [LogInController::class, 'logout'])->name('logout');
@@ -124,6 +124,7 @@ Route::middleware(['auth', 'role:Admin|Room Manager', '2fa'])->prefix('admin')->
         Route::get('/', [RoomUserController::class, 'index'])->middleware('permission:view room users')->name('index');
         Route::get('/create', [RoomUserController::class, 'create'])->middleware('permission:create room users')->name('create');
         Route::post('/', [RoomUserController::class, 'store'])->middleware('permission:create room users')->name('store');
+        Route::get('/{user}', [RoomUserController::class, 'show'])->middleware('permission:view room users')->name('show');
         Route::get('/{user}/edit', [RoomUserController::class, 'edit'])->middleware('permission:edit room users')->name('edit');
         Route::put('/{user}', [RoomUserController::class, 'update'])->middleware('permission:edit room users')->name('update');
         Route::delete('/{user}', [RoomUserController::class, 'destroy'])->middleware('permission:delete room users')->name('destroy');

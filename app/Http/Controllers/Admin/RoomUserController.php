@@ -35,7 +35,7 @@ class RoomUserController extends Controller
         // Decide which rooms to show in dropdown
         if ($authUser->hasRole('Admin')) {
             $rooms = Room::all();
-        } elseif ($authUser->hasRole('Room Manager')) {
+        } elseif ($authUser->hasRole('Office Manager')) {
             $rooms = Room::where('id', $authUser->room_id)->get();
         } else {
             $rooms = collect(); // no dropdown for other roles
@@ -49,8 +49,8 @@ class RoomUserController extends Controller
             if ($roomId) {
                 $userQuery->where('room_id', $roomId);
             }
-        } elseif ($authUser->hasRole('Room Manager')) {
-            // Room Managers can only ever see their own room
+        } elseif ($authUser->hasRole('Office Manager')) {
+            // Office Managers can only ever see their own room
             $userQuery->where('room_id', $authUser->room_id);
 
             // Block URL tampering (?roomId=999)
@@ -106,22 +106,11 @@ class RoomUserController extends Controller
             'room_id' => $request->room_id,
         ]);
 
-        // Assign Room Manager role
-        $user->assignRole('Room Manager');
+        // Assign Office Manager role
+        $user->assignRole('Office Manager');
 
         return redirect()->route('room-user.index')
             ->with('success', 'Ofice user created successfully!');
-    }
-
-    public function show(User $user)
-    {
-        $authUser = Auth::user();
-
-        // Room Managers can only view users from their own room
-        if ($authUser->hasRole('Room Manager') && $user->room_id !== $authUser->room_id) {
-            abort(403, 'You can only view users from your assigned office.');
-        }
-        return view('pages.admin.room-users.show', compact('user'));
     }
 
     public function edit(User $user)
@@ -135,6 +124,17 @@ class RoomUserController extends Controller
         return view('pages.admin.room-users.edit', compact('user', 'rooms'));
     }
 
+    public function show(User $user)
+    {
+        $authUser = Auth::user();
+
+        // Office Managers can only view users from their own room
+        if ($authUser->hasRole('Office Manager') && $user->room_id !== $authUser->room_id) {
+            abort(403, 'You can only view users from your assigned office.');
+        }
+        return view('pages.admin.room-users.show', compact('user'));
+    }
+    
     public function update(Request $request, User $user)
     {
         $request->validate([

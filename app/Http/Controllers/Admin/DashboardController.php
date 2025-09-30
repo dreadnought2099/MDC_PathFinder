@@ -15,12 +15,11 @@ class DashboardController extends Controller
         $paths = Path::all();
         $user  = Auth::user();
 
-        // Didn't use hasRole to avoid Undefined method
-        if ($user->roles->contains('name', 'Admin')) {
+        if ($user->hasRole('name', 'Admin')) {
             // Admin sees all rooms
             $totalRooms = Room::count();
         } else {
-            // Room Manager (or any non-admin) sees only their assigned room
+            // Office Manager (or any non-admin) sees only their assigned room
             $totalRooms = $user->room ? 1 : 0;
         }
 

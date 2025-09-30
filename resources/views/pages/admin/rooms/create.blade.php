@@ -203,7 +203,7 @@
             <div>
                 <button type="submit" id="submit-btn"
                     class="w-full bg-primary text-white px-4 py-2 bg-primary rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
-                    Save Room
+                    Save Office
                 </button>
             </div>
         </form>

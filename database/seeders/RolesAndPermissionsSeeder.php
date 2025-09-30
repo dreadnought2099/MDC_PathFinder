@@ -29,18 +29,19 @@ class RolesAndPermissionsSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'delete staff']);
 
         // Permission for Room Users
+        Permission::firstOrCreate(['name' => 'view room users']);
         Permission::firstOrCreate(['name' => 'create room users']);
         Permission::firstOrCreate(['name' => 'edit room users']);
         Permission::firstOrCreate(['name' => 'delete room users']);
 
         // Roles
         $adminRole = Role::firstOrCreate(['name' => 'Admin']);
-        $managerRole = Role::firstOrCreate(['name' => 'Room Manager']);
+        $managerRole = Role::firstOrCreate(['name' => 'Office Manager']);
 
         // Assign permissions
         $adminRole->syncPermissions(Permission::all());
 
-        // Room Manager can only view + edit, no create
+        // Office Manager can only view + edit, no create
         $managerRole->givePermissionTo(['view rooms', 'edit rooms', 'view staff', 'edit staff', 'view room users']);
 
         // Default Admin
