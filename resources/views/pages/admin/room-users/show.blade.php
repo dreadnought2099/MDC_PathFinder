@@ -2,42 +2,41 @@
 
 @section('content')
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <!-- Header -->
-        <div class="mb-8">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Office User Details</h1>
-                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                        View office user information and details
-                    </p>
-                </div>
+        <div class="mb-8 relative">
+            <!-- Centered Header -->
+            <div class="text-center">
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Office User Details</h1>
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                    View office user information and details
+                </p>
+            </div>
 
-                @can('update', $user)
-                    <div class="mt-4 sm:mt-0 sm:ml-4 flex space-x-3">
-                        <div class="relative inline-block group">
-                            <a href="{{ route('room-user.edit', $user->id) }}"
-                                class="hover:scale-115 transition-transform duration-300">
-                                <img src="{{ asset('icons/edit.png') }}" alt="Edit Icon" class="w-8 h-8 object-contain">
-                            </a>
+            <!-- Edit Button (absolute right) -->
+            @can('update', $user)
+                <div class="absolute top-0 right-0 flex space-x-3">
+                    <div class="relative inline-block group">
+                        <a href="{{ route('room-user.edit', $user->id) }}"
+                            class="hover:scale-115 transition-transform duration-300">
+                            <img src="{{ asset('icons/edit.png') }}" alt="Edit Icon" class="w-8 h-8 object-contain">
+                        </a>
 
-                            <!-- Tooltip -->
+                        <!-- Tooltip -->
+                        <div
+                            class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
+                       text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible
+                       group-hover:opacity-100 group-hover:visible transition-all duration-300 
+                       whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
+                            Edit User
                             <div
-                                class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
-                   text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible
-                   group-hover:opacity-100 group-hover:visible transition-all duration-300 
-                   whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
-                                Edit User
-                                <div
-                                    class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
-                       border-l-4 border-l-gray-900 dark:border-l-gray-700
-                       border-t-4 border-t-transparent 
-                       border-b-4 border-b-transparent">
-                                </div>
+                                class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
+                           border-l-4 border-l-gray-900 dark:border-l-gray-700
+                           border-t-4 border-t-transparent 
+                           border-b-4 border-b-transparent">
                             </div>
                         </div>
                     </div>
-                @endcan
-            </div>
+                </div>
+            @endcan
         </div>
 
         <!-- User Information Card -->
@@ -61,18 +60,13 @@
                         </div>
                     </div>
                     <div class="mt-4 sm:mt-0 sm:ml-6">
-                        <h2 class="text-xl font-bold text-white">
+                        <h2 class="text-xl font-bold dark:text-gray-300">
                             {{ $user->name ?? 'No Name Set' }}
                         </h2>
-                        <p class="text-primary-light">@{{ $user - > username }}</p>
-                        <div class="mt-2 flex items-center text-sm text-primary-light">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            {{ $user->room ? $user->room->name : 'No Room Assigned' }}
+                        <p class="dark:text-gray-300 text-sm">{{ Auth::user()->username }}</p>
+                        <div class="mt-2 flex items-center text-sm dark:text-gray-300">
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/location.png" alt="block h-4 w-4 object-contain">
+                            {{ $user->room ? $user->room->name : 'No Office Assigned' }}
                         </div>
                     </div>
                 </div>
@@ -99,7 +93,7 @@
 
                     <!-- Room -->
                     <div>
-                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Assigned Room</dt>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Assigned Office</dt>
                         <dd class="mt-1 text-sm text-gray-900 dark:text-white">
                             @if ($user->room)
                                 <div class="flex items-center">
@@ -114,7 +108,7 @@
                                     @endif
                                 </div>
                             @else
-                                <span class="text-gray-500 dark:text-gray-400 italic">No room assigned</span>
+                                <span class="text-gray-500 dark:text-gray-400 italic">No office assigned</span>
                             @endif
                         </dd>
                     </div>
@@ -219,41 +213,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Actions Panel (Admin Only) -->
-        @can('delete', $user)
-            <div class="mt-8">
-                <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
-                    <div class="flex items-start">
-                        <div class="flex-shrink-0">
-                            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                        <div class="ml-3 flex-1">
-                            <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
-                                Danger Zone
-                            </h3>
-                            <div class="mt-2 text-sm text-red-700 dark:text-red-300">
-                                <p>Once you delete this user, all of their data will be archived. This action can be undone from
-                                    the recycle bin.</p>
-                            </div>
-                            <div class="mt-4">
-                                <button type="button"
-                                    onclick="openUserDeleteModal('{{ $user->username }}', '{{ route('room-user.destroy', $user) }}')"
-                                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                                    <img src="{{ asset('icons/trash.png') }}" alt="Delete Icon"
-                                        class="w-8 h-8 object-contain">
-                                    Delete User
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endcan
     </div>
 
     <!-- Delete Confirmation Modal -->
