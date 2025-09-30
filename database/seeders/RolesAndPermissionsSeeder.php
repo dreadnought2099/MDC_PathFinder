@@ -29,7 +29,6 @@ class RolesAndPermissionsSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'delete staff']);
 
         // Permission for Room Users
-        Permission::firstOrCreate(['name' => 'view room users']);
         Permission::firstOrCreate(['name' => 'create room users']);
         Permission::firstOrCreate(['name' => 'edit room users']);
         Permission::firstOrCreate(['name' => 'delete room users']);

@@ -33,30 +33,6 @@
                         <td class="px-4 sm:px-6 py-2 text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-300">
                             {{ $user->getRoleNames()->implode(', ') ?? '-' }}</td>
                         <td class="px-4 sm:px-6 py-2 flex flex-wrap items-center space-x-1 sm:space-x-3">
-                            <!-- Actions icons -->
-                            @if (auth()->user()->hasRole('Admin') || auth()->user()->can('view room users'))
-                                <div class="relative inline-block group">
-                                    <a href="{{ route('room-user.show', $user->id) }}"
-                                        class="hover-underline hover:scale-110 transform transition duration-200">
-                                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/view.png"
-                                            alt="View Icon" class="w-6 sm:w-8 h-6 sm:h-8 object-contain">
-                                    </a>
-                                    <!-- Tooltip -->
-                                    <div
-                                        class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
-                                                text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible
-                                                group-hover:opacity-100 group-hover:visible transition-all duration-300 
-                                                whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
-                                        View User
-                                        <div
-                                            class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
-                                                    border-l-4 border-l-gray-900 dark:border-l-gray-700
-                                                    border-t-4 border-t-transparent 
-                                                    border-b-4 border-b-transparent">
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
                             @if (auth()->user()->hasRole('Admin'))
                                 <div class="relative inline-block group">
                                     <a href="{{ route('room-user.edit', $user->id) }}"

@@ -124,7 +124,6 @@ Route::middleware(['auth', 'role:Admin|Room Manager', '2fa'])->prefix('admin')->
         Route::get('/', [RoomUserController::class, 'index'])->middleware('permission:view room users')->name('index');
         Route::get('/create', [RoomUserController::class, 'create'])->middleware('permission:create room users')->name('create');
         Route::post('/', [RoomUserController::class, 'store'])->middleware('permission:create room users')->name('store');
-        Route::get('/{user}', [RoomUserController::class, 'show'])->middleware('permission:view room users')->name('show');
         Route::get('/{user}/edit', [RoomUserController::class, 'edit'])->middleware('permission:edit room users')->name('edit');
         Route::put('/{user}', [RoomUserController::class, 'update'])->middleware('permission:edit room users')->name('update');
         Route::delete('/{user}', [RoomUserController::class, 'destroy'])->middleware('permission:delete room users')->name('destroy');
