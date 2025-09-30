@@ -43,7 +43,7 @@
             @endcan
         </div>
 
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden max-w-4xl max-auto">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden max-w-4xl mx-auto">
             <!-- Header Section -->
             <div class="bg-gradient-to-tr from-blue-500 to-blue-700 px-8 py-10">
                 <div class="flex items-center gap-4">
