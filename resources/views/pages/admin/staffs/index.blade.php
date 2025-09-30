@@ -93,7 +93,7 @@
                                             @if (auth()->user()->hasRole('Admin') || auth()->user()->can('view staffs'))
                                                 <div class="relative inline-block group">
                                                     <a href="{{ route('staff.show', $staff->id) }}"
-                                                        class="hover-underline inline-flex items-center justify-center p-2 rounded-lg hover:scale-110 transition duration-200">
+                                                        class="hover-underline inline-flex items-center justify-center p-2 rounded-lg hover:scale-125 transition duration-200">
                                                         <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/view.png"
                                                             alt="View Icon"
                                                             class="block w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 object-contain">
@@ -112,7 +112,7 @@
                                             @if (auth()->user()->hasRole('Admin') || auth()->user()->can('edit staffs'))
                                                 <div class="relative inline-block group">
                                                     <a href="{{ route('staff.edit', $staff->id) }}"
-                                                        class="hover-underline-edit inline-flex items-center justify-center p-2 rounded-lg hover:scale-110 transition duration-200">
+                                                        class="hover-underline-edit inline-flex items-center justify-center p-2 rounded-lg hover:scale-125 transition duration-200">
                                                         <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/edit.png"
                                                             alt="Edit Icon"
                                                             class="block w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 object-contain">
@@ -132,7 +132,7 @@
                                                 <div class="relative inline-block group">
                                                     <button type="button"
                                                         onclick="openModal('{{ $staff->id }}', '{{ addslashes($staff->first_name . ' ' . $staff->last_name) }}')"
-                                                        class="hover-underline-delete inline-flex items-center justify-center p-2 rounded-lg hover:scale-110 transition duration-200 appearance-none bg-transparent border-0 cursor-pointer">
+                                                        class="hover-underline-delete inline-flex items-center justify-center p-2 rounded-lg hover:scale-125 transition duration-200 appearance-none bg-transparent border-0 cursor-pointer">
                                                         <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/trash.png"
                                                             alt="Delete Icon"
                                                             class="block w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 object-contain">

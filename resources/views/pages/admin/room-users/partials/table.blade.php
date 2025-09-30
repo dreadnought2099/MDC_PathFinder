@@ -33,10 +33,11 @@
                         <td class="px-4 sm:px-6 py-2 text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-300">
                             {{ $user->getRoleNames()->implode(', ') ?? '-' }}</td>
                         <td class="px-4 sm:px-6 py-2 flex flex-wrap items-center space-x-1 sm:space-x-3">
+
                             @if (auth()->user()->hasRole('Admin') || auth()->user()->can('view room users'))
                                 <div class="relative inline-block group">
                                     <a href="{{ route('room-user.show', $user->id) }}"
-                                        class="hover-underline hover:scale-110 transform transition duration-200">
+                                        class="hover-underline hover:scale-125 ease-in-out transform transition-transform duration-200">
                                         <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/view.png"
                                             alt="View Icon" class="w-6 sm:w-8 h-6 sm:h-8 object-contain">
                                     </a>
@@ -59,7 +60,7 @@
                             @if (auth()->user()->hasRole('Admin'))
                                 <div class="relative inline-block group">
                                     <a href="{{ route('room-user.edit', $user->id) }}"
-                                        class="hover-underline-edit hover:scale-110 transform transition duration-200">
+                                        class="hover-underline-edit hover:scale-125 ease-in-out transform transition-transform duration-200">
                                         <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/edit.png"
                                             alt="Edit Icon" class="w-6 sm:w-8 h-6 sm:h-8 object-contain">
                                     </a>
@@ -80,7 +81,7 @@
                                 <div class="relative inline-block group">
                                     <button type="button"
                                         onclick="openToggleModal('{{ $user->id }}', '{{ $user->username }}', '{{ $user->is_active ? 'disable' : 'enable' }}')"
-                                        class="hover:scale-110 transform transition duration-200 cursor-pointer
+                                        class="hover:scale-125 ease-in-out transform transition-transform  duration-200 cursor-pointer
                                                 {{ $user->is_active ? 'hover-underline-delete' : 'hover-underline' }}">
                                         <img src="{{ $user->is_active
                                             ? 'https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/off.png'
@@ -106,7 +107,7 @@
                                 <div class="relative inline-block group">
                                     <button
                                         onclick="openUserModal('{{ $user->id }}', '{{ addslashes($user->username) }}')"
-                                        class="hover-underline-delete hover:scale-110 transform transition duration-200 cursor-pointer">
+                                        class="hover-underline-delete hover:scale-125 ease-in-out transform transition-transform duration-200 cursor-pointer">
                                         <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/trash.png"
                                             alt="Delete Icon" class="w-6 sm:w-8 h-6 sm:h-8 object-contain">
                                     </button>

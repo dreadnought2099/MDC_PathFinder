@@ -18,9 +18,9 @@
             @can('update', $user)
                 <div class="absolute top-0 right-0 flex space-x-3">
                     <div class="relative inline-block group">
-                        <a href="{{ route('room-user.edit', $user->id) }}"
-                            class="hover:scale-115 transition-transform duration-300">
-                            <img src="{{ asset('icons/edit.png') }}" alt="Edit Icon" class="w-8 h-8 object-contain">
+                        <a href="{{ route('room-user.edit', $user->id) }}" class="hover-underline-delete inline-flex items-center justify-center p-2 rounded-lg hover:scale-125 transition duration-200 appearance-none bg-transparent border-0 cursor-pointer">
+                            <img src="{{ asset('icons/edit.png') }}" alt="Edit Icon"
+                                class="block w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 object-contain">
                         </a>
 
                         <!-- Tooltip -->
@@ -41,8 +41,9 @@
                 </div>
             @endcan
         </div>
+        
         <div
-            class="bg-white dark:bg-gray-800 shadow-sm rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+            class="bg-white dark:bg-gray-800 shadow-sm rounded-lg border-2 border-primary overflow-hidden">
             <div class="bg-gradient-to-r from-primary to-primary-dark px-6 py-8">
                 <div class="flex flex-col sm:flex-row sm:items-center">
                     <div class="mt-4 sm:mt-0 sm:ml-6">
@@ -136,7 +137,7 @@
                                 </span>
                             @else
                                 <span
-                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                                    class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
                                     <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/warning.png"
                                         alt="Warning Icon" class="block w-3 h-3 object-contain">
                                     Email Unavailable
