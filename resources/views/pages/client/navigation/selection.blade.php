@@ -75,7 +75,7 @@
                             <input type="hidden" id="from_room" name="from_room">
 
                             <div id="from_room_dropdown"
-                                class="hidden absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-primary rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                class="hidden absolute z-10 w-full mt-1 dark:text-gray-300 bg-white dark:bg-gray-700 border border-primary rounded-lg shadow-lg max-h-60 overflow-y-auto">
                                 <div id="from_room_options" class="py-1">
                                     @foreach ($rooms as $room)
                                         <div class="from-room-option px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
@@ -111,7 +111,7 @@
                             <input type="hidden" id="to_room" name="to_room">
 
                             <div id="to_room_dropdown"
-                                class="hidden absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-primary rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                class="hidden absolute z-10 w-full mt-1 dark:text-gray-300 bg-white dark:bg-gray-700 border border-primary rounded-lg shadow-lg max-h-60 overflow-y-auto">
                                 <div id="to_room_options" class="py-1">
                                     @foreach ($rooms as $room)
                                         <div class="to-room-option px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
@@ -341,5 +341,15 @@
 
         fromHidden.addEventListener('change', updateDisabledOptions);
         toHidden.addEventListener('change', updateDisabledOptions);
+
+        // Preselect from_room if provided
+        @if (isset($preselectedFromRoom) && $preselectedFromRoom)
+            const preselectedRoomId = '{{ $preselectedFromRoom }}';
+            const preselectedOption = document.querySelector(`.from-room-option[data-value="${preselectedRoomId}"]`);
+
+            if (preselectedOption) {
+                fromCombobox.selectOption(preselectedRoomId, preselectedOption.dataset.label);
+            }
+        @endif
     </script>
 @endpush

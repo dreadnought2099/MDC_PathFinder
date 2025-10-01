@@ -42,10 +42,12 @@ class PathController extends Controller
     }
 
     // Client-side path selection page
-    public function selection()
+    public function selection(Request $request)
     {
         $rooms = Room::orderBy('name')->get();
-        return view('pages.client.navigation.selection', compact('rooms'));
+        $preselectedFromRoom = $request->query('from');
+
+        return view('pages.client.navigation.selection', compact('rooms', 'preselectedFromRoom'));
     }
 
     // Client-side navigation results page
@@ -80,12 +82,6 @@ class PathController extends Controller
             ->get();
 
         return view('pages.client.navigation.results', compact('fromRoom', 'toRoom', 'paths'));
-    }
-
-    public function select()
-    {
-        $rooms = Room::all(); // or however you fetch rooms
-        return view('paths.select', compact('rooms'));
     }
 
     public function results(Request $request)

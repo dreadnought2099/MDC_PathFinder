@@ -107,7 +107,7 @@
 
                 <!-- Start new navigation button -->
                 <div class="mt-4 sm:mt-8 flex justify-center">
-                    <a href="{{ route('paths.select') }}"
+                    <a href="{{ route('paths.select', ['from' => $toRoom->id]) }}"
                         class="px-4 py-2 sm:px-6 sm:py-3 lg:px-8 lg:py-4 text-sm sm:text-base lg:text-lg rounded-md bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary dark:hover:bg-gray-800 shadow-primary-light transition-all cursor-pointer">
                         Start New Navigation
                     </a>
