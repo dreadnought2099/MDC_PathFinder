@@ -33,7 +33,7 @@
         <div class="flex justify-center mt-8">
             <div x-data="staffSearch()" class="relative w-full max-w-md">
                 <input type="text" x-model="query" @input.debounce.300ms="filterStaff" placeholder="Search staff..."
-                    class="font-sofia w-full border border-primary focus:ring-2 focus:border-primary focus:ring-primary focus:outline-none rounded-lg p-2 pr-8 dark:bg-gray-700 dark:text-gray-300 transition-all duration-200">
+                    class="w-full border border-primary focus:ring-2 focus:border-primary focus:ring-primary focus:outline-none rounded-lg p-2 pr-8 dark:bg-gray-700 dark:text-gray-300 transition-all duration-200">
 
                 <ul x-show="results.length"
                     class="absolute w-full bg-white dark:bg-gray-800 dark:text-gray-300 border rounded mt-1 max-h-60 overflow-y-auto z-50">
