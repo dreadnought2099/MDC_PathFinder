@@ -156,7 +156,14 @@
                     fetch(`/staff/search?q=${encodeURIComponent(this.query)}`)
                         .then(res => res.json())
                         .then(data => {
-                            this.results = data;
+                            // Filter out staff whose rooms are already selected
+                            const fromValue = fromCombobox.getValue();
+                            const toValue = toCombobox.getValue();
+
+                            this.results = data.filter(staff => {
+                                if (!staff.room) return true;
+                                return staff.room.id != fromValue && staff.room.id != toValue;
+                            });
                         });
                 },
                 selectStaff(staff) {
@@ -164,18 +171,8 @@
                     this.results = [];
 
                     if (staff.room) {
-                        const toSearchInput = document.getElementById('to_room_search');
-                        const toHiddenInput = document.getElementById('to_room');
-
-                        toHiddenInput.value = staff.room.id;
-                        toSearchInput.value = staff.room.name;
-
-                        // Update Combobox internal state
-                        toCombobox.selectedValue = staff.room.id;
-                        toCombobox.selectedLabel = staff.room.name;
-
-                        // Trigger change event to enable start button
-                        toHiddenInput.dispatchEvent(new Event('change'));
+                        // Use the combobox's selectOption method to properly update everything
+                        toCombobox.selectOption(staff.room.id.toString(), staff.room.name);
                     }
                 }
             }
