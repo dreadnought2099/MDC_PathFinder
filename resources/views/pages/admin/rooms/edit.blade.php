@@ -1,546 +1,628 @@
+{{-- filepath: resources/views/pages/admin/rooms/edit.blade.php --}}
 @extends('layouts.app')
 
 @section('content')
     <x-floating-actions />
 
     <div class="max-w-xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-6 dark:bg-gray-800">
-        <div class="text-center mb-8">
-            <h2 class="text-2xl text-center mb-2 dark:text-gray-300"><span class="text-primary">Edit</span>
-                {{ $room->name }}
-            </h2>
-            <p class="text-gray-400">Update office information</p>
-        </div>
+        <h2 class="text-2xl text-center mb-6 dark:text-gray-300"><span class="text-primary">Edit</span> {{ $room->name }}
+        </h2>
 
-        <form action="{{ route('room.update', $room->id) }}" method="POST" enctype="multipart/form-data" data-upload
-            onsubmit="this.querySelector('button[type=submit]').disabled=true;">
-            @csrf
-            @method('PUT')
+        <x-upload-progress-modal>
+            <form action="{{ route('room.update', $room->id) }}" method="POST" enctype="multipart/form-data" id="room-form">
+                @csrf
+                @method('PUT')
 
-            @php
-                $inputClasses =
-                    'peer py-3 w-full placeholder-transparent font-sofia rounded-md text-gray-700 dark:text-gray-300 ring-1 px-4 ring-gray-500 dark:ring-gray-500 focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-white dark:bg-gray-800';
+                @php
+                    $inputClasses =
+                        'peer py-3 w-full placeholder-transparent font-sofia rounded-md text-gray-700 dark:text-gray-300 ring-1 px-4 ring-gray-500 dark:ring-gray-500 focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-white dark:bg-gray-800';
+                    $labelClasses =
+                        'absolute cursor-text left-0 -top-3 text-sm font-sofia text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 mx-1 px-1 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3 peer-focus:text-primary peer-focus:text-sm peer-focus:bg-white dark:peer-focus:bg-gray-800 peer-focus:px-2 peer-focus:rounded-md';
+                @endphp
 
-                $labelClasses =
-                    'absolute cursor-text left-0 -top-3 text-sm font-sofia text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 mx-1 px-1 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3 peer-focus:text-primary peer-focus:text-sm peer-focus:bg-white dark:peer-focus:bg-gray-800 peer-focus:px-2 peer-focus:rounded-md';
-            @endphp
-
-            <div class="relative mb-4">
-                <input type="text" name="name" placeholder="Office Name" class="{{ $inputClasses }}"
-                    value="{{ old('name', $room->name) }}" required>
-                <label class="{{ $labelClasses }}">Office Name</label>
-            </div>
-
-            <div class="relative mb-4">
-                <textarea name="description" placeholder="Description" class="{{ $inputClasses }}" rows="3">{{ old('description', $room->description) }}</textarea>
-                <label class="{{ $labelClasses }}">Description</label>
-            </div>
-
-            <div class="mb-4">
-                <label class="block mb-2 font-medium dark:text-gray-300">Room Type</label>
-                <select name="room_type" id="room_type"
-                    class="w-full border dark:text-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent border-gray-500 dark:bg-gray-800"
-                    required>
-                    <option value="regular" {{ old('room_type', $room->room_type) === 'regular' ? 'selected' : '' }}>
-                        Regular Office
-                    </option>
-                    <option value="entrance_point"
-                        {{ old('room_type', $room->room_type) === 'entrance_point' ? 'selected' : '' }}>
-                        Entrance Point
-                    </option>
-                </select>
-                <p class="text-sm text-gray-600 mt-1 dark:text-gray-300">
-                    Entrance gates automatically connect to all other rooms for navigation purposes.
-                </p>
-            </div>
-
-            {{-- Current Cover Image --}}
-            <div class="mb-4 conditional-field" id="cover-image-section">
-                @if ($room->image_path && Storage::disk('public')->exists($room->image_path))
-                    <div class="mb-4">
-                        <label class="block mb-2 font-medium dark:text-gray-300">Current Cover Image</label>
-                        <img src="{{ Storage::url($room->image_path) }}" alt="Cover Image"
-                            class="w-48 rounded mb-2 border" />
-                        <label class="inline-flex items-center space-x-2">
-                            <input type="checkbox" name="remove_image_path" value="1" id="remove_image_path"
-                                class="form-checkbox" />
-                            <span class="dark:text-gray-300">Remove Cover Image</span>
-                        </label>
-                    </div>
-                @endif
-
-                <label class="block mb-2 dark:text-gray-300">Cover Image (optional)</label>
-
-                <div id="uploadBox"
-                    class="flex flex-col items-center justify-center w-full h-40 
-                border-2 border-dashed border-gray-300 dark:border-gray-600 
-                rounded cursor-pointer 
-                hover:border-primary hover:bg-gray-50 
-                dark:hover:border-primary dark:hover:bg-gray-800
-                transition-colors overflow-hidden relative">
-                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
-                        alt="Image Icon" class="w-8 h-8">
-                    <span id="uploadText" class="text-gray-500 dark:text-gray-300">
-                        Click to upload cover image(Max 10MB)
-                    </span>
-
-                    <img id="previewImage" class="absolute inset-0 object-cover w-full h-full hidden" alt="Image preview" />
+                <div class="relative mb-4">
+                    <input type="text" name="name" id="name" placeholder="Office Name" class="{{ $inputClasses }}"
+                        value="{{ old('name', $room->name) }}" required>
+                    <label class="{{ $labelClasses }}">Office Name</label>
+                    <span id="name-feedback" class="text-red-500 text-sm"></span>
+                    @error('name')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
                 </div>
 
-                {{-- Hidden input placed outside --}}
-                <input type="file" name="image_path" id="image_path" class="hidden" accept="image/*" />
-            </div>
+                <div class="relative mb-4">
+                    <textarea name="description" placeholder="Description" class="{{ $inputClasses }}" rows="3">{{ old('description', $room->description) }}</textarea>
+                    <label class="{{ $labelClasses }}">Description</label>
+                    @error('description')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
 
-            {{-- Carousel Images --}}
-            <div class="mb-4 max-w-xl mx-auto conditional-field" id="carousel-images-section">
-                <label class="block mb-2 dark:text-gray-300">Carousel Images (optional)</label>
-                <div id="carouselUploadBox"
-                    class="flex flex-col items-center justify-center w-full h-40 
+                <div class="mb-4">
+                    <label class="block mb-2 font-medium dark:text-gray-300">Room Type</label>
+                    <select name="room_type" id="room_type"
+                        class="w-full border dark:text-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent border-gray-500 dark:bg-gray-800"
+                        required>
+                        <option value="regular" {{ old('room_type', $room->room_type) === 'regular' ? 'selected' : '' }}>
+                            Regular Office
+                        </option>
+                        <option value="entrance_point"
+                            {{ old('room_type', $room->room_type) === 'entrance_point' ? 'selected' : '' }}>
+                            Entrance Point
+                        </option>
+                    </select>
+                    <p class="text-sm text-gray-600 mt-1 dark:text-gray-300">
+                        Entrance gates automatically connect to all other rooms for navigation purposes.
+                    </p>
+                    @error('room_type')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                {{-- Cover Image --}}
+                <div class="mb-4 conditional-field" id="cover-image-section">
+                    @if ($room->image_path && Storage::disk('public')->exists($room->image_path))
+                        <div class="mb-2">
+                            <label class="block mb-2 font-medium dark:text-gray-300">Current Cover Image</label>
+                            <img src="{{ Storage::url($room->image_path) }}" alt="Cover Image"
+                                class="w-48 rounded mb-2 border" />
+                            <label class="inline-flex items-center space-x-2">
+                                <input type="checkbox" name="remove_image_path" value="1" id="remove_image_path"
+                                    class="form-checkbox" />
+                                <span class="dark:text-gray-300">Remove Cover Image</span>
+                            </label>
+                        </div>
+                    @endif
+                    <label class="block mb-2 dark:text-gray-300">Cover Image (optional, max 10MB)</label>
+                    <div id="uploadBox"
+                        class="flex flex-col items-center justify-center w-full h-40 
+                        border-2 border-dashed border-gray-300 dark:border-gray-600 
+                        rounded cursor-pointer hover:border-primary hover:bg-gray-50 
+                        dark:hover:border-primary dark:hover:bg-gray-800
+                        transition-colors overflow-hidden relative">
+                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
+                            alt="Image Icon" class="w-8 h-8" onerror="this.style.display='none'">
+                        <span id="uploadText" class="text-gray-500 dark:text-gray-300">
+                            Click to upload cover image
+                        </span>
+                        <img id="previewImage" class="absolute inset-0 object-cover w-full h-full hidden"
+                            alt="Image preview" />
+                    </div>
+                    <input type="file" name="image_path" id="image_path" class="hidden" accept="image/*" />
+                    @error('image_path')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                {{-- Carousel Images --}}
+                <div class="mb-4 max-w-xl mx-auto conditional-field" id="carousel-images-section">
+                    <label class="block mb-2 dark:text-gray-300">Carousel Images (optional, max 50 images, 10MB
+                        each)</label>
+                    <div id="carouselUploadBox"
+                        class="flex flex-col items-center justify-center w-full h-40 
                         border-2 border-dashed border-gray-300 dark:border-gray-600 
                         rounded cursor-pointer hover:border-primary hover:bg-gray-50 
                         dark:hover:border-primary dark:hover:bg-gray-800 transition-colors overflow-hidden relative">
-                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
-                        alt="Image Icon" class="w-8 h-8">
-                    <span id="carouselUploadText" class="text-gray-500 mb-4 dark:text-gray-300">
-                        Click to upload images (max 50, 10MB each)
-                    </span>
-                    <div id="carouselPreviewContainer" class="flex flex-wrap gap-3 w-full justify-start">
-                        {{-- Existing images --}}
-                        @if ($room->images && $room->images->count() > 0)
-                            @foreach ($room->images as $image)
-                                @if (Storage::disk('public')->exists($image->image_path))
-                                    <div
-                                        class="relative w-24 h-24 rounded overflow-hidden shadow border {{ $image->trashed() ? 'border-red-400 opacity-50' : 'border-gray-300' }}">
-                                        <img src="{{ Storage::url($image->image_path) }}" alt="Carousel Image"
-                                            class="w-full h-full object-cover rounded" />
-                                        @if ($image->trashed())
-                                            <span
-                                                class="absolute top-1 left-1 bg-yellow-600 text-white rounded px-1 text-xs">Deleted</span>
-                                        @else
-                                            <button type="button"
-                                                class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow"
-                                                onclick="toggleImageRemoval(this, {{ $image->id }})"
-                                                title="Remove this image">
-                                                &times;
-                                            </button>
-                                            <input type="checkbox" name="remove_images[]" value="{{ $image->id }}"
-                                                class="hidden" />
-                                        @endif
+                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
+                            alt="Image Icon" class="w-8 h-8" onerror="this.style.display='none'">
+                        <span id="carouselUploadText" class="text-gray-500 mb-4 dark:text-gray-300">
+                            Click to upload images
+                        </span>
+                        <div id="carouselPreviewContainer" class="flex flex-wrap gap-3 w-full justify-start">
+                            {{-- Existing images --}}
+                            @if ($room->images && $room->images->count() > 0)
+                                @foreach ($room->images as $image)
+                                    @if (Storage::disk('public')->exists($image->image_path))
+                                        <div
+                                            class="relative w-24 h-24 rounded overflow-hidden shadow border {{ $image->trashed() ? 'border-red-400 opacity-50' : 'border-gray-300' }}">
+                                            <img src="{{ Storage::url($image->image_path) }}" alt="Carousel Image"
+                                                class="w-full h-full object-cover rounded" />
+                                            @if ($image->trashed())
+                                                <span
+                                                    class="absolute top-1 left-1 bg-yellow-600 text-white rounded px-1 text-xs">Deleted</span>
+                                            @else
+                                                <button type="button"
+                                                    class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow"
+                                                    onclick="toggleImageRemoval(this, {{ $image->id }})"
+                                                    title="Remove this image">
+                                                    &times;
+                                                </button>
+                                                <input type="checkbox" name="remove_images[]" value="{{ $image->id }}"
+                                                    class="hidden" />
+                                            @endif
+                                        </div>
+                                    @endif
+                                @endforeach
+                            @endif
+                        </div>
+                    </div>
+                    <input type="file" name="carousel_images[]" id="carousel_images" class="hidden"
+                        accept="image/jpeg,image/jpg,image/png" multiple />
+                    @error('carousel_images')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                    @error('carousel_images.*')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                {{-- Video --}}
+                <div class="mb-4 max-w-xl mx-auto conditional-field" id="video-section">
+                    @if ($room->video_path && Storage::disk('public')->exists($room->video_path))
+                        <div class="mb-2">
+                            <label class="block mb-2 font-medium dark:text-gray-300">Current Video</label>
+                            <video controls class="w-64 rounded mb-2 border">
+                                <source src="{{ Storage::url($room->video_path) }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <label class="inline-flex items-center space-x-2">
+                                <input type="checkbox" name="remove_video_path" value="1" id="remove_video_path"
+                                    class="form-checkbox" />
+                                <span class="dark:text-gray-300">Remove Video</span>
+                            </label>
+                        </div>
+                    @endif
+                    <label class="block mb-2 dark:text-gray-300">Short Video (optional, max 50MB)</label>
+                    <div id="videoDropZone"
+                        class="flex flex-col items-center justify-center w-full h-40 
+                        border-2 border-dashed border-gray-300 dark:border-gray-600 
+                        rounded cursor-pointer hover:border-primary hover:bg-gray-50 
+                        dark:hover:border-primary dark:hover:bg-gray-800 transition-colors overflow-hidden relative">
+                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/video.png"
+                            alt="Video Icon" class="w-9 h-9" onerror="this.style.display='none'">
+                        <p class="mb-2 dark:text-gray-300">Drag & drop a video file here or click to select</p>
+                        <p class="text-xs text-gray-400 dark:text-gray-300">(mp4, avi, mpeg)</p>
+                    </div>
+                    <input type="file" id="video_path" name="video_path" accept="video/mp4,video/avi,video/mpeg"
+                        class="hidden" />
+
+                    <div id="videoPreviewContainer"
+                        class="mt-4 hidden relative rounded border border-gray-300 overflow-hidden">
+                        <video id="videoPreview" controls class="w-full h-auto bg-black"></video>
+                        <button type="button" id="removeVideoBtn"
+                            class="absolute top-2 right-2 bg-secondary text-white rounded-full p-1 hover:bg-red-700 transition-colors"
+                            title="Remove video">&times;</button>
+                    </div>
+                    @error('video_path')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                {{-- Office Hours --}}
+                <div class="mb-6 conditional-field" id="office-hours-section">
+                    <label class="block font-semibold mb-2 dark:text-gray-300">Office Hours</label>
+                    {{-- (Copy the office hours section from create.blade.php, but pre-fill with $existingOfficeHours) --}}
+                    {{-- ... --}}
+                    <div class="mb-6 p-4 border border-primary rounded dark:bg-gray-800">
+                        <p class="font-semibold mb-3 dark:text-gray-300">Set Time Range for Multiple Days</p>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-2 dark:text-gray-300">Select Days:</label>
+                            <div class="flex gap-2 flex-wrap">
+                                @php
+                                    $daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                                @endphp
+                                @foreach ($daysOfWeek as $day)
+                                    <label
+                                        class="flex items-center bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                                        <input type="checkbox"
+                                            class="bulk-day-checkbox mr-2 text-primary focus:ring-primary"
+                                            value="{{ $day }}">
+                                        <span class="text-sm text-gray-700 dark:text-gray-300">{{ $day }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+
+                            <div class="mt-2 flex gap-2 flex-wrap">
+                                <button type="button"
+                                    class="quick-select bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white px-3 py-1 rounded text-sm transition-colors"
+                                    data-days="Mon,Tue,Wed,Thu,Fri">Weekdays</button>
+                                <button type="button"
+                                    class="quick-select bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white px-3 py-1 rounded text-sm transition-colors"
+                                    data-days="Sat,Sun">Weekends</button>
+                                <button type="button"
+                                    class="quick-select bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white px-3 py-1 rounded text-sm transition-colors"
+                                    data-days="Mon,Tue,Wed,Thu,Fri,Sat,Sun">All Days</button>
+                                <button type="button"
+                                    class="clear-select bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300 px-3 py-1 rounded text-sm transition-colors">Clear
+                                    All</button>
+                            </div>
+                        </div>
+
+                        <div class="bulk-time-ranges mb-4">
+                            <label class="block text-sm font-medium mb-2 dark:text-gray-300">Time Range:</label>
+                            <div class="bulk-ranges-container">
+                                <div class="flex gap-2 mb-2 bulk-range-row">
+                                    <div class="relative flex-1">
+                                        <input type="time"
+                                            class="custom-time-input bulk-start-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary">
+                                        <button type="button"
+                                            class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
+                                            title="Clear">&times;</button>
                                     </div>
-                                @endif
-                            @endforeach
-                        @endif
-                    </div>
-                </div>
-                <input type="file" name="carousel_images[]" id="carousel_images" class="hidden" accept="image/*"
-                    multiple />
-            </div>
-
-            {{-- Current Video --}}
-            <div class="mb-4 max-w-xl mx-auto conditional-field" id="video-section">
-                @if ($room->video_path && Storage::disk('public')->exists($room->video_path))
-                    <div class="mb-4">
-                        <label class="block mb-2 font-medium dark:text-gray-300">Current Video</label>
-                        <video controls class="w-64 rounded mb-2 border">
-                            <source src="{{ Storage::url($room->video_path) }}" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                        <label class="inline-flex items-center space-x-2">
-                            <input type="checkbox" name="remove_video_path" value="1" id="remove_video_path"
-                                class="form-checkbox" />
-                            <span class="dark:text-gray-300">Remove Video</span>
-                        </label>
-                    </div>
-                @endif
-
-                <label class="block mb-2 dark:text-gray-300">Short Video (optional)</label>
-                <div id="videoDropZone"
-                    class="flex flex-col items-center justify-center w-full h-40 
-                        border-2 border-dashed border-gray-300 dark:border-gray-600 
-                        rounded cursor-pointer hover:border-primary hover:bg-gray-50 
-                        dark:hover:border-primary dark:hover:bg-gray-800 transition-colors overflow-hidden relative">
-                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/video.png"
-                        alt="Video Icon" class="w-9 h-9">
-                    <p class="mb-2 dark:text-gray-300">Drag & drop a video file here or click to select</p>
-                    <p class="text-xs text-gray-400 dark:text-gray-300">(mp4, avi, mpeg | max 50MB)</p>
-                </div>
-                <input type="file" id="video_path" name="video_path" accept="video/mp4,video/avi,video/mpeg"
-                    class="hidden" />
-
-                <div id="videoPreviewContainer"
-                    class="mt-4 hidden relative rounded border border-gray-300 overflow-hidden">
-                    <video id="videoPreview" controls class="w-full h-auto bg-black"></video>
-                    <button type="button" id="removeVideoBtn"
-                        class="absolute top-2 right-2 bg-secondary text-white rounded-full p-1 hover:bg-red-700 transition-colors"
-                        title="Remove video">&times;</button>
-                </div>
-            </div>
-
-            <div class="mb-6 conditional-field" id="office-hours-section">
-                <label class="block font-semibold mb-2 dark:text-gray-300">Office Hours</label>
-
-                {{-- Bulk Day Selection Section --}}
-                <div class="mb-6 p-4 border border-primary rounded dark:bg-gray-800">
-                    <p class="font-semibold mb-3 dark:text-gray-300">Set Time Range for Multiple Days</p>
-
-                    {{-- Day Selection --}}
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium mb-2 dark:text-gray-300">Select Days:</label>
-                        <div class="flex gap-2 flex-wrap">
-                            @php
-                                $daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                            @endphp
-                            @foreach ($daysOfWeek as $day)
-                                <label
-                                    class="flex items-center bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
-                                    <input type="checkbox"
-                                        class="bulk-day-checkbox mr-2 text-primary focus:ring-primary dark:focus:ring-primary"
-                                        value="{{ $day }}">
-                                    <span class="text-sm text-gray-700 dark:text-gray-300">{{ $day }}</span>
-                                </label>
-                            @endforeach
-                        </div>
-
-                        {{-- Quick Select Buttons --}}
-                        <div class="mt-2 flex gap-2 flex-wrap">
-                            <button type="button"
-                                class="quick-select bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white px-3 py-1 rounded text-sm transition-colors"
-                                data-days="Mon,Tue,Wed,Thu,Fri">Weekdays</button>
-                            <button type="button"
-                                class="quick-select bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white px-3 py-1 rounded text-sm transition-colors"
-                                data-days="Sat,Sun">Weekends</button>
-                            <button type="button"
-                                class="quick-select bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white px-3 py-1 rounded text-sm transition-colors"
-                                data-days="Mon,Tue,Wed,Thu,Fri,Sat,Sun">All Days</button>
-                            <button type="button"
-                                class="clear-select bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300 px-3 py-1 rounded text-sm transition-colors">Clear
-                                All</button>
-                        </div>
-                    </div>
-
-                    {{-- Time Range Input (Single Row Only) --}}
-                    <div class="bulk-time-ranges mb-4">
-                        <label class="block text-sm font-medium mb-2 dark:text-gray-300">Time Range:</label>
-                        <div class="bulk-ranges-container">
-                            <div class="flex gap-2 mb-2 bulk-range-row">
-                                <div class="relative flex-1">
-                                    <input type="time"
-                                        class="custom-time-input bulk-start-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary dark:focus:border-primary">
-                                    <button type="button"
-                                        class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
-                                        title="Clear">
-                                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png"
-                                            class="w-3 h-3 cursor-pointer hover:scale-120 transition-all duration-300 ease-in-out"
-                                            alt="Clear">
-                                    </button>
-                                </div>
-                                <div class="relative flex-1">
-                                    <input type="time"
-                                        class="custom-time-input bulk-end-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary dark:focus:border-primary">
-                                    <button type="button"
-                                        class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
-                                        title="Clear">
-                                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png"
-                                            class="w-3 h-3 cursor-pointer hover:scale-120 transition-all duration-300 ease-in-out"
-                                            alt="Clear">
-                                    </button>
+                                    <div class="relative flex-1">
+                                        <input type="time"
+                                            class="custom-time-input bulk-end-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary">
+                                        <button type="button"
+                                            class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
+                                            title="Clear">&times;</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
+                        <button type="button"
+                            class="apply-bulk bg-primary text-center text-white px-4 py-2 rounded-md hover:text-primary border-2 border-primary hover:bg-white dark:hover:bg-gray-800 duration-300 ease-in-out transition-all cursor-pointer shadow-primary-hover">
+                            Apply to Selected Days
+                        </button>
                     </div>
 
-                    {{-- Apply Button --}}
-                    <button type="button"
-                        class="apply-bulk bg-primary text-center text-white px-4 py-2 rounded-md hover:text-primary border-2 border-primary hover:bg-white dark:hover:bg-gray-800 duration-300 ease-in-out transition-all cursor-pointer shadow-primary-hover">
-                        Apply to Selected Days
+                    <div class="p-4 border border-primary rounded dark:bg-gray-800">
+                        <p class="mb-3 dark:text-gray-300">Saved Office Hours</p>
+                        <ul id="officeHoursDisplay" class="space-y-2 text-sm text-gray-700 dark:text-gray-300"></ul>
+                    </div>
+                    @error('office_hours')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div>
+                    <button type="submit" id="submit-btn"
+                        class="w-full bg-primary text-white px-4 py-2 rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
+                        Update Office
                     </button>
                 </div>
-
-                {{-- Display Saved Hours --}}
-                <div class="p-4 border border-primary rounded dark:bg-gray-800">
-                    <p class="mb-3 dark:text-gray-300">Saved Office Hours</p>
-                    <ul id="officeHoursDisplay" class="space-y-2 text-sm text-gray-700 dark:text-gray-300"></ul>
-                </div>
-            </div>
-
-            <div>
-                <button type="submit"
-                    class="w-full bg-primary text-white px-4 py-2 bg-primary rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
-                    Update Office
-                </button>
-            </div>
-        </form>
+            </form>
+        </x-upload-progress-modal>
     </div>
 @endsection
 
 @push('scripts')
+    {{-- Copy the entire <script> section from create.blade.php and adjust as needed for edit --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Room type change handler with same logic as create
+            let isUploading = false;
+
+            window.onbeforeunload = function(e) {
+                if (isUploading) {
+                    e.preventDefault();
+                    e.returnValue = '';
+                    return '';
+                }
+            };
+
+            const MAX_CAROUSEL_FILES = 50;
+            const MAX_IMAGE_SIZE_MB = 10;
+            const MAX_VIDEO_SIZE_MB = 50;
+
+            // Track which files have been compressed
+            let compressedFileNames = new Set();
+
+            // Canvas-based image compression
+            async function compressImageCanvas(file, maxDimension = 2000, quality = 0.85) {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            let width = img.width;
+                            let height = img.height;
+                            if (width > maxDimension || height > maxDimension) {
+                                if (width > height) {
+                                    height = Math.round((height * maxDimension) / width);
+                                    width = maxDimension;
+                                } else {
+                                    width = Math.round((width * maxDimension) / height);
+                                    height = maxDimension;
+                                }
+                            }
+                            const canvas = document.createElement('canvas');
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+                            canvas.toBlob(
+                                (blob) => {
+                                    if (blob && blob.size < file.size) {
+                                        const compressedFile = new File([blob], file.name, {
+                                            type: 'image/jpeg',
+                                            lastModified: Date.now()
+                                        });
+                                        resolve(compressedFile);
+                                    } else {
+                                        resolve(file);
+                                    }
+                                },
+                                'image/jpeg',
+                                quality
+                            );
+                        };
+                        img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            const form = document.getElementById('room-form');
+            const nameInput = document.querySelector('#name');
+            const feedback = document.querySelector('#name-feedback');
+            const submitBtn = document.querySelector('#submit-btn');
+
+            // Show loading overlay on form submit
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); // Prevent default submission
+
+                const carouselFiles = document.getElementById('carousel_images').files;
+                const coverFile = document.getElementById('image_path').files[0];
+
+                // Check if we need to show loading (images to compress)
+                if ((carouselFiles && carouselFiles.length > 0) || coverFile) {
+                    compressAndSubmitForm();
+                } else {
+                    form.submit();
+                }
+            });
+
+            // Name uniqueness check with debouncing
+            let typingTimer;
+            const typingDelay = 500;
+
+            nameInput.addEventListener('input', () => {
+                clearTimeout(typingTimer);
+                typingTimer = setTimeout(async () => {
+                    // TODO: AJAX uniqueness check here if needed
+                }, typingDelay);
+            });
+
+            nameInput.addEventListener('keydown', () => clearTimeout(typingTimer));
+
+            // Room type change handler
             const roomTypeSelect = document.getElementById('room_type');
             const conditionalFields = document.querySelectorAll('.conditional-field');
 
             function toggleConditionalFields() {
                 const isEntrancePoint = roomTypeSelect.value === 'entrance_point';
-
                 conditionalFields.forEach(field => {
-                    if (isEntrancePoint) {
-                        field.style.display = 'none';
-                        const inputs = field.querySelectorAll('input, textarea, select');
-                        inputs.forEach(input => {
-                            input.disabled = true;
-                            if (input.type === 'file' && !isPageLoad) {
-                                input.value = '';
-                            }
-                        });
-                    } else {
-                        field.style.display = 'block';
-                        const inputs = field.querySelectorAll('input, textarea, select');
-                        inputs.forEach(input => {
-                            input.disabled = false;
-                        });
-                    }
+                    field.style.display = isEntrancePoint ? 'none' : '';
                 });
-
-                if (isEntrancePoint && !isPageLoad) {
-                    const coverPreview = document.getElementById('previewImage');
-                    const coverUploadText = document.getElementById('uploadText');
-                    const uploadBox = document.getElementById('uploadBox');
-                    if (coverPreview) {
-                        coverPreview.classList.add('hidden');
-                        coverPreview.src = '';
-                    }
-                    if (coverUploadText) coverUploadText.style.display = '';
-                    const uploadIcon = uploadBox?.querySelector('img');
-                    if (uploadIcon) uploadIcon.style.display = '';
-
-                    const carouselContainer = document.getElementById('carouselPreviewContainer');
-                    if (carouselContainer) {
-                        // Only clear new files, not existing images
-                        [...carouselContainer.children].forEach(div => {
-                            if (!div.querySelector('input[type="checkbox"]')) {
-                                div.remove();
-                            }
-                        });
-                    }
-                    selectedFiles = [];
-                    updateUploadIconVisibility();
-
-                    clearVideo();
-                    const videoInput = document.getElementById('video_path');
-                    if (videoInput) videoInput.value = '';
-
-                    officeHoursData = {};
-                    renderOfficeHours();
-                }
-
-                sessionStorage.setItem('room_type', roomTypeSelect.value);
             }
 
             let isPageLoad = true;
-            const savedRoomType = sessionStorage.getItem('room_type');
-            if (savedRoomType && savedRoomType !== roomTypeSelect.value) {
-                roomTypeSelect.value = savedRoomType;
-            }
-
             toggleConditionalFields();
-
             setTimeout(() => {
                 isPageLoad = false;
             }, 100);
-
             roomTypeSelect.addEventListener('change', () => {
                 isPageLoad = false;
                 toggleConditionalFields();
             });
 
-            // Cover image upload preview + drag and drop
+            // Cover image functionality
             const coverInput = document.getElementById('image_path');
-            const coverPreview = document.getElementById('previewImage');
             const coverUploadBox = document.getElementById('uploadBox');
+            let coverPreview = document.getElementById('previewImage');
+            if (!coverPreview) {
+                coverPreview = document.createElement('img');
+                coverPreview.id = 'previewImage';
+                coverPreview.className = 'hidden w-full h-32 object-cover rounded mt-2';
+                coverUploadBox.appendChild(coverPreview);
+            }
 
             coverUploadBox.addEventListener('click', () => coverInput.click());
-
             coverInput.addEventListener('change', () => {
                 if (coverInput.files && coverInput.files[0]) {
-                    showCoverPreview(coverInput.files[0]);
+                    compressAndPreviewCoverImage(coverInput.files[0]);
                 }
             });
 
-            coverUploadBox.addEventListener('dragover', e => {
-                e.preventDefault();
-                coverUploadBox.classList.add('border-primary', 'bg-gray-50');
+            ['dragover', 'dragleave', 'drop'].forEach(eventName => {
+                coverUploadBox.addEventListener(eventName, handleDragEvent);
             });
 
-            coverUploadBox.addEventListener('dragleave', e => {
+            function handleDragEvent(e) {
                 e.preventDefault();
-                coverUploadBox.classList.remove('border-primary', 'bg-gray-50');
-            });
-
-            coverUploadBox.addEventListener('drop', e => {
-                e.preventDefault();
-                coverUploadBox.classList.remove('border-primary', 'bg-gray-50');
-
-                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                    coverInput.files = e.dataTransfer.files;
-                    showCoverPreview(e.dataTransfer.files[0]);
+                if (e.type === 'dragover') {
+                    coverUploadBox.classList.add('border-primary', 'bg-gray-50');
+                } else if (e.type === 'dragleave') {
+                    coverUploadBox.classList.remove('border-primary', 'bg-gray-50');
+                } else if (e.type === 'drop') {
+                    coverUploadBox.classList.remove('border-primary', 'bg-gray-50');
+                    const files = Array.from(e.dataTransfer.files);
+                    if (files.length > 0) {
+                        compressAndPreviewCoverImage(files[0]);
+                    }
                 }
-            });
+            }
+
+            async function compressAndPreviewCoverImage(file) {
+                try {
+                    showTemporaryMessage('Compressing cover image...', 'info');
+                    const compressedFile = await compressImageCanvas(file, 2000, 0.85);
+                    compressedFileNames.add(file.name);
+                    // Update the file input with compressed file
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(new File([compressedFile], file.name, {
+                        type: compressedFile.type,
+                        lastModified: Date.now()
+                    }));
+                    coverInput.files = dataTransfer.files;
+                    showCoverPreview(compressedFile);
+                    const originalSizeMB = (file.size / 1024 / 1024).toFixed(2);
+                    const compressedSizeMB = (compressedFile.size / 1024 / 1024).toFixed(2);
+                    showTemporaryMessage(`Cover image compressed: ${originalSizeMB}MB → ${compressedSizeMB}MB`,
+                        'success');
+                } catch (error) {
+                    console.error('Compression failed:', error);
+                    showTemporaryMessage('Compression failed, using original image', 'error');
+                    showCoverPreview(file);
+                }
+            }
 
             function showCoverPreview(file) {
                 const reader = new FileReader();
                 reader.onload = e => {
                     coverPreview.src = e.target.result;
                     coverPreview.classList.remove('hidden');
-
-                    const icon = coverUploadBox.querySelector('img');
-                    const text = coverUploadBox.querySelector('span');
-                    if (icon) icon.style.display = 'none';
-                    if (text) text.style.display = 'none';
                 };
                 reader.readAsDataURL(file);
             }
 
-            // Carousel images functionality + drag and drop
-            const maxFiles = 50;
-            const maxSizeMB = 10;
+            function resetCoverImage() {
+                coverPreview.classList.add('hidden');
+                coverPreview.src = '';
+                const icon = coverUploadBox.querySelector('img:not(#previewImage)');
+                const text = coverUploadBox.querySelector('span');
+                if (icon) icon.style.display = '';
+                if (text) text.style.display = '';
+                coverInput.value = '';
+            }
+
+            // Carousel images functionality
             const carouselInput = document.getElementById('carousel_images');
             const carouselUploadBox = document.getElementById('carouselUploadBox');
-            const carouselPreviewContainer = document.getElementById('carouselPreviewContainer');
+            let carouselPreviewContainer = document.getElementById('carouselPreviewContainer');
+            if (!carouselPreviewContainer) {
+                carouselPreviewContainer = document.createElement('div');
+                carouselPreviewContainer.id = 'carouselPreviewContainer';
+                carouselPreviewContainer.className = 'grid grid-cols-2 md:grid-cols-3 gap-4 mt-4';
+                carouselUploadBox.parentNode.insertBefore(carouselPreviewContainer, carouselUploadBox.nextSibling);
+            }
             let selectedFiles = [];
 
             carouselUploadBox.addEventListener('click', () => carouselInput.click());
 
-            function updateUploadIconVisibility() {
-                const icon = carouselUploadBox.querySelector('img');
-                const text = carouselUploadBox.querySelector('span');
+            carouselInput.addEventListener('change', () => {
+                handleCarouselFiles(Array.from(carouselInput.files || []));
+            });
 
-                // Count existing images that aren't marked for removal
-                const existingImages = [...carouselPreviewContainer.children].filter(div => {
-                    const checkbox = div.querySelector('input[type="checkbox"]');
-                    return !checkbox || !checkbox.checked;
-                });
+            ['dragover', 'dragleave', 'drop'].forEach(eventName => {
+                carouselUploadBox.addEventListener(eventName, handleCarouselDrag);
+            });
 
-                const totalVisible = existingImages.length + selectedFiles.length;
-
-                if (icon) icon.style.display = totalVisible > 0 ? 'none' : '';
-                if (text) text.style.display = totalVisible > 0 ? 'none' : '';
+            function handleCarouselDrag(e) {
+                e.preventDefault();
+                if (e.type === 'dragover') {
+                    carouselUploadBox.classList.add('border-primary', 'bg-gray-50');
+                } else if (e.type === 'dragleave') {
+                    carouselUploadBox.classList.remove('border-primary', 'bg-gray-50');
+                } else if (e.type === 'drop') {
+                    carouselUploadBox.classList.remove('border-primary', 'bg-gray-50');
+                    const files = Array.from(e.dataTransfer.files);
+                    handleCarouselFiles(files);
+                }
             }
 
-            function updateInputFiles() {
+            function handleCarouselFiles(newFiles) {
+                carouselInput.value = '';
+
+                if (selectedFiles.length + newFiles.length > MAX_CAROUSEL_FILES) {
+                    showTemporaryMessage(`Maximum ${MAX_CAROUSEL_FILES} images allowed.`, 'error');
+                    return;
+                }
+
+                const invalidFiles = newFiles.filter(file => !validateImageFile(file, false));
+                if (invalidFiles.length > 0) {
+                    showTemporaryMessage('Some files are invalid or too large.', 'error');
+                    return;
+                }
+
+                // Compress images before adding
+                compressCarouselImages(newFiles);
+            }
+
+            async function compressCarouselImages(newFiles) {
+                showTemporaryMessage(`Compressing ${newFiles.length} image(s)...`, 'info');
+                try {
+                    const compressedFiles = [];
+                    for (let i = 0; i < newFiles.length; i++) {
+                        const file = newFiles[i];
+                        try {
+                            const compressedFile = await compressImageCanvas(file, 2000, 0.85);
+                            const finalFile = new File([compressedFile], file.name, {
+                                type: compressedFile.type,
+                                lastModified: Date.now()
+                            });
+                            compressedFileNames.add(file.name);
+                            compressedFiles.push(finalFile);
+                        } catch (error) {
+                            console.error(`Failed to compress ${file.name}:`, error);
+                            compressedFiles.push(file);
+                        }
+                    }
+                    selectedFiles = selectedFiles.concat(compressedFiles);
+                    renderCarouselPreviews();
+                    updateCarouselInputFiles();
+                    const totalOriginalSize = newFiles.reduce((sum, f) => sum + f.size, 0) / 1024 / 1024;
+                    const totalCompressedSize = compressedFiles.reduce((sum, f) => sum + f.size, 0) / 1024 /
+                        1024;
+                    showTemporaryMessage(
+                        `${newFiles.length} image(s) compressed: ${totalOriginalSize.toFixed(2)}MB → ${totalCompressedSize.toFixed(2)}MB`,
+                        'success'
+                    );
+                } catch (error) {
+                    console.error('Batch compression failed:', error);
+                    showTemporaryMessage('Some images could not be compressed', 'error');
+                } finally {}
+            }
+
+            function renderCarouselPreviews() {
+                carouselPreviewContainer.innerHTML = '';
+                selectedFiles.forEach((file, index) => {
+                    const reader = new FileReader();
+                    const div = document.createElement('div');
+                    div.className = 'relative rounded overflow-hidden border shadow-sm group';
+                    reader.onload = e => {
+                        div.innerHTML = `
+                    <img src="${e.target.result}" class="w-full h-24 object-cover">
+                    <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-1 truncate">
+                        ${file.name}
+                    </div>
+                    <div class="absolute top-1 left-1 bg-black/60 text-white text-xs px-1 rounded">
+                        ${(file.size / 1024 / 1024).toFixed(2)}MB
+                    </div>
+                    <button type="button" 
+                        class="absolute top-1 right-1 bg-red-500 text-white w-6 h-6 rounded-full
+                        flex items-center justify-center text-sm hover:bg-red-600 transition-colors
+                        opacity-0 group-hover:opacity-100"
+                        data-index="${index}" 
+                        title="Remove">
+                        ×
+                    </button>
+                `;
+                        const removeBtn = div.querySelector('button');
+                        removeBtn.addEventListener('click', function() {
+                            selectedFiles.splice(index, 1);
+                            renderCarouselPreviews();
+                            updateCarouselInputFiles();
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                    carouselPreviewContainer.appendChild(div);
+                });
+                updateUploadIconVisibility();
+            }
+
+            function updateCarouselInputFiles() {
                 const dt = new DataTransfer();
                 selectedFiles.forEach(file => dt.items.add(file));
                 carouselInput.files = dt.files;
             }
 
-            function renderPreviews() {
-                // Remove only the new file previews (not existing images)
-                [...carouselPreviewContainer.children].forEach(div => {
-                    if (!div.querySelector('input[type="checkbox"]')) {
-                        div.remove();
-                    }
-                });
-
-                selectedFiles.forEach((file, index) => {
-                    const reader = new FileReader();
-                    reader.onload = e => {
-                        const container = document.createElement('div');
-                        container.className =
-                            'relative w-24 h-24 rounded overflow-hidden shadow border border-gray-300';
-
-                        const img = document.createElement('img');
-                        img.src = e.target.result;
-                        img.className = 'w-full h-full object-cover rounded';
-
-                        const removeBtn = document.createElement('button');
-                        removeBtn.innerHTML = '&times;';
-                        removeBtn.className =
-                            'absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow';
-                        removeBtn.onclick = ev => {
-                            ev.preventDefault();
-                            selectedFiles.splice(index, 1);
-                            renderPreviews();
-                            updateInputFiles();
-                            updateUploadIconVisibility();
-                        };
-
-                        container.appendChild(img);
-                        container.appendChild(removeBtn);
-                        carouselPreviewContainer.appendChild(container);
-                    };
-                    reader.readAsDataURL(file);
-                });
-
-                updateUploadIconVisibility();
+            function updateUploadIconVisibility() {
+                const icon = carouselUploadBox.querySelector('img:first-child');
+                const text = carouselUploadBox.querySelector('span');
+                const display = selectedFiles.length > 0 ? 'none' : '';
+                if (icon) icon.style.display = display;
+                if (text) text.style.display = display;
             }
 
-            carouselInput.addEventListener('change', () => handleCarouselFiles(Array.from(carouselInput.files ||
-            [])));
-
-            carouselUploadBox.addEventListener('dragover', e => {
-                e.preventDefault();
-                carouselUploadBox.classList.add('border-primary', 'bg-gray-50');
-            });
-
-            carouselUploadBox.addEventListener('dragleave', e => {
-                e.preventDefault();
-                carouselUploadBox.classList.remove('border-primary', 'bg-gray-50');
-            });
-
-            carouselUploadBox.addEventListener('drop', e => {
-                e.preventDefault();
-                carouselUploadBox.classList.remove('border-primary', 'bg-gray-50');
-
-                if (e.dataTransfer.files) {
-                    handleCarouselFiles(Array.from(e.dataTransfer.files));
-                }
-            });
-
-            function handleCarouselFiles(newFiles) {
+            function resetCarouselImages() {
+                selectedFiles = [];
+                carouselPreviewContainer.innerHTML = '';
                 carouselInput.value = '';
-
-                // Count existing images that aren't marked for removal
-                const existingCount = [...carouselPreviewContainer.children].filter(div => {
-                    const checkbox = div.querySelector('input[type="checkbox"]');
-                    return checkbox && !checkbox.checked;
-                }).length;
-
-                // Check number of files
-                if (existingCount + selectedFiles.length + newFiles.length > maxFiles) {
-                    alert(`You can upload max ${maxFiles} images.`);
-                    return;
-                }
-
-                // Limit file sizes per file
-                for (let file of newFiles) {
-                    if (file.size > maxSizeMB * 1024 * 1024) {
-                        alert(`"${file.name}" is too large. Max size is ${maxSizeMB} MB.`);
-                        return;
-                    }
-                }
-
-                selectedFiles = selectedFiles.concat(newFiles);
-                renderPreviews();
-                updateInputFiles();
+                updateUploadIconVisibility();
             }
 
-            // Function to toggle image removal for existing images
-            window.toggleImageRemoval = function(button, imageId) {
-                const container = button.parentElement;
-                const checkbox = container.querySelector('input[type="checkbox"]');
-
-                if (checkbox.checked) {
-                    checkbox.checked = false;
-                    container.style.opacity = '1';
-                    button.innerHTML = '&times;';
-                } else {
-                    checkbox.checked = true;
-                    container.style.opacity = '0.4';
-                    button.innerHTML = '↶';
-                }
-                updateUploadIconVisibility();
-            };
-
-            updateUploadIconVisibility();
 
             // Video upload functionality
             const maxVideoSizeMB = 50;
@@ -588,7 +670,7 @@
             function showVideoPreview(file) {
                 // Size check
                 if (file.size / 1024 / 1024 > maxVideoSizeMB) {
-                    alert(`"${file.name}" is too large. Max size is ${maxVideoSizeMB} MB.`);
+                    showTemporaryMessage(`"${file.name}" is too large. Max size is ${maxVideoSizeMB} MB.`);
                     clearVideo();
                     videoInput.value = '';
                     return;
@@ -596,7 +678,7 @@
 
                 // Type check
                 if (!allowedVideoTypes.includes(file.type)) {
-                    alert(`"${file.name}" is not a valid format. Only MP4, AVI, or MPEG allowed.`);
+                    showTemporaryMessage(`"${file.name}" is not a valid format. Only MP4, AVI, or MPEG allowed.`);
                     clearVideo();
                     videoInput.value = '';
                     return;
@@ -613,12 +695,166 @@
                 videoPreviewContainer.classList.add('hidden');
             }
 
+            // Validation functions
+            function validateImageFile(file, showError = true) {
+                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+                if (!allowedTypes.includes(file.type)) {
+                    if (showError) showTemporaryMessage('Invalid image type.', 'error');
+                    return false;
+                }
+                if (file.size > MAX_IMAGE_SIZE_MB * 1024 * 1024) {
+                    if (showError) showTemporaryMessage('Image too large.', 'error');
+                    return false;
+                }
+                return true;
+            }
+
+            // Show temporary messages
+            function showTemporaryMessage(message, type = "info") {
+                let msgDiv = document.getElementById('temp-message');
+                if (!msgDiv) {
+                    msgDiv = document.createElement('div');
+                    msgDiv.id = 'temp-message';
+                    msgDiv.className =
+                        'fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2 rounded shadow-lg';
+                    document.body.appendChild(msgDiv);
+                }
+                msgDiv.textContent = message;
+                msgDiv.className =
+                    'fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2 rounded shadow-lg ' +
+                    (type === 'success' ? 'bg-green-500 text-white' :
+                        type === 'error' ? 'bg-red-500 text-white' :
+                        'bg-blue-500 text-white');
+                msgDiv.style.display = 'block';
+                setTimeout(() => {
+                    msgDiv.style.display = 'none';
+                }, 3500);
+            }
+
+            // Compress all images before final form submission
+            async function compressCarouselImages(newFiles) {
+                showTemporaryMessage(`Compressing ${newFiles.length} image(s)...`, 'info');
+                try {
+                    const compressedFiles = [];
+                    for (let i = 0; i < newFiles.length; i++) {
+                        const file = newFiles[i];
+                        try {
+                            const compressedFile = await compressImageCanvas(file, 2000, 0.85);
+                            const finalFile = new File([compressedFile], file.name, {
+                                type: compressedFile.type,
+                                lastModified: Date.now()
+                            });
+                            compressedFileNames.add(file.name);
+                            compressedFiles.push(finalFile);
+                        } catch (error) {
+                            console.error(`Failed to compress ${file.name}:`, error);
+                            compressedFiles.push(file);
+                        }
+                    }
+                    selectedFiles = selectedFiles.concat(compressedFiles);
+                    renderCarouselPreviews();
+                    updateCarouselInputFiles();
+                    const totalOriginalSize = newFiles.reduce((sum, f) => sum + f.size, 0) / 1024 / 1024;
+                    const totalCompressedSize = compressedFiles.reduce((sum, f) => sum + f.size, 0) / 1024 /
+                        1024;
+                    showTemporaryMessage(
+                        `${newFiles.length} image(s) compressed: ${totalOriginalSize.toFixed(2)}MB → ${totalCompressedSize.toFixed(2)}MB`,
+                        'success'
+                    );
+                } catch (error) {
+                    console.error('Batch compression failed:', error);
+                    showTemporaryMessage('Some images could not be compressed', 'error');
+                } finally {}
+            }
+
+            async function compressAndSubmitForm() {
+                isUploading = true;
+                window.dispatchEvent(new CustomEvent('upload-start'));
+                submitBtn.disabled = true;
+
+                const carouselFiles = Array.from(document.getElementById('carousel_images').files || []);
+                const coverFile = document.getElementById('image_path').files[0];
+
+                try {
+                    // Compress cover image if needed
+                    if (coverFile && !compressedFileNames.has(coverFile.name)) {
+                        const compressedCover = await compressImageCanvas(coverFile, 2000, 0.85);
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(new File([compressedCover], coverFile.name, {
+                            type: compressedCover.type,
+                            lastModified: Date.now()
+                        }));
+                        document.getElementById('image_path').files = dataTransfer.files;
+                    }
+
+                    // Compress carousel images if needed
+                    const filesToCompress = carouselFiles.filter(f => !compressedFileNames.has(f.name));
+                    if (filesToCompress.length > 0) {
+                        await compressCarouselImages(filesToCompress);
+                    }
+
+                    // Submit the form with AJAX to track progress
+                    const formData = new FormData(form);
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', form.action, true);
+                    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+                    xhr.upload.onprogress = function(e) {
+                        if (e.lengthComputable) {
+                            const percent = Math.round((e.loaded / e.total) * 100);
+                            window.dispatchEvent(new CustomEvent('upload-progress', {
+                                detail: {
+                                    progress: percent
+                                }
+                            }));
+                        }
+                    };
+
+                    xhr.onload = function() {
+                        isUploading = false;
+                        window.dispatchEvent(new CustomEvent('upload-finish'));
+                        submitBtn.disabled = false;
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            try {
+                                const data = JSON.parse(xhr.responseText);
+                                if (data.redirect) {
+                                    window.onbeforeunload = null;
+                                    window.location.href = data.redirect;
+                                    return;
+                                }
+                            } catch {}
+                            window.onbeforeunload = null;
+                            window.location.href = '/admin/rooms';
+                        } else {
+                            let msg = 'Submission failed.';
+                            try {
+                                const data = JSON.parse(xhr.responseText);
+                                if (data.message) msg = data.message;
+                            } catch {}
+                            showTemporaryMessage(msg, 'error');
+                        }
+                    };
+
+                    xhr.onerror = function() {
+                        isUploading = false;
+                        window.dispatchEvent(new CustomEvent('upload-finish'));
+                        submitBtn.disabled = false;
+                        showTemporaryMessage('Upload failed. Please try again.', 'error');
+                    };
+
+                    xhr.send(formData);
+
+                } catch (error) {
+                    isUploading = false;
+                    window.dispatchEvent(new CustomEvent('upload-finish'));
+                    submitBtn.disabled = false;
+                    showTemporaryMessage('Error during image compression. Please try again.', 'error');
+                }
+            }
+
             // ================= Enhanced Office Hours with Day.js =================
             const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
             let officeHoursData = {};
-
-            // Populate existing data from the room model
-            officeHoursData = @json($existingOfficeHours);
 
             // Day.js Enhanced Time Functions
             function formatTime12Hour(time24) {
@@ -713,20 +949,18 @@
                             `.bulk-day-checkbox[value="${day}"]`);
                         if (cb) cb.checked = true;
                     });
-                    updateBulkInputsForSelectedDays();
                 });
             });
 
             document.querySelector('.clear-select').addEventListener('click', () => {
                 document.querySelectorAll('.bulk-day-checkbox').forEach(cb => cb.checked = false);
-                updateBulkInputsForSelectedDays();
             });
 
             // Apply bulk changes with proper edit handling
             document.querySelector('.apply-bulk').addEventListener('click', function() {
                 const selectedDays = Array.from(document.querySelectorAll('.bulk-day-checkbox:checked'))
                     .map(cb => cb.value);
-                if (!selectedDays.length) return alert("Please select at least one day.");
+                if (!selectedDays.length) return showTemporaryMessage("Please select at least one day.");
 
                 const ranges = collectBulkRanges();
                 if (!ranges) return;
@@ -791,59 +1025,6 @@
                 });
             }
 
-            // Function to update bulk inputs when days are selected
-            function updateBulkInputsForSelectedDays() {
-                const selectedDays = Array.from(document.querySelectorAll('.bulk-day-checkbox:checked'))
-                    .map(cb => cb.value);
-
-                if (selectedDays.length === 0) {
-                    document.querySelector('.bulk-start-time').value = '';
-                    document.querySelector('.bulk-end-time').value = '';
-                    return;
-                }
-
-                let commonRange = null;
-
-                if (selectedDays.length === 1) {
-                    const dayRanges = officeHoursData[selectedDays[0]];
-                    if (dayRanges && dayRanges.length > 0) {
-                        commonRange = dayRanges[0];
-                    }
-                } else {
-                    const firstDayRanges = officeHoursData[selectedDays[0]];
-                    if (firstDayRanges && firstDayRanges.length > 0) {
-                        const candidateRange = firstDayRanges[0];
-
-                        const allHaveSameRange = selectedDays.every(day => {
-                            const dayRanges = officeHoursData[day];
-                            return dayRanges && dayRanges.length > 0 &&
-                                dayRanges[0].start === candidateRange.start &&
-                                dayRanges[0].end === candidateRange.end;
-                        });
-
-                        if (allHaveSameRange) {
-                            commonRange = candidateRange;
-                        }
-                    }
-                }
-
-                const startInput = document.querySelector('.bulk-start-time');
-                const endInput = document.querySelector('.bulk-end-time');
-
-                if (commonRange) {
-                    startInput.value = commonRange.start;
-                    endInput.value = commonRange.end;
-                } else {
-                    startInput.value = '';
-                    endInput.value = '';
-                }
-            }
-
-            // Add event listeners for day checkbox changes
-            document.querySelectorAll('.bulk-day-checkbox').forEach(checkbox => {
-                checkbox.addEventListener('change', updateBulkInputsForSelectedDays);
-            });
-
             // Clear time input when X is clicked
             document.addEventListener('click', e => {
                 if (e.target.classList.contains('clear-time') || e.target.closest('.clear-time')) {
@@ -884,13 +1065,13 @@
 
                 if (!valid) return null;
                 if (!ranges.length) {
-                    alert("Please enter at least one valid time range.");
+                    showTemporaryMessage("Please enter at least one valid time range.");
                     return null;
                 }
 
                 const overlapCheck = hasOverlapDayJs(ranges);
                 if (overlapCheck.hasOverlap) {
-                    alert("Time ranges overlap. Fix them first.");
+                    showTemporaryMessage("Time ranges overlap. Fix them first.");
                     return null;
                 }
 
@@ -945,17 +1126,17 @@
                                 <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                             </div>
                             ${rangeKey !== "closed" ? `
-                                            <div class="flex gap-2 ml-4">
-                                                <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                        data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                                    Edit
-                                                </button>
-                                                <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                        data-days='${JSON.stringify(group.days)}'>
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        ` : ''}
+                                                                                                                                                            <div class="flex gap-2 ml-4">
+                                                                                                                                                                <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                                                                                        data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                                                                                                                                    Edit
+                                                                                                                                                                </button>
+                                                                                                                                                                <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                                                                                        data-days='${JSON.stringify(group.days)}'>
+                                                                                                                                                                    Delete
+                                                                                                                                                                </button>
+                                                                                                                                                            </div>
+                                                                                                                                                        ` : ''}
                         </div>
                     `;
 
