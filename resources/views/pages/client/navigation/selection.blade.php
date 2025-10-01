@@ -30,18 +30,19 @@
         <x-floating-q-r href="{{ route('scan.index') }}" icon="{{ asset('icons/qr-code.png') }}" alt="Scan Office"
             title="Scan office to know more" />
 
-        <div class="flex justify-center mt-8">
+        <div class="flex justify-center mt-4 sm:mt-8 px-4 sm:px-0">
             <div x-data="staffSearch()" class="relative w-full max-w-md">
                 <input type="text" x-model="query" @input.debounce.300ms="filterStaff" placeholder="Search staff..."
-                    class="w-full border border-primary focus:ring-2 focus:border-primary focus:ring-primary focus:outline-none rounded-lg p-2 pr-8 dark:bg-gray-700 dark:text-gray-300 transition-all duration-200">
+                    class="w-full border border-primary focus:ring-2 focus:border-primary focus:ring-primary focus:outline-none rounded-lg p-2 pr-8 text-sm sm:text-base dark:bg-gray-700 dark:text-gray-300 transition-all duration-200">
 
                 <ul x-show="results.length"
-                    class="absolute w-full bg-white dark:bg-gray-800 dark:text-gray-300 border rounded mt-1 max-h-60 overflow-y-auto z-50">
+                    class="absolute w-full bg-white dark:bg-gray-800 dark:text-gray-300 border border-primary rounded-lg mt-1 max-h-48 sm:max-h-60 overflow-y-auto z-50 shadow-lg">
                     <template x-for="staff in results" :key="staff.id">
-                        <li @click="selectStaff(staff)" class="p-2 cursor-pointer hover:bg-primary hover:text-white">
-                            <span x-text="staff.name"></span>
+                        <li @click="selectStaff(staff)"
+                            class="p-2 sm:p-3 cursor-pointer hover:bg-primary hover:text-white transition-colors duration-150">
+                            <span x-text="staff.name" class="text-sm sm:text-base font-medium"></span>
                             <small x-text="staff.room ? '(' + staff.room.name + ')' : ''"
-                                class="ml-2 text-gray-500"></small>
+                                class="ml-2 text-xs sm:text-sm text-gray-500 hover:text-gray-200"></small>
                         </li>
                     </template>
                 </ul>
