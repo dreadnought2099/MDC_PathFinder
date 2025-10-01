@@ -38,7 +38,8 @@
                 <template x-for="staff in results" :key="staff.id">
                     <li @click="selectStaff(staff)" class="p-2 cursor-pointer hover:bg-primary hover:text-white">
                         <span x-text="staff.name"></span>
-                        <small x-text="staff.room ? '(' + staff.room + ')' : ''" class="ml-2 text-gray-500"></small>
+                        {{-- reference the name property to avoid object object --}}
+                        <small x-text="staff.room ? '(' + staff.room.name + ')' : ''" class="ml-2 text-gray-500"></small>
                     </li>
                 </template>
             </ul>
@@ -69,7 +70,7 @@
                             </svg>
 
                             <input type="hidden" id="from_room" name="from_room">
-                            
+
                             <div id="from_room_dropdown"
                                 class="hidden absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-primary rounded-lg shadow-lg max-h-60 overflow-y-auto">
                                 <div id="from_room_options" class="py-1">
