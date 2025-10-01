@@ -73,29 +73,30 @@
 
 <body class="flex flex-col min-h-screen">
     <!-- Flash Messages -->
-    <div id="success-message-container" class="absolute top-24 right-4 z-50">
+    <div id="success-message-container"
+        class="fixed top-20 sm:top-24 right-2 sm:right-4 left-2 sm:left-auto z-50 max-w-full sm:max-w-md">
         @if (session('success') || session('error') || session('info') || session('warning') || $errors->any())
             <div id="message"
-                class="p-3 rounded-md shadow-lg border-l-4
-                    {{ session('success') ? 'bg-green-100 text-green-700 border-green-300 dark:bg-green-800 dark:text-green-200 dark:border-green-600' : '' }}
-                    {{ session('error') ? 'bg-red-100 text-red-700 border-red-300 dark:bg-red-800 dark:text-red-200 dark:border-red-600' : '' }}
-                    {{ session('info') ? 'bg-yellow-100 text-yellow-700 border-yellow-300 dark:bg-yellow-700 dark:text-yellow-200 dark:border-yellow-500' : '' }}
-                    {{ session('warning') ? 'bg-orange-100 text-orange-700 border-orange-300 dark:bg-orange-800 dark:text-orange-200 dark:border-orange-600' : '' }}
-                    {{ $errors->any() ? 'bg-red-100 text-red-700 border-red-300 dark:bg-red-800 dark:text-red-200 dark:border-red-600' : '' }}">
+                class="p-3 sm:p-4 rounded-md shadow-lg border-l-4 text-sm sm:text-base transition-opacity duration-500
+                {{ session('success') ? 'bg-green-100 text-green-700 border-green-300 dark:bg-green-800 dark:text-green-200 dark:border-green-600' : '' }}
+                {{ session('error') ? 'bg-red-100 text-red-700 border-red-300 dark:bg-red-800 dark:text-red-200 dark:border-red-600' : '' }}
+                {{ session('info') ? 'bg-yellow-100 text-yellow-700 border-yellow-300 dark:bg-yellow-700 dark:text-yellow-200 dark:border-yellow-500' : '' }}
+                {{ session('warning') ? 'bg-orange-100 text-orange-700 border-orange-300 dark:bg-orange-800 dark:text-orange-200 dark:border-orange-600' : '' }}
+                {{ $errors->any() ? 'bg-red-100 text-red-700 border-red-300 dark:bg-red-800 dark:text-red-200 dark:border-red-600' : '' }}">
                 @if (session('success'))
-                    <p>{{ session('success') }}</p>
+                    <p class="break-words">{{ session('success') }}</p>
                 @endif
                 @if (session('error'))
-                    <p>{{ session('error') }}</p>
+                    <p class="break-words">{{ session('error') }}</p>
                 @endif
                 @if (session('info'))
-                    <p>{{ session('info') }}</p>
+                    <p class="break-words">{{ session('info') }}</p>
                 @endif
                 @if (session('warning'))
-                    <p>{{ session('warning') }}</p>
+                    <p class="break-words">{{ session('warning') }}</p>
                 @endif
                 @foreach ($errors->all() as $error)
-                    <p>{{ $error }}</p>
+                    <p class="break-words {{ !$loop->last ? 'mb-1' : '' }}">{{ $error }}</p>
                 @endforeach
             </div>
 
@@ -213,7 +214,8 @@
                                 });
 
                                 alert(
-                                    "Validation failed. Please fix inputs — files are still attached.");
+                                    "Validation failed. Please fix inputs — files are still attached."
+                                    );
                                 return;
                             }
                         } catch (err) {
