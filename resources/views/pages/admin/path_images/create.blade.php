@@ -10,56 +10,49 @@
             <h2 class="text-2xl text-center mb-6 dark:text-gray-300">
                 <span class="text-primary">Upload</span> Path Images
             </h2>
+            <x-upload-progress-modal>
+                {{-- Upload Form --}}
+                <form id="uploadForm" action="{{ route('path-image.store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
 
-            <form id="uploadForm" action="{{ route('path-image.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-
-                {{-- Path Selector --}}
-                <div class="mb-4 dark:text-gray-300">
-                    <label for="path_id" class="block text-gray-700 mb-2 dark:text-gray-300">Select Path</label>
-                    <select name="path_id" id="path_id" required
-                        class="w-full border border-primary rounded px-3 py-2 dark:bg-gray-800">
-                        @foreach ($paths as $p)
-                            <option value="{{ $p->id }}" {{ $p->id == $defaultPath->id ? 'selected' : '' }}>
-                                {{ $p->fromRoom->name ?? 'Room #' . $p->from_room_id }} →
-                                {{ $p->toRoom->name ?? 'Room #' . $p->to_room_id }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                {{-- Dropzone --}}
-                <label for="fileInput"
-                    class="flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary dark:hover:bg-gray-800 transition-colors p-4 overflow-auto relative">
-                    <span class="text-gray-600 dark:text-gray-300 mb-2">Drop images here or click to browse</span>
-                    <span class="text-xs text-gray-400">
-                        JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 10 MB each | multiple allowed
-                    </span>
-
-                    <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
-                </label>
-
-                <div id="fileError" class="text-red-500 text-sm mt-2 hidden"></div>
-                <div id="selectedFiles" class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4"></div>
-
-                <button type="submit" id="submitBtn"
-                    class="w-full bg-primary text-white px-4 py-2 rounded-md border-2 border-primary duration-300 transition-all ease-in-out mt-4 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer hover:bg-white hover:text-primary dark:hover:bg-gray-800 shadow-primary-hover"
-                    disabled>
-                    Upload Images
-                </button>
-            </form>
-
-            {{-- Upload Modal --}}
-            <div id="uploadModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
-                <div class="bg-white dark:bg-gray-800 rounded p-6 w-96 shadow-lg">
-                    <h2 class="text-lg mb-4 dark:text-gray-300">Uploading...</h2>
-                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden relative">
-                        <div id="progressBar" class="h-4 rounded-full bg-primary transition-all duration-300 ease-out"
-                            style="width: 0%"></div>
+                    {{-- Path Selector --}}
+                    <div class="mb-4 dark:text-gray-300">
+                        <label for="path_id" class="block text-gray-700 mb-2 dark:text-gray-300">Select Path</label>
+                        <select name="path_id" id="path_id" required
+                            class="w-full border border-primary rounded px-3 py-2 dark:bg-gray-800">
+                            @foreach ($paths as $p)
+                                <option value="{{ $p->id }}" {{ $p->id == $defaultPath->id ? 'selected' : '' }}>
+                                    {{ $p->fromRoom->name ?? 'Room #' . $p->from_room_id }} →
+                                    {{ $p->toRoom->name ?? 'Room #' . $p->to_room_id }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
-                    <p id="progressText" class="mt-2 text-sm text-gray-600 dark:text-gray-400">0%</p>
-                </div>
-            </div>
+
+                    {{-- Dropzone --}}
+                    <label for="fileInput"
+                        class="flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary dark:hover:bg-gray-800 transition-colors p-4 overflow-auto relative">
+                        <span class="text-gray-600 dark:text-gray-300 mb-2">Drop images here or click to browse</span>
+                        <span class="text-xs text-gray-400">
+                            JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 10 MB each | multiple allowed
+                        </span>
+
+                        <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
+                    </label>
+
+                    <div id="fileError" class="text-red-500 text-sm mt-2 hidden"></div>
+                    <div id="selectedFiles" class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4"></div>
+
+                    <button type="submit" id="submitBtn"
+                        class="w-full bg-primary text-white px-4 py-2 rounded-md border-2 border-primary duration-300 transition-all ease-in-out mt-4 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer hover:bg-white hover:text-primary dark:hover:bg-gray-800 shadow-primary-hover"
+                        disabled>
+                        Upload Images
+                    </button>
+                </form>
+                {{-- Progress Modal handled in the component --}}
+            </x-upload-progress-modal>
+
+
         </div>
     @endif
 @endsection
@@ -428,10 +421,8 @@
                 isSubmitting = true;
                 updateSubmitButton();
 
-                const modal = document.getElementById('uploadModal');
-                const progressBar = document.getElementById('progressBar');
-                const progressText = document.getElementById('progressText');
-                modal.classList.remove('hidden');
+                // Show modal via Alpine event
+                window.dispatchEvent(new CustomEvent('upload-start'));
 
                 const formData = new FormData();
                 formData.append('_token', document.querySelector('input[name="_token"]').value);
@@ -446,18 +437,20 @@
                 xhr.upload.addEventListener('progress', function(e) {
                     if (e.lengthComputable) {
                         const percentComplete = Math.round((e.loaded / e.total) * 100);
-                        progressBar.style.width = percentComplete + '%';
-                        progressText.textContent =
-                            `${percentComplete}% (${formatFileSize(e.loaded)} / ${formatFileSize(e.total)})`;
+                        window.dispatchEvent(new CustomEvent('upload-progress', {
+                            detail: {
+                                progress: percentComplete
+                            }
+                        }));
                     }
                 });
 
                 xhr.addEventListener('load', function() {
+                    window.dispatchEvent(new CustomEvent('upload-finish'));
                     if (xhr.status >= 200 && xhr.status < 400) {
                         const pathId = pathSelect.value;
                         window.location.href = `/admin/paths/${pathId}`;
                     } else {
-                        modal.classList.add('hidden');
                         showError(['Upload failed. Please try again.']);
                         isSubmitting = false;
                         updateSubmitButton();
@@ -465,14 +458,14 @@
                 });
 
                 xhr.addEventListener('error', function() {
-                    modal.classList.add('hidden');
+                    window.dispatchEvent(new CustomEvent('upload-finish'));
                     showError(['Network error. Please check your connection and try again.']);
                     isSubmitting = false;
                     updateSubmitButton();
                 });
 
                 xhr.addEventListener('timeout', function() {
-                    modal.classList.add('hidden');
+                    window.dispatchEvent(new CustomEvent('upload-finish'));
                     showError([
                         'Upload timeout. The files may be too large or your connection is slow.'
                     ]);

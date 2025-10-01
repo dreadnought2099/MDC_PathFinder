@@ -3,236 +3,234 @@
 @section('content')
     <x-floating-actions />
 
-    <!-- Loading Overlay -->
-    <div id="loading-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl">
-            <div class="flex items-center space-x-4">
-                <svg class="animate-spin h-8 w-8 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none"
-                    viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
-                    </circle>
-                    <path class="opacity-75" fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                    </path>
-                </svg>
-                <span class="text-lg font-medium dark:text-gray-300">Processing images...</span>
-            </div>
-        </div>
-    </div>
-
     <div class="max-w-xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-6 dark:bg-gray-800">
         <h2 class="text-2xl text-center mb-6 dark:text-gray-300"><span class="text-primary">Add</span> New Office</h2>
 
-        <form action="{{ route('room.store') }}" method="POST" enctype="multipart/form-data" id="room-form" data-upload>
-            @csrf
+        <x-upload-progress-modal>
+            <form action="{{ route('room.store') }}" method="POST" enctype="multipart/form-data" id="room-form">
+                @csrf
 
-            @php
-                $inputClasses =
-                    'peer py-3 w-full placeholder-transparent font-sofia rounded-md text-gray-700 dark:text-gray-300 ring-1 px-4 ring-gray-500 dark:ring-gray-500 focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-white dark:bg-gray-800';
-                $labelClasses =
-                    'absolute cursor-text left-0 -top-3 text-sm font-sofia text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 mx-1 px-1 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3 peer-focus:text-primary peer-focus:text-sm peer-focus:bg-white dark:peer-focus:bg-gray-800 peer-focus:px-2 peer-focus:rounded-md';
-            @endphp
+                @php
+                    $inputClasses =
+                        'peer py-3 w-full placeholder-transparent font-sofia rounded-md text-gray-700 dark:text-gray-300 ring-1 px-4 ring-gray-500 dark:ring-gray-500 focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-white dark:bg-gray-800';
+                    $labelClasses =
+                        'absolute cursor-text left-0 -top-3 text-sm font-sofia text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 mx-1 px-1 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3 peer-focus:text-primary peer-focus:text-sm peer-focus:bg-white dark:peer-focus:bg-gray-800 peer-focus:px-2 peer-focus:rounded-md';
+                @endphp
 
-            <div class="relative mb-4">
-                <input type="text" name="name" id="name" placeholder="Office Name" class="{{ $inputClasses }}"
-                    value="{{ old('name') }}" required>
-                <label class="{{ $labelClasses }}">Office Name</label>
-                <span id="name-feedback" class="text-red-500 text-sm"></span>
-                @error('name')
-                    <span class="text-red-500 text-sm">{{ $message }}</span>
-                @enderror
-            </div>
+                <div class="relative mb-4">
+                    <input type="text" name="name" id="name" placeholder="Office Name" class="{{ $inputClasses }}"
+                        value="{{ old('name') }}" required>
+                    <label class="{{ $labelClasses }}">Office Name</label>
+                    <span id="name-feedback" class="text-red-500 text-sm"></span>
+                    @error('name')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
 
-            <div class="relative mb-4">
-                <textarea name="description" placeholder="Description" class="{{ $inputClasses }}" rows="3">{{ old('description') }}</textarea>
-                <label class="{{ $labelClasses }}">Description</label>
-                @error('description')
-                    <span class="text-red-500 text-sm">{{ $message }}</span>
-                @enderror
-            </div>
+                <div class="relative mb-4">
+                    <textarea name="description" placeholder="Description" class="{{ $inputClasses }}" rows="3">{{ old('description') }}</textarea>
+                    <label class="{{ $labelClasses }}">Description</label>
+                    @error('description')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
 
-            <div class="mb-4">
-                <label class="block mb-2 font-medium dark:text-gray-300">Room Type</label>
-                <select name="room_type" id="room_type"
-                    class="w-full border dark:text-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent border-gray-500 dark:bg-gray-800"
-                    required>
-                    <option value="regular" {{ old('room_type') === 'regular' ? 'selected' : '' }}>
-                        Regular Office
-                    </option>
-                    <option value="entrance_point" {{ old('room_type') === 'entrance_point' ? 'selected' : '' }}>
-                        Entrance Point
-                    </option>
-                </select>
-                <p class="text-sm text-gray-600 mt-1 dark:text-gray-300">
-                    Entrance gates automatically connect to all other rooms for navigation purposes.
-                </p>
-                @error('room_type')
-                    <span class="text-red-500 text-sm">{{ $message }}</span>
-                @enderror
-            </div>
+                <div class="mb-4">
+                    <label class="block mb-2 font-medium dark:text-gray-300">Room Type</label>
+                    <select name="room_type" id="room_type"
+                        class="w-full border dark:text-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent border-gray-500 dark:bg-gray-800"
+                        required>
+                        <option value="regular" {{ old('room_type') === 'regular' ? 'selected' : '' }}>
+                            Regular Office
+                        </option>
+                        <option value="entrance_point" {{ old('room_type') === 'entrance_point' ? 'selected' : '' }}>
+                            Entrance Point
+                        </option>
+                    </select>
+                    <p class="text-sm text-gray-600 mt-1 dark:text-gray-300">
+                        Entrance gates automatically connect to all other rooms for navigation purposes.
+                    </p>
+                    @error('room_type')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
 
-            <div class="mb-4 conditional-field" id="cover-image-section">
-                <label class="block mb-2 dark:text-gray-300">Cover Image (optional, max 10MB)</label>
+                <div class="mb-4 conditional-field" id="cover-image-section">
+                    <label class="block mb-2 dark:text-gray-300">Cover Image (optional, max 10MB)</label>
 
-                <div id="uploadBox"
-                    class="flex flex-col items-center justify-center w-full h-40 
+                    <div id="uploadBox"
+                        class="flex flex-col items-center justify-center w-full h-40 
                     border-2 border-dashed border-gray-300 dark:border-gray-600 
                     rounded cursor-pointer hover:border-primary hover:bg-gray-50 
                     dark:hover:border-primary dark:hover:bg-gray-800
                     transition-colors overflow-hidden relative">
-                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
-                        alt="Image Icon" class="w-8 h-8" onerror="this.style.display='none'">
-                    <span id="uploadText" class="text-gray-500 dark:text-gray-300">
-                        Click to upload cover image
-                    </span>
-                    <img id="previewImage" class="absolute inset-0 object-cover w-full h-full hidden" alt="Image preview" />
-                </div>
-
-                <input type="file" name="image_path" id="image_path" class="hidden" accept="image/*" />
-                @error('image_path')
-                    <span class="text-red-500 text-sm">{{ $message }}</span>
-                @enderror
-            </div>
-
-            <div class="mb-4 max-w-xl mx-auto conditional-field" id="carousel-images-section">
-                <label class="block mb-2 dark:text-gray-300">Carousel Images (optional, max 50 images, 10MB each)</label>
-                <div id="carouselUploadBox"
-                    class="flex flex-col items-center justify-center w-full h-40 
-                    border-2 border-dashed border-gray-300 dark:border-gray-600 
-                    rounded cursor-pointer hover:border-primary hover:bg-gray-50 
-                    dark:hover:border-primary dark:hover:bg-gray-800 transition-colors overflow-hidden relative">
-                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
-                        alt="Image Icon" class="w-8 h-8" onerror="this.style.display='none'">
-                    <span id="carouselUploadText" class="text-gray-500 mb-4 dark:text-gray-300">
-                        Click to upload images
-                    </span>
-                    <div id="carouselPreviewContainer" class="flex flex-wrap gap-3 w-full justify-start"></div>
-                </div>
-                <input type="file" name="carousel_images[]" id="carousel_images" class="hidden"
-                    accept="image/jpeg,image/jpg,image/png" multiple />
-                @error('carousel_images')
-                    <span class="text-red-500 text-sm">{{ $message }}</span>
-                @enderror
-                @error('carousel_images.*')
-                    <span class="text-red-500 text-sm">{{ $message }}</span>
-                @enderror
-            </div>
-
-            <div class="mb-4 max-w-xl mx-auto conditional-field" id="video-section">
-                <label class="block mb-2 dark:text-gray-300">Short Video (optional, max 50MB)</label>
-                <div id="videoDropZone"
-                    class="flex flex-col items-center justify-center w-full h-40 
-                    border-2 border-dashed border-gray-300 dark:border-gray-600 
-                    rounded cursor-pointer hover:border-primary hover:bg-gray-50 
-                    dark:hover:border-primary dark:hover:bg-gray-800 transition-colors overflow-hidden relative">
-                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/video.png"
-                        alt="Video Icon" class="w-9 h-9" onerror="this.style.display='none'">
-                    <p class="mb-2 dark:text-gray-300">Drag & drop a video file here or click to select</p>
-                    <p class="text-xs text-gray-400 dark:text-gray-300">(mp4, avi, mpeg)</p>
-                </div>
-                <input type="file" id="video_path" name="video_path" accept="video/mp4,video/avi,video/mpeg"
-                    class="hidden" />
-
-                <div id="videoPreviewContainer"
-                    class="mt-4 hidden relative rounded border border-gray-300 overflow-hidden">
-                    <video id="videoPreview" controls class="w-full h-auto bg-black"></video>
-                    <button type="button" id="removeVideoBtn"
-                        class="absolute top-2 right-2 bg-secondary text-white rounded-full p-1 hover:bg-red-700 transition-colors"
-                        title="Remove video">&times;</button>
-                </div>
-                @error('video_path')
-                    <span class="text-red-500 text-sm">{{ $message }}</span>
-                @enderror
-            </div>
-
-            <div class="mb-6 conditional-field" id="office-hours-section">
-                <label class="block font-semibold mb-2 dark:text-gray-300">Office Hours</label>
-
-                <div class="mb-6 p-4 border border-primary rounded dark:bg-gray-800">
-                    <p class="font-semibold mb-3 dark:text-gray-300">Set Time Range for Multiple Days</p>
-
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium mb-2 dark:text-gray-300">Select Days:</label>
-                        <div class="flex gap-2 flex-wrap">
-                            @php
-                                $daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                            @endphp
-                            @foreach ($daysOfWeek as $day)
-                                <label
-                                    class="flex items-center bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
-                                    <input type="checkbox" class="bulk-day-checkbox mr-2 text-primary focus:ring-primary"
-                                        value="{{ $day }}">
-                                    <span class="text-sm text-gray-700 dark:text-gray-300">{{ $day }}</span>
-                                </label>
-                            @endforeach
-                        </div>
-
-                        <div class="mt-2 flex gap-2 flex-wrap">
-                            <button type="button"
-                                class="quick-select bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white px-3 py-1 rounded text-sm transition-colors"
-                                data-days="Mon,Tue,Wed,Thu,Fri">Weekdays</button>
-                            <button type="button"
-                                class="quick-select bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white px-3 py-1 rounded text-sm transition-colors"
-                                data-days="Sat,Sun">Weekends</button>
-                            <button type="button"
-                                class="quick-select bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white px-3 py-1 rounded text-sm transition-colors"
-                                data-days="Mon,Tue,Wed,Thu,Fri,Sat,Sun">All Days</button>
-                            <button type="button"
-                                class="clear-select bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300 px-3 py-1 rounded text-sm transition-colors">Clear
-                                All</button>
-                        </div>
+                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
+                            alt="Image Icon" class="w-8 h-8" onerror="this.style.display='none'">
+                        <span id="uploadText" class="text-gray-500 dark:text-gray-300">
+                            Click to upload cover image
+                        </span>
+                        <img id="previewImage" class="absolute inset-0 object-cover w-full h-full hidden"
+                            alt="Image preview" />
                     </div>
 
-                    <div class="bulk-time-ranges mb-4">
-                        <label class="block text-sm font-medium mb-2 dark:text-gray-300">Time Range:</label>
-                        <div class="bulk-ranges-container">
-                            <div class="flex gap-2 mb-2 bulk-range-row">
-                                <div class="relative flex-1">
-                                    <input type="time"
-                                        class="custom-time-input bulk-start-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary">
-                                    <button type="button"
-                                        class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
-                                        title="Clear">&times;</button>
-                                </div>
-                                <div class="relative flex-1">
-                                    <input type="time"
-                                        class="custom-time-input bulk-end-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary">
-                                    <button type="button"
-                                        class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
-                                        title="Clear">&times;</button>
+                    <input type="file" name="image_path" id="image_path" class="hidden" accept="image/*" />
+                    @error('image_path')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="mb-4 max-w-xl mx-auto conditional-field" id="carousel-images-section">
+                    <label class="block mb-2 dark:text-gray-300">Carousel Images (optional, max 50 images, 10MB
+                        each)</label>
+                    <div id="carouselUploadBox"
+                        class="flex flex-col items-center justify-center w-full h-40 
+                    border-2 border-dashed border-gray-300 dark:border-gray-600 
+                    rounded cursor-pointer hover:border-primary hover:bg-gray-50 
+                    dark:hover:border-primary dark:hover:bg-gray-800 transition-colors overflow-hidden relative">
+                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
+                            alt="Image Icon" class="w-8 h-8" onerror="this.style.display='none'">
+                        <span id="carouselUploadText" class="text-gray-500 mb-4 dark:text-gray-300">
+                            Click to upload images
+                        </span>
+                        <div id="carouselPreviewContainer" class="flex flex-wrap gap-3 w-full justify-start"></div>
+                    </div>
+                    <input type="file" name="carousel_images[]" id="carousel_images" class="hidden"
+                        accept="image/jpeg,image/jpg,image/png" multiple />
+                    @error('carousel_images')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                    @error('carousel_images.*')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="mb-4 max-w-xl mx-auto conditional-field" id="video-section">
+                    <label class="block mb-2 dark:text-gray-300">Short Video (optional, max 50MB)</label>
+                    <div id="videoDropZone"
+                        class="flex flex-col items-center justify-center w-full h-40 
+                    border-2 border-dashed border-gray-300 dark:border-gray-600 
+                    rounded cursor-pointer hover:border-primary hover:bg-gray-50 
+                    dark:hover:border-primary dark:hover:bg-gray-800 transition-colors overflow-hidden relative">
+                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/video.png"
+                            alt="Video Icon" class="w-9 h-9" onerror="this.style.display='none'">
+                        <p class="mb-2 dark:text-gray-300">Drag & drop a video file here or click to select</p>
+                        <p class="text-xs text-gray-400 dark:text-gray-300">(mp4, avi, mpeg)</p>
+                    </div>
+                    <input type="file" id="video_path" name="video_path" accept="video/mp4,video/avi,video/mpeg"
+                        class="hidden" />
+
+                    <div id="videoPreviewContainer"
+                        class="mt-4 hidden relative rounded border border-gray-300 overflow-hidden">
+                        <video id="videoPreview" controls class="w-full h-auto bg-black"></video>
+                        <button type="button" id="removeVideoBtn"
+                            class="absolute top-2 right-2 bg-secondary text-white rounded-full p-1 hover:bg-red-700 transition-colors"
+                            title="Remove video">&times;</button>
+                    </div>
+                    @error('video_path')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="mb-6 conditional-field" id="office-hours-section">
+                    <label class="block font-semibold mb-2 dark:text-gray-300">Office Hours</label>
+
+                    <div class="mb-6 p-4 border border-primary rounded dark:bg-gray-800">
+                        <p class="font-semibold mb-3 dark:text-gray-300">Set Time Range for Multiple Days</p>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-2 dark:text-gray-300">Select Days:</label>
+                            <div class="flex gap-2 flex-wrap">
+                                @php
+                                    $daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                                @endphp
+                                @foreach ($daysOfWeek as $day)
+                                    <label
+                                        class="flex items-center bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                                        <input type="checkbox"
+                                            class="bulk-day-checkbox mr-2 text-primary focus:ring-primary"
+                                            value="{{ $day }}">
+                                        <span class="text-sm text-gray-700 dark:text-gray-300">{{ $day }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+
+                            <div class="mt-2 flex gap-2 flex-wrap">
+                                <button type="button"
+                                    class="quick-select bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white px-3 py-1 rounded text-sm transition-colors"
+                                    data-days="Mon,Tue,Wed,Thu,Fri">Weekdays</button>
+                                <button type="button"
+                                    class="quick-select bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white px-3 py-1 rounded text-sm transition-colors"
+                                    data-days="Sat,Sun">Weekends</button>
+                                <button type="button"
+                                    class="quick-select bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white px-3 py-1 rounded text-sm transition-colors"
+                                    data-days="Mon,Tue,Wed,Thu,Fri,Sat,Sun">All Days</button>
+                                <button type="button"
+                                    class="clear-select bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300 px-3 py-1 rounded text-sm transition-colors">Clear
+                                    All</button>
+                            </div>
+                        </div>
+
+                        <div class="bulk-time-ranges mb-4">
+                            <label class="block text-sm font-medium mb-2 dark:text-gray-300">Time Range:</label>
+                            <div class="bulk-ranges-container">
+                                <div class="flex gap-2 mb-2 bulk-range-row">
+                                    <div class="relative flex-1">
+                                        <input type="time"
+                                            class="custom-time-input bulk-start-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary">
+                                        <button type="button"
+                                            class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
+                                            title="Clear">&times;</button>
+                                    </div>
+                                    <div class="relative flex-1">
+                                        <input type="time"
+                                            class="custom-time-input bulk-end-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary">
+                                        <button type="button"
+                                            class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
+                                            title="Clear">&times;</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
+                        <button type="button"
+                            class="apply-bulk bg-primary text-center text-white px-4 py-2 rounded-md hover:text-primary border-2 border-primary hover:bg-white dark:hover:bg-gray-800 duration-300 ease-in-out transition-all cursor-pointer shadow-primary-hover">
+                            Apply to Selected Days
+                        </button>
                     </div>
 
-                    <button type="button"
-                        class="apply-bulk bg-primary text-center text-white px-4 py-2 rounded-md hover:text-primary border-2 border-primary hover:bg-white dark:hover:bg-gray-800 duration-300 ease-in-out transition-all cursor-pointer shadow-primary-hover">
-                        Apply to Selected Days
+                    <div class="p-4 border border-primary rounded dark:bg-gray-800">
+                        <p class="mb-3 dark:text-gray-300">Saved Office Hours</p>
+                        <ul id="officeHoursDisplay" class="space-y-2 text-sm text-gray-700 dark:text-gray-300"></ul>
+                    </div>
+                    @error('office_hours')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div>
+                    <button type="submit" id="submit-btn"
+                        class="w-full bg-primary text-white px-4 py-2 rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
+                        Save Office
                     </button>
                 </div>
-
-                <div class="p-4 border border-primary rounded dark:bg-gray-800">
-                    <p class="mb-3 dark:text-gray-300">Saved Office Hours</p>
-                    <ul id="officeHoursDisplay" class="space-y-2 text-sm text-gray-700 dark:text-gray-300"></ul>
-                </div>
-                @error('office_hours')
-                    <span class="text-red-500 text-sm">{{ $message }}</span>
-                @enderror
-            </div>
-
-            <div>
-                <button type="submit" id="submit-btn"
-                    class="w-full bg-primary text-white px-4 py-2 rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
-                    Save Office
-                </button>
-            </div>
-        </form>
+            </form>
+        </x-upload-progress-modal>
     </div>
 @endsection
 
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            let isUploading = false;
+
+            window.onbeforeunload = function(e) {
+                if (isUploading) {
+                    e.preventDefault();
+                    e.returnValue = '';
+                    return '';
+                }
+            };
+
             const MAX_CAROUSEL_FILES = 50;
             const MAX_IMAGE_SIZE_MB = 10;
             const MAX_VIDEO_SIZE_MB = 50;
@@ -286,7 +284,6 @@
             }
 
             const form = document.getElementById('room-form');
-            const loadingOverlay = document.getElementById('loading-overlay');
             const nameInput = document.querySelector('#name');
             const feedback = document.querySelector('#name-feedback');
             const submitBtn = document.querySelector('#submit-btn');
@@ -475,7 +472,6 @@
 
             async function compressCarouselImages(newFiles) {
                 showTemporaryMessage(`Compressing ${newFiles.length} image(s)...`, 'info');
-                loadingOverlay.classList.remove('hidden');
                 try {
                     const compressedFiles = [];
                     for (let i = 0; i < newFiles.length; i++) {
@@ -506,9 +502,7 @@
                 } catch (error) {
                     console.error('Batch compression failed:', error);
                     showTemporaryMessage('Some images could not be compressed', 'error');
-                } finally {
-                    loadingOverlay.classList.add('hidden');
-                }
+                } finally {}
             }
 
             function renderCarouselPreviews() {
@@ -569,8 +563,6 @@
                 updateUploadIconVisibility();
             }
 
-            // Video upload functionality (placeholder)
-            // TODO: Add your video upload, preview, and validation logic here
 
             // Video upload functionality
             const maxVideoSizeMB = 50;
@@ -642,7 +634,7 @@
                 videoPreview.src = '';
                 videoPreviewContainer.classList.add('hidden');
             }
-            
+
             // Validation functions
             function validateImageFile(file, showError = true) {
                 const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
@@ -680,26 +672,123 @@
             }
 
             // Compress all images before final form submission
-            async function compressAndSubmitForm() {
-                loadingOverlay.classList.remove('hidden');
+            async function compressCarouselImages(newFiles) {
+                showTemporaryMessage(`Compressing ${newFiles.length} image(s)...`, 'info');
                 try {
-                    // Compress cover image if needed
-                    const coverFile = coverInput.files[0];
-                    if (coverFile && !compressedFileNames.has(coverFile.name)) {
-                        await compressAndPreviewCoverImage(coverFile);
-                    }
-                    // Compress carousel images if needed
-                    for (let i = 0; i < selectedFiles.length; i++) {
-                        if (!compressedFileNames.has(selectedFiles[i].name)) {
-                            selectedFiles[i] = await compressImageCanvas(selectedFiles[i], 2000, 0.85);
+                    const compressedFiles = [];
+                    for (let i = 0; i < newFiles.length; i++) {
+                        const file = newFiles[i];
+                        try {
+                            const compressedFile = await compressImageCanvas(file, 2000, 0.85);
+                            const finalFile = new File([compressedFile], file.name, {
+                                type: compressedFile.type,
+                                lastModified: Date.now()
+                            });
+                            compressedFileNames.add(file.name);
+                            compressedFiles.push(finalFile);
+                        } catch (error) {
+                            console.error(`Failed to compress ${file.name}:`, error);
+                            compressedFiles.push(file);
                         }
                     }
+                    selectedFiles = selectedFiles.concat(compressedFiles);
+                    renderCarouselPreviews();
                     updateCarouselInputFiles();
-                    loadingOverlay.classList.add('hidden');
-                    form.submit();
+                    const totalOriginalSize = newFiles.reduce((sum, f) => sum + f.size, 0) / 1024 / 1024;
+                    const totalCompressedSize = compressedFiles.reduce((sum, f) => sum + f.size, 0) / 1024 /
+                        1024;
+                    showTemporaryMessage(
+                        `${newFiles.length} image(s) compressed: ${totalOriginalSize.toFixed(2)}MB → ${totalCompressedSize.toFixed(2)}MB`,
+                        'success'
+                    );
                 } catch (error) {
-                    loadingOverlay.classList.add('hidden');
-                    showTemporaryMessage('Compression failed. Please try again.', 'error');
+                    console.error('Batch compression failed:', error);
+                    showTemporaryMessage('Some images could not be compressed', 'error');
+                } finally {}
+            }
+
+            async function compressAndSubmitForm() {
+                isUploading = true;
+                window.dispatchEvent(new CustomEvent('upload-start'));
+                submitBtn.disabled = true;
+
+                const carouselFiles = Array.from(document.getElementById('carousel_images').files || []);
+                const coverFile = document.getElementById('image_path').files[0];
+
+                try {
+                    // Compress cover image if needed
+                    if (coverFile && !compressedFileNames.has(coverFile.name)) {
+                        const compressedCover = await compressImageCanvas(coverFile, 2000, 0.85);
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(new File([compressedCover], coverFile.name, {
+                            type: compressedCover.type,
+                            lastModified: Date.now()
+                        }));
+                        document.getElementById('image_path').files = dataTransfer.files;
+                    }
+
+                    // Compress carousel images if needed
+                    const filesToCompress = carouselFiles.filter(f => !compressedFileNames.has(f.name));
+                    if (filesToCompress.length > 0) {
+                        await compressCarouselImages(filesToCompress);
+                    }
+
+                    // Submit the form with AJAX to track progress
+                    const formData = new FormData(form);
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', form.action, true);
+                    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+                    xhr.upload.onprogress = function(e) {
+                        if (e.lengthComputable) {
+                            const percent = Math.round((e.loaded / e.total) * 100);
+                            window.dispatchEvent(new CustomEvent('upload-progress', {
+                                detail: {
+                                    progress: percent
+                                }
+                            }));
+                        }
+                    };
+
+                    xhr.onload = function() {
+                        isUploading = false;
+                        window.dispatchEvent(new CustomEvent('upload-finish'));
+                        submitBtn.disabled = false;
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            try {
+                                const data = JSON.parse(xhr.responseText);
+                                if (data.redirect) {
+                                    window.onbeforeunload = null;
+                                    window.location.href = data.redirect;
+                                    return;
+                                }
+                            } catch {}
+                            window.onbeforeunload = null;
+                            window.location.href = '/admin/rooms';
+                        } else {
+                            let msg = 'Submission failed.';
+                            try {
+                                const data = JSON.parse(xhr.responseText);
+                                if (data.message) msg = data.message;
+                            } catch {}
+                            showTemporaryMessage(msg, 'error');
+                        }
+                    };
+
+                    xhr.onerror = function() {
+                        isUploading = false;
+                        window.dispatchEvent(new CustomEvent('upload-finish'));
+                        submitBtn.disabled = false;
+                        showTemporaryMessage('Upload failed. Please try again.', 'error');
+                    };
+
+                    xhr.send(formData);
+
+                } catch (error) {
+                    isUploading = false;
+                    window.dispatchEvent(new CustomEvent('upload-finish'));
+                    submitBtn.disabled = false;
+                    showTemporaryMessage('Error during image compression. Please try again.', 'error');
                 }
             }
 
@@ -977,17 +1066,17 @@
                                 <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                             </div>
                             ${rangeKey !== "closed" ? `
-                                                                                                    <div class="flex gap-2 ml-4">
-                                                                                                        <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                                                data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                                                                                            Edit
-                                                                                                        </button>
-                                                                                                        <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                                                data-days='${JSON.stringify(group.days)}'>
-                                                                                                            Delete
-                                                                                                        </button>
-                                                                                                    </div>
-                                                                                                ` : ''}
+                                                                                                                                                    <div class="flex gap-2 ml-4">
+                                                                                                                                                        <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                                                                                data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                                                                                                                            Edit
+                                                                                                                                                        </button>
+                                                                                                                                                        <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                                                                                data-days='${JSON.stringify(group.days)}'>
+                                                                                                                                                            Delete
+                                                                                                                                                        </button>
+                                                                                                                                                    </div>
+                                                                                                                                                ` : ''}
                         </div>
                     `;
 
