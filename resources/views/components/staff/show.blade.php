@@ -61,7 +61,7 @@
 
                         <!-- Email -->
                         <div
-                            class="border border-primary rounded-xl p-4 hover:scale-110 transition-all duration-250 ease-in-out">
+                            class="border border-primary rounded-xl p-4 hover:scale-105 transition-all duration-250 ease-in-out">
                             <div class="flex items-center space-x-3">
                                 <div class="bg-orange-100 p-2 rounded-lg">
                                     <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/email.png"

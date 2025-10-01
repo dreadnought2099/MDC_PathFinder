@@ -13,6 +13,7 @@
 
             <form id="uploadForm" action="{{ route('path-image.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
+
                 {{-- Path Selector --}}
                 <div class="mb-4 dark:text-gray-300">
                     <label for="path_id" class="block text-gray-700 mb-2 dark:text-gray-300">Select Path</label>
@@ -76,43 +77,24 @@
             let isSubmitting = false;
 
             // ===== CONFIGURATION =====
-            const MAX_FILES = 20; // Maximum number of files per upload
-            const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB per file (reduced for safety)
-            const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // 100MB total (reduced)
+            const MAX_FILES = 20;
+            const MAX_FILE_SIZE = 10 * 1024 * 1024;
+            const MAX_TOTAL_SIZE = 100 * 1024 * 1024;
             const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif',
                 'image/bmp', 'image/svg+xml', 'image/webp'
             ];
 
             // Client-side compression settings
-            const COMPRESS_ENABLED = true; // Enable client-side compression
-            const MAX_DIMENSION = 2000; // Max width/height before compression
-            const COMPRESSION_QUALITY = 0.85; // JPEG/WebP quality (0-1)
+            const COMPRESS_ENABLED = true;
+            const MAX_DIMENSION = 2000;
+            const COMPRESSION_QUALITY = 0.85;
 
-            // Session storage key
-            const STORAGE_KEY = 'selected_path_id';
             const createRouteBase = "{{ url('/admin/path-images/create') }}";
-
-            // Load saved path selection
-            function loadSavedPathSelection() {
-                const savedPathId = sessionStorage.getItem(STORAGE_KEY);
-                if (savedPathId) {
-                    const option = pathSelect.querySelector(`option[value="${savedPathId}"]`);
-                    if (option) {
-                        pathSelect.value = savedPathId;
-                    }
-                }
-            }
-
-            // Save path selection
-            function savePathSelection() {
-                sessionStorage.setItem(STORAGE_KEY, pathSelect.value);
-            }
 
             // Handle path selection change
             function handlePathChange() {
                 const selectedPathId = pathSelect.value;
                 if (selectedPathId) {
-                    savePathSelection();
                     const newUrl = `${createRouteBase}/${selectedPathId}`;
                     window.location.href = newUrl;
                 }
@@ -123,7 +105,6 @@
             function updateSubmitButton() {
                 submitBtn.disabled = files.length === 0 || isSubmitting;
 
-                // Update button text with file count
                 if (files.length > 0) {
                     submitBtn.textContent = `Upload ${files.length} Image${files.length > 1 ? 's' : ''}`;
                 } else {
@@ -148,7 +129,6 @@
                 const currentCount = files.length;
                 const potentialTotal = currentCount + newFiles.length;
 
-                // Check file count limit
                 if (potentialTotal > MAX_FILES) {
                     errors.push(
                         `Maximum ${MAX_FILES} files allowed. Currently selected: ${currentCount}, trying to add: ${newFiles.length}`
@@ -163,13 +143,11 @@
                 const validFiles = [];
 
                 newFiles.forEach(file => {
-                    // Check file type
                     if (!ALLOWED_TYPES.includes(file.type)) {
                         errors.push(`"${file.name}" - Invalid file type. Only images are allowed.`);
                         return;
                     }
 
-                    // Check individual file size
                     if (file.size > MAX_FILE_SIZE) {
                         errors.push(
                             `"${file.name}" - File too large (${formatFileSize(file.size)}). Maximum ${formatFileSize(MAX_FILE_SIZE)} per file.`
@@ -177,7 +155,6 @@
                         return;
                     }
 
-                    // Check if file already exists
                     const exists = files.some(f => f.name === file.name && f.size === file.size);
                     if (exists) {
                         errors.push(`"${file.name}" - Already added.`);
@@ -187,7 +164,6 @@
                     validFiles.push(file);
                 });
 
-                // Check total size after adding valid files
                 const currentSize = getTotalSize();
                 const newFilesSize = validFiles.reduce((total, file) => total + file.size, 0);
                 const totalSize = currentSize + newFilesSize;
@@ -215,13 +191,11 @@
                 fileError.innerHTML = messages.map(msg => `<div>⚠ ${msg}</div>`).join('');
                 fileError.classList.remove('hidden');
 
-                // Auto-hide after 8 seconds
                 setTimeout(() => {
                     fileError.classList.add('hidden');
                 }, 8000);
             }
 
-            // Client-side image compression
             async function compressImage(file) {
                 return new Promise((resolve) => {
                     const reader = new FileReader();
@@ -234,7 +208,6 @@
                             let width = img.width;
                             let height = img.height;
 
-                            // Calculate new dimensions if image is too large
                             if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
                                 if (width > height) {
                                     height = Math.round((height * MAX_DIMENSION) / width);
@@ -251,10 +224,8 @@
                             const ctx = canvas.getContext('2d');
                             ctx.drawImage(img, 0, 0, width, height);
 
-                            // Convert to blob
                             canvas.toBlob(
                                 (blob) => {
-                                    // Only use compressed version if it's smaller
                                     if (blob && blob.size < file.size) {
                                         const compressedFile = new File([blob], file.name, {
                                             type: 'image/jpeg',
@@ -281,7 +252,6 @@
                 const fileError = document.getElementById('fileError');
                 let compressionInfo = [];
 
-                // Show processing indicator
                 fileError.innerHTML = '<div class="text-blue-600">⏳ Compressing images...</div>';
                 fileError.classList.remove('hidden');
 
@@ -300,13 +270,12 @@
                         files.push(compressed);
                     } catch (error) {
                         console.error('Compression failed for', file.name, error);
-                        files.push(file); // Use original if compression fails
+                        files.push(file);
                     }
                 }
 
                 fileError.classList.add('hidden');
 
-                // Show compression results if any files were compressed
                 if (compressionInfo.length > 0) {
                     const successDiv = document.createElement('div');
                     successDiv.className =
@@ -334,7 +303,6 @@
                 }
 
                 if (validation.validFiles.length > 0) {
-                    // Process files with compression if enabled
                     if (COMPRESS_ENABLED) {
                         processFilesWithCompression(validation.validFiles);
                     } else {
@@ -357,7 +325,6 @@
                 selectedFilesContainer.innerHTML = '';
                 if (!files.length) return;
 
-                // Add info banner
                 const totalSize = getTotalSize();
                 const infoBanner = document.createElement('div');
                 infoBanner.className =
@@ -405,12 +372,10 @@
                 });
             }
 
-            // File input change handler
             fileInput.addEventListener('change', function() {
                 addFiles(Array.from(this.files));
             });
 
-            // Drag and drop support
             const dropzone = fileInput.parentElement;
 
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -440,7 +405,6 @@
                 addFiles(droppedFiles);
             });
 
-            // Handle form submission
             uploadForm.addEventListener('submit', function(e) {
                 e.preventDefault();
 
@@ -448,7 +412,6 @@
                     return;
                 }
 
-                // Final validation before upload
                 const totalSize = getTotalSize();
                 if (totalSize > MAX_TOTAL_SIZE) {
                     showError([
@@ -465,13 +428,11 @@
                 isSubmitting = true;
                 updateSubmitButton();
 
-                // Show upload modal
                 const modal = document.getElementById('uploadModal');
                 const progressBar = document.getElementById('progressBar');
                 const progressText = document.getElementById('progressText');
                 modal.classList.remove('hidden');
 
-                // Create FormData
                 const formData = new FormData();
                 formData.append('_token', document.querySelector('input[name="_token"]').value);
                 formData.append('path_id', pathSelect.value);
@@ -480,7 +441,6 @@
                     formData.append('files[]', file);
                 });
 
-                // Upload with XMLHttpRequest
                 const xhr = new XMLHttpRequest();
 
                 xhr.upload.addEventListener('progress', function(e) {
@@ -522,12 +482,10 @@
 
                 xhr.open('POST', uploadForm.action);
                 xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-                xhr.timeout = 300000; // 5 minutes timeout
+                xhr.timeout = 300000;
                 xhr.send(formData);
             });
 
-            // Initialize on page load
-            loadSavedPathSelection();
             updateSubmitButton();
         });
     </script>
