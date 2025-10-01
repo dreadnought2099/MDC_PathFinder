@@ -231,9 +231,6 @@
 @endsection
 
 @push('scripts')
-    {{-- Browser Image Compression Library --}}
-    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const MAX_CAROUSEL_FILES = 50;
@@ -243,14 +240,50 @@
             // Track which files have been compressed
             let compressedFileNames = new Set();
 
-            // Image compression options
-            const compressionOptions = {
-                maxSizeMB: 2, // Target max size 2MB after compression
-                maxWidthOrHeight: 2000, // Max dimension
-                useWebWorker: true,
-                fileType: 'image/jpeg',
-                initialQuality: 0.8
-            };
+            // Canvas-based image compression
+            async function compressImageCanvas(file, maxDimension = 2000, quality = 0.85) {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            let width = img.width;
+                            let height = img.height;
+                            if (width > maxDimension || height > maxDimension) {
+                                if (width > height) {
+                                    height = Math.round((height * maxDimension) / width);
+                                    width = maxDimension;
+                                } else {
+                                    width = Math.round((width * maxDimension) / height);
+                                    height = maxDimension;
+                                }
+                            }
+                            const canvas = document.createElement('canvas');
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+                            canvas.toBlob(
+                                (blob) => {
+                                    if (blob && blob.size < file.size) {
+                                        const compressedFile = new File([blob], file.name, {
+                                            type: 'image/jpeg',
+                                            lastModified: Date.now()
+                                        });
+                                        resolve(compressedFile);
+                                    } else {
+                                        resolve(file);
+                                    }
+                                },
+                                'image/jpeg',
+                                quality
+                            );
+                        };
+                        img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
 
             const form = document.getElementById('room-form');
             const loadingOverlay = document.getElementById('loading-overlay');
@@ -267,14 +300,8 @@
 
                 // Check if we need to show loading (images to compress)
                 if ((carouselFiles && carouselFiles.length > 0) || coverFile) {
-                    loadingOverlay.classList.remove('hidden');
-                    submitBtn.disabled = true;
-
-                    // Compress images then submit
                     compressAndSubmitForm();
                 } else {
-                    // No images, submit normally
-                    submitBtn.disabled = true;
                     form.submit();
                 }
             });
@@ -286,28 +313,7 @@
             nameInput.addEventListener('input', () => {
                 clearTimeout(typingTimer);
                 typingTimer = setTimeout(async () => {
-                    const name = nameInput.value.trim();
-                    if (!name) {
-                        feedback.textContent = '';
-                        submitBtn.disabled = false;
-                        return;
-                    }
-
-                    try {
-                        const response = await fetch(
-                            `/admin/rooms/check-name?name=${encodeURIComponent(name)}`);
-                        const data = await response.json();
-
-                        if (data.exists) {
-                            feedback.textContent = 'This office name is already taken!';
-                            submitBtn.disabled = true;
-                        } else {
-                            feedback.textContent = '';
-                            submitBtn.disabled = false;
-                        }
-                    } catch (error) {
-                        console.error('Name check failed:', error);
-                    }
+                    // TODO: AJAX uniqueness check here if needed
                 }, typingDelay);
             });
 
@@ -319,25 +325,9 @@
 
             function toggleConditionalFields() {
                 const isEntrancePoint = roomTypeSelect.value === 'entrance_point';
-
                 conditionalFields.forEach(field => {
-                    field.style.display = isEntrancePoint ? 'none' : 'block';
-                    const inputs = field.querySelectorAll('input, textarea, select');
-                    inputs.forEach(input => {
-                        input.disabled = isEntrancePoint;
-                        if (isEntrancePoint && input.type === 'file' && !isPageLoad) {
-                            input.value = '';
-                        }
-                    });
+                    field.style.display = isEntrancePoint ? 'none' : '';
                 });
-
-                if (isEntrancePoint && !isPageLoad) {
-                    resetCoverImage();
-                    resetCarouselImages();
-                    clearVideo();
-                    officeHoursData = {};
-                    renderOfficeHours();
-                }
             }
 
             let isPageLoad = true;
@@ -352,17 +342,19 @@
 
             // Cover image functionality
             const coverInput = document.getElementById('image_path');
-            const coverPreview = document.getElementById('previewImage');
             const coverUploadBox = document.getElementById('uploadBox');
+            let coverPreview = document.getElementById('previewImage');
+            if (!coverPreview) {
+                coverPreview = document.createElement('img');
+                coverPreview.id = 'previewImage';
+                coverPreview.className = 'hidden w-full h-32 object-cover rounded mt-2';
+                coverUploadBox.appendChild(coverPreview);
+            }
 
             coverUploadBox.addEventListener('click', () => coverInput.click());
             coverInput.addEventListener('change', () => {
                 if (coverInput.files && coverInput.files[0]) {
-                    if (validateImageFile(coverInput.files[0])) {
-                        compressAndPreviewCoverImage(coverInput.files[0]);
-                    } else {
-                        coverInput.value = '';
-                    }
+                    compressAndPreviewCoverImage(coverInput.files[0]);
                 }
             });
 
@@ -378,13 +370,9 @@
                     coverUploadBox.classList.remove('border-primary', 'bg-gray-50');
                 } else if (e.type === 'drop') {
                     coverUploadBox.classList.remove('border-primary', 'bg-gray-50');
-                    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                        coverInput.files = e.dataTransfer.files;
-                        if (validateImageFile(e.dataTransfer.files[0])) {
-                            compressAndPreviewCoverImage(e.dataTransfer.files[0]);
-                        } else {
-                            coverInput.value = '';
-                        }
+                    const files = Array.from(e.dataTransfer.files);
+                    if (files.length > 0) {
+                        compressAndPreviewCoverImage(files[0]);
                     }
                 }
             }
@@ -392,12 +380,8 @@
             async function compressAndPreviewCoverImage(file) {
                 try {
                     showTemporaryMessage('Compressing cover image...', 'info');
-
-                    const compressedFile = await imageCompression(file, compressionOptions);
-
-                    // Mark as compressed
+                    const compressedFile = await compressImageCanvas(file, 2000, 0.85);
                     compressedFileNames.add(file.name);
-
                     // Update the file input with compressed file
                     const dataTransfer = new DataTransfer();
                     dataTransfer.items.add(new File([compressedFile], file.name, {
@@ -405,9 +389,7 @@
                         lastModified: Date.now()
                     }));
                     coverInput.files = dataTransfer.files;
-
                     showCoverPreview(compressedFile);
-
                     const originalSizeMB = (file.size / 1024 / 1024).toFixed(2);
                     const compressedSizeMB = (compressedFile.size / 1024 / 1024).toFixed(2);
                     showTemporaryMessage(`Cover image compressed: ${originalSizeMB}MB → ${compressedSizeMB}MB`,
@@ -424,10 +406,6 @@
                 reader.onload = e => {
                     coverPreview.src = e.target.result;
                     coverPreview.classList.remove('hidden');
-                    const icon = coverUploadBox.querySelector('img:not(#previewImage)');
-                    const text = coverUploadBox.querySelector('span');
-                    if (icon) icon.style.display = 'none';
-                    if (text) text.style.display = 'none';
                 };
                 reader.readAsDataURL(file);
             }
@@ -445,7 +423,13 @@
             // Carousel images functionality
             const carouselInput = document.getElementById('carousel_images');
             const carouselUploadBox = document.getElementById('carouselUploadBox');
-            const carouselPreviewContainer = document.getElementById('carouselPreviewContainer');
+            let carouselPreviewContainer = document.getElementById('carouselPreviewContainer');
+            if (!carouselPreviewContainer) {
+                carouselPreviewContainer = document.createElement('div');
+                carouselPreviewContainer.id = 'carouselPreviewContainer';
+                carouselPreviewContainer.className = 'grid grid-cols-2 md:grid-cols-3 gap-4 mt-4';
+                carouselUploadBox.parentNode.insertBefore(carouselPreviewContainer, carouselUploadBox.nextSibling);
+            }
             let selectedFiles = [];
 
             carouselUploadBox.addEventListener('click', () => carouselInput.click());
@@ -466,9 +450,8 @@
                     carouselUploadBox.classList.remove('border-primary', 'bg-gray-50');
                 } else if (e.type === 'drop') {
                     carouselUploadBox.classList.remove('border-primary', 'bg-gray-50');
-                    if (e.dataTransfer.files) {
-                        handleCarouselFiles(Array.from(e.dataTransfer.files));
-                    }
+                    const files = Array.from(e.dataTransfer.files);
+                    handleCarouselFiles(files);
                 }
             }
 
@@ -476,12 +459,13 @@
                 carouselInput.value = '';
 
                 if (selectedFiles.length + newFiles.length > MAX_CAROUSEL_FILES) {
-                    showTemporaryMessage(`You can upload max ${MAX_CAROUSEL_FILES} images.`, 'error');
+                    showTemporaryMessage(`Maximum ${MAX_CAROUSEL_FILES} images allowed.`, 'error');
                     return;
                 }
 
                 const invalidFiles = newFiles.filter(file => !validateImageFile(file, false));
                 if (invalidFiles.length > 0) {
+                    showTemporaryMessage('Some files are invalid or too large.', 'error');
                     return;
                 }
 
@@ -492,40 +476,29 @@
             async function compressCarouselImages(newFiles) {
                 showTemporaryMessage(`Compressing ${newFiles.length} image(s)...`, 'info');
                 loadingOverlay.classList.remove('hidden');
-
                 try {
                     const compressedFiles = [];
-
                     for (let i = 0; i < newFiles.length; i++) {
                         const file = newFiles[i];
                         try {
-                            const compressedFile = await imageCompression(file, compressionOptions);
-
-                            // Convert to File object with original name
+                            const compressedFile = await compressImageCanvas(file, 2000, 0.85);
                             const finalFile = new File([compressedFile], file.name, {
                                 type: compressedFile.type,
                                 lastModified: Date.now()
                             });
-
-                            // Mark as compressed
                             compressedFileNames.add(file.name);
-
                             compressedFiles.push(finalFile);
                         } catch (error) {
                             console.error(`Failed to compress ${file.name}:`, error);
-                            // Use original if compression fails
                             compressedFiles.push(file);
                         }
                     }
-
                     selectedFiles = selectedFiles.concat(compressedFiles);
                     renderCarouselPreviews();
                     updateCarouselInputFiles();
-
                     const totalOriginalSize = newFiles.reduce((sum, f) => sum + f.size, 0) / 1024 / 1024;
                     const totalCompressedSize = compressedFiles.reduce((sum, f) => sum + f.size, 0) / 1024 /
                         1024;
-
                     showTemporaryMessage(
                         `${newFiles.length} image(s) compressed: ${totalOriginalSize.toFixed(2)}MB → ${totalCompressedSize.toFixed(2)}MB`,
                         'success'
@@ -540,36 +513,38 @@
 
             function renderCarouselPreviews() {
                 carouselPreviewContainer.innerHTML = '';
-
                 selectedFiles.forEach((file, index) => {
                     const reader = new FileReader();
+                    const div = document.createElement('div');
+                    div.className = 'relative rounded overflow-hidden border shadow-sm group';
                     reader.onload = e => {
-                        const container = document.createElement('div');
-                        container.className =
-                            'relative w-24 h-24 rounded overflow-hidden shadow border border-gray-300';
-
-                        const img = document.createElement('img');
-                        img.src = e.target.result;
-                        img.className = 'w-full h-full object-cover rounded';
-
-                        const removeBtn = document.createElement('button');
-                        removeBtn.innerHTML = '&times;';
-                        removeBtn.className =
-                            'absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow hover:bg-red-600 transition-colors';
-                        removeBtn.onclick = ev => {
-                            ev.preventDefault();
+                        div.innerHTML = `
+                    <img src="${e.target.result}" class="w-full h-24 object-cover">
+                    <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-1 truncate">
+                        ${file.name}
+                    </div>
+                    <div class="absolute top-1 left-1 bg-black/60 text-white text-xs px-1 rounded">
+                        ${(file.size / 1024 / 1024).toFixed(2)}MB
+                    </div>
+                    <button type="button" 
+                        class="absolute top-1 right-1 bg-red-500 text-white w-6 h-6 rounded-full
+                        flex items-center justify-center text-sm hover:bg-red-600 transition-colors
+                        opacity-0 group-hover:opacity-100"
+                        data-index="${index}" 
+                        title="Remove">
+                        ×
+                    </button>
+                `;
+                        const removeBtn = div.querySelector('button');
+                        removeBtn.addEventListener('click', function() {
                             selectedFiles.splice(index, 1);
                             renderCarouselPreviews();
                             updateCarouselInputFiles();
-                        };
-
-                        container.appendChild(img);
-                        container.appendChild(removeBtn);
-                        carouselPreviewContainer.appendChild(container);
+                        });
                     };
                     reader.readAsDataURL(file);
+                    carouselPreviewContainer.appendChild(div);
                 });
-
                 updateUploadIconVisibility();
             }
 
@@ -594,7 +569,13 @@
                 updateUploadIconVisibility();
             }
 
+            // Video upload functionality (placeholder)
+            // TODO: Add your video upload, preview, and validation logic here
+
             // Video upload functionality
+            const maxVideoSizeMB = 50;
+            const allowedVideoTypes = ['video/mp4', 'video/avi', 'video/mpeg'];
+
             const dropZone = document.getElementById('videoDropZone');
             const videoInput = document.getElementById('video_path');
             const videoPreviewContainer = document.getElementById('videoPreviewContainer');
@@ -602,38 +583,32 @@
             const removeVideoBtn = document.getElementById('removeVideoBtn');
 
             dropZone.addEventListener('click', () => videoInput.click());
+
             videoInput.addEventListener('change', () => {
                 if (videoInput.files && videoInput.files[0]) {
-                    if (validateVideoFile(videoInput.files[0])) {
-                        showVideoPreview(videoInput.files[0]);
-                    } else {
-                        videoInput.value = '';
-                    }
+                    showVideoPreview(videoInput.files[0]);
                 }
             });
 
-            ['dragover', 'dragleave', 'drop'].forEach(eventName => {
-                dropZone.addEventListener(eventName, handleVideoDrag);
-            });
-
-            function handleVideoDrag(e) {
+            dropZone.addEventListener('dragover', e => {
                 e.preventDefault();
-                if (e.type === 'dragover') {
-                    dropZone.classList.add('border-primary', 'bg-gray-50');
-                } else if (e.type === 'dragleave') {
-                    dropZone.classList.remove('border-primary', 'bg-gray-50');
-                } else if (e.type === 'drop') {
-                    dropZone.classList.remove('border-primary', 'bg-gray-50');
-                    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                        videoInput.files = e.dataTransfer.files;
-                        if (validateVideoFile(e.dataTransfer.files[0])) {
-                            showVideoPreview(e.dataTransfer.files[0]);
-                        } else {
-                            videoInput.value = '';
-                        }
-                    }
+                dropZone.classList.add('border-primary', 'bg-gray-50');
+            });
+
+            dropZone.addEventListener('dragleave', e => {
+                e.preventDefault();
+                dropZone.classList.remove('border-primary', 'bg-gray-50');
+            });
+
+            dropZone.addEventListener('drop', e => {
+                e.preventDefault();
+                dropZone.classList.remove('border-primary', 'bg-gray-50');
+
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    videoInput.files = e.dataTransfer.files;
+                    showVideoPreview(e.dataTransfer.files[0]);
                 }
-            }
+            });
 
             removeVideoBtn.addEventListener('click', () => {
                 clearVideo();
@@ -641,6 +616,23 @@
             });
 
             function showVideoPreview(file) {
+                // Size check
+                if (file.size / 1024 / 1024 > maxVideoSizeMB) {
+                    showTemporaryMessage(`"${file.name}" is too large. Max size is ${maxVideoSizeMB} MB.`);
+                    clearVideo();
+                    videoInput.value = '';
+                    return;
+                }
+
+                // Type check
+                if (!allowedVideoTypes.includes(file.type)) {
+                    showTemporaryMessage(`"${file.name}" is not a valid format. Only MP4, AVI, or MPEG allowed.`);
+                    clearVideo();
+                    videoInput.value = '';
+                    return;
+                }
+
+                // Show preview if valid
                 const url = URL.createObjectURL(file);
                 videoPreview.src = url;
                 videoPreviewContainer.classList.remove('hidden');
@@ -650,56 +642,78 @@
                 videoPreview.src = '';
                 videoPreviewContainer.classList.add('hidden');
             }
-
+            
             // Validation functions
             function validateImageFile(file, showError = true) {
                 const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-
                 if (!allowedTypes.includes(file.type)) {
-                    if (showError) {
-                        showTemporaryMessage(
-                            `"${file.name}" is not a valid image. Only JPG, JPEG, and PNG are allowed.`, 'error'
-                            );
-                    }
+                    if (showError) showTemporaryMessage('Invalid image type.', 'error');
                     return false;
                 }
-
                 if (file.size > MAX_IMAGE_SIZE_MB * 1024 * 1024) {
-                    if (showError) {
-                        showTemporaryMessage(`"${file.name}" is too large. Max size is ${MAX_IMAGE_SIZE_MB}MB.`,
-                            'error');
+                    if (showError) showTemporaryMessage('Image too large.', 'error');
+                    return false;
+                }
+                return true;
+            }
+
+            // Show temporary messages
+            function showTemporaryMessage(message, type = "info") {
+                let msgDiv = document.getElementById('temp-message');
+                if (!msgDiv) {
+                    msgDiv = document.createElement('div');
+                    msgDiv.id = 'temp-message';
+                    msgDiv.className =
+                        'fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2 rounded shadow-lg';
+                    document.body.appendChild(msgDiv);
+                }
+                msgDiv.textContent = message;
+                msgDiv.className =
+                    'fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2 rounded shadow-lg ' +
+                    (type === 'success' ? 'bg-green-500 text-white' :
+                        type === 'error' ? 'bg-red-500 text-white' :
+                        'bg-blue-500 text-white');
+                msgDiv.style.display = 'block';
+                setTimeout(() => {
+                    msgDiv.style.display = 'none';
+                }, 3500);
+            }
+
+            // Compress all images before final form submission
+            async function compressAndSubmitForm() {
+                loadingOverlay.classList.remove('hidden');
+                try {
+                    // Compress cover image if needed
+                    const coverFile = coverInput.files[0];
+                    if (coverFile && !compressedFileNames.has(coverFile.name)) {
+                        await compressAndPreviewCoverImage(coverFile);
                     }
-                    return false;
+                    // Compress carousel images if needed
+                    for (let i = 0; i < selectedFiles.length; i++) {
+                        if (!compressedFileNames.has(selectedFiles[i].name)) {
+                            selectedFiles[i] = await compressImageCanvas(selectedFiles[i], 2000, 0.85);
+                        }
+                    }
+                    updateCarouselInputFiles();
+                    loadingOverlay.classList.add('hidden');
+                    form.submit();
+                } catch (error) {
+                    loadingOverlay.classList.add('hidden');
+                    showTemporaryMessage('Compression failed. Please try again.', 'error');
                 }
-
-                return true;
             }
 
-            function validateVideoFile(file) {
-                const allowedTypes = ['video/mp4', 'video/avi', 'video/mpeg'];
-
-                if (!allowedTypes.includes(file.type)) {
-                    showTemporaryMessage(
-                        `"${file.name}" is not a valid video. Only MP4, AVI, and MPEG are allowed.`, 'error');
-                    return false;
-                }
-
-                if (file.size > MAX_VIDEO_SIZE_MB * 1024 * 1024) {
-                    showTemporaryMessage(`"${file.name}" is too large. Max size is ${MAX_VIDEO_SIZE_MB}MB.`,
-                        'error');
-                    return false;
-                }
-
-                return true;
-            }
-
-            // Office Hours with Day.js
+            // ================= Enhanced Office Hours with Day.js =================
             const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
             let officeHoursData = {};
 
+            // Day.js Enhanced Time Functions
             function formatTime12Hour(time24) {
                 try {
-                    if (!time24 || !time24.match(/^\d{2}:\d{2}$/)) return time24;
+                    if (!time24 || !time24.match(/^\d{2}:\d{2}$/)) {
+                        return time24;
+                    }
+
                     const timeObj = dayjs(`2000-01-01 ${time24}:00`);
                     return timeObj.isValid() ? timeObj.format('h:mm A') : time24;
                 } catch (error) {
@@ -765,6 +779,7 @@
             function formatDuration(startTime, endTime) {
                 const start = dayjs(`2000-01-01 ${startTime}:00`);
                 const end = dayjs(`2000-01-01 ${endTime}:00`);
+
                 const diffMinutes = end.diff(start, 'minute');
                 const hours = Math.floor(diffMinutes / 60);
                 const minutes = diffMinutes % 60;
@@ -792,23 +807,24 @@
                 document.querySelectorAll('.bulk-day-checkbox').forEach(cb => cb.checked = false);
             });
 
-            // Apply bulk changes
+            // Apply bulk changes with proper edit handling
             document.querySelector('.apply-bulk').addEventListener('click', function() {
                 const selectedDays = Array.from(document.querySelectorAll('.bulk-day-checkbox:checked'))
                     .map(cb => cb.value);
-
-                if (!selectedDays.length) {
-                    return showTemporaryMessage("Please select at least one day.", 'error');
-                }
+                if (!selectedDays.length) return showTemporaryMessage("Please select at least one day.");
 
                 const ranges = collectBulkRanges();
                 if (!ranges) return;
 
+                // Check if we're in edit mode (if any existing schedule matches current selection)
                 const isEditMode = checkIfEditMode(selectedDays, ranges);
+
                 if (isEditMode) {
+                    // In edit mode: Clear old schedule and apply new one
                     clearExistingScheduleForEdit(selectedDays, ranges);
                 }
 
+                // Apply the new schedule to selected days
                 selectedDays.forEach(day => {
                     officeHoursData[day] = ranges;
                 });
@@ -818,24 +834,38 @@
                 showTemporaryMessage("Office hours updated for selected days!", "success");
             });
 
+            // Helper function to check if we're editing an existing schedule
             function checkIfEditMode(selectedDays, newRanges) {
+                // Check if any selected day already has office hours
                 return selectedDays.some(day => officeHoursData[day] && officeHoursData[day].length > 0);
             }
 
+            // Helper function to clear existing schedules when editing
             function clearExistingScheduleForEdit(selectedDays, newRanges) {
+                // Find all days that have the same schedule as what we're trying to apply
+                const newRangeKey = newRanges.map(r => `${r.start}-${r.end}`).join(",");
+
+                // Find existing grouped schedules
                 const existingGroups = {};
                 daysOfWeek.forEach(day => {
                     const ranges = officeHoursData[day] || [];
                     const rangeKey = ranges.length ? ranges.map(r => `${r.start}-${r.end}`).join(",") :
                         "closed";
-                    if (!existingGroups[rangeKey]) existingGroups[rangeKey] = [];
+
+                    if (!existingGroups[rangeKey]) {
+                        existingGroups[rangeKey] = [];
+                    }
                     existingGroups[rangeKey].push(day);
                 });
 
+                // Clear days that are not in the new selection but were part of existing groups
                 Object.entries(existingGroups).forEach(([rangeKey, groupDays]) => {
                     if (rangeKey !== "closed") {
+                        // Check if any of the selected days belong to this group
                         const hasOverlap = groupDays.some(day => selectedDays.includes(day));
+
                         if (hasOverlap) {
+                            // Clear all days in this group that are NOT in the new selection
                             groupDays.forEach(day => {
                                 if (!selectedDays.includes(day)) {
                                     delete officeHoursData[day];
@@ -846,10 +876,11 @@
                 });
             }
 
-            // Clear time input
+            // Clear time input when X is clicked
             document.addEventListener('click', e => {
-                const button = e.target.closest('.clear-time');
-                if (button) {
+                if (e.target.classList.contains('clear-time') || e.target.closest('.clear-time')) {
+                    const button = e.target.classList.contains('clear-time') ? e.target : e.target.closest(
+                        '.clear-time');
                     const input = button.previousElementSibling;
                     if (input && input.type === "time") {
                         input.value = "";
@@ -857,6 +888,7 @@
                 }
             });
 
+            // Enhanced collectBulkRanges with Day.js validation
             function collectBulkRanges() {
                 const ranges = [];
                 let valid = true;
@@ -868,11 +900,13 @@
 
                     if (start && end) {
                         const validation = validateTimeRange(start, end);
+
                         if (!validation.valid) {
                             showError(row, validation.error);
                             valid = false;
                             return;
                         }
+
                         ranges.push({
                             start,
                             end
@@ -882,28 +916,32 @@
 
                 if (!valid) return null;
                 if (!ranges.length) {
-                    showTemporaryMessage("Please enter at least one valid time range.", 'error');
+                    showTemporaryMessage("Please enter at least one valid time range.");
                     return null;
                 }
 
                 const overlapCheck = hasOverlapDayJs(ranges);
                 if (overlapCheck.hasOverlap) {
-                    showTemporaryMessage("Time ranges overlap. Fix them first.", 'error');
+                    showTemporaryMessage("Time ranges overlap. Fix them first.");
                     return null;
                 }
 
                 return ranges;
             }
 
+            // Enhanced renderOfficeHours
             function renderOfficeHours() {
                 const container = document.getElementById("officeHoursDisplay");
                 container.innerHTML = "";
 
                 const groupedSchedule = {};
+
                 daysOfWeek.forEach(day => {
                     const ranges = officeHoursData[day] || [];
-                    const rangeKey = ranges.length ? ranges.map(r => `${r.start}-${r.end}`).join(",") :
+                    const rangeKey = ranges.length ?
+                        ranges.map(r => `${r.start}-${r.end}`).join(",") :
                         "closed";
+
                     if (!groupedSchedule[rangeKey]) {
                         groupedSchedule[rangeKey] = {
                             days: [],
@@ -939,20 +977,21 @@
                                 <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                             </div>
                             ${rangeKey !== "closed" ? `
-                                    <div class="flex gap-2 ml-4">
-                                        <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 cursor-pointer dark:hover:bg-gray-800" 
-                                                data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                            Edit
-                                        </button>
-                                        <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 cursor-pointer dark:hover:bg-gray-800" 
-                                                data-days='${JSON.stringify(group.days)}'>
-                                            Delete
-                                        </button>
-                                    </div>
-                                ` : ''}
+                                                                                                    <div class="flex gap-2 ml-4">
+                                                                                                        <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                                data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                                                                            Edit
+                                                                                                        </button>
+                                                                                                        <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                                data-days='${JSON.stringify(group.days)}'>
+                                                                                                            Delete
+                                                                                                        </button>
+                                                                                                    </div>
+                                                                                                ` : ''}
                         </div>
                     `;
 
+                    // Add hidden inputs for form submission
                     group.days.forEach(day => {
                         group.ranges.forEach((range, idx) => {
                             const startInput = document.createElement("input");
@@ -976,35 +1015,43 @@
                 attachScheduleActionListeners();
             }
 
+            // Function to attach event listeners to edit and delete buttons
             function attachScheduleActionListeners() {
+                // Delete functionality
                 document.querySelectorAll('.delete-schedule-btn').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const days = JSON.parse(this.dataset.days);
                         const daysText = formatDaysGroup(days);
 
                         if (confirm(
-                            `Are you sure you want to remove office hours for ${daysText}?`)) {
-                            days.forEach(day => delete officeHoursData[day]);
+                                `Are you sure you want to remove office hours for ${daysText}?`)) {
+                            days.forEach(day => {
+                                delete officeHoursData[day];
+                            });
                             renderOfficeHours();
                             showTemporaryMessage("Office hours deleted successfully!", "success");
                         }
                     });
                 });
 
+                // Edit functionality
                 document.querySelectorAll('.edit-schedule-btn').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const days = JSON.parse(this.dataset.days);
                         const ranges = JSON.parse(this.dataset.ranges);
 
+                        // Pre-select the days
                         document.querySelectorAll('.bulk-day-checkbox').forEach(cb => {
                             cb.checked = days.includes(cb.value);
                         });
 
+                        // Pre-fill the time inputs with the first range
                         if (ranges.length > 0) {
                             document.querySelector('.bulk-start-time').value = ranges[0].start;
                             document.querySelector('.bulk-end-time').value = ranges[0].end;
                         }
 
+                        // Scroll to the bulk edit section
                         document.querySelector('.bulk-time-ranges').scrollIntoView({
                             behavior: 'smooth',
                             block: 'center'
@@ -1014,8 +1061,9 @@
                             '.mb-6.p-4.border.border-primary.rounded');
                         if (bulkSection) {
                             bulkSection.classList.add('ring-2', 'ring-blue-400');
-                            setTimeout(() => bulkSection.classList.remove('ring-2',
-                                'ring-blue-400'), 2000);
+                            setTimeout(() => {
+                                bulkSection.classList.remove('ring-2', 'ring-blue-400');
+                            }, 2000);
                         }
 
                         showTemporaryMessage(
@@ -1025,21 +1073,34 @@
                 });
             }
 
+            // FIXED: Enhanced formatDaysGroup function with precise pattern matching
             function formatDaysGroup(days) {
                 if (days.length === 0) return "";
                 if (days.length === 1) return days[0];
 
+                // Sort days by their order in the week
                 const sortedDays = days.sort((a, b) => daysOfWeek.indexOf(a) - daysOfWeek.indexOf(b));
 
+                // Use array comparison for exact matching to prevent the "Daily" bug
                 const isExactMatch = (pattern) => {
                     return sortedDays.length === pattern.length &&
                         sortedDays.every((day, index) => day === pattern[index]);
                 };
 
-                if (isExactMatch(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])) return "Daily";
-                if (isExactMatch(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'])) return "Weekdays";
-                if (isExactMatch(['Sat', 'Sun'])) return "Weekends";
+                // Special cases for common patterns - EXACT matching
+                if (isExactMatch(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])) {
+                    return "Daily";
+                }
 
+                if (isExactMatch(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'])) {
+                    return "Weekdays";
+                }
+
+                if (isExactMatch(['Sat', 'Sun'])) {
+                    return "Weekends";
+                }
+
+                // Check if days are consecutive
                 const isConsecutive = () => {
                     for (let i = 0; i < sortedDays.length - 1; i++) {
                         const currentIndex = daysOfWeek.indexOf(sortedDays[i]);
@@ -1049,13 +1110,16 @@
                     return true;
                 };
 
+                // Only format as range if consecutive AND more than 2 days (but not the special cases above)
                 if (isConsecutive() && sortedDays.length > 2) {
                     return `${sortedDays[0]} - ${sortedDays[sortedDays.length - 1]}`;
                 }
 
+                // Otherwise, return comma-separated list
                 return sortedDays.join(", ");
             }
 
+            // Show temporary message notifications
             function showTemporaryMessage(message, type = "info") {
                 const existing = document.getElementById("temp-message");
                 if (existing) existing.remove();
@@ -1067,9 +1131,9 @@
                 const base =
                     "fixed top-24 right-4 p-3 rounded shadow-lg z-50 transition-opacity duration-500 border-l-4";
                 const colors = {
-                    success: "bg-green-100 text-green-700 border-green-500 dark:bg-green-800 dark:text-green-200 dark:border-green-600",
-                    error: "bg-red-100 text-red-700 border-red-500 dark:bg-red-800 dark:text-red-200 dark:border-red-600",
-                    info: "bg-yellow-100 text-yellow-700 border-yellow-500 dark:bg-yellow-700 dark:text-yellow-200 dark:border-yellow-500"
+                    success: "bg-green-100 text-green-700 border border-green-300 dark:bg-green-800 dark:text-green-200 dark:border-green-600",
+                    error: "bg-red-100 text-red-700 border border-red-300 dark:bg-red-800 dark:text-red-200 dark:border-red-600",
+                    info: "bg-yellow-100 text-yellow-700 border border-yellow-300 dark:bg-yellow-700 dark:text-yellow-200 dark:border-yellow-500"
                 };
 
                 div.className = `${base} ${colors[type] || colors.info}`;
@@ -1094,38 +1158,22 @@
             }
 
             function showError(row, msg) {
-                row.classList.add("bg-red-50", "border", "border-red-400", "dark:bg-red-900",
-                "dark:border-red-600");
+                row.classList.add("bg-red-50", "border", "border-red-400");
                 if (!row.querySelector(".error-msg")) {
                     const p = document.createElement("p");
-                    p.className = "error-msg text-red-600 dark:text-red-300 text-xs mt-1";
+                    p.className = "error-msg text-red-600 text-xs mt-1";
                     p.textContent = msg;
                     row.appendChild(p);
                 }
             }
 
             function clearError(row) {
-                row.classList.remove("bg-red-50", "border", "border-red-400", "dark:bg-red-900",
-                    "dark:border-red-600");
+                row.classList.remove("bg-red-50", "border", "border-red-400");
                 const msg = row.querySelector(".error-msg");
                 if (msg) msg.remove();
             }
 
-            // Compress all images before final form submission
-            async function compressAndSubmitForm() {
-                try {
-                    // Images should already be compressed from upload handlers
-                    // Just submit the form directly
-                    form.submit();
-
-                } catch (error) {
-                    console.error('Submission error:', error);
-                    loadingOverlay.classList.add('hidden');
-                    submitBtn.disabled = false;
-                    showTemporaryMessage('Submission failed. Please try again.', 'error');
-                }
-            }
-
+            // Initial render
             renderOfficeHours();
         });
     </script>
