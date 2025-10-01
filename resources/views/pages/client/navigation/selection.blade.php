@@ -30,25 +30,28 @@
         <x-floating-q-r href="{{ route('scan.index') }}" icon="{{ asset('icons/qr-code.png') }}" alt="Scan Office"
             title="Scan office to know more" />
 
-        <div x-data="staffSearch()" class="relative w-full max-w-md">
-            <input type="text" x-model="query" @input.debounce.300ms="filterStaff" placeholder="Search staff..."
-                class="font-sofia w-full border rounded-lg p-2">
+        <div class="flex justify-center mt-8">
+            <div x-data="staffSearch()" class="relative w-full max-w-md">
+                <input type="text" x-model="query" @input.debounce.300ms="filterStaff" placeholder="Search staff..."
+                    class="font-sofia w-full border border-primary focus:ring-2 focus:border-primary focus:ring-primary focus:outline-none rounded-lg p-2 pr-8 dark:bg-gray-700 dark:text-gray-300 transition-all duration-200">
 
-            <ul x-show="results.length" class="absolute w-full bg-white border rounded mt-1 max-h-60 overflow-y-auto">
-                <template x-for="staff in results" :key="staff.id">
-                    <li @click="selectStaff(staff)" class="p-2 cursor-pointer hover:bg-primary hover:text-white">
-                        <span x-text="staff.name"></span>
-                        {{-- reference the name property to avoid object object --}}
-                        <small x-text="staff.room ? '(' + staff.room.name + ')' : ''" class="ml-2 text-gray-500"></small>
-                    </li>
-                </template>
-            </ul>
+                <ul x-show="results.length"
+                    class="absolute w-full bg-white dark:bg-gray-800 dark:text-gray-300 border rounded mt-1 max-h-60 overflow-y-auto z-50">
+                    <template x-for="staff in results" :key="staff.id">
+                        <li @click="selectStaff(staff)" class="p-2 cursor-pointer hover:bg-primary hover:text-white">
+                            <span x-text="staff.name"></span>
+                            <small x-text="staff.room ? '(' + staff.room.name + ')' : ''"
+                                class="ml-2 text-gray-500"></small>
+                        </li>
+                    </template>
+                </ul>
+            </div>
         </div>
 
         <!-- Main content -->
         <div class="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8">
             <div class="w-full max-w-lg bg-white border-2 border-primary dark:bg-gray-800 shadow-lg rounded-md p-6">
-                <h2 class="text-2xl font-semibold mb-6 text-center dark:text-gray-200">
+                <h2 class="text-2xl mb-6 text-center dark:text-gray-200">
                     Select Starting Point & Destination
                 </h2>
                 <form action="{{ route('paths.results') }}" method="POST">
@@ -166,6 +169,13 @@
 
                         toHiddenInput.value = staff.room.id;
                         toSearchInput.value = staff.room.name;
+
+                        // Update Combobox internal state
+                        toCombobox.selectedValue = staff.room.id;
+                        toCombobox.selectedLabel = staff.room.name;
+
+                        // Trigger change event to enable start button
+                        toHiddenInput.dispatchEvent(new Event('change'));
                     }
                 }
             }
