@@ -39,32 +39,68 @@
                 <form action="{{ route('paths.results') }}" method="POST">
                     @csrf
 
-                    <!-- From Room -->
+                    <!-- From Room Combobox -->
                     <div class="mb-4">
-                        <label for="from_room" class="block text-sm font-medium mb-2 dark:text-gray-300">
+                        <label for="from_room_search" class="block text-sm font-medium mb-2 dark:text-gray-300">
                             Starting Point
                         </label>
-                        <select id="from_room" name="from_room"
-                            class="w-full border border-primary focus:ring-2 focus:border-primary focus:ring-primary focus:outline-none rounded-lg p-2 dark:bg-gray-700 dark:text-gray-200 transition-all duration-200">
-                            <option value="">-- Select a room --</option>
-                            @foreach ($rooms as $room)
-                                <option value="{{ $room->id }}">{{ $room->name }}</option>
-                            @endforeach
-                        </select>
+                        <div class="relative">
+                            <input type="text" id="from_room_search" autocomplete="off"
+                                placeholder="Search or select an office"
+                                class="w-full border border-primary focus:ring-2 focus:border-primary focus:ring-primary focus:outline-none rounded-lg p-2 pr-8 dark:bg-gray-700 dark:text-gray-200 transition-all duration-200">
+                            <svg class="absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                            <input type="hidden" id="from_room" name="from_room">
+                            <div id="from_room_dropdown"
+                                class="hidden absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-primary rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                <div id="from_room_options" class="py-1">
+                                    @foreach ($rooms as $room)
+                                        <div class="from-room-option px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
+                                            data-value="{{ $room->id }}" data-label="{{ $room->name }}">
+                                            {{ $room->name }}
+                                        </div>
+                                    @endforeach
+                                </div>
+                                <div id="from_room_no_results"
+                                    class="hidden px-4 py-2 text-gray-500 dark:text-gray-400 text-sm">
+                                    No office found
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- To Room -->
+                    <!-- To Room Combobox -->
                     <div class="mb-6">
-                        <label for="to_room" class="block text-sm font-medium mb-2 dark:text-gray-300">
+                        <label for="to_room_search" class="block text-sm font-medium mb-2 dark:text-gray-300">
                             Destination
                         </label>
-                        <select id="to_room" name="to_room"
-                            class="w-full border border-primary focus:ring-2 focus:border-primary focus:ring-primary focus:outline-none rounded-lg p-2 dark:bg-gray-700 dark:text-gray-200 transition-all duration-200">
-                            <option value="">-- Select a room --</option>
-                            @foreach ($rooms as $room)
-                                <option value="{{ $room->id }}">{{ $room->name }}</option>
-                            @endforeach
-                        </select>
+                        <div class="relative">
+                            <input type="text" id="to_room_search" autocomplete="off"
+                                placeholder="Search or select an office"
+                                class="w-full border border-primary focus:ring-2 focus:border-primary focus:ring-primary focus:outline-none rounded-lg p-2 pr-8 dark:bg-gray-700 dark:text-gray-200 transition-all duration-200">
+                            <svg class="absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                            <input type="hidden" id="to_room" name="to_room">
+                            <div id="to_room_dropdown"
+                                class="hidden absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-primary rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                <div id="to_room_options" class="py-1">
+                                    @foreach ($rooms as $room)
+                                        <div class="to-room-option px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
+                                            data-value="{{ $room->id }}" data-label="{{ $room->name }}">
+                                            {{ $room->name }}
+                                        </div>
+                                    @endforeach
+                                </div>
+                                <div id="to_room_no_results"
+                                    class="hidden px-4 py-2 text-gray-500 dark:text-gray-400 text-sm">
+                                    No office found
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="flex justify-center">
@@ -77,40 +113,173 @@
                 </form>
             </div>
         </div>
-    @endsection
+    </div>
+@endsection
 
-    @push('scripts')
-        <script>
-            const fromSelect = document.getElementById('from_room');
-            const toSelect = document.getElementById('to_room');
-            const startBtn = document.getElementById('startBtn');
+@push('scripts')
+    <script>
+        class Combobox {
+            constructor(searchInputId, hiddenInputId, dropdownId, optionsContainerId, noResultsId, optionClass) {
+                this.searchInput = document.getElementById(searchInputId);
+                this.hiddenInput = document.getElementById(hiddenInputId);
+                this.dropdown = document.getElementById(dropdownId);
+                this.optionsContainer = document.getElementById(optionsContainerId);
+                this.noResults = document.getElementById(noResultsId);
+                this.optionClass = optionClass;
+                this.options = Array.from(document.querySelectorAll(`.${optionClass}`));
+                this.selectedValue = '';
+                this.selectedLabel = '';
 
-            function updateDisabledOptions() {
-                const fromValue = fromSelect.value;
-                const toValue = toSelect.value;
-
-                // Enable all options first
-                [...fromSelect.options].forEach(opt => opt.disabled = false);
-                [...toSelect.options].forEach(opt => opt.disabled = false);
-
-                // Disable the selected destination in starting point dropdown
-                if (toValue) {
-                    [...fromSelect.options].forEach(opt => {
-                        if (opt.value === toValue) opt.disabled = true;
-                    });
-                }
-
-                // Disable the selected starting point in destination dropdown
-                if (fromValue) {
-                    [...toSelect.options].forEach(opt => {
-                        if (opt.value === fromValue) opt.disabled = true;
-                    });
-                }
-
-                startBtn.disabled = !(fromValue && toValue);
+                this.init();
             }
 
-            fromSelect.addEventListener('change', updateDisabledOptions);
-            toSelect.addEventListener('change', updateDisabledOptions);
-        </script>
-    @endpush
+            init() {
+                // Show dropdown on focus
+                this.searchInput.addEventListener('focus', () => {
+                    this.filterOptions('');
+                    this.dropdown.classList.remove('hidden');
+                });
+
+                // Filter options on input
+                this.searchInput.addEventListener('input', (e) => {
+                    this.filterOptions(e.target.value);
+                });
+
+                // Handle option click
+                this.options.forEach(option => {
+                    option.addEventListener('click', () => {
+                        this.selectOption(option.dataset.value, option.dataset.label);
+                    });
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!this.searchInput.contains(e.target) && !this.dropdown.contains(e.target)) {
+                        this.dropdown.classList.add('hidden');
+                        // Restore selected value or clear
+                        if (this.selectedLabel) {
+                            this.searchInput.value = this.selectedLabel;
+                        }
+                    }
+                });
+            }
+
+            filterOptions(searchTerm) {
+                const term = searchTerm.toLowerCase();
+                let visibleCount = 0;
+
+                this.options.forEach(option => {
+                    const label = option.dataset.label.toLowerCase();
+                    const isDisabled = option.classList.contains('opacity-50');
+
+                    if (label.includes(term) && !isDisabled) {
+                        option.classList.remove('hidden');
+                        visibleCount++;
+                    } else {
+                        option.classList.add('hidden');
+                    }
+                });
+
+                if (visibleCount === 0) {
+                    this.noResults.classList.remove('hidden');
+                    this.optionsContainer.classList.add('hidden');
+                } else {
+                    this.noResults.classList.add('hidden');
+                    this.optionsContainer.classList.remove('hidden');
+                }
+            }
+
+            selectOption(value, label) {
+                this.selectedValue = value;
+                this.selectedLabel = label;
+                this.searchInput.value = label;
+                this.hiddenInput.value = value;
+                this.dropdown.classList.add('hidden');
+
+                // Trigger change event for cross-combobox updates
+                this.hiddenInput.dispatchEvent(new Event('change'));
+            }
+
+            disableOption(value) {
+                this.options.forEach(option => {
+                    if (option.dataset.value === value) {
+                        option.classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+                    }
+                });
+            }
+
+            enableOption(value) {
+                this.options.forEach(option => {
+                    if (option.dataset.value === value) {
+                        option.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+                    }
+                });
+            }
+
+            enableAllOptions() {
+                this.options.forEach(option => {
+                    option.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+                });
+            }
+
+            getValue() {
+                return this.selectedValue;
+            }
+
+            clear() {
+                this.selectedValue = '';
+                this.selectedLabel = '';
+                this.searchInput.value = '';
+                this.hiddenInput.value = '';
+            }
+        }
+
+        // Initialize comboboxes
+        const fromCombobox = new Combobox(
+            'from_room_search',
+            'from_room',
+            'from_room_dropdown',
+            'from_room_options',
+            'from_room_no_results',
+            'from-room-option'
+        );
+
+        const toCombobox = new Combobox(
+            'to_room_search',
+            'to_room',
+            'to_room_dropdown',
+            'to_room_options',
+            'to_room_no_results',
+            'to-room-option'
+        );
+
+        const startBtn = document.getElementById('startBtn');
+        const fromHidden = document.getElementById('from_room');
+        const toHidden = document.getElementById('to_room');
+
+        function updateDisabledOptions() {
+            const fromValue = fromCombobox.getValue();
+            const toValue = toCombobox.getValue();
+
+            // Enable all options first
+            fromCombobox.enableAllOptions();
+            toCombobox.enableAllOptions();
+
+            // Disable the selected destination in starting point combobox
+            if (toValue) {
+                fromCombobox.disableOption(toValue);
+            }
+
+            // Disable the selected starting point in destination combobox
+            if (fromValue) {
+                toCombobox.disableOption(fromValue);
+            }
+
+            // Enable/disable start button
+            startBtn.disabled = !(fromValue && toValue);
+        }
+
+        fromHidden.addEventListener('change', updateDisabledOptions);
+        toHidden.addEventListener('change', updateDisabledOptions);
+    </script>
+@endpush
