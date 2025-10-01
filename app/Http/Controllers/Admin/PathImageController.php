@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Path;
 use App\Models\PathImage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Encoders\WebpEncoder;
@@ -13,6 +14,8 @@ use Intervention\Image\Drivers\Gd\Driver;
 
 class PathImageController extends Controller
 {
+    private $manager;
+
     public function __construct()
     {
         $this->middleware(['auth', 'role:Admin'])->only([
@@ -30,12 +33,12 @@ class PathImageController extends Controller
         $this->middleware('auth');
         ini_set('memory_limit', '512M');
         ini_set('max_execution_time', '300');
+
+        $this->manager = new ImageManager(new Driver());
     }
 
-    // Show form to upload images
     public function create(Path $path = null)
     {
-        // Get all paths for the dropdown
         $paths = Path::with(['fromRoom', 'toRoom'])->get();
 
         if ($paths->isEmpty()) {
@@ -43,13 +46,11 @@ class PathImageController extends Controller
                 ->with('warning', 'No paths available. Please create a path first.');
         }
 
-        // Fixed: Remove the non-existent ->exists property
         $defaultPath = $path ?? $paths->first();
 
         return view('pages.admin.path_images.create', compact('paths', 'defaultPath'));
     }
 
-    // Store multiple images for a path
     public function store(Request $request)
     {
         if (!$request->hasFile('files') || count($request->file('files')) === 0) {
@@ -59,61 +60,19 @@ class PathImageController extends Controller
         $request->validate([
             'path_id' => 'required|exists:paths,id',
             'files'   => 'required|array|min:1|max:20',
-            'files.*' => 'required|image|max:10240', // Reduced to 10MB for safety
+            'files.*' => 'required|image|max:10240',
         ]);
 
         $path = Path::findOrFail($request->path_id);
         $files = $request->file('files');
         $nextOrder = PathImage::where('path_id', $path->id)->max('image_order') ?? 0;
 
-        $manager = new ImageManager(new Driver());
-
-        // Track successful uploads
         $uploadedCount = 0;
         $errors = [];
 
-        foreach ($files as $index => $file) {
+        foreach ($files as $file) {
             try {
-                // Temporarily increase memory for this operation
-                $currentMemory = ini_get('memory_limit');
-                ini_set('memory_limit', '512M');
-
-                $baseName = uniqid('', true);
-                $folder = "path_images/{$path->id}";
-                $webpPath = "{$folder}/{$baseName}.webp";
-
-                // Read and resize image to prevent memory issues
-                $image = $manager->read($file);
-
-                // Get original dimensions
-                $width = $image->width();
-                $height = $image->height();
-
-                // Resize if image is too large (max 2000px on longest side)
-                $maxDimension = 2000;
-                if ($width > $maxDimension || $height > $maxDimension) {
-                    if ($width > $height) {
-                        $image->scale(width: $maxDimension);
-                    } else {
-                        $image->scale(height: $maxDimension);
-                    }
-                }
-
-                // Encode to WebP with quality adjustment based on size
-                $quality = 70;
-                if ($file->getSize() > 5 * 1024 * 1024) { // If > 5MB
-                    $quality = 60; // Lower quality for larger files
-                }
-
-                $encodedImage = $image->encode(new WebpEncoder($quality));
-
-                // Free memory
-                unset($image);
-
-                Storage::disk('public')->put($webpPath, (string) $encodedImage);
-
-                // Free memory
-                unset($encodedImage);
+                $webpPath = $this->processAndSaveImage($file, $path->id);
 
                 PathImage::create([
                     'path_id'     => $path->id,
@@ -122,33 +81,20 @@ class PathImageController extends Controller
                 ]);
 
                 $uploadedCount++;
-
-                // Restore original memory limit
-                ini_set('memory_limit', $currentMemory);
-
-                // Force garbage collection after each image
                 gc_collect_cycles();
             } catch (\Exception $e) {
-                // Restore memory limit on error
-                if (isset($currentMemory)) {
-                    ini_set('memory_limit', $currentMemory);
-                }
-
                 $errors[] = "Failed to upload {$file->getClientOriginalName()}: " . $e->getMessage();
 
-                // Log the error
-                \Log::error("Image upload failed", [
+                Log::error("Image upload failed", [
                     'file' => $file->getClientOriginalName(),
                     'size' => $file->getSize(),
                     'error' => $e->getMessage()
                 ]);
 
-                // Continue with next file instead of failing completely
                 continue;
             }
         }
 
-        // Build success message
         $message = "{$uploadedCount} image(s) uploaded successfully.";
 
         if (count($errors) > 0) {
@@ -163,13 +109,17 @@ class PathImageController extends Controller
             ->with('success', $message);
     }
 
-
-    // Show form to edit single or multiple images
     public function edit(Request $request, Path $path, PathImage $pathImage = null)
     {
         $path->load(['fromRoom', 'toRoom']);
-        $pathImages = $pathImage && $pathImage->exists
-            ? collect([$pathImage->path_id === $path->id ? $pathImage : null])->filter()
+
+        if ($pathImage && $pathImage->path_id !== $path->id) {
+            return redirect()->route('path.show', $path)
+                ->with('error', 'Image does not belong to this path.');
+        }
+
+        $pathImages = $pathImage
+            ? collect([$pathImage])
             : PathImage::where('path_id', $path->id)->orderBy('image_order')->get();
 
         if ($pathImages->isEmpty()) {
@@ -180,10 +130,8 @@ class PathImageController extends Controller
         return view('pages.admin.path_images.edit', compact('path', 'pathImages'));
     }
 
-    // Update multiple images (orders and/or files)
     public function update(Request $request, $pathOrPathImage = null)
     {
-        // Handle both single and multiple image updates
         if ($pathOrPathImage instanceof PathImage) {
             return $this->updateSingle($request, $pathOrPathImage);
         } else {
@@ -191,12 +139,11 @@ class PathImageController extends Controller
         }
     }
 
-    // Update single image (backward compatibility)
     public function updateSingle(Request $request, PathImage $pathImage)
     {
         $data = $request->validate([
             'image_order' => 'nullable|integer|min:1',
-            'image_file'  => 'nullable|image|max:51200',
+            'image_file'  => 'nullable|image|max:10240',
         ]);
 
         if (isset($data['image_order'])) {
@@ -204,32 +151,27 @@ class PathImageController extends Controller
         }
 
         if ($request->hasFile('image_file')) {
-            // Delete old files
-            Storage::disk('public')->delete($pathImage->image_file);
+            try {
+                // Delete old file
+                Storage::disk('public')->delete($pathImage->image_file);
 
-            // Process new upload (save original + webp)
-            $manager = new ImageManager(new Driver());
-            $file = $request->file('image_file');
-            $file->getClientOriginalExtension();
-            $baseName = uniqid('', true);
+                // Process and save new image
+                $webpPath = $this->processAndSaveImage(
+                    $request->file('image_file'),
+                    $pathImage->path_id
+                );
 
-            $folder   = "path_images/{$pathImage->path_id}";
-            $webpPath = "{$folder}/{$baseName}.webp";
-
-            // Save webp
-            $image = $manager->read($file)->encode(new WebpEncoder(70));
-            Storage::disk('public')->put($webpPath, (string) $image);
-
-            $pathImage->update([
-                'image_file'    => $webpPath,
-            ]);
+                $pathImage->update(['image_file' => $webpPath]);
+            } catch (\Exception $e) {
+                return back()->with('error', 'Failed to update image: ' . $e->getMessage());
+            }
         }
 
-        $path = $pathImage->path;
-        return redirect()->route('path.show', $path)->with('success', 'Image updated successfully.');
+        return redirect()
+            ->route('path.show', $pathImage->path)
+            ->with('success', 'Image updated successfully.');
     }
 
-    // Update multiple images
     public function updateMultiple(Request $request, $pathId = null)
     {
         $pathId = $pathId ?? $request->input('path_id');
@@ -240,14 +182,26 @@ class PathImageController extends Controller
             'images' => 'required|array|min:1',
             'images.*.id' => 'required|exists:path_images,id',
             'images.*.image_order' => 'nullable|integer|min:1',
-            'images.*.image_file' => 'nullable|image|max:51200',
             'images.*.delete' => 'nullable|boolean',
         ]);
 
+        // Validate file uploads separately by checking request files
+        $filesValidation = [];
+        foreach ($request->file('images', []) as $index => $imageFiles) {
+            if (isset($imageFiles['image_file'])) {
+                $filesValidation["images.{$index}.image_file"] = 'image|max:10240';
+            }
+        }
+
+        if (!empty($filesValidation)) {
+            $request->validate($filesValidation);
+        }
+
         $updatedCount = 0;
         $deletedCount = 0;
+        $errors = [];
 
-        foreach ($request->input('images') as $imageData) {
+        foreach ($request->input('images') as $index => $imageData) {
             $pathImage = PathImage::where('id', $imageData['id'])
                 ->where('path_id', $path->id)
                 ->first();
@@ -257,7 +211,6 @@ class PathImageController extends Controller
             // Handle deletion
             if (!empty($imageData['delete'])) {
                 Storage::disk('public')->delete($pathImage->image_file);
-
                 $pathImage->delete();
                 $deletedCount++;
                 continue;
@@ -269,26 +222,21 @@ class PathImageController extends Controller
                 $updateData['image_order'] = $imageData['image_order'];
             }
 
-            // Replace image file
-            if ($request->hasFile("images.{$imageData['id']}.image_file")) {
-                $file = $request->file("images.{$imageData['id']}.image_file");
+            // Handle file replacement
+            if ($request->hasFile("images.{$index}.image_file")) {
+                try {
+                    $file = $request->file("images.{$index}.image_file");
 
-                // Delete old files
-                Storage::disk('public')->delete($pathImage->image_file);
+                    // Delete old file
+                    Storage::disk('public')->delete($pathImage->image_file);
 
-                // Process new upload
-                $manager = new ImageManager(new Driver());
-                $file->getClientOriginalExtension();
-                $baseName = uniqid('', true);
-
-                $folder   = "path_images/{$path->id}";
-                $webpPath = "{$folder}/{$baseName}.webp";
-
-                // Save webp
-                $image = $manager->read($file)->encode(new WebpEncoder(70));
-                Storage::disk('public')->put($webpPath, (string) $image);
-
-                $updateData['image_file']    = $webpPath;
+                    // Process and save new image
+                    $webpPath = $this->processAndSaveImage($file, $path->id);
+                    $updateData['image_file'] = $webpPath;
+                } catch (\Exception $e) {
+                    $errors[] = "Failed to update image {$pathImage->id}: " . $e->getMessage();
+                    continue;
+                }
             }
 
             if (!empty($updateData)) {
@@ -303,27 +251,34 @@ class PathImageController extends Controller
 
         $successMessage = implode(' and ', $message) . ' successfully.';
 
+        if (count($errors) > 0) {
+            $successMessage .= ' However, some updates failed.';
+        }
+
         if ($request->expectsJson()) {
             return response()->json([
                 'redirect' => route('path.show', $path),
                 'message' => $successMessage,
                 'updated_count' => $updatedCount,
                 'deleted_count' => $deletedCount,
+                'errors' => $errors,
             ], 200);
         }
 
-        return redirect()->route('path.show', $path)->with('success', $successMessage);
+        $redirect = redirect()->route('path.show', $path)->with('success', $successMessage);
+
+        if (count($errors) > 0) {
+            $redirect->withErrors($errors);
+        }
+
+        return $redirect;
     }
 
-
-    // Delete a specific image
     public function destroySingle(PathImage $pathImage)
     {
         $path = $pathImage->path;
 
-        // Delete both webp
         Storage::disk('public')->delete($pathImage->image_file);
-
         $pathImage->delete();
 
         if (request()->expectsJson()) {
@@ -333,7 +288,6 @@ class PathImageController extends Controller
         return redirect()->route('path.show', $path)->with('success', 'Image deleted successfully.');
     }
 
-    // Delete multiple images
     public function destroyMultiple(Request $request)
     {
         $request->validate([
@@ -351,9 +305,7 @@ class PathImageController extends Controller
                 ->first();
 
             if ($pathImage) {
-                // Delete both webp
                 Storage::disk('public')->delete($pathImage->image_file);
-
                 $pathImage->delete();
                 $deletedCount++;
             }
@@ -372,8 +324,6 @@ class PathImageController extends Controller
         return redirect()->route('path.show', $path)->with('success', $successMessage);
     }
 
-
-    // Bulk update image orders
     public function updateOrder(Request $request, Path $path)
     {
         $request->validate([
@@ -393,5 +343,44 @@ class PathImageController extends Controller
         }
 
         return redirect()->route('path.show', $path)->with('success', 'Image order updated successfully.');
+    }
+
+    /**
+     * Process and save an uploaded image
+     */
+    private function processAndSaveImage($file, $pathId)
+    {
+        $baseName = uniqid('', true);
+        $folder = "path_images/{$pathId}";
+        $webpPath = "{$folder}/{$baseName}.webp";
+
+        $image = $this->manager->read($file);
+
+        // Resize if too large
+        $width = $image->width();
+        $height = $image->height();
+        $maxDimension = 2000;
+
+        if ($width > $maxDimension || $height > $maxDimension) {
+            if ($width > $height) {
+                $image->scale(width: $maxDimension);
+            } else {
+                $image->scale(height: $maxDimension);
+            }
+        }
+
+        // Adjust quality based on file size
+        $quality = 70;
+        if ($file->getSize() > 5 * 1024 * 1024) {
+            $quality = 60;
+        }
+
+        $encodedImage = $image->encode(new WebpEncoder($quality));
+        unset($image);
+
+        Storage::disk('public')->put($webpPath, (string) $encodedImage);
+        unset($encodedImage);
+
+        return $webpPath;
     }
 }

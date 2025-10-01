@@ -9,6 +9,7 @@ use App\Models\RoomImage;
 use App\Models\Staff;
 use App\Services\EntrancePointService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -19,6 +20,8 @@ use Intervention\Image\Drivers\Gd\Driver;
 
 class RoomController extends Controller
 {
+    private $manager;
+
     public function __construct()
     {
         $this->middleware(['auth', 'role:Admin'])->only([
@@ -31,7 +34,13 @@ class RoomController extends Controller
             'forceDelete',
             'recycleBin'
         ]);
+
+        ini_set('memory_limit', '512M');
+        ini_set('max_execution_time', '300');
+
+        $this->manager = new ImageManager(new Driver());
     }
+
     public function index(Request $request)
     {
         $sort = $request->get('sort', 'name');
@@ -49,7 +58,7 @@ class RoomController extends Controller
         return view('pages.admin.rooms.create');
     }
 
-    public function store(Request $request, EntrancePointService $entrancePointService, Room $room)
+    public function store(Request $request, EntrancePointService $entrancePointService)
     {
         $validated = $request->validate([
             'name' => [
@@ -60,64 +69,70 @@ class RoomController extends Controller
             ],
             'description' => 'nullable|string',
             'room_type' => 'required|in:regular,entrance_point',
-            'image_path' => 'nullable|image|max:10240', // 10 MB
-            'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200', // 50 MB
-            'carousel_images'   => 'nullable|array|max:50',  // MAX 50 files allowed
-            'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:10240', // 10 MB each
-
-            // Office hours
+            'image_path' => 'nullable|image|max:10240',
+            'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200',
+            'carousel_images' => 'nullable|array|max:50',
+            'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
             'office_hours' => 'nullable|array',
         ]);
 
         try {
-            // Create the room (regular or entrance gate)
+            DB::beginTransaction();
+
             $room = Room::create(collect($validated)->except('office_hours')->toArray());
 
-            // Always auto-connect this new room to all other rooms
             $connectionResult = $entrancePointService->connectNewRoomToAllRooms($room);
 
             $successMessage = "{$room->name} created and connected to {$connectionResult['rooms_connected']} office with {$connectionResult['paths_created']} paths.";
 
+            // Save office hours
             if ($request->has('office_hours')) {
                 foreach ($request->office_hours as $day => $ranges) {
                     foreach ($ranges as $range) {
                         if (!empty($range['start']) && !empty($range['end'])) {
                             $room->officeHours()->create([
-                                'day'        => $day,
+                                'day' => $day,
                                 'start_time' => $range['start'],
-                                'end_time'   => $range['end'],
+                                'end_time' => $range['end'],
                             ]);
                         }
                     }
                 }
             }
 
-            $manager = new ImageManager(new Driver());
-
-            // Cover image
+            // Process cover image
             if ($request->hasFile('image_path')) {
-                $baseName = uniqid('', true);
-                $folder   = "offices/{$room->id}/cover_images";
-                $webpPath = "{$folder}/{$baseName}.webp";
-
-                $image = $manager->read($request->file('image_path'))->encode(new WebpEncoder(90));
-                Storage::disk('public')->put($webpPath, (string) $image);
-
-                $room->image_path = $webpPath;
-                $room->save();
+                try {
+                    $webpPath = $this->processAndSaveImage(
+                        $request->file('image_path'),
+                        "offices/{$room->id}/cover_images"
+                    );
+                    $room->image_path = $webpPath;
+                } catch (\Exception $e) {
+                    Log::error('Cover image processing failed', [
+                        'room_id' => $room->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
             }
 
-            // Video
+            // Process video
             if ($request->hasFile('video_path')) {
-                $path = $request->file('video_path')->store('offices/' . $room->id . '/videos', 'public');
-                $room->video_path = $path;
-                $room->save();
+                try {
+                    $path = $request->file('video_path')->store("offices/{$room->id}/videos", 'public');
+                    $room->video_path = $path;
+                } catch (\Exception $e) {
+                    Log::error('Video upload failed', [
+                        'room_id' => $room->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
             }
 
             // Generate QR code
             $marker_id = 'room_' . $room->id;
             $qrImage = QrCode::format('svg')->size(300)->generate($room->token);
-            $qrPath = 'offices/' . $room->id . '/qrcodes/' . $marker_id . '.svg';
+            $qrPath = "offices/{$room->id}/qrcodes/{$marker_id}.svg";
             Storage::disk('public')->put($qrPath, $qrImage);
 
             $room->update([
@@ -125,61 +140,78 @@ class RoomController extends Controller
                 'qr_code_path' => $qrPath,
             ]);
 
-            // Carousel images
+            // Process carousel images
             if ($request->hasFile('carousel_images')) {
+                $uploadedCount = 0;
+                $failedCount = 0;
+
                 foreach ($request->file('carousel_images') as $carouselImage) {
-                    $baseName = uniqid('', true);
-                    $folder   = "offices/{$room->id}/carousel";
-                    $webpPath = "{$folder}/{$baseName}.webp";
+                    try {
+                        $webpPath = $this->processAndSaveImage(
+                            $carouselImage,
+                            "offices/{$room->id}/carousel"
+                        );
 
-                    $image = $manager->read($carouselImage)->encode(new WebpEncoder(90));
-                    Storage::disk('public')->put($webpPath, (string) $image);
+                        RoomImage::create([
+                            'room_id' => $room->id,
+                            'image_path' => $webpPath
+                        ]);
 
-                    RoomImage::firstOrCreate([
-                        'room_id' => $room->id,
-                        'image_path' => $webpPath
-                    ]);
+                        $uploadedCount++;
+                        gc_collect_cycles();
+                    } catch (\Exception $e) {
+                        $failedCount++;
+                        Log::error('Carousel image processing failed', [
+                            'room_id' => $room->id,
+                            'file' => $carouselImage->getClientOriginalName(),
+                            'error' => $e->getMessage()
+                        ]);
+                    }
+                }
+
+                if ($failedCount > 0) {
+                    $successMessage .= " However, {$failedCount} carousel image(s) failed to upload.";
                 }
             }
 
-            // CHANGE 4: Use the dynamic success message instead of hardcoded one
+            DB::commit();
+
             session()->flash('success', $successMessage);
 
             if ($request->expectsJson()) {
                 return response()->json(['redirect' => route('room.show', $room->id)], 200);
             }
 
-            // CHANGE 5: Use the dynamic success message here too
             return redirect()->route('room.show', $room->id)
                 ->with('success', $successMessage);
         } catch (\Exception $e) {
+            DB::rollBack();
+
             Log::error('Room creation error: ' . $e->getMessage(), [
-                'request' => $request->all()
+                'request' => $request->except(['image_path', 'video_path', 'carousel_images'])
             ]);
+
             return back()->withInput()->with('error', 'Failed to create room: ' . $e->getMessage());
         }
     }
 
     public function show(Room $room)
     {
-        $room->load(['images' => function ($query) {
-            $query->withTrashed(); // Include soft-deleted images
-        }, 'staff']);
-
-        $images = $room->images;
-
-        $room->load('officeHours'); // eager load
+        $room->load([
+            'images' => function ($query) {
+                $query->withTrashed();
+            },
+            'staff',
+            'officeHours'
+        ]);
 
         if (!$room->qr_code_path || !Storage::disk('public')->exists($room->qr_code_path)) {
             $marker_id = 'room_' . $room->id;
-
             $qrImage = QrCode::format('svg')->size(300)->generate($room->token);
-            $qrPath = 'qrcodes/' . $marker_id . '.svg';
+            $qrPath = "offices/{$room->id}/qrcodes/{$marker_id}.svg";
             Storage::disk('public')->put($qrPath, $qrImage);
 
-            $room->update([
-                'qr_code_path' => $qrPath,
-            ]);
+            $room->update(['qr_code_path' => $qrPath]);
         }
 
         return view('pages.admin.rooms.show', compact('room'));
@@ -187,25 +219,21 @@ class RoomController extends Controller
 
     public function edit(Room $room)
     {
+        $this->authorize('update', $room);
+
         $staffs = Staff::all();
         $room->load(['images' => function ($query) {
-            $query->withTrashed(); // Include soft-deleted images
+            $query->withTrashed();
         }]);
 
-        $this->authorize('update', $room); // uses RoomPolicy
-
-        // Transform officeHours relation to JSON structure expected by JS
         $officeHours = [];
-        $existingOfficeHours = []; // Add this variable
-
         foreach ($room->officeHours as $hour) {
             $officeHours[$hour->day][] = [
                 'start' => \Carbon\Carbon::parse($hour->start_time)->format('H:i'),
-                'end'   => \Carbon\Carbon::parse($hour->end_time)->format('H:i'),
+                'end' => \Carbon\Carbon::parse($hour->end_time)->format('H:i'),
             ];
         }
 
-        // Create the existingOfficeHours array (same as officeHours for consistency)
         $existingOfficeHours = $officeHours;
 
         return view('pages.admin.rooms.edit', compact('room', 'staffs', 'officeHours', 'existingOfficeHours'));
@@ -213,8 +241,7 @@ class RoomController extends Controller
 
     public function update(Request $request, Room $room)
     {
-        // Authorization
-        $this->authorize('update', $room); // uses RoomPolicy
+        $this->authorize('update', $room);
 
         $validated = $request->validate([
             'name' => [
@@ -225,161 +252,181 @@ class RoomController extends Controller
             ],
             'description' => 'nullable|string',
             'room_type' => 'required|in:regular,entrance_point',
-            'image_path' => 'nullable|image|max:5120', // 5 MB
-            'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200', // 50 MB
-            'carousel_images'   => 'nullable|array|max:50',  // MAX 50 files allowed
-            'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:5120', // 5 MB each
+            'image_path' => 'nullable|image|max:10240',
+            'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200',
+            'carousel_images' => 'nullable|array|max:50',
+            'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
             'office_hours' => 'nullable|array',
         ]);
 
-        $oldType = $room->room_type;
-        $roomData = collect($validated)->except('office_hours')->toArray();
-        $room->update($roomData);
+        try {
+            DB::beginTransaction();
 
-        // Remove old hours
-        $room->officeHours()->delete();
+            $oldType = $room->room_type;
+            $roomData = collect($validated)->except('office_hours')->toArray();
+            $room->update($roomData);
 
-        // If type changed, reset and reconnect paths
-        if ($oldType !== $room->room_type) {
-            // Delete old paths
-            Path::where('from_room_id', $room->id)
-                ->orWhere('to_room_id', $room->id)
-                ->delete();
-            $entranceService = app(EntrancePointService::class);
+            // Remove old office hours
+            $room->officeHours()->delete();
 
-            if ($room->room_type === 'entrance_point') {
-                $entranceService->reconnectEntrancePoint($room);
-            } else {
-                $entranceService->connectNewRoomToAllRooms($room);
+            // Handle room type change
+            if ($oldType !== $room->room_type) {
+                Path::where('from_room_id', $room->id)
+                    ->orWhere('to_room_id', $room->id)
+                    ->delete();
+
+                $entranceService = app(EntrancePointService::class);
+
+                if ($room->room_type === 'entrance_point') {
+                    $entranceService->reconnectEntrancePoint($room);
+                } else {
+                    $entranceService->connectNewRoomToAllRooms($room);
+                }
             }
-        }
 
-        if ($request->has('office_hours')) {
-            foreach ($request->office_hours as $day => $ranges) {
-                foreach ($ranges as $range) {
-                    if (!empty($range['start']) && !empty($range['end'])) {
-                        $room->officeHours()->create([
-                            'day'        => $day,
-                            'start_time' => $range['start'],
-                            'end_time'   => $range['end'],
+            // Save new office hours
+            if ($request->has('office_hours')) {
+                foreach ($request->office_hours as $day => $ranges) {
+                    foreach ($ranges as $range) {
+                        if (!empty($range['start']) && !empty($range['end'])) {
+                            $room->officeHours()->create([
+                                'day' => $day,
+                                'start_time' => $range['start'],
+                                'end_time' => $range['end'],
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            // Handle main image removal
+            if ($request->input('remove_image_path') && $room->image_path) {
+                if (Storage::disk('public')->exists($room->image_path)) {
+                    Storage::disk('public')->delete($room->image_path);
+                }
+                $room->image_path = null;
+            }
+
+            // Update cover image
+            if ($request->hasFile('image_path')) {
+                if ($room->image_path && Storage::disk('public')->exists($room->image_path)) {
+                    Storage::disk('public')->delete($room->image_path);
+                }
+
+                try {
+                    $webpPath = $this->processAndSaveImage(
+                        $request->file('image_path'),
+                        "offices/{$room->id}/cover_images"
+                    );
+                    $room->image_path = $webpPath;
+                } catch (\Exception $e) {
+                    Log::error('Cover image update failed', [
+                        'room_id' => $room->id,
+                        'error' => $e->getMessage()
+                    ]);
+                    throw $e;
+                }
+            }
+
+            // Handle video removal
+            if ($request->input('remove_video_path') && $room->video_path) {
+                if (Storage::disk('public')->exists($room->video_path)) {
+                    Storage::disk('public')->delete($room->video_path);
+                }
+                $room->video_path = null;
+            }
+
+            // Update video
+            if ($request->hasFile('video_path')) {
+                if ($room->video_path && Storage::disk('public')->exists($room->video_path)) {
+                    Storage::disk('public')->delete($room->video_path);
+                }
+
+                $newVideoPath = $request->file('video_path')->store("offices/{$room->id}/videos", 'public');
+                $room->video_path = $newVideoPath;
+            }
+
+            // Save any changes to room
+            $room->save();
+
+            // Delete selected carousel images
+            if ($request->filled('remove_images')) {
+                $images = RoomImage::whereIn('id', $request->remove_images)->get();
+                foreach ($images as $img) {
+                    if ($img->image_path && Storage::disk('public')->exists($img->image_path)) {
+                        Storage::disk('public')->delete($img->image_path);
+                    }
+                    $img->forceDelete();
+                }
+            }
+
+            // Add new carousel images
+            if ($request->hasFile('carousel_images')) {
+                $uploadedCount = 0;
+                $failedCount = 0;
+
+                foreach ($request->file('carousel_images') as $carouselImage) {
+                    try {
+                        $webpPath = $this->processAndSaveImage(
+                            $carouselImage,
+                            "offices/{$room->id}/carousel"
+                        );
+
+                        RoomImage::create([
+                            'room_id' => $room->id,
+                            'image_path' => $webpPath
+                        ]);
+
+                        $uploadedCount++;
+                        gc_collect_cycles();
+                    } catch (\Exception $e) {
+                        $failedCount++;
+                        Log::error('Carousel image update failed', [
+                            'room_id' => $room->id,
+                            'file' => $carouselImage->getClientOriginalName(),
+                            'error' => $e->getMessage()
                         ]);
                     }
                 }
             }
-        }
 
-        // Handle main image removal
-        if ($request->input('remove_image_path') && $room->image_path) {
-            if (Storage::disk('public')->exists($room->image_path)) {
-                Storage::disk('public')->delete($room->image_path);
-            }
-            $room->image_path = null;
-            $room->save();
-        }
+            DB::commit();
 
-        $manager = new ImageManager(new Driver());
+            $room->load(['images' => function ($query) {
+                $query->withTrashed();
+            }]);
 
-        // Update cover image (permanently delete old one)
-        if ($request->hasFile('image_path')) {
-            // Permanently delete old cover image file
-            if ($room->image_path && Storage::disk('public')->exists($room->image_path)) {
-                Storage::disk('public')->delete($room->image_path);
+            $successMessage = "{$room->name} was updated successfully.";
+            session()->flash('success', $successMessage);
+
+            if ($request->expectsJson()) {
+                return response()->json(['redirect' => route('room.show', $room->id)], 200);
             }
 
-            $baseName = uniqid('', true);
-            $folder   = "offices/{$room->id}/cover_images";
-            $webpPath = "{$folder}/{$baseName}.webp";
+            return redirect()->route('room.show', $room->id)
+                ->with('success', $successMessage);
+        } catch (\Exception $e) {
+            DB::rollBack();
 
-            $image = $manager->read($request->file('image_path'))->encode(new WebpEncoder(90));
-            Storage::disk('public')->put($webpPath, (string) $image);
+            Log::error('Room update error: ' . $e->getMessage(), [
+                'room_id' => $room->id,
+                'request' => $request->except(['image_path', 'video_path', 'carousel_images'])
+            ]);
 
-            // Store new cover image
-            $room->image_path = $webpPath;
-            $room->save();
+            return back()->withInput()->with('error', 'Failed to update room: ' . $e->getMessage());
         }
-
-        // Handle video removal
-        if ($request->input('remove_video_path') && $room->video_path) {
-            if (Storage::disk('public')->exists($room->video_path)) {
-                Storage::disk('public')->delete($room->video_path);
-            }
-            $room->video_path = null;
-            $room->save();
-        }
-
-        // Update video (permanently delete old one)
-        if ($request->hasFile('video_path')) {
-            // Permanently delete old video file
-            if ($room->video_path && Storage::disk('public')->exists($room->video_path)) {
-                Storage::disk('public')->delete($room->video_path);
-            }
-
-            // Store new video
-            $newVideoPath = $request->file('video_path')->store('offices/' . $room->id . '/videos', 'public');
-            $room->video_path = $newVideoPath;
-            $room->save();
-        }
-
-
-        // Permanently delete selected carousel images (same as before)
-        if ($request->filled('remove_images')) {
-            $images = RoomImage::whereIn('id', $request->remove_images)->get();
-            foreach ($images as $img) {
-                // Permanently delete file from storage
-                if ($img->image_path && Storage::disk('public')->exists($img->image_path)) {
-                    Storage::disk('public')->delete($img->image_path);
-                }
-                // Permanently delete database record
-                $img->forceDelete();
-            }
-        }
-
-        // Add new carousel images
-        if ($request->hasFile('carousel_images')) {
-            foreach ($request->file('carousel_images') as $carouselImage) {
-                $baseName = uniqid('', true);
-                $folder   = "offices/{$room->id}/carousel";
-                $webpPath = "{$folder}/{$baseName}.webp";
-
-                $image = $manager->read($carouselImage)->encode(new WebpEncoder(90));
-                Storage::disk('public')->put($webpPath, (string) $image);
-
-                RoomImage::firstOrCreate([
-                    'room_id' => $room->id,
-                    'image_path' => $webpPath
-                ]);
-            }
-        }
-
-        $room->load(['images' => function ($query) {
-            $query->withTrashed();
-        }]);
-
-        session()->flash('success', "{$room->name} was updated successfully.");
-
-        if ($request->expectsJson()) {
-            return response()->json(['redirect' => route('room.show', $room->id)], 200);
-        }
-
-        return redirect()->route('room.show', $room->id)
-            ->with('success', "{$room->name} was updated successfully.");
     }
 
     public function destroy(Room $room, EntrancePointService $entrancePointService)
     {
-        // CHANGE 6: Improve path cleanup for both room types
         if ($room->room_type === 'entrance_point') {
-            // Use the service method for entrance gates (already exists)
             $entrancePointService->removeEntrancePointPaths($room);
         } else {
-            // CHANGE 7: Add path cleanup for regular rooms too
-            // Remove all paths connected to this regular room
             Path::where('from_room_id', $room->id)
                 ->orWhere('to_room_id', $room->id)
                 ->delete();
         }
 
-        // Soft delete the room (images are soft-deleted via cascade, video_path remains untouched)
         $room->delete();
 
         return redirect()->route('room.index')
@@ -390,35 +437,28 @@ class RoomController extends Controller
     {
         $room = Room::onlyTrashed()->findOrFail($id);
 
-        // Restore the room
         $room->restore();
         $room->refresh();
 
-        // Restore images
         RoomImage::onlyTrashed()->where('room_id', $room->id)->restore();
 
-        // Restore old paths (same IDs)
         Path::onlyTrashed()
             ->where('from_room_id', $room->id)
             ->orWhere('to_room_id', $room->id)
             ->restore();
 
-        // Regenerate QR code if missing
         if (!$room->qr_code_path || !Storage::disk('public')->exists($room->qr_code_path)) {
             $marker_id = 'room_' . $room->id;
             $qrImage = QrCode::format('svg')->size(300)->generate($room->token);
-            $qrPath = 'offices/' . $room->id . '/qrcodes/' . $marker_id . '.svg';
+            $qrPath = "offices/{$room->id}/qrcodes/{$marker_id}.svg";
             Storage::disk('public')->put($qrPath, $qrImage);
 
             $room->update([
-                'marker_id'    => $marker_id,
+                'marker_id' => $marker_id,
                 'qr_code_path' => $qrPath,
             ]);
         }
 
-        /**
-         * Ensure the restored room is also connected to any NEW rooms
-         */
         if ($room->room_type === 'entrance_point') {
             $entrancePointService->reconnectEntrancePoint($room);
         } else {
@@ -429,19 +469,16 @@ class RoomController extends Controller
             ->with('success', 'Room and paths restored successfully, including connections to new rooms.');
     }
 
-
     public function forceDelete($id)
     {
         $room = Room::onlyTrashed()->findOrFail($id);
 
-        // Delete files
         foreach ([$room->image_path, $room->video_path, $room->qr_code_path] as $path) {
             if ($path && Storage::disk('public')->exists($path)) {
                 Storage::disk('public')->delete($path);
             }
         }
 
-        // Delete carousel images
         foreach ($room->images()->withTrashed()->get() as $image) {
             if ($image->image_path && Storage::disk('public')->exists($image->image_path)) {
                 Storage::disk('public')->delete($image->image_path);
@@ -460,7 +497,7 @@ class RoomController extends Controller
         if ($image->image_path && Storage::disk('public')->exists($image->image_path)) {
             Storage::disk('public')->delete($image->image_path);
         }
-        $image->forceDelete(); // Permanently delete
+        $image->forceDelete();
 
         return back()->with('success', 'Image removed successfully.');
     }
@@ -473,13 +510,8 @@ class RoomController extends Controller
     public function assign(Request $request, $roomId = null)
     {
         $rooms = Room::all();
-
-        // Use route parameter first, then query parameter, then default
         $roomId = $roomId ?? $request->query('roomId') ?? ($rooms->first()->id ?? null);
         $selectedRoom = $roomId ? Room::find($roomId) : null;
-        $staff = Staff::with('room')->get();
-
-        // Paginate staff
         $staff = Staff::with('room')->paginate(12);
 
         return view('pages.admin.rooms.assign', compact('rooms', 'staff', 'selectedRoom'));
@@ -496,10 +528,7 @@ class RoomController extends Controller
         $roomId = $request->room_id;
         $staffIds = $request->staff_ids ?? [];
 
-        // Get currently assigned staff
         $currentlyAssigned = Staff::where('room_id', $roomId)->pluck('id')->toArray();
-
-        // Determine who to unassign and assign
         $toUnassign = array_diff($currentlyAssigned, $staffIds);
         $toAssign = array_diff($staffIds, $currentlyAssigned);
 
@@ -510,25 +539,15 @@ class RoomController extends Controller
             Staff::whereIn('id', $toAssign)->update(['room_id' => $roomId]);
         }
 
-        // Re-fetch the correct room by ID to guarantee we have the name
         $room = Room::findOrFail($roomId);
-
-        // Get all staff models that were just assigned
-        // Eloquent won’t let you pluck('full_name') because it’s an accessor, not a real DB column.
-        // So instead, fetch and map.
-        // That way it uses your accessor properly.
         $assignedStaff = Staff::whereIn('id', $toAssign)
             ->get()
             ->map(fn($s) => $s->full_name)
             ->toArray();
 
-        // Build message
         $staffNames = !empty($assignedStaff) ? implode(', ', $assignedStaff) : 'No staff';
-
-        // Get current page from request
         $page = $request->input('page', 1);
 
-        // Redirect with both roomId and page parameters
         return redirect()
             ->route('room.assign', ['roomId' => $room->id])
             ->with('success', "{$staffNames} was successfully assigned to {$room->name}.")
@@ -538,15 +557,12 @@ class RoomController extends Controller
     public function removeFromRoom(Request $request, $id)
     {
         $staff = Staff::findOrFail($id);
-        $room = $staff->room; // assumes Staff has a belongsTo(Room::class) relationship
-
+        $room = $staff->room;
         $name = $staff->full_name;
 
         $staff->room_id = null;
         $staff->save();
 
-        // Preserve pagination page after the page reload
-        // Get page from request or session
         $page = $request->input('page') ?? session('current_page', 1);
 
         return redirect()
@@ -559,5 +575,45 @@ class RoomController extends Controller
     {
         $exists = Room::where('name', $request->name)->exists();
         return response()->json(['exists' => $exists]);
+    }
+
+    /**
+     * Process and save an uploaded image with optimization
+     */
+    private function processAndSaveImage($file, $folder)
+    {
+        $baseName = uniqid('', true);
+        $webpPath = "{$folder}/{$baseName}.webp";
+
+        $image = $this->manager->read($file);
+
+        // Resize if too large
+        $width = $image->width();
+        $height = $image->height();
+        $maxDimension = 2000;
+
+        if ($width > $maxDimension || $height > $maxDimension) {
+            if ($width > $height) {
+                $image->scale(width: $maxDimension);
+            } else {
+                $image->scale(height: $maxDimension);
+            }
+        }
+
+        // Adjust quality based on file size
+        $quality = 80;
+        if ($file->getSize() > 5 * 1024 * 1024) {
+            $quality = 70;
+        } elseif ($file->getSize() > 2 * 1024 * 1024) {
+            $quality = 75;
+        }
+
+        $encodedImage = $image->encode(new WebpEncoder($quality));
+        unset($image);
+
+        Storage::disk('public')->put($webpPath, (string) $encodedImage);
+        unset($encodedImage);
+
+        return $webpPath;
     }
 }
