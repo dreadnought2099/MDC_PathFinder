@@ -11,8 +11,7 @@
                 <span class="text-primary">Upload</span> Path Images
             </h2>
 
-            <form id="uploadForm" action="{{ route('path-image.store') }}" method="POST" enctype="multipart/form-data"
-                data-upload>
+            <form id="uploadForm" action="{{ route('path-image.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 {{-- Path Selector --}}
                 <div class="mb-4 dark:text-gray-300">
@@ -33,9 +32,10 @@
                     class="flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary dark:hover:bg-gray-800 transition-colors p-4 overflow-auto relative">
                     <span class="text-gray-600 dark:text-gray-300 mb-2">Drop images here or click to browse</span>
                     <span class="text-xs text-gray-400">
-                        JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 5 MB each | multiple allowed
+                        JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 10 MB each | multiple allowed
                     </span>
-                    <input type="file" name="files[]" id="fileInput" multiple accept="image/*" class="hidden">
+
+                    <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
                 </label>
 
                 <div id="fileError" class="text-red-500 text-sm mt-2 hidden"></div>
@@ -50,13 +50,13 @@
 
             {{-- Upload Modal --}}
             <div id="uploadModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
-                <div class="bg-white rounded p-6 w-96 shadow-lg">
-                    <h2 class="text-lg mb-4">Uploading...</h2>
-                    <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden relative">
+                <div class="bg-white dark:bg-gray-800 rounded p-6 w-96 shadow-lg">
+                    <h2 class="text-lg mb-4 dark:text-gray-300">Uploading...</h2>
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden relative">
                         <div id="progressBar" class="h-4 rounded-full bg-primary transition-all duration-300 ease-out"
                             style="width: 0%"></div>
                     </div>
-                    <p id="progressText" class="mt-2 text-sm text-gray-600">0%</p>
+                    <p id="progressText" class="mt-2 text-sm text-gray-600 dark:text-gray-400">0%</p>
                 </div>
             </div>
         </div>
@@ -75,13 +75,24 @@
             let files = [];
             let isSubmitting = false;
 
+            // ===== CONFIGURATION =====
+            const MAX_FILES = 20; // Maximum number of files per upload
+            const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB per file (reduced for safety)
+            const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // 100MB total (reduced)
+            const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif',
+                'image/bmp', 'image/svg+xml', 'image/webp'
+            ];
+
+            // Client-side compression settings
+            const COMPRESS_ENABLED = true; // Enable client-side compression
+            const MAX_DIMENSION = 2000; // Max width/height before compression
+            const COMPRESSION_QUALITY = 0.85; // JPEG/WebP quality (0-1)
+
             // Session storage key
             const STORAGE_KEY = 'selected_path_id';
-
-            // Get the base URL from Laravel (more robust than hardcoding)
             const createRouteBase = "{{ url('/admin/path-images/create') }}";
 
-            // Load saved path selection from sessionStorage
+            // Load saved path selection
             function loadSavedPathSelection() {
                 const savedPathId = sessionStorage.getItem(STORAGE_KEY);
                 if (savedPathId) {
@@ -92,58 +103,248 @@
                 }
             }
 
-            // Save path selection to sessionStorage
+            // Save path selection
             function savePathSelection() {
                 sessionStorage.setItem(STORAGE_KEY, pathSelect.value);
             }
 
-            // Handle path selection change - redirect to maintain URL consistency
+            // Handle path selection change
             function handlePathChange() {
                 const selectedPathId = pathSelect.value;
-                console.log('Selected Path ID:', selectedPathId);
-                console.log('Create Route Base:', createRouteBase);
-
                 if (selectedPathId) {
                     savePathSelection();
                     const newUrl = `${createRouteBase}/${selectedPathId}`;
-                    console.log('Redirecting to:', newUrl);
-                    // Redirect to the create route with the selected path
                     window.location.href = newUrl;
                 }
             }
 
-            // Handle path selection change
-            pathSelect.addEventListener('change', function() {
-                console.log('Dropdown changed!');
-                handlePathChange();
-            });
+            pathSelect.addEventListener('change', handlePathChange);
 
             function updateSubmitButton() {
                 submitBtn.disabled = files.length === 0 || isSubmitting;
+
+                // Update button text with file count
+                if (files.length > 0) {
+                    submitBtn.textContent = `Upload ${files.length} Image${files.length > 1 ? 's' : ''}`;
+                } else {
+                    submitBtn.textContent = 'Upload Images';
+                }
+            }
+
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+            }
+
+            function getTotalSize() {
+                return files.reduce((total, file) => total + file.size, 0);
+            }
+
+            function validateFiles(newFiles) {
+                const errors = [];
+                const currentCount = files.length;
+                const potentialTotal = currentCount + newFiles.length;
+
+                // Check file count limit
+                if (potentialTotal > MAX_FILES) {
+                    errors.push(
+                        `Maximum ${MAX_FILES} files allowed. Currently selected: ${currentCount}, trying to add: ${newFiles.length}`
+                    );
+                    return {
+                        valid: false,
+                        errors,
+                        validFiles: []
+                    };
+                }
+
+                const validFiles = [];
+
+                newFiles.forEach(file => {
+                    // Check file type
+                    if (!ALLOWED_TYPES.includes(file.type)) {
+                        errors.push(`"${file.name}" - Invalid file type. Only images are allowed.`);
+                        return;
+                    }
+
+                    // Check individual file size
+                    if (file.size > MAX_FILE_SIZE) {
+                        errors.push(
+                            `"${file.name}" - File too large (${formatFileSize(file.size)}). Maximum ${formatFileSize(MAX_FILE_SIZE)} per file.`
+                        );
+                        return;
+                    }
+
+                    // Check if file already exists
+                    const exists = files.some(f => f.name === file.name && f.size === file.size);
+                    if (exists) {
+                        errors.push(`"${file.name}" - Already added.`);
+                        return;
+                    }
+
+                    validFiles.push(file);
+                });
+
+                // Check total size after adding valid files
+                const currentSize = getTotalSize();
+                const newFilesSize = validFiles.reduce((total, file) => total + file.size, 0);
+                const totalSize = currentSize + newFilesSize;
+
+                if (totalSize > MAX_TOTAL_SIZE) {
+                    errors.push(
+                        `Total size would exceed ${formatFileSize(MAX_TOTAL_SIZE)}. Current: ${formatFileSize(currentSize)}, trying to add: ${formatFileSize(newFilesSize)}`
+                    );
+                    return {
+                        valid: false,
+                        errors,
+                        validFiles: []
+                    };
+                }
+
+                return {
+                    valid: errors.length === 0,
+                    errors,
+                    validFiles
+                };
+            }
+
+            function showError(messages) {
+                const fileError = document.getElementById('fileError');
+                fileError.innerHTML = messages.map(msg => `<div>⚠ ${msg}</div>`).join('');
+                fileError.classList.remove('hidden');
+
+                // Auto-hide after 8 seconds
+                setTimeout(() => {
+                    fileError.classList.add('hidden');
+                }, 8000);
+            }
+
+            // Client-side image compression
+            async function compressImage(file) {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+
+                    reader.onload = (e) => {
+                        const img = new Image();
+
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            let width = img.width;
+                            let height = img.height;
+
+                            // Calculate new dimensions if image is too large
+                            if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+                                if (width > height) {
+                                    height = Math.round((height * MAX_DIMENSION) / width);
+                                    width = MAX_DIMENSION;
+                                } else {
+                                    width = Math.round((width * MAX_DIMENSION) / height);
+                                    height = MAX_DIMENSION;
+                                }
+                            }
+
+                            canvas.width = width;
+                            canvas.height = height;
+
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+
+                            // Convert to blob
+                            canvas.toBlob(
+                                (blob) => {
+                                    // Only use compressed version if it's smaller
+                                    if (blob && blob.size < file.size) {
+                                        const compressedFile = new File([blob], file.name, {
+                                            type: 'image/jpeg',
+                                            lastModified: Date.now()
+                                        });
+                                        resolve(compressedFile);
+                                    } else {
+                                        resolve(file);
+                                    }
+                                },
+                                'image/jpeg',
+                                COMPRESSION_QUALITY
+                            );
+                        };
+
+                        img.src = e.target.result;
+                    };
+
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            async function processFilesWithCompression(filesToProcess) {
+                const fileError = document.getElementById('fileError');
+                let compressionInfo = [];
+
+                // Show processing indicator
+                fileError.innerHTML = '<div class="text-blue-600">⏳ Compressing images...</div>';
+                fileError.classList.remove('hidden');
+
+                for (const file of filesToProcess) {
+                    try {
+                        const originalSize = file.size;
+                        const compressed = await compressImage(file);
+                        const savedBytes = originalSize - compressed.size;
+
+                        if (savedBytes > 0) {
+                            compressionInfo.push(
+                                `"${file.name}" compressed: ${formatFileSize(originalSize)} → ${formatFileSize(compressed.size)}`
+                            );
+                        }
+
+                        files.push(compressed);
+                    } catch (error) {
+                        console.error('Compression failed for', file.name, error);
+                        files.push(file); // Use original if compression fails
+                    }
+                }
+
+                fileError.classList.add('hidden');
+
+                // Show compression results if any files were compressed
+                if (compressionInfo.length > 0) {
+                    const successDiv = document.createElement('div');
+                    successDiv.className =
+                        'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded p-3 text-sm text-green-800 dark:text-green-200 mt-2';
+                    successDiv.innerHTML = `
+                <div class="font-semibold mb-1">✓ Images optimized for upload:</div>
+                ${compressionInfo.map(info => `<div class="text-xs">${info}</div>`).join('')}
+            `;
+                    selectedFilesContainer.insertAdjacentElement('beforebegin', successDiv);
+                    setTimeout(() => successDiv.remove(), 8000);
+                }
+
+                renderPreviews();
+                updateSubmitButton();
             }
 
             function addFiles(newFiles) {
                 const fileError = document.getElementById('fileError');
                 fileError.classList.add('hidden');
-                let errorMessages = [];
 
-                newFiles.forEach(file => {
-                    if (!file.type.startsWith('image/')) {
-                        errorMessages.push(`File ${file.name} is not an image.`);
-                    } else if (file.size > 50 * 1024 * 1024) {
-                        errorMessages.push(`File ${file.name} exceeds 50MB.`);
-                    } else {
-                        files.push(file);
-                    }
-                });
+                const validation = validateFiles(newFiles);
 
-                if (errorMessages.length) {
-                    fileError.textContent = errorMessages.join(' ');
-                    fileError.classList.remove('hidden');
+                if (validation.errors.length > 0) {
+                    showError(validation.errors);
                 }
 
-                renderPreviews();
-                updateSubmitButton();
+                if (validation.validFiles.length > 0) {
+                    // Process files with compression if enabled
+                    if (COMPRESS_ENABLED) {
+                        processFilesWithCompression(validation.validFiles);
+                    } else {
+                        files.push(...validation.validFiles);
+                        renderPreviews();
+                        updateSubmitButton();
+                    }
+                }
+
+                fileInput.value = '';
             }
 
             function removeFile(index) {
@@ -156,33 +357,178 @@
                 selectedFilesContainer.innerHTML = '';
                 if (!files.length) return;
 
+                // Add info banner
+                const totalSize = getTotalSize();
+                const infoBanner = document.createElement('div');
+                infoBanner.className =
+                    'col-span-full bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded p-3 text-sm';
+                infoBanner.innerHTML = `
+            <div class="flex justify-between items-center text-blue-800 dark:text-blue-200">
+                <span><strong>${files.length}</strong> of ${MAX_FILES} files</span>
+                <span><strong>${formatFileSize(totalSize)}</strong> of ${formatFileSize(MAX_TOTAL_SIZE)}</span>
+            </div>
+        `;
+                selectedFilesContainer.appendChild(infoBanner);
+
                 files.forEach((file, index) => {
                     const reader = new FileReader();
                     const div = document.createElement('div');
-                    div.className = 'relative rounded overflow-hidden border shadow-sm';
+                    div.className = 'relative rounded overflow-hidden border shadow-sm group';
+
                     reader.onload = e => {
                         div.innerHTML = `
                     <img src="${e.target.result}" class="w-full h-24 object-cover">
-                    <button type="button" class="absolute top-1 right-1 bg-red-500 text-white w-5 h-5 rounded-full
-                    flex items-center justify-center text-xs hover:bg-red-600"
-                    onclick="removeFile(${index})">&times;</button>
+                    <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-1 truncate">
+                        ${file.name}
+                    </div>
+                    <div class="absolute top-1 left-1 bg-black/60 text-white text-xs px-1 rounded">
+                        ${formatFileSize(file.size)}
+                    </div>
+                    <button type="button" 
+                        class="absolute top-1 right-1 bg-red-500 text-white w-6 h-6 rounded-full
+                        flex items-center justify-center text-sm hover:bg-red-600 transition-colors
+                        opacity-0 group-hover:opacity-100"
+                        data-index="${index}" 
+                        title="Remove">
+                        ×
+                    </button>
                 `;
+
+                        const removeBtn = div.querySelector('button');
+                        removeBtn.addEventListener('click', function() {
+                            removeFile(parseInt(this.dataset.index));
+                        });
                     };
+
                     reader.readAsDataURL(file);
                     selectedFilesContainer.appendChild(div);
                 });
             }
-
-            // Make removeFile function global
-            window.removeFile = removeFile;
 
             // File input change handler
             fileInput.addEventListener('change', function() {
                 addFiles(Array.from(this.files));
             });
 
+            // Drag and drop support
+            const dropzone = fileInput.parentElement;
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, () => {
+                    dropzone.classList.add('border-primary', 'bg-primary/5');
+                });
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, () => {
+                    dropzone.classList.remove('border-primary', 'bg-primary/5');
+                });
+            });
+
+            dropzone.addEventListener('drop', function(e) {
+                const dt = e.dataTransfer;
+                const droppedFiles = Array.from(dt.files);
+                addFiles(droppedFiles);
+            });
+
+            // Handle form submission
+            uploadForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                if (isSubmitting || files.length === 0) {
+                    return;
+                }
+
+                // Final validation before upload
+                const totalSize = getTotalSize();
+                if (totalSize > MAX_TOTAL_SIZE) {
+                    showError([
+                        `Total size (${formatFileSize(totalSize)}) exceeds maximum allowed (${formatFileSize(MAX_TOTAL_SIZE)})`
+                    ]);
+                    return;
+                }
+
+                if (files.length > MAX_FILES) {
+                    showError([`Number of files (${files.length}) exceeds maximum allowed (${MAX_FILES})`]);
+                    return;
+                }
+
+                isSubmitting = true;
+                updateSubmitButton();
+
+                // Show upload modal
+                const modal = document.getElementById('uploadModal');
+                const progressBar = document.getElementById('progressBar');
+                const progressText = document.getElementById('progressText');
+                modal.classList.remove('hidden');
+
+                // Create FormData
+                const formData = new FormData();
+                formData.append('_token', document.querySelector('input[name="_token"]').value);
+                formData.append('path_id', pathSelect.value);
+
+                files.forEach(file => {
+                    formData.append('files[]', file);
+                });
+
+                // Upload with XMLHttpRequest
+                const xhr = new XMLHttpRequest();
+
+                xhr.upload.addEventListener('progress', function(e) {
+                    if (e.lengthComputable) {
+                        const percentComplete = Math.round((e.loaded / e.total) * 100);
+                        progressBar.style.width = percentComplete + '%';
+                        progressText.textContent =
+                            `${percentComplete}% (${formatFileSize(e.loaded)} / ${formatFileSize(e.total)})`;
+                    }
+                });
+
+                xhr.addEventListener('load', function() {
+                    if (xhr.status >= 200 && xhr.status < 400) {
+                        const pathId = pathSelect.value;
+                        window.location.href = `/admin/paths/${pathId}`;
+                    } else {
+                        modal.classList.add('hidden');
+                        showError(['Upload failed. Please try again.']);
+                        isSubmitting = false;
+                        updateSubmitButton();
+                    }
+                });
+
+                xhr.addEventListener('error', function() {
+                    modal.classList.add('hidden');
+                    showError(['Network error. Please check your connection and try again.']);
+                    isSubmitting = false;
+                    updateSubmitButton();
+                });
+
+                xhr.addEventListener('timeout', function() {
+                    modal.classList.add('hidden');
+                    showError([
+                        'Upload timeout. The files may be too large or your connection is slow.'
+                    ]);
+                    isSubmitting = false;
+                    updateSubmitButton();
+                });
+
+                xhr.open('POST', uploadForm.action);
+                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                xhr.timeout = 300000; // 5 minutes timeout
+                xhr.send(formData);
+            });
+
             // Initialize on page load
             loadSavedPathSelection();
+            updateSubmitButton();
         });
     </script>
 @endpush

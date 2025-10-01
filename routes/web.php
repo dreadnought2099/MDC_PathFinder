@@ -152,7 +152,7 @@ Route::middleware(['auth', 'role:Admin|Office Manager', '2fa'])->prefix('admin')
 
     Route::prefix('path-images')->name('path-image.')->group(function () {
         Route::get('/create/{path?}', [PathImageController::class, 'create'])->name('create');
-        Route::post('/create', [PathImageController::class, 'store'])->name('store');
+        Route::post('/', [PathImageController::class, 'store'])->name('store');
 
         // Path Images
         Route::get('/{path}/images/edit/{pathImage?}', [PathImageController::class, 'edit'])->name('edit');

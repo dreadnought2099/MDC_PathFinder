@@ -26,6 +26,10 @@ class PathImageController extends Controller
             'destroyMultiple',
             'updateOrder'
         ]);
+
+        $this->middleware('auth');
+        ini_set('memory_limit', '512M');
+        ini_set('max_execution_time', '300');
     }
 
     // Show form to upload images
@@ -54,8 +58,8 @@ class PathImageController extends Controller
 
         $request->validate([
             'path_id' => 'required|exists:paths,id',
-            'files'   => 'required|array|min:1',
-            'files.*' => 'required|image|max:51200', // 50MB
+            'files'   => 'required|array|min:1|max:20',
+            'files.*' => 'required|image|max:10240', // Reduced to 10MB for safety
         ]);
 
         $path = Path::findOrFail($request->path_id);
@@ -64,29 +68,99 @@ class PathImageController extends Controller
 
         $manager = new ImageManager(new Driver());
 
-        foreach ($files as $file) {
-            // Get original extension
-            strtolower($file->getClientOriginalExtension());
-            $baseName    = uniqid('', true);
+        // Track successful uploads
+        $uploadedCount = 0;
+        $errors = [];
 
-            $folder      = "path_images/{$path->id}";
-            $webpPath    = "{$folder}/{$baseName}.webp";
+        foreach ($files as $index => $file) {
+            try {
+                // Temporarily increase memory for this operation
+                $currentMemory = ini_get('memory_limit');
+                ini_set('memory_limit', '512M');
 
-            // Convert and save WebP
-            $image = $manager->read($file)->encode(new WebpEncoder(70));
+                $baseName = uniqid('', true);
+                $folder = "path_images/{$path->id}";
+                $webpPath = "{$folder}/{$baseName}.webp";
 
-            Storage::disk('public')->put($webpPath, (string) $image);
+                // Read and resize image to prevent memory issues
+                $image = $manager->read($file);
 
-            PathImage::create([
-                'path_id'       => $path->id,
-                'image_file'    => $webpPath,     // WebP
-                'image_order'   => ++$nextOrder,
-            ]);
+                // Get original dimensions
+                $width = $image->width();
+                $height = $image->height();
+
+                // Resize if image is too large (max 2000px on longest side)
+                $maxDimension = 2000;
+                if ($width > $maxDimension || $height > $maxDimension) {
+                    if ($width > $height) {
+                        $image->scale(width: $maxDimension);
+                    } else {
+                        $image->scale(height: $maxDimension);
+                    }
+                }
+
+                // Encode to WebP with quality adjustment based on size
+                $quality = 70;
+                if ($file->getSize() > 5 * 1024 * 1024) { // If > 5MB
+                    $quality = 60; // Lower quality for larger files
+                }
+
+                $encodedImage = $image->encode(new WebpEncoder($quality));
+
+                // Free memory
+                unset($image);
+
+                Storage::disk('public')->put($webpPath, (string) $encodedImage);
+
+                // Free memory
+                unset($encodedImage);
+
+                PathImage::create([
+                    'path_id'     => $path->id,
+                    'image_file'  => $webpPath,
+                    'image_order' => ++$nextOrder,
+                ]);
+
+                $uploadedCount++;
+
+                // Restore original memory limit
+                ini_set('memory_limit', $currentMemory);
+
+                // Force garbage collection after each image
+                gc_collect_cycles();
+            } catch (\Exception $e) {
+                // Restore memory limit on error
+                if (isset($currentMemory)) {
+                    ini_set('memory_limit', $currentMemory);
+                }
+
+                $errors[] = "Failed to upload {$file->getClientOriginalName()}: " . $e->getMessage();
+
+                // Log the error
+                \Log::error("Image upload failed", [
+                    'file' => $file->getClientOriginalName(),
+                    'size' => $file->getSize(),
+                    'error' => $e->getMessage()
+                ]);
+
+                // Continue with next file instead of failing completely
+                continue;
+            }
+        }
+
+        // Build success message
+        $message = "{$uploadedCount} image(s) uploaded successfully.";
+
+        if (count($errors) > 0) {
+            return redirect()
+                ->route('path.show', $path)
+                ->with('warning', $message . ' However, ' . count($errors) . ' file(s) failed.')
+                ->withErrors($errors);
         }
 
         return redirect()
             ->route('path.show', $path)
-            ->with('success', "Images uploaded successfully.");
+            ->with('success', $message);
     }
 
 
