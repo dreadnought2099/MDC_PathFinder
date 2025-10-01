@@ -49,11 +49,8 @@
                                 class="px-3 sm:px-4 md:px-6 py-2 sm:py-3 text-left uppercase tracking-wide text-gray-700 dark:text-gray-300">
                                 To Room</th>
                             <th
-                                class="px-3 sm:px-4 md:px-6 py-2 sm:py-3 text-left uppercase tracking-wide text-gray-700 dark:text-gray-300">
+                                class="px-3 sm:px-4 md:px-6 py-2 sm:py-3 text-left uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs sm:text-xs md:text-xs">
                                 Path Direction</th>
-                            <th
-                                class="px-3 sm:px-4 md:px-6 py-2 sm:py-3 text-left uppercase tracking-wide text-gray-700 dark:text-gray-300">
-                                Created At</th>
                             <th
                                 class="px-3 sm:px-4 md:px-6 py-2 sm:py-3 text-right uppercase tracking-wide text-gray-700 dark:text-gray-300">
                                 Actions</th>
@@ -82,19 +79,14 @@
                                     </td>
 
                                     <!-- Path Direction -->
-                                    <td class="px-3 sm:px-4 md:px-6 py-3 text-xs sm:text-sm text-gray-500">
+                                    <td class="px-3 sm:px-4 md:px-6 py-3 text-[11px] sm:text-xs md:text-xs text-gray-500">
                                         {{ $path->fromRoom->name }} → {{ $path->toRoom->name }}
                                         @if ($hasImage)
                                             <span
-                                                class="ml-2 px-2 py-0.5 text-[9px] sm:text-xs md:text-sm text-white bg-primary rounded-full whitespace-nowrap">
+                                                class="ml-2 px-2 py-0.5 text-[9px] sm:text-xs md:text-xs text-white bg-primary rounded-full whitespace-nowrap">
                                                 Image Uploaded
                                             </span>
                                         @endif
-                                    </td>
-
-                                    <!-- Created At -->
-                                    <td class="px-3 sm:px-4 md:px-6 py-3 text-xs sm:text-sm text-gray-500">
-                                        {{ $path->created_at ? $path->created_at->format('M d, Y H:i') : 'N/A' }}
                                     </td>
 
                                     <!-- Actions -->
