@@ -15,11 +15,6 @@ use App\Http\Controllers\ScannerController;
 use App\Http\Controllers\TokenController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
 
 Route::middleware(['web'])->group(function () {
 
@@ -37,6 +32,7 @@ Route::middleware(['web'])->group(function () {
 
     // Client-facing staff
     Route::get('/staffs/{staffToken}', [StaffController::class, 'clientShow'])->name('staff.client-show');
+    Route::get('/staff/search', [StaffController::class, 'search'])->name('search');
 
     // Client-side navigation
     Route::get('/navigation/select', [PathController::class, 'selection'])->name('paths.select');
@@ -45,7 +41,7 @@ Route::middleware(['web'])->group(function () {
 
     // Test error page
     Route::get('/test-error/{code}', function ($code) {
-        $allowedCodes = [401, 402, 403, 404, 419, 429, 500, 503];
+        $allowedCodes = [401, 402, 403, 404, 405, 419, 429, 500, 503];
         if (!in_array($code, $allowedCodes)) abort(400, 'Invalid test error code.');
         abort($code);
     });
@@ -57,6 +53,7 @@ Route::post('/admin', [LogInController::class, 'login']);
 
 // Routes available after login, before 2FA
 Route::middleware(['auth', 'role:Admin|Office Manager'])->group(function () {
+
     Route::get('/admin/2fa/verify', [TwoFactorController::class, 'showVerifyForm'])
         ->name('admin.2fa.showVerifyForm');
     Route::post('/admin/2fa/verify', [TwoFactorController::class, 'verifyOTP'])

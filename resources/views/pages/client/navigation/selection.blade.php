@@ -30,6 +30,20 @@
         <x-floating-q-r href="{{ route('scan.index') }}" icon="{{ asset('icons/qr-code.png') }}" alt="Scan Office"
             title="Scan office to know more" />
 
+        <div x-data="staffSearch()" class="relative w-full max-w-md">
+            <input type="text" x-model="query" @input.debounce.300ms="filterStaff" placeholder="Search staff..."
+                class="font-sofia w-full border rounded-lg p-2">
+
+            <ul x-show="results.length" class="absolute w-full bg-white border rounded mt-1 max-h-60 overflow-y-auto">
+                <template x-for="staff in results" :key="staff.id">
+                    <li @click="selectStaff(staff)" class="p-2 cursor-pointer hover:bg-primary hover:text-white">
+                        <span x-text="staff.name"></span>
+                        <small x-text="staff.room ? '(' + staff.room + ')' : ''" class="ml-2 text-gray-500"></small>
+                    </li>
+                </template>
+            </ul>
+        </div>
+
         <!-- Main content -->
         <div class="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8">
             <div class="w-full max-w-lg bg-white border-2 border-primary dark:bg-gray-800 shadow-lg rounded-md p-6">
@@ -44,6 +58,7 @@
                         <label for="from_room_search" class="block text-sm font-medium mb-2 dark:text-gray-300">
                             Starting Point
                         </label>
+
                         <div class="relative">
                             <input type="text" id="from_room_search" autocomplete="off"
                                 placeholder="Search or select an office"
@@ -52,7 +67,9 @@
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
+
                             <input type="hidden" id="from_room" name="from_room">
+                            
                             <div id="from_room_dropdown"
                                 class="hidden absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-primary rounded-lg shadow-lg max-h-60 overflow-y-auto">
                                 <div id="from_room_options" class="py-1">
@@ -63,6 +80,7 @@
                                         </div>
                                     @endforeach
                                 </div>
+
                                 <div id="from_room_no_results"
                                     class="hidden px-4 py-2 text-gray-500 dark:text-gray-400 text-sm">
                                     No office found
@@ -76,6 +94,7 @@
                         <label for="to_room_search" class="block text-sm font-medium mb-2 dark:text-gray-300">
                             Destination
                         </label>
+
                         <div class="relative">
                             <input type="text" id="to_room_search" autocomplete="off"
                                 placeholder="Search or select an office"
@@ -84,7 +103,9 @@
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
+
                             <input type="hidden" id="to_room" name="to_room">
+
                             <div id="to_room_dropdown"
                                 class="hidden absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-primary rounded-lg shadow-lg max-h-60 overflow-y-auto">
                                 <div id="to_room_options" class="py-1">
@@ -95,6 +116,7 @@
                                         </div>
                                     @endforeach
                                 </div>
+
                                 <div id="to_room_no_results"
                                     class="hidden px-4 py-2 text-gray-500 dark:text-gray-400 text-sm">
                                     No office found
@@ -118,6 +140,36 @@
 
 @push('scripts')
     <script>
+        function staffSearch() {
+            return {
+                query: '',
+                results: [],
+                filterStaff() {
+                    if (this.query.length < 1) {
+                        this.results = [];
+                        return;
+                    }
+                    fetch(`/staff/search?q=${encodeURIComponent(this.query)}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            this.results = data;
+                        });
+                },
+                selectStaff(staff) {
+                    this.query = staff.name;
+                    this.results = [];
+
+                    if (staff.room) {
+                        const toSearchInput = document.getElementById('to_room_search');
+                        const toHiddenInput = document.getElementById('to_room');
+
+                        toHiddenInput.value = staff.room.id;
+                        toSearchInput.value = staff.room.name;
+                    }
+                }
+            }
+        }
+
         class Combobox {
             constructor(searchInputId, hiddenInputId, dropdownId, optionsContainerId, noResultsId, optionClass) {
                 this.searchInput = document.getElementById(searchInputId);

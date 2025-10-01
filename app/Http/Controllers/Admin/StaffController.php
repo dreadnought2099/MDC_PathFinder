@@ -186,4 +186,27 @@ class StaffController extends Controller
         $exists = Staff::where('email', $request->query('email'))->exists();
         return response()->json(['exists' => $exists]);
     }
+
+    public function search(Request $request)
+    {
+        $query = $request->query('q', '');
+
+        $staffs = Staff::with('room')
+            ->where('first_name', 'like', "%{$query}%")
+            ->orWhere('last_name', 'like', "%{$query}%")
+            ->orWhereRaw("concat(first_name, ' ', last_name) like ?", ["%{$query}%"])
+            ->limit(10)
+            ->get(['id', 'first_name', 'middle_name', 'last_name', 'suffix', 'room_id']);
+
+        // Format for frontend
+        $results = $staffs->map(function ($s) {
+            return [
+                'id' => $s->id,
+                'name' => $s->full_name,
+                'room' => $s->room ? ['id' => $s->room->id, 'name' => $s->room->name] : null,
+            ];
+        });
+
+        return response()->json($results);
+    }
 }
