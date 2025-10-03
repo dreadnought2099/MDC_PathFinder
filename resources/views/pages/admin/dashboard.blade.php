@@ -33,7 +33,7 @@
                         <div class="text-2xl lg:text-3xl font-bold text-green-600 mb-1 dark:text-green-400">
                             {{ $totalRooms }}
                         </div>
-                        <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Total Rooms</div>
+                        <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Total Offices</div>
                     </div>
 
                     <!-- Assignments -->

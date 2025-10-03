@@ -15,7 +15,7 @@ class DashboardController extends Controller
         $paths = Path::all();
         $user  = Auth::user();
 
-        if ($user->hasRole('name', 'Admin')) {
+        if ($user->hasRole('Admin')) {
             // Admin sees all rooms
             $totalRooms = Room::count();
         } else {
