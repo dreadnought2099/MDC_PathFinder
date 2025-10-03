@@ -1,12 +1,10 @@
-{{-- filepath: resources/views/pages/admin/rooms/edit.blade.php --}}
 @extends('layouts.app')
 
 @section('content')
     <x-floating-actions />
 
-    <div class="max-w-xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-6 dark:bg-gray-800">
-        <h2 class="text-2xl text-center mb-6 dark:text-gray-300"><span class="text-primary">Edit</span> {{ $room->name }}
-        </h2>
+    <div class="max-w-4xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-6 dark:bg-gray-800">
+        <h2 class="text-2xl text-center mb-6 dark:text-gray-300"><span class="text-primary">Edit</span> Office</h2>
 
         <x-upload-progress-modal>
             <form action="{{ route('room.update', $room->id) }}" method="POST" enctype="multipart/form-data" id="room-form">
@@ -20,179 +18,210 @@
                         'absolute cursor-text left-0 -top-3 text-sm font-sofia text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 mx-1 px-1 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3 peer-focus:text-primary peer-focus:text-sm peer-focus:bg-white dark:peer-focus:bg-gray-800 peer-focus:px-2 peer-focus:rounded-md';
                 @endphp
 
-                <div class="relative mb-4">
-                    <input type="text" name="name" id="name" placeholder="Office Name" class="{{ $inputClasses }}"
-                        value="{{ old('name', $room->name) }}" required>
-                    <label class="{{ $labelClasses }}">Office Name</label>
-                    <span id="name-feedback" class="text-red-500 text-sm"></span>
-                    @error('name')
-                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
+                <!-- Office Name and Room Type Row -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="relative">
+                        <input type="text" name="name" id="name" placeholder="Office Name"
+                            class="{{ $inputClasses }}" value="{{ old('name', $room->name) }}" required>
+                        <label class="{{ $labelClasses }}">Office Name</label>
+                        <span id="name-feedback" class="text-red-500 text-sm"></span>
+                        @error('name')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="relative">
+                        <select name="room_type" id="room_type"
+                            class="peer py-3 w-full font-sofia rounded-md text-gray-700 dark:text-gray-300 ring-1 px-4 ring-gray-500 dark:ring-gray-500 focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-white dark:bg-gray-800"
+                            required>
+                            <option value="" disabled hidden></option>
+                            <option value="regular"
+                                {{ old('room_type', $room->room_type) === 'regular' ? 'selected' : '' }}>
+                                Regular Office
+                            </option>
+                            <option value="entrance_point"
+                                {{ old('room_type', $room->room_type) === 'entrance_point' ? 'selected' : '' }}>
+                                Entrance Point
+                            </option>
+                        </select>
+                        <label class="{{ $labelClasses }}">Room Type</label>
+                        @error('room_type')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
+                    </div>
                 </div>
 
+                <!-- Room Type Info -->
+                <p class="text-sm text-gray-600 mb-4 dark:text-gray-300">
+                    Entrance gates automatically connect to all other rooms for navigation purposes.
+                </p>
+
+                <!-- Description (Full Width) -->
                 <div class="relative mb-4">
-                    <textarea name="description" placeholder="Description" class="{{ $inputClasses }}" rows="3">{{ old('description', $room->description) }}</textarea>
+                    <textarea name="description" id="description" placeholder="Description" class="{{ $inputClasses }}" rows="3">{{ old('description', $room->description) }}</textarea>
                     <label class="{{ $labelClasses }}">Description</label>
                     @error('description')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror
-                </div>
 
-                <div class="mb-4">
-                    <label class="block mb-2 font-medium dark:text-gray-300">Room Type</label>
-                    <select name="room_type" id="room_type"
-                        class="w-full border dark:text-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent border-gray-500 dark:bg-gray-800"
-                        required>
-                        <option value="regular" {{ old('room_type', $room->room_type) === 'regular' ? 'selected' : '' }}>
-                            Regular Office
-                        </option>
-                        <option value="entrance_point"
-                            {{ old('room_type', $room->room_type) === 'entrance_point' ? 'selected' : '' }}>
-                            Entrance Point
-                        </option>
-                    </select>
-                    <p class="text-sm text-gray-600 mt-1 dark:text-gray-300">
-                        Entrance gates automatically connect to all other rooms for navigation purposes.
-                    </p>
-                    @error('room_type')
-                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
-                </div>
-
-                {{-- Cover Image --}}
-                <div class="mb-4 conditional-field" id="cover-image-section">
-                    @if ($room->image_path && Storage::disk('public')->exists($room->image_path))
-                        <div class="mb-2">
-                            <label class="block mb-2 font-medium dark:text-gray-300">Current Cover Image</label>
-                            <img src="{{ Storage::url($room->image_path) }}" alt="Cover Image"
-                                class="w-48 rounded mb-2 border" />
-                            <label class="inline-flex items-center space-x-2">
-                                <input type="checkbox" name="remove_image_path" value="1" id="remove_image_path"
-                                    class="form-checkbox" />
-                                <span class="dark:text-gray-300">Remove Cover Image</span>
-                            </label>
+                    <!-- Description Preview with Read More/Less -->
+                    @if ($room->description && strlen($room->description) > 150)
+                        <div
+                            class="mt-3 p-3 bg-gray-50 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600">
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1 font-semibold">Current Description:</p>
+                            <div class="text-sm text-gray-700 dark:text-gray-300">
+                                <p id="descriptionPreview" class="description-preview">
+                                    {{ Str::limit($room->description, 150) }}
+                                </p>
+                                <p id="descriptionFull" class="description-full hidden">
+                                    {{ $room->description }}
+                                </p>
+                                <button type="button" id="toggleDescription"
+                                    class="text-primary hover:text-primary-dark font-medium text-xs mt-1 focus:outline-none">
+                                    Read more
+                                </button>
+                            </div>
+                        </div>
+                    @elseif($room->description)
+                        <div
+                            class="mt-3 p-3 bg-gray-50 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600">
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1 font-semibold">Current Description:</p>
+                            <p class="text-sm text-gray-700 dark:text-gray-300">{{ $room->description }}</p>
                         </div>
                     @endif
-                    <label class="block mb-2 dark:text-gray-300">Cover Image (optional, max 10MB)</label>
-                    <div id="uploadBox"
-                        class="flex flex-col items-center justify-center w-full h-40 
+                </div>
+
+                <!-- Media Uploads Row -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <!-- Cover Image -->
+                    <div class="conditional-field" id="cover-image-section">
+                        <label class="block mb-2 dark:text-gray-300">Cover Image (optional, max 10MB)</label>
+
+                        @if ($room->image_path)
+                            <div class="mb-2">
+                                <img src="{{ asset('storage/' . $room->image_path) }}" alt="Current cover"
+                                    class="w-full h-32 object-cover rounded">
+                                <label class="flex items-center mt-2 text-sm text-gray-600 dark:text-gray-300">
+                                    <input type="checkbox" name="remove_cover_image" value="1" class="mr-2">
+                                    Remove current image
+                                </label>
+                            </div>
+                        @endif
+
+                        <div id="uploadBox"
+                            class="flex flex-col items-center justify-center w-full h-40 
                         border-2 border-dashed border-gray-300 dark:border-gray-600 
                         rounded cursor-pointer hover:border-primary hover:bg-gray-50 
                         dark:hover:border-primary dark:hover:bg-gray-800
                         transition-colors overflow-hidden relative">
-                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
-                            alt="Image Icon" class="w-8 h-8" onerror="this.style.display='none'">
-                        <span id="uploadText" class="text-gray-500 dark:text-gray-300">
-                            Click to upload cover image
-                        </span>
-                        <img id="previewImage" class="absolute inset-0 object-cover w-full h-full hidden"
-                            alt="Image preview" />
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
+                                alt="Image Icon" class="w-8 h-8" onerror="this.style.display='none'">
+                            <span id="uploadText" class="text-gray-500 dark:text-gray-300 text-sm text-center px-2">
+                                Click to upload new cover image
+                            </span>
+                            <img id="previewImage" class="absolute inset-0 object-cover w-full h-full hidden"
+                                alt="Image preview" />
+                        </div>
+                        <input type="file" name="image_path" id="image_path" class="hidden" accept="image/*" />
+                        @error('image_path')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
                     </div>
-                    <input type="file" name="image_path" id="image_path" class="hidden" accept="image/*" />
-                    @error('image_path')
-                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
-                </div>
 
-                {{-- Carousel Images --}}
-                <div class="mb-4 max-w-xl mx-auto conditional-field" id="carousel-images-section">
-                    <label class="block mb-2 dark:text-gray-300">Carousel Images (optional, max 50 images, 10MB
-                        each)</label>
-                    <div id="carouselUploadBox"
-                        class="flex flex-col items-center justify-center w-full h-40 
+                    <!-- Video Upload -->
+                    <div class="conditional-field" id="video-section">
+                        <label class="block mb-2 dark:text-gray-300">Short Video (optional, max 50MB)</label>
+
+                        @if ($room->video_path)
+                            <div class="mb-2">
+                                <video src="{{ asset('storage/' . $room->video_path) }}"
+                                    class="w-full h-32 object-cover rounded" controls></video>
+                                <label class="flex items-center mt-2 text-sm text-gray-600 dark:text-gray-300">
+                                    <input type="checkbox" name="remove_video" value="1" class="mr-2">
+                                    Remove current video
+                                </label>
+                            </div>
+                        @endif
+
+                        <div id="videoDropZone"
+                            class="flex flex-col items-center justify-center w-full h-40 
                         border-2 border-dashed border-gray-300 dark:border-gray-600 
                         rounded cursor-pointer hover:border-primary hover:bg-gray-50 
                         dark:hover:border-primary dark:hover:bg-gray-800 transition-colors overflow-hidden relative">
-                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
-                            alt="Image Icon" class="w-8 h-8" onerror="this.style.display='none'">
-                        <span id="carouselUploadText" class="text-gray-500 mb-4 dark:text-gray-300">
-                            Click to upload images
-                        </span>
-                        <div id="carouselPreviewContainer" class="flex flex-wrap gap-3 w-full justify-start">
-                            {{-- Existing images --}}
-                            @if ($room->images && $room->images->count() > 0)
-                                @foreach ($room->images as $image)
-                                    @if (Storage::disk('public')->exists($image->image_path))
-                                        <div
-                                            class="relative w-24 h-24 rounded overflow-hidden shadow border {{ $image->trashed() ? 'border-red-400 opacity-50' : 'border-gray-300' }}">
-                                            <img src="{{ Storage::url($image->image_path) }}" alt="Carousel Image"
-                                                class="w-full h-full object-cover rounded" />
-                                            @if ($image->trashed())
-                                                <span
-                                                    class="absolute top-1 left-1 bg-yellow-600 text-white rounded px-1 text-xs">Deleted</span>
-                                            @else
-                                                <button type="button"
-                                                    class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow"
-                                                    onclick="toggleImageRemoval(this, {{ $image->id }})"
-                                                    title="Remove this image">
-                                                    &times;
-                                                </button>
-                                                <input type="checkbox" name="remove_images[]" value="{{ $image->id }}"
-                                                    class="hidden" />
-                                            @endif
-                                        </div>
-                                    @endif
-                                @endforeach
-                            @endif
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/video.png"
+                                alt="Video Icon" id="videoIcon" class="w-9 h-9" onerror="this.style.display='none'">
+                            <span id="videoUploadText" class="text-gray-500 dark:text-gray-300 text-sm text-center px-2">
+                                Drag & drop or click to select new video
+                            </span>
+                            <p class="text-xs text-gray-400 dark:text-gray-300">(mp4, avi, mpeg)</p>
+
+                            <div id="videoThumbnailPreview" class="absolute inset-0 hidden bg-black">
+                                <video id="videoThumbnail" class="w-full h-full object-cover"></video>
+                                <button type="button" id="removeVideoThumbnailBtn"
+                                    class="absolute top-2 right-2 bg-secondary text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-700 transition-colors text-lg z-10"
+                                    title="Remove video">&times;</button>
+                            </div>
                         </div>
+                        <input type="file" id="video_path" name="video_path" accept="video/mp4,video/avi,video/mpeg"
+                            class="hidden" />
+                        @error('video_path')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+
+                <!-- Carousel Images (Full Width) -->
+                <div class="mb-4 conditional-field" id="carousel-images-section">
+                    <label class="block mb-2 dark:text-gray-300">Carousel Images (optional, max 50 images, 10MB
+                        each)</label>
+
+                    @if ($room->carouselImages && $room->carouselImages->count() > 0)
+                        <div class="mb-4">
+                            <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Existing Images (click X to remove):
+                            </p>
+                            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                                @foreach ($room->carouselImages as $carouselImage)
+                                    <div class="relative group">
+                                        <img src="{{ asset('storage/' . $carouselImage->image_path) }}"
+                                            class="w-full h-20 object-cover rounded border">
+                                        <label
+                                            class="absolute top-1 right-1 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center cursor-pointer hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <input type="checkbox" name="remove_carousel_images[]"
+                                                value="{{ $carouselImage->id }}" class="hidden">
+                                            ×
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+                    <div id="carouselUploadBox"
+                        class="flex flex-col items-center justify-center w-full min-h-40 p-4
+                    border-2 border-dashed border-gray-300 dark:border-gray-600 
+                    rounded cursor-pointer hover:border-primary hover:bg-gray-50 
+                    dark:hover:border-primary dark:hover:bg-gray-800 transition-colors relative">
+                        <div id="carouselPlaceholder" class="text-center">
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
+                                alt="Image Icon" class="w-8 h-8 mx-auto" onerror="this.style.display='none'">
+                            <span id="carouselUploadText" class="text-gray-500 dark:text-gray-300 block mt-2">
+                                Click to upload additional images
+                            </span>
+                        </div>
+                        <div id="carouselPreviewContainer"
+                            class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 w-full mt-3"></div>
                     </div>
                     <input type="file" name="carousel_images[]" id="carousel_images" class="hidden"
                         accept="image/jpeg,image/jpg,image/png" multiple />
                     @error('carousel_images')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror
-                    @error('carousel_images.*')
-                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
                 </div>
 
-                {{-- Video --}}
-                <div class="mb-4 max-w-xl mx-auto conditional-field" id="video-section">
-                    @if ($room->video_path && Storage::disk('public')->exists($room->video_path))
-                        <div class="mb-2">
-                            <label class="block mb-2 font-medium dark:text-gray-300">Current Video</label>
-                            <video controls class="w-64 rounded mb-2 border">
-                                <source src="{{ Storage::url($room->video_path) }}" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
-                            <label class="inline-flex items-center space-x-2">
-                                <input type="checkbox" name="remove_video_path" value="1" id="remove_video_path"
-                                    class="form-checkbox" />
-                                <span class="dark:text-gray-300">Remove Video</span>
-                            </label>
-                        </div>
-                    @endif
-                    <label class="block mb-2 dark:text-gray-300">Short Video (optional, max 50MB)</label>
-                    <div id="videoDropZone"
-                        class="flex flex-col items-center justify-center w-full h-40 
-                        border-2 border-dashed border-gray-300 dark:border-gray-600 
-                        rounded cursor-pointer hover:border-primary hover:bg-gray-50 
-                        dark:hover:border-primary dark:hover:bg-gray-800 transition-colors overflow-hidden relative">
-                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/video.png"
-                            alt="Video Icon" class="w-9 h-9" onerror="this.style.display='none'">
-                        <p class="mb-2 dark:text-gray-300">Drag & drop a video file here or click to select</p>
-                        <p class="text-xs text-gray-400 dark:text-gray-300">(mp4, avi, mpeg)</p>
-                    </div>
-                    <input type="file" id="video_path" name="video_path" accept="video/mp4,video/avi,video/mpeg"
-                        class="hidden" />
-
-                    <div id="videoPreviewContainer"
-                        class="mt-4 hidden relative rounded border border-gray-300 overflow-hidden">
-                        <video id="videoPreview" controls class="w-full h-auto bg-black"></video>
-                        <button type="button" id="removeVideoBtn"
-                            class="absolute top-2 right-2 bg-secondary text-white rounded-full p-1 hover:bg-red-700 transition-colors"
-                            title="Remove video">&times;</button>
-                    </div>
-                    @error('video_path')
-                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
-                </div>
-
-                {{-- Office Hours --}}
+                <!-- Office Hours (same as create form) -->
                 <div class="mb-6 conditional-field" id="office-hours-section">
                     <label class="block font-semibold mb-2 dark:text-gray-300">Office Hours</label>
-                    {{-- (Copy the office hours section from create.blade.php, but pre-fill with $existingOfficeHours) --}}
-                    {{-- ... --}}
+
                     <div class="mb-6 p-4 border border-primary rounded dark:bg-gray-800">
                         <p class="font-semibold mb-3 dark:text-gray-300">Set Time Range for Multiple Days</p>
 
@@ -232,7 +261,7 @@
                         <div class="bulk-time-ranges mb-4">
                             <label class="block text-sm font-medium mb-2 dark:text-gray-300">Time Range:</label>
                             <div class="bulk-ranges-container">
-                                <div class="flex gap-2 mb-2 bulk-range-row">
+                                <div class="flex gap-2 mb-2 bulk-range-row max-w-md">
                                     <div class="relative flex-1">
                                         <input type="time"
                                             class="custom-time-input bulk-start-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary">
@@ -266,9 +295,14 @@
                     @enderror
                 </div>
 
-                <div>
+                <!-- Submit Button -->
+                <div class="flex justify-end gap-2">
+                    <a href="{{ route('room.index') }}"
+                        class="px-8 bg-gray-500 text-white py-2 rounded-md hover:bg-gray-600 transition-all duration-300">
+                        Cancel
+                    </a>
                     <button type="submit" id="submit-btn"
-                        class="w-full bg-primary text-white px-4 py-2 rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
+                        class="px-8 bg-primary text-white py-2 rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
                         Update Office
                     </button>
                 </div>
@@ -278,9 +312,15 @@
 @endsection
 
 @push('scripts')
-    {{-- Copy the entire <script> section from create.blade.php and adjust as needed for edit --}}
+    <script>
+        // Pre-load existing office hours data
+        const existingOfficeHours = @json($room->officeHours ?? []);
+    </script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // [COPY THE ENTIRE SCRIPT CONTENT FROM CREATE.BLADE.PHP - EVERYTHING INSIDE THE DOMContentLoaded FUNCTION]
+            // DO NOT copy the outer DOMContentLoaded wrapper itself
             let isUploading = false;
 
             window.onbeforeunload = function(e) {
@@ -480,16 +520,21 @@
             // Carousel images functionality
             const carouselInput = document.getElementById('carousel_images');
             const carouselUploadBox = document.getElementById('carouselUploadBox');
-            let carouselPreviewContainer = document.getElementById('carouselPreviewContainer');
-            if (!carouselPreviewContainer) {
-                carouselPreviewContainer = document.createElement('div');
-                carouselPreviewContainer.id = 'carouselPreviewContainer';
-                carouselPreviewContainer.className = 'grid grid-cols-2 md:grid-cols-3 gap-4 mt-4';
-                carouselUploadBox.parentNode.insertBefore(carouselPreviewContainer, carouselUploadBox.nextSibling);
-            }
+            const carouselPreviewContainer = document.getElementById('carouselPreviewContainer');
+
             let selectedFiles = [];
 
-            carouselUploadBox.addEventListener('click', () => carouselInput.click());
+            carouselUploadBox.addEventListener('click', function(e) {
+                // Only block if clicking directly on an image preview div or remove button
+                const clickedPreviewItem = e.target.closest('[data-carousel-index]');
+                const clickedRemoveBtn = e.target.closest('.remove-carousel-btn');
+
+                if (clickedPreviewItem || clickedRemoveBtn) {
+                    return; // Don't open file dialog when clicking on existing images
+                }
+
+                carouselInput.click(); // Open file dialog for everything else
+            });
 
             carouselInput.addEventListener('change', () => {
                 handleCarouselFiles(Array.from(carouselInput.files || []));
@@ -567,40 +612,39 @@
 
             function renderCarouselPreviews() {
                 carouselPreviewContainer.innerHTML = '';
+
                 selectedFiles.forEach((file, index) => {
                     const reader = new FileReader();
                     const div = document.createElement('div');
-                    div.className = 'relative rounded overflow-hidden border shadow-sm group';
+                    div.className = 'relative rounded overflow-hidden border shadow-sm group aspect-square';
+                    div.dataset.carouselIndex = index; // Add this for identification
+
                     reader.onload = e => {
                         div.innerHTML = `
-                    <img src="${e.target.result}" class="w-full h-24 object-cover">
-                    <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-1 truncate">
-                        ${file.name}
-                    </div>
-                    <div class="absolute top-1 left-1 bg-black/60 text-white text-xs px-1 rounded">
-                        ${(file.size / 1024 / 1024).toFixed(2)}MB
-                    </div>
-                    <button type="button" 
-                        class="absolute top-1 right-1 bg-red-500 text-white w-6 h-6 rounded-full
-                        flex items-center justify-center text-sm hover:bg-red-600 transition-colors
-                        opacity-0 group-hover:opacity-100"
-                        data-index="${index}" 
-                        title="Remove">
-                        ×
-                    </button>
-                `;
-                        const removeBtn = div.querySelector('button');
-                        removeBtn.addEventListener('click', function() {
-                            selectedFiles.splice(index, 1);
-                            renderCarouselPreviews();
-                            updateCarouselInputFiles();
-                        });
+                <img src="${e.target.result}" class="w-full h-full object-cover">
+                <div class="absolute inset-x-0 bottom-0 bg-black/60 text-white text-xs p-1 truncate">
+                    ${file.name}
+                </div>
+                <div class="absolute top-1 left-1 bg-black/60 text-white text-xs px-1 rounded">
+                    ${(file.size / 1024 / 1024).toFixed(2)}MB
+                </div>
+                <button type="button" 
+                    class="remove-carousel-btn absolute top-1 right-1 bg-red-500 text-white w-6 h-6 rounded-full
+                    flex items-center justify-center text-lg hover:bg-red-600 transition-colors
+                    opacity-0 group-hover:opacity-100"
+                    title="Remove">
+                    ×
+                </button>
+            `;
                     };
+
                     reader.readAsDataURL(file);
                     carouselPreviewContainer.appendChild(div);
                 });
-                updateUploadIconVisibility();
+
+                updateCarouselPlaceholderVisibility();
             }
+
 
             function updateCarouselInputFiles() {
                 const dt = new DataTransfer();
@@ -616,84 +660,136 @@
                 if (text) text.style.display = display;
             }
 
+            function updateCarouselPlaceholderVisibility() {
+                const carouselPlaceholder = document.getElementById('carouselPlaceholder');
+                if (carouselPlaceholder) {
+                    carouselPlaceholder.style.display = selectedFiles.length > 0 ? 'none' : '';
+                }
+            }
+
             function resetCarouselImages() {
                 selectedFiles = [];
                 carouselPreviewContainer.innerHTML = '';
                 carouselInput.value = '';
-                updateUploadIconVisibility();
+                updateCarouselPlaceholderVisibility();
             }
+
+            // Event delegation for carousel remove buttons - DEBUGGING VERSION
+            carouselPreviewContainer.addEventListener('click', function(e) {
+
+                const removeBtn = e.target.closest('.remove-carousel-btn');
+
+                if (removeBtn) {
+                    e.stopPropagation();
+                    e.preventDefault();
+
+                    const carouselItem = removeBtn.closest('[data-carousel-index]');
+
+                    if (carouselItem) {
+                        const index = parseInt(carouselItem.dataset.carouselIndex);
+                        selectedFiles.splice(index, 1);
+                        renderCarouselPreviews();
+                        updateCarouselInputFiles();
+                    }
+                }
+            }, true); // Added capture phase
 
 
             // Video upload functionality
             const maxVideoSizeMB = 50;
             const allowedVideoTypes = ['video/mp4', 'video/avi', 'video/mpeg'];
 
-            const dropZone = document.getElementById('videoDropZone');
+            const videoDropZone = document.getElementById('videoDropZone');
             const videoInput = document.getElementById('video_path');
-            const videoPreviewContainer = document.getElementById('videoPreviewContainer');
-            const videoPreview = document.getElementById('videoPreview');
-            const removeVideoBtn = document.getElementById('removeVideoBtn');
+            const videoThumbnailPreview = document.getElementById('videoThumbnailPreview');
+            const videoThumbnail = document.getElementById('videoThumbnail');
+            const removeVideoThumbnailBtn = document.getElementById('removeVideoThumbnailBtn');
+            const videoIcon = document.getElementById('videoIcon');
+            const videoUploadText = document.getElementById('videoUploadText');
+            const videoFormatText = videoDropZone.querySelector('p.text-xs');
 
-            dropZone.addEventListener('click', () => videoInput.click());
+            videoDropZone.addEventListener('click', (e) => {
+                // Don't open file dialog if clicking on the remove button
+                if (e.target.closest('#removeVideoThumbnailBtn')) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    return;
+                }
+                videoInput.click();
+            });
 
             videoInput.addEventListener('change', () => {
                 if (videoInput.files && videoInput.files[0]) {
-                    showVideoPreview(videoInput.files[0]);
+                    showVideoThumbnailPreview(videoInput.files[0]);
                 }
             });
 
-            dropZone.addEventListener('dragover', e => {
+            videoDropZone.addEventListener('dragover', e => {
                 e.preventDefault();
-                dropZone.classList.add('border-primary', 'bg-gray-50');
+                videoDropZone.classList.add('border-primary', 'bg-gray-50');
             });
 
-            dropZone.addEventListener('dragleave', e => {
+            videoDropZone.addEventListener('dragleave', e => {
                 e.preventDefault();
-                dropZone.classList.remove('border-primary', 'bg-gray-50');
+                videoDropZone.classList.remove('border-primary', 'bg-gray-50');
             });
 
-            dropZone.addEventListener('drop', e => {
+            videoDropZone.addEventListener('drop', e => {
                 e.preventDefault();
-                dropZone.classList.remove('border-primary', 'bg-gray-50');
+                videoDropZone.classList.remove('border-primary', 'bg-gray-50');
 
                 if (e.dataTransfer.files && e.dataTransfer.files[0]) {
                     videoInput.files = e.dataTransfer.files;
-                    showVideoPreview(e.dataTransfer.files[0]);
+                    showVideoThumbnailPreview(e.dataTransfer.files[0]);
                 }
             });
 
-            removeVideoBtn.addEventListener('click', () => {
-                clearVideo();
+            removeVideoThumbnailBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                clearVideoThumbnail();
                 videoInput.value = '';
             });
 
-            function showVideoPreview(file) {
+            function showVideoThumbnailPreview(file) {
                 // Size check
                 if (file.size / 1024 / 1024 > maxVideoSizeMB) {
-                    showTemporaryMessage(`"${file.name}" is too large. Max size is ${maxVideoSizeMB} MB.`);
-                    clearVideo();
+                    showTemporaryMessage(`"${file.name}" is too large. Max size is ${maxVideoSizeMB} MB.`, 'error');
+                    clearVideoThumbnail();
                     videoInput.value = '';
                     return;
                 }
 
                 // Type check
                 if (!allowedVideoTypes.includes(file.type)) {
-                    showTemporaryMessage(`"${file.name}" is not a valid format. Only MP4, AVI, or MPEG allowed.`);
-                    clearVideo();
+                    showTemporaryMessage(`"${file.name}" is not a valid format. Only MP4, AVI, or MPEG allowed.`,
+                        'error');
+                    clearVideoThumbnail();
                     videoInput.value = '';
                     return;
                 }
 
-                // Show preview if valid
+                // Show thumbnail preview
                 const url = URL.createObjectURL(file);
-                videoPreview.src = url;
-                videoPreviewContainer.classList.remove('hidden');
+                videoThumbnail.src = url;
+                videoThumbnailPreview.classList.remove('hidden');
+
+                // Hide upload icon and text
+                if (videoIcon) videoIcon.style.display = 'none';
+                if (videoUploadText) videoUploadText.style.display = 'none';
+                if (videoFormatText) videoFormatText.style.display = 'none';
             }
 
-            function clearVideo() {
-                videoPreview.src = '';
-                videoPreviewContainer.classList.add('hidden');
+            function clearVideoThumbnail() {
+                videoThumbnail.src = '';
+                videoThumbnailPreview.classList.add('hidden');
+
+                // Show upload icon and text again
+                if (videoIcon) videoIcon.style.display = '';
+                if (videoUploadText) videoUploadText.style.display = '';
+                if (videoFormatText) videoFormatText.style.display = '';
             }
+
 
             // Validation functions
             function validateImageFile(file, showError = true) {
@@ -729,42 +825,6 @@
                 setTimeout(() => {
                     msgDiv.style.display = 'none';
                 }, 3500);
-            }
-
-            // Compress all images before final form submission
-            async function compressCarouselImages(newFiles) {
-                showTemporaryMessage(`Compressing ${newFiles.length} image(s)...`, 'info');
-                try {
-                    const compressedFiles = [];
-                    for (let i = 0; i < newFiles.length; i++) {
-                        const file = newFiles[i];
-                        try {
-                            const compressedFile = await compressImageCanvas(file, 2000, 0.85);
-                            const finalFile = new File([compressedFile], file.name, {
-                                type: compressedFile.type,
-                                lastModified: Date.now()
-                            });
-                            compressedFileNames.add(file.name);
-                            compressedFiles.push(finalFile);
-                        } catch (error) {
-                            console.error(`Failed to compress ${file.name}:`, error);
-                            compressedFiles.push(file);
-                        }
-                    }
-                    selectedFiles = selectedFiles.concat(compressedFiles);
-                    renderCarouselPreviews();
-                    updateCarouselInputFiles();
-                    const totalOriginalSize = newFiles.reduce((sum, f) => sum + f.size, 0) / 1024 / 1024;
-                    const totalCompressedSize = compressedFiles.reduce((sum, f) => sum + f.size, 0) / 1024 /
-                        1024;
-                    showTemporaryMessage(
-                        `${newFiles.length} image(s) compressed: ${totalOriginalSize.toFixed(2)}MB → ${totalCompressedSize.toFixed(2)}MB`,
-                        'success'
-                    );
-                } catch (error) {
-                    console.error('Batch compression failed:', error);
-                    showTemporaryMessage('Some images could not be compressed', 'error');
-                } finally {}
             }
 
             async function compressAndSubmitForm() {
@@ -1126,17 +1186,17 @@
                                 <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                             </div>
                             ${rangeKey !== "closed" ? `
-                                                                                                                                                            <div class="flex gap-2 ml-4">
-                                                                                                                                                                <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                                                                                                        data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                                                                                                                                                    Edit
-                                                                                                                                                                </button>
-                                                                                                                                                                <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                                                                                                        data-days='${JSON.stringify(group.days)}'>
-                                                                                                                                                                    Delete
-                                                                                                                                                                </button>
-                                                                                                                                                            </div>
-                                                                                                                                                        ` : ''}
+                                                                                                                                                                                                                        <div class="flex gap-2 ml-4">
+                                                                                                                                                                                                                            <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                                                                                                                                                    data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                                                                                                                                                                                                Edit
+                                                                                                                                                                                                                            </button>
+                                                                                                                                                                                                                            <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                                                                                                                                                    data-days='${JSON.stringify(group.days)}'>
+                                                                                                                                                                                                                                Delete
+                                                                                                                                                                                                                            </button>
+                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                    ` : ''}
                         </div>
                     `;
 
@@ -1322,8 +1382,57 @@
                 if (msg) msg.remove();
             }
 
+            // Pre-populate office hours from existing data
+            if (typeof existingOfficeHours !== 'undefined' && existingOfficeHours && existingOfficeHours.length >
+                0) {
+                existingOfficeHours.forEach(hour => {
+                    if (!officeHoursData[hour.day_of_week]) {
+                        officeHoursData[hour.day_of_week] = [];
+                    }
+                    officeHoursData[hour.day_of_week].push({
+                        start: hour.start_time,
+                        end: hour.end_time
+                    });
+                });
+            }
+
             // Initial render
             renderOfficeHours();
+
+            // Handle existing carousel image removal checkboxes
+            document.querySelectorAll('input[name="remove_carousel_images[]"]').forEach(checkbox => {
+                const label = checkbox.closest('label');
+                if (label) {
+                    checkbox.addEventListener('change', function() {
+                        if (this.checked) {
+                            label.classList.add('bg-red-100', 'border-red-500');
+                        } else {
+                            label.classList.remove('bg-red-100', 'border-red-500');
+                        }
+                    });
+                }
+            });
+
+            // Description Read More/Less Toggle
+            const toggleBtn = document.getElementById('toggleDescription');
+            if (toggleBtn) {
+                const preview = document.getElementById('descriptionPreview');
+                const full = document.getElementById('descriptionFull');
+
+                toggleBtn.addEventListener('click', function() {
+                    if (preview.classList.contains('hidden')) {
+                        // Show preview, hide full
+                        preview.classList.remove('hidden');
+                        full.classList.add('hidden');
+                        this.textContent = 'Read more';
+                    } else {
+                        // Show full, hide preview
+                        preview.classList.add('hidden');
+                        full.classList.remove('hidden');
+                        this.textContent = 'Read less';
+                    }
+                });
+            }
         });
     </script>
 @endpush
