@@ -443,13 +443,17 @@
             let selectedFiles = [];
 
             carouselUploadBox.addEventListener('click', function(e) {
-                // Don't open file dialog if clicking inside the preview container at all
-                if (e.target.closest('#carouselPreviewContainer')) {
-                    return; // Just return, don't call carouselInput.click()
+                // Only block if clicking directly on an image preview div or remove button
+                const clickedPreviewItem = e.target.closest('[data-carousel-index]');
+                const clickedRemoveBtn = e.target.closest('.remove-carousel-btn');
+
+                if (clickedPreviewItem || clickedRemoveBtn) {
+                    return; // Don't open file dialog when clicking on existing images
                 }
-                carouselInput.click();
+
+                carouselInput.click(); // Open file dialog for everything else
             });
-            
+
             carouselInput.addEventListener('change', () => {
                 handleCarouselFiles(Array.from(carouselInput.files || []));
             });
@@ -1100,17 +1104,17 @@
                                 <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                             </div>
                             ${rangeKey !== "closed" ? `
-                                                                                                                                                                                                            <div class="flex gap-2 ml-4">
-                                                                                                                                                                                                                <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                                                                                                                                                        data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                                                                                                                                                                                                    Edit
-                                                                                                                                                                                                                </button>
-                                                                                                                                                                                                                <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                                                                                                                                                        data-days='${JSON.stringify(group.days)}'>
-                                                                                                                                                                                                                    Delete
-                                                                                                                                                                                                                </button>
-                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                        ` : ''}
+                                                                                                                                                                                                                <div class="flex gap-2 ml-4">
+                                                                                                                                                                                                                    <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                                                                                                                                            data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                                                                                                                                                                                        Edit
+                                                                                                                                                                                                                    </button>
+                                                                                                                                                                                                                    <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                                                                                                                                            data-days='${JSON.stringify(group.days)}'>
+                                                                                                                                                                                                                        Delete
+                                                                                                                                                                                                                    </button>
+                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                            ` : ''}
                         </div>
                     `;
 
