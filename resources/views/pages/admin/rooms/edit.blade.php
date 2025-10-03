@@ -315,6 +315,14 @@
     <script>
         // Pre-load existing office hours data
         const existingOfficeHours = @json($room->officeHours ?? []);
+
+        // DEBUG: Check what data we're receiving
+        console.log('Existing Office Hours:', existingOfficeHours);
+        console.log('Data type:', typeof existingOfficeHours);
+        console.log('Is array?', Array.isArray(existingOfficeHours));
+        if (existingOfficeHours && existingOfficeHours.length > 0) {
+            console.log('First item structure:', existingOfficeHours[0]);
+        }
     </script>
 
     <script>
@@ -1186,17 +1194,17 @@
                                 <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                             </div>
                             ${rangeKey !== "closed" ? `
-                                                                                                                                                                                                                        <div class="flex gap-2 ml-4">
-                                                                                                                                                                                                                            <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                                                                                                                                                                    data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                                                                                                                                                                                                                Edit
-                                                                                                                                                                                                                            </button>
-                                                                                                                                                                                                                            <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                                                                                                                                                                    data-days='${JSON.stringify(group.days)}'>
-                                                                                                                                                                                                                                Delete
-                                                                                                                                                                                                                            </button>
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                    ` : ''}
+                                                                                                                                                                                                                                <div class="flex gap-2 ml-4">
+                                                                                                                                                                                                                                    <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                                                                                                                                                            data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                                                                                                                                                                                                        Edit
+                                                                                                                                                                                                                                    </button>
+                                                                                                                                                                                                                                    <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                                                                                                                                                            data-days='${JSON.stringify(group.days)}'>
+                                                                                                                                                                                                                                        Delete
+                                                                                                                                                                                                                                    </button>
+                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                            ` : ''}
                         </div>
                     `;
 
@@ -1386,16 +1394,24 @@
             if (typeof existingOfficeHours !== 'undefined' && existingOfficeHours && existingOfficeHours.length >
                 0) {
                 existingOfficeHours.forEach(hour => {
-                    if (!officeHoursData[hour.day_of_week]) {
-                        officeHoursData[hour.day_of_week] = [];
+                    // FIX: Use 'day' instead of 'day_of_week'
+                    const dayKey = hour.day || hour.day_of_week;
+
+                    if (!officeHoursData[dayKey]) {
+                        officeHoursData[dayKey] = [];
                     }
-                    officeHoursData[hour.day_of_week].push({
-                        start: hour.start_time,
-                        end: hour.end_time
+
+                    // FIX: Trim seconds from time format (08:06:00 -> 08:06)
+                    const startTime = hour.start_time ? hour.start_time.substring(0, 5) : hour.start_time;
+                    const endTime = hour.end_time ? hour.end_time.substring(0, 5) : hour.end_time;
+
+                    officeHoursData[dayKey].push({
+                        start: startTime,
+                        end: endTime
                     });
                 });
             }
-
+            
             // Initial render
             renderOfficeHours();
 
