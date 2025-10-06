@@ -134,7 +134,7 @@ class RoomUserController extends Controller
         }
         return view('pages.admin.room-users.show', compact('user'));
     }
-    
+
     public function update(Request $request, User $user)
     {
         $request->validate([
@@ -152,7 +152,6 @@ class RoomUserController extends Controller
 
         $passwordChanged = false;
 
-        // Update password only if provided
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
             $passwordChanged = true;
@@ -160,19 +159,27 @@ class RoomUserController extends Controller
 
         $user->update($data);
 
-
-        // If password was changed → log out the user everywhere
         if ($passwordChanged) {
-            // Delete all user sessions
+            // Always log out the updated user's sessions
             DB::table('sessions')->where('user_id', $user->id)->delete();
 
-            return redirect()->route('login')
-                ->with('success', 'Password changed successfully. Please log in again.');
+            // If the logged-in admin updated their own account
+            if (Auth::id() === $user->id) {
+                Auth::logout();
+                return redirect()->route('login')
+                    ->with('success', 'Your password was changed. Please log in again.');
+            }
+
+            // Otherwise, admin updated another user's password
+            return redirect()->route('room-user.index')
+                ->with('success', 'User password updated successfully. That user has been logged out.');
         }
 
         return redirect()->route('room-user.index')
             ->with('success', 'Office user updated successfully!');
     }
+
+
 
     /**
      * Soft delete a room user
