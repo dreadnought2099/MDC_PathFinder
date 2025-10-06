@@ -71,11 +71,6 @@
                                     class="px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
                                     {{ $user->room->name }}
                                 </span>
-                                @if ($user->room->description)
-                                    <span class="text-sm text-gray-600 dark:text-gray-400">
-                                        {{ $user->room->description }}
-                                    </span>
-                                @endif
                             </div>
                         @else
                             <p class="text-sm text-gray-500 dark:text-gray-400 italic">No office assigned</p>
