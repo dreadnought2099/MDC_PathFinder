@@ -3,7 +3,7 @@
 @section('content')
     <x-floating-actions />
 
-    <div class="max-w-4xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-8 dark:bg-gray-800">
+    <div class="max-w-4xl mx-auto mt-10 mb-10 rounded-lg border-2 shadow-2xl border-primary p-4 sm:p-6 md:p-8 dark:bg-gray-800">
         <h2 class="text-2xl text-center mb-8"><span class="text-primary">Add</span> <span class="dark:text-gray-300">Staff
                 Member</span></h2>
 
@@ -103,6 +103,7 @@
                 </div>
             </div>
 
+            <!-- Photo Upload - Full width in grid -->
             <div class="relative mb-4">
                 <input type="file" name="photo_path" id="photo_path" accept="image/*"
                     class="peer py-3 w-full placeholder-transparent rounded-md text-gray-500 dark:text-gray-300 ring-1 px-4 ring-gray-400 dark:ring-gray-500 focus:ring-2 focus:ring-primary focus:border-primary outline-none bg-white dark:bg-gray-800">
