@@ -51,11 +51,6 @@
                     </div>
                 </div>
 
-                <!-- Room Type Info -->
-                <p class="text-sm text-gray-600 mb-4 dark:text-gray-300">
-                    Entrance gates automatically connect to all other rooms for navigation purposes.
-                </p>
-
                 <!-- Description (Full Width) -->
                 <div class="relative mb-6">
                     <textarea name="description" id="description" placeholder="Description"

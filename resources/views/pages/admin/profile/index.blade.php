@@ -232,7 +232,7 @@
                 <input type="file" id="profile_image" accept="image/*" class="hidden">
                 <div class="flex justify-end mt-4">
                     <button type="submit"
-                        class="bg-primary text-white text-sm font-medium px-4 py-2 rounded-md border-2 border-primary hover:bg-white hover:text-primary transition-all duration-300 dark:hover:bg-gray-800">
+                        class="bg-primary text-white text-sm font-medium px-4 py-2 rounded-md border-2 border-primary hover:bg-white hover:text-primary transition-all duration-300 dark:hover:bg-gray-800 cursor-pointer shadow-primary-hover">
                         Crop & Upload
                     </button>
                 </div>

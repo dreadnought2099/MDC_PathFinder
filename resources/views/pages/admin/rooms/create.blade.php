@@ -48,11 +48,6 @@
                     </div>
                 </div>
 
-                <!-- Room Type Info -->
-                <p class="text-sm text-gray-600 mb-4 dark:text-gray-300">
-                    Entrance gates automatically connect to all other rooms for navigation purposes.
-                </p>
-
                 <!-- Description (Full Width) -->
                 <div class="relative mb-6">
                     <textarea name="description" placeholder="Description" class="{{ $inputClasses }}" rows="3">{{ old('description') }}</textarea>
@@ -1113,17 +1108,17 @@
                                 <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                             </div>
                             ${rangeKey !== "closed" ? `
-                                                                                                                                                                                                                                        <div class="flex gap-2 ml-4">
-                                                                                                                                                                                                                                            <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                                                                                                                                                                                    data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                                                                                                                                                                                                                                Edit
-                                                                                                                                                                                                                                            </button>
-                                                                                                                                                                                                                                            <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                                                                                                                                                                                    data-days='${JSON.stringify(group.days)}'>
-                                                                                                                                                                                                                                                Delete
-                                                                                                                                                                                                                                            </button>
-                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                    ` : ''}
+                                                                                                                                                                                                                                            <div class="flex gap-2 ml-4">
+                                                                                                                                                                                                                                                <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                                                                                                                                                                        data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                                                                                                                                                                                                                    Edit
+                                                                                                                                                                                                                                                </button>
+                                                                                                                                                                                                                                                <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                                                                                                                                                                        data-days='${JSON.stringify(group.days)}'>
+                                                                                                                                                                                                                                                    Delete
+                                                                                                                                                                                                                                                </button>
+                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                        ` : ''}
                         </div>
                     `;
 
