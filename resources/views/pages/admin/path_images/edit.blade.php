@@ -56,7 +56,7 @@
                                 </label>
                                 <input type="number" name="images[{{ $index }}][image_order]"
                                     value="{{ $image->image_order }}" min="1"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    class="w-full px-3 py-2 border border-primary rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
                             </div>
 
                             <!-- Replace File -->
@@ -65,9 +65,9 @@
                                     Replace Image
                                 </label>
                                 <input type="file" name="images[{{ $image->id }}][image_file]" accept="image/*"
-                                    class="w-full text-sm border border-gray-300 rounded px-3 py-2 
+                                    class="w-full text-sm border border-primary rounded px-3 py-2 
                                       file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 
-                                      file:bg-[#157ee1] fle:hover:bg-white file:text-white file:text-sm">
+                                      file:bg-[#157ee1] fle:hover:bg-white file:text-white file:text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
                             </div>
                         </div>
                     </div>
