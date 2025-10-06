@@ -4,7 +4,7 @@
     <x-floating-actions />
 
     <div class="max-w-4xl mx-auto mt-10 mb-10 rounded-lg border-2 shadow-2xl border-primary p-6 dark:bg-gray-800">
-        <h2 class="text-2xl text-center mb-6 dark:text-gray-300"><span class="text-primary">Edit</span> Office</h2>
+        <h2 class="text-2xl text-center mb-12 dark:text-gray-300"><span class="text-primary">Edit</span> Office</h2>
 
         <x-upload-progress-modal>
             <form action="{{ route('room.update', $room->id) }}" method="POST" enctype="multipart/form-data" id="room-form">
@@ -19,7 +19,7 @@
                 @endphp
 
                 <!-- Office Name and Room Type Row -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div class="relative">
                         <input type="text" name="name" id="name" placeholder="Office Name"
                             class="{{ $inputClasses }}" value="{{ old('name', $room->name) }}" required>
@@ -57,7 +57,7 @@
                 </p>
 
                 <!-- Description (Full Width) -->
-                <div class="relative mb-4">
+                <div class="relative mb-6">
                     <textarea name="description" id="description" placeholder="Description"
                         class="{{ $inputClasses }} resize-none overflow-hidden" rows="3">{{ old('description', $room->description) }}</textarea>
                     <label class="{{ $labelClasses }}">Description</label>
@@ -67,7 +67,7 @@
                 </div>
 
                 <!-- Media Uploads Row -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                     <!-- Cover Image -->
                     <div class="conditional-field" id="cover-image-section">
                         <label class="block mb-2 dark:text-gray-300">Cover Image (optional, max 10MB)</label>
@@ -151,13 +151,15 @@
                         each)</label>
 
                     @if ($room->carouselImages && $room->carouselImages->count() > 0)
-                        <div class="mb-4">
+                        <div class="mb-4" data-existing-carousel-container>
                             <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Existing Images (click X to remove):
                             </p>
                             <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
                                 @foreach ($room->carouselImages as $carouselImage)
                                     <div class="relative group">
                                         <img src="{{ asset('storage/' . $carouselImage->image_path) }}"
+                                            data-existing-carousel-id="{{ $carouselImage->id }}"
+                                            data-filename="{{ basename($carouselImage->image_path) }}"
                                             class="w-full h-20 object-cover rounded border">
                                         <label
                                             class="absolute top-1 right-1 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center cursor-pointer hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -500,6 +502,25 @@
 
             let selectedFiles = [];
 
+            // NEW: Initialize with existing carousel images on page load (for edit mode)
+            const existingCarouselContainer = document.querySelector('[data-existing-carousel-container]');
+            if (existingCarouselContainer) {
+                const existingImages = existingCarouselContainer.querySelectorAll('[data-existing-carousel-id]');
+                existingImages.forEach((img) => {
+                    selectedFiles.push({
+                        isExisting: true,
+                        id: img.dataset.existingCarouselId,
+                        url: img.src,
+                        name: img.dataset.filename || 'Existing image'
+                    });
+                });
+
+                // Render existing images in the preview container
+                if (selectedFiles.length > 0) {
+                    renderCarouselPreviews();
+                }
+            }
+
             carouselUploadBox.addEventListener('click', function(e) {
                 // Only block if clicking directly on an image preview div or remove button
                 const clickedPreviewItem = e.target.closest('[data-carousel-index]');
@@ -590,31 +611,45 @@
                 carouselPreviewContainer.innerHTML = '';
 
                 selectedFiles.forEach((file, index) => {
-                    const reader = new FileReader();
                     const div = document.createElement('div');
                     div.className = 'relative rounded overflow-hidden border shadow-sm group aspect-square';
-                    div.dataset.carouselIndex = index; // Add this for identification
+                    div.dataset.carouselIndex = index;
 
-                    reader.onload = e => {
+                    if (file.isExisting) {
+                        // Render existing image (already in database)
                         div.innerHTML = `
-                <img src="${e.target.result}" class="w-full h-full object-cover">
+                <img src="${file.url}" class="w-full h-full object-cover">
                 <div class="absolute inset-x-0 bottom-0 bg-black/60 text-white text-xs p-1 truncate">
                     ${file.name}
                 </div>
-                <div class="absolute top-1 left-1 bg-black/60 text-white text-xs px-1 rounded">
-                    ${(file.size / 1024 / 1024).toFixed(2)}MB
+                <div class="absolute top-1 left-1 bg-green-600 text-white text-xs px-1 rounded">
+                    Saved
                 </div>
-                <button type="button" 
-                    class="remove-carousel-btn absolute top-1 right-1 bg-red-500 text-white w-6 h-6 rounded-full
-                    flex items-center justify-center text-lg hover:bg-red-600 transition-colors
-                    opacity-0 group-hover:opacity-100"
-                    title="Remove">
-                    ×
-                </button>
             `;
-                    };
+                    } else {
+                        // Render new uploaded file
+                        const reader = new FileReader();
+                        reader.onload = e => {
+                            div.innerHTML = `
+                    <img src="${e.target.result}" class="w-full h-full object-cover">
+                    <div class="absolute inset-x-0 bottom-0 bg-black/60 text-white text-xs p-1 truncate">
+                        ${file.name}
+                    </div>
+                    <div class="absolute top-1 left-1 bg-black/60 text-white text-xs px-1 rounded">
+                        ${(file.size / 1024 / 1024).toFixed(2)}MB
+                    </div>
+                    <button type="button" 
+                        class="remove-carousel-btn absolute top-1 right-1 bg-red-500 text-white w-6 h-6 rounded-full
+                        flex items-center justify-center text-lg hover:bg-red-600 transition-colors
+                        opacity-0 group-hover:opacity-100"
+                        title="Remove">
+                        ×
+                    </button>
+                `;
+                        };
+                        reader.readAsDataURL(file);
+                    }
 
-                    reader.readAsDataURL(file);
                     carouselPreviewContainer.appendChild(div);
                 });
 
@@ -1162,17 +1197,17 @@
                                 <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                             </div>
                             ${rangeKey !== "closed" ? `
-                                                                                                                                                                                                                                                    <div class="flex gap-2 ml-4">
-                                                                                                                                                                                                                                                        <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                                                                                                                                                                                                data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                                                                                                                                                                                                                                            Edit
-                                                                                                                                                                                                                                                        </button>
-                                                                                                                                                                                                                                                        <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                                                                                                                                                                                                data-days='${JSON.stringify(group.days)}'>
-                                                                                                                                                                                                                                                            Delete
-                                                                                                                                                                                                                                                        </button>
-                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                ` : ''}
+                                                                                                                                                                                                                                                                <div class="flex gap-2 ml-4">
+                                                                                                                                                                                                                                                                    <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                                                                                                                                                                                            data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                                                                                                                                                                                                                                        Edit
+                                                                                                                                                                                                                                                                    </button>
+                                                                                                                                                                                                                                                                    <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                                                                                                                                                                                            data-days='${JSON.stringify(group.days)}'>
+                                                                                                                                                                                                                                                                        Delete
+                                                                                                                                                                                                                                                                    </button>
+                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                            ` : ''}
                         </div>
                     `;
 

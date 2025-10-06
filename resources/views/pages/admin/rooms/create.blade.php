@@ -4,7 +4,7 @@
     <x-floating-actions />
 
     <div class="max-w-4xl mx-auto mt-10 mb-10 rounded-lg border-2 shadow-2xl border-primary p-6 dark:bg-gray-800">
-        <h2 class="text-2xl text-center mb-6 dark:text-gray-300"><span class="text-primary">Add</span> New Office</h2>
+        <h2 class="text-2xl text-center mb-12 dark:text-gray-300"><span class="text-primary">Add</span> New Office</h2>
 
         <x-upload-progress-modal>
             <form action="{{ route('room.store') }}" method="POST" enctype="multipart/form-data" id="room-form">
