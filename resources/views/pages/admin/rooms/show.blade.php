@@ -106,7 +106,8 @@
                                             class="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500">
                                     </div>
                                     <div class="p-6 text-center dark:bg-gray-700">
-                                        <a href="{{ route('staff.show', $member->id) }}" target="_blank" rel="noopener noreferrer"
+                                        <a href="{{ route('staff.show', $member->id) }}" target="_blank"
+                                            rel="noopener noreferrer"
                                             class="block text-xl font-bold text-slate-800 hover:text-primary transition-colors duration-300 mb-2 dark:text-gray-300">
                                             {{ $member->full_name }}
                                         </a>
@@ -121,7 +122,8 @@
             @else
                 <div class="text-center py-8">
                     <div class="rounded-2xl p-8 border-2 border-primary flex flex-col items-center dark:bg-gray-800">
-                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/group.png" alt="Assigned Staff Icon" class="w-10 h-8">
+                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/group.png"
+                            alt="Assigned Staff Icon" class="w-10 h-8">
                         <p class="text-slate-500 text-lg font-medium">No staff assigned to this room yet.</p>
                     </div>
                 </div>
@@ -185,21 +187,22 @@
             @endif
         </div>
 
-        {{-- Modal Markup (unchanged functionality) --}}
         <div id="imageModal"
             class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
             <div class="absolute top-5 right-5 flex items-center space-x-8">
                 <!-- Download button -->
                 <a id="downloadBtn" href="#" download title="Download Image"
                     class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6">
-                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/download-button.png" alt="Download Image" class="w-10 h-10">
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/download-button.png"
+                        alt="Download Image" class="w-10 h-10">
                 </a>
 
                 <!-- Close button -->
                 <button onclick="closeModal()"
                     class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6 cursor-pointer"
                     title="Close Modal">
-                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png" alt="Close Modal" class="w-10 h-10">
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png"
+                        alt="Close Modal" class="w-10 h-10">
                 </button>
             </div>
 
@@ -215,8 +218,31 @@
             function openModal(src) {
                 const modal = document.getElementById('imageModal');
                 const modalImage = document.getElementById('modalImage');
+                const downloadBtn = document.getElementById('downloadBtn');
+
                 modalImage.src = src;
                 modal.classList.remove('hidden');
+
+                // Convert and download as PNG when clicked
+                downloadBtn.onclick = async (e) => {
+                    e.preventDefault();
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous'; // allow CORS for CDN
+                    img.src = src;
+                    await img.decode();
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+
+                    const pngUrl = canvas.toDataURL('image/png');
+                    const a = document.createElement('a');
+                    a.href = pngUrl;
+                    a.download = src.split('/').pop().replace(/\.\w+$/, '.png'); // rename to .png
+                    a.click();
+                };
             }
 
             function closeModal() {
@@ -231,9 +257,7 @@
 
             const modal = document.getElementById('imageModal');
             modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    closeModal();
-                }
+                if (e.target === modal) closeModal();
             });
         });
     </script>

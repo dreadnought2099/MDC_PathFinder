@@ -1229,17 +1229,20 @@
                                 <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                             </div>
                             ${rangeKey !== "closed" ? `
-                                                                                                                                                                                                                                                                                                                        <div class="flex gap-2 ml-4">
-                                                                                                                                                                                                                                                                                                                            <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                                                                                                                                                                                                                                                                    data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                                                                                                                                                                                                                                                                                                                Edit
-                                                                                                                                                                                                                                                                                                                            </button>
-                                                                                                                                                                                                                                                                                                                            <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                                                                                                                                                                                                                                                                    data-days='${JSON.stringify(group.days)}'>
-                                                                                                                                                                                                                                                                                                                                Delete
-                                                                                                                                                                                                                                                                                                                            </button>
-                                                                                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                                                                                    ` : ''}
+                                                                                                                                                                                                                                                                                                                            <div class="flex flex-col sm:flex-row gap-2 ml-0 sm:ml-4 mt-2 sm:mt-0">
+                                <button type="button" 
+                                    class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-3 py-1.5 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800 w-full sm:w-auto" 
+                                    data-days='${JSON.stringify(group.days)}' 
+                                    data-ranges='${JSON.stringify(group.ranges)}'>
+                                    Edit
+                                </button>
+                                <button type="button" 
+                                    class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-3 py-1.5 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800 w-full sm:w-auto" 
+                                    data-days='${JSON.stringify(group.days)}'>
+                                    Delete
+                                </button>
+                            </div>
+                                                                                                                                                                                                                                                                                                                        ` : ''}
                         </div>
                     `;
 

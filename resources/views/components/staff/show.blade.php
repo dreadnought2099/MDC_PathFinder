@@ -117,8 +117,8 @@
             class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
             <div class="absolute top-5 right-5 flex items-center space-x-8">
                 <!-- Download -->
-                <a id="downloadBtn" href="#" download title="Download Image"
-                    class="p-2 rounded-xl hover:scale-110 transition-all duration-300">
+                <a id="downloadBtn" href="#" title="Download Image"
+                    class="p-2 rounded-xl hover:scale-110 transition-all duration-300 cursor-pointer">
                     <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/download-button.png"
                         alt="Download Image" class="w-10 h-10">
                 </a>
@@ -139,23 +139,50 @@
         document.addEventListener('DOMContentLoaded', () => {
             const modal = document.getElementById('imageModal');
             const modalImage = document.getElementById('modalImage');
+            const downloadBtn = document.getElementById('downloadBtn');
             const bioText = document.getElementById('bioText');
             const toggleBio = document.getElementById('toggleBio');
 
-            // Modal open/close
+            // Open modal
             window.openModal = function(src) {
                 modalImage.src = src;
                 modal.classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
-                document.getElementById('downloadBtn').href = src;
+
+                // Handle download (convert to PNG)
+                downloadBtn.onclick = async (e) => {
+                    e.preventDefault();
+                    try {
+                        const img = new Image();
+                        img.crossOrigin = 'anonymous';
+                        img.src = src;
+                        await img.decode();
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+
+                        const pngUrl = canvas.toDataURL('image/png');
+                        const a = document.createElement('a');
+                        a.href = pngUrl;
+                        a.download = src.split('/').pop().replace(/\.\w+$/, '.png');
+                        a.click();
+                    } catch (err) {
+                        alert('Failed to download image. It may be blocked by CORS.');
+                    }
+                };
             };
 
+            // Close modal
             window.closeModal = function() {
                 modal.classList.add('hidden');
                 modalImage.src = '';
                 document.body.style.overflow = 'auto';
             };
 
+            // Click outside or Escape closes modal
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) closeModal();
             });
@@ -163,9 +190,9 @@
                 if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
             });
 
-            // Bio see more/less
+            // Bio See More/Less
             if (bioText && toggleBio) {
-                const maxLength = 150; // characters before "See more"
+                const maxLength = 150;
                 const fullText = bioText.textContent.trim();
                 if (fullText.length > maxLength) {
                     const shortText = fullText.slice(0, maxLength) + '...';
