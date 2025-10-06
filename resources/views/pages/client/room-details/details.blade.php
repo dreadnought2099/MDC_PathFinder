@@ -139,14 +139,16 @@
         <!-- Download button -->
         <a id="downloadBtn" href="#" download title="Download Image"
             class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6">
-            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/download-button.png" alt="Download" class="w-10 h-10">
+            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/download-button.png"
+                alt="Download" class="w-10 h-10">
         </a>
 
         <!-- Close button -->
         <button onclick="closeModal()"
             class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6 cursor-pointer"
             title="Close Modal">
-            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png" alt="Close Modal" class="w-10 h-10">
+            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png"
+                alt="Close Modal" class="w-10 h-10">
         </button>
     </div>
 
@@ -161,29 +163,42 @@
             const modal = document.getElementById('imageModal');
             const modalImage = document.getElementById('modalImage');
             const downloadBtn = document.getElementById('downloadBtn');
+
             modalImage.src = src;
             modal.classList.remove('hidden');
 
-            downloadBtn.href = src; // set download link to the image
+            // When image finishes loading, prepare PNG download
+            modalImage.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = modalImage.naturalWidth;
+                canvas.height = modalImage.naturalHeight;
+                ctx.drawImage(modalImage, 0, 0);
+
+                // Convert to PNG blob and set as downloadable link
+                canvas.toBlob((blob) => {
+                    const pngUrl = URL.createObjectURL(blob);
+                    downloadBtn.href = pngUrl;
+                    downloadBtn.download = 'image.png';
+                }, 'image/png');
+            };
         }
 
         function closeModal() {
             const modal = document.getElementById('imageModal');
             const modalImage = document.getElementById('modalImage');
-            modalImage.src = '';
             modal.classList.add('hidden');
+            modalImage.src = '';
         }
 
-        // Expose functions globally for inline onclick
+        // Expose functions globally
         window.openModal = openModal;
         window.closeModal = closeModal;
 
-        // Close modal when clicking outside the image
+        // Click outside image to close
         const modal = document.getElementById('imageModal');
         modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeModal();
-            }
+            if (e.target === modal) closeModal();
         });
     });
 </script>
