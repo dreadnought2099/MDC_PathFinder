@@ -128,7 +128,7 @@
                     <div class="space-y-2">
                         <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Account
                             Status</h3>
-                        @if ($user->deleted_at)
+                        @if (!$user->is_active)
                             <span
                                 class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300">
                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -136,7 +136,7 @@
                                         d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
                                         clip-rule="evenodd" />
                                 </svg>
-                                Deleted
+                                Deactivated
                             </span>
                         @else
                             <span

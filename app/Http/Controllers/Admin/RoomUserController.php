@@ -299,7 +299,7 @@ class RoomUserController extends Controller
             DB::table('sessions')->where('user_id', $user->id)->delete();
         }
 
-        return back()->with(
+        return redirect()->route('room-user.index')->with(
             'success',
             "User {$user->name} has been " . ($user->is_active ? 'enabled' : 'disabled') . "."
         );
