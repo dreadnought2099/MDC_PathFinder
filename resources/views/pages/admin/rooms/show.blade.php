@@ -100,8 +100,9 @@
                                 <div
                                     class="bg-gradient-to-br from-slate-50 to-white rounded-xl shadow-md hover:shadow-xl border-2 border-primary overflow-hidden group transform hover:scale-105 transition-all duration-300">
                                     <div class="cursor-pointer overflow-hidden"
-                                        onclick="openModal(' {{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/mdc-logo.png') }} ')">
-                                        <img src="{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/mdc-logo.png') }}"
+                                        onclick="openModal('{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/mdc.png') }}')">
+
+                                        <img src="{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/mdc.png') }}"
                                             alt="{{ $member->name }}"
                                             class="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500">
                                     </div>
@@ -190,23 +191,19 @@
         <div id="imageModal"
             class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
             <div class="absolute top-5 right-5 flex items-center space-x-8">
-                <!-- Download button -->
-                <a id="downloadBtn" href="#" download title="Download Image"
-                    class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6">
+                <!-- Download -->
+                <a id="downloadBtn" href="#" title="Download Image"
+                    class="p-2 rounded-xl hover:scale-110 transition-all duration-300">
                     <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/download-button.png"
                         alt="Download Image" class="w-10 h-10">
                 </a>
-
-                <!-- Close button -->
-                <button onclick="closeModal()"
-                    class="p-2 rounded-xl transition-all hover:scale-120 ease-in-out duration-300 mt-6 cursor-pointer"
+                <!-- Close -->
+                <button onclick="closeModal()" class="p-2 rounded-xl hover:scale-110 transition-all duration-300"
                     title="Close Modal">
                     <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png"
                         alt="Close Modal" class="w-10 h-10">
                 </button>
             </div>
-
-            <!-- Image -->
             <img id="modalImage" src="" alt="Full Image" class="max-w-full max-h-full rounded shadow-lg" />
         </div>
     </div>
@@ -215,49 +212,62 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            function openModal(src) {
-                const modal = document.getElementById('imageModal');
-                const modalImage = document.getElementById('modalImage');
-                const downloadBtn = document.getElementById('downloadBtn');
-
-                modalImage.src = src;
-                modal.classList.remove('hidden');
-
-                // Convert and download as PNG when clicked
-                downloadBtn.onclick = async (e) => {
-                    e.preventDefault();
-                    const img = new Image();
-                    img.crossOrigin = 'anonymous'; // allow CORS for CDN
-                    img.src = src;
-                    await img.decode();
-
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0);
-
-                    const pngUrl = canvas.toDataURL('image/png');
-                    const a = document.createElement('a');
-                    a.href = pngUrl;
-                    a.download = src.split('/').pop().replace(/\.\w+$/, '.png'); // rename to .png
-                    a.click();
-                };
-            }
-
-            function closeModal() {
-                const modal = document.getElementById('imageModal');
-                const modalImage = document.getElementById('modalImage');
-                modalImage.src = '';
-                modal.classList.add('hidden');
-            }
-
-            window.openModal = openModal;
-            window.closeModal = closeModal;
-
             const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            const downloadBtn = document.getElementById('downloadBtn');
+
+            // Open modal and show image
+            window.openModal = function(src) {
+                modalImage.src = src.trim();
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            };
+
+            // Close modal
+            window.closeModal = function() {
+                modal.classList.add('hidden');
+                modalImage.src = '';
+                document.body.style.overflow = 'auto';
+            };
+
+            // Close on backdrop click or ESC key
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) closeModal();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
+            });
+
+            // Convert image to PNG when download button is clicked
+            downloadBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const imgSrc = modalImage.src;
+                if (!imgSrc) return;
+
+                try {
+                    const response = await fetch(imgSrc);
+                    const blob = await response.blob();
+
+                    const bitmap = await createImageBitmap(blob);
+                    const canvas = document.createElement('canvas');
+                    canvas.width = bitmap.width;
+                    canvas.height = bitmap.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(bitmap, 0, 0);
+
+                    canvas.toBlob((pngBlob) => {
+                        const pngUrl = URL.createObjectURL(pngBlob);
+                        const a = document.createElement('a');
+                        a.href = pngUrl;
+                        a.download = 'downloaded-image.png';
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        URL.revokeObjectURL(pngUrl);
+                    }, 'image/png');
+                } catch (err) {
+                    console.error('Error converting image:', err);
+                }
             });
         });
     </script>
