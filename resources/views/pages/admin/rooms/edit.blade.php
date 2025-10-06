@@ -297,8 +297,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // [COPY THE ENTIRE SCRIPT CONTENT FROM CREATE.BLADE.PHP - EVERYTHING INSIDE THE DOMContentLoaded FUNCTION]
-            // DO NOT copy the outer DOMContentLoaded wrapper itself
             let isUploading = false;
 
             window.onbeforeunload = function(e) {
