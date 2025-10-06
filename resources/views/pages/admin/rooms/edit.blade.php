@@ -145,17 +145,16 @@
                     </div>
                 </div>
 
-                <!-- Carousel Images (Full Width) -->
                 <div class="mb-4 conditional-field" id="carousel-images-section">
                     <label class="block mb-2 dark:text-gray-300">Carousel Images (optional, max 50 images, 10MB
                         each)</label>
 
-                    @if ($room->carouselImages && $room->carouselImages->count() > 0)
+                    @if ($room->images && $room->images->count() > 0)
                         <div class="mb-4" data-existing-carousel-container>
                             <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Existing Images (click X to remove):
                             </p>
                             <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                                @foreach ($room->carouselImages as $carouselImage)
+                                @foreach ($room->images as $carouselImage)
                                     <div class="relative group">
                                         <img src="{{ asset('storage/' . $carouselImage->image_path) }}"
                                             data-existing-carousel-id="{{ $carouselImage->id }}"
@@ -419,6 +418,7 @@
             const coverInput = document.getElementById('image_path');
             const coverUploadBox = document.getElementById('uploadBox');
             let coverPreview = document.getElementById('previewImage');
+            
             if (!coverPreview) {
                 coverPreview = document.createElement('img');
                 coverPreview.id = 'previewImage';
@@ -500,37 +500,142 @@
             const carouselUploadBox = document.getElementById('carouselUploadBox');
             const carouselPreviewContainer = document.getElementById('carouselPreviewContainer');
 
-            let selectedFiles = [];
+            let selectedFiles = []; // Only NEW uploaded files
+            let existingImageData = []; // Existing images from database
+            let removedExistingImageIds = []; // Track removed existing images
 
-            // NEW: Initialize with existing carousel images on page load (for edit mode)
-            const existingCarouselContainer = document.querySelector('[data-existing-carousel-container]');
-            if (existingCarouselContainer) {
-                const existingImages = existingCarouselContainer.querySelectorAll('[data-existing-carousel-id]');
-                existingImages.forEach((img) => {
-                    selectedFiles.push({
-                        isExisting: true,
-                        id: img.dataset.existingCarouselId,
-                        url: img.src,
-                        name: img.dataset.filename || 'Existing image'
-                    });
+            async function loadExistingCarouselImages() {
+                const existingImages = document.querySelectorAll('[data-existing-carousel-id]');
+
+                if (existingImages.length === 0) return;
+
+                // Just store the data, don't fetch/convert to files
+                existingImageData = Array.from(existingImages).map(img => ({
+                    id: img.dataset.existingCarouselId,
+                    src: img.src,
+                    filename: img.dataset.filename
+                }));
+
+                const existingContainer = document.querySelector('[data-existing-carousel-container]');
+                if (existingContainer && existingImageData.length > 0) {
+                    existingContainer.style.display = 'none';
+                }
+
+                renderCarouselPreviews();
+            }
+
+            function renderCarouselPreviews() {
+                carouselPreviewContainer.innerHTML = '';
+
+                // Render existing images first
+                existingImageData.forEach((imgData, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'relative rounded overflow-hidden border shadow-sm group aspect-square';
+                    div.dataset.carouselType = 'existing';
+                    div.dataset.carouselIndex = index;
+
+                    div.innerHTML = `
+            <img src="${imgData.src}" class="w-full h-full object-cover">
+            <div class="absolute inset-x-0 bottom-0 bg-black/60 text-white text-xs p-1 truncate">
+                ${imgData.filename}
+            </div>
+            <div class="absolute top-1 left-1 bg-blue-500 text-white text-xs px-1 rounded">
+                Existing
+            </div>
+            <button type="button" 
+                class="remove-carousel-btn absolute top-1 right-1 bg-red-500 text-white w-6 h-6 rounded-full
+                flex items-center justify-center text-lg hover:bg-red-600 transition-colors
+                opacity-0 group-hover:opacity-100"
+                title="Remove">
+                ×
+            </button>
+        `;
+                    carouselPreviewContainer.appendChild(div);
                 });
 
-                // Render existing images in the preview container
-                if (selectedFiles.length > 0) {
-                    renderCarouselPreviews();
+                // Render new files
+                selectedFiles.forEach((file, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'relative rounded overflow-hidden border shadow-sm group aspect-square';
+                    div.dataset.carouselType = 'new';
+                    div.dataset.carouselIndex = index;
+
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        div.innerHTML = `
+                <img src="${e.target.result}" class="w-full h-full object-cover">
+                <div class="absolute inset-x-0 bottom-0 bg-black/60 text-white text-xs p-1 truncate">
+                    ${file.name}
+                </div>
+                <div class="absolute top-1 left-1 bg-green-500 text-white text-xs px-1 rounded">
+                    ${(file.size / 1024 / 1024).toFixed(2)}MB
+                </div>
+                <button type="button" 
+                    class="remove-carousel-btn absolute top-1 right-1 bg-red-500 text-white w-6 h-6 rounded-full
+                    flex items-center justify-center text-lg hover:bg-red-600 transition-colors
+                    opacity-0 group-hover:opacity-100"
+                    title="Remove">
+                    ×
+                </button>
+            `;
+                    };
+
+                    reader.readAsDataURL(file);
+                    carouselPreviewContainer.appendChild(div);
+                });
+
+                updateCarouselPlaceholderVisibility();
+            }
+
+            function updateCarouselInputFiles() {
+                const dt = new DataTransfer();
+                selectedFiles.forEach(file => dt.items.add(file));
+                carouselInput.files = dt.files;
+            }
+
+            function updateCarouselPlaceholderVisibility() {
+                const carouselPlaceholder = document.getElementById('carouselPlaceholder');
+                if (carouselPlaceholder) {
+                    const totalImages = existingImageData.length + selectedFiles.length;
+                    carouselPlaceholder.style.display = totalImages > 0 ? 'none' : '';
                 }
             }
 
+            function resetCarouselImages() {
+                selectedFiles = [];
+                existingImageData = [];
+                removedExistingImageIds = [];
+                carouselPreviewContainer.innerHTML = '';
+                carouselInput.value = '';
+                updateCarouselPlaceholderVisibility();
+            }
+
+            function addRemovedImageHiddenInputs() {
+                // Remove old dynamic inputs
+                document.querySelectorAll('input[data-dynamic-removal="true"]').forEach(input => {
+                    input.remove();
+                });
+
+                // Add new hidden inputs for removed images
+                removedExistingImageIds.forEach(id => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'remove_images[]';
+                    input.value = id;
+                    input.dataset.dynamicRemoval = 'true';
+                    form.appendChild(input);
+                });
+            }
+
             carouselUploadBox.addEventListener('click', function(e) {
-                // Only block if clicking directly on an image preview div or remove button
                 const clickedPreviewItem = e.target.closest('[data-carousel-index]');
                 const clickedRemoveBtn = e.target.closest('.remove-carousel-btn');
 
                 if (clickedPreviewItem || clickedRemoveBtn) {
-                    return; // Don't open file dialog when clicking on existing images
+                    return;
                 }
 
-                carouselInput.click(); // Open file dialog for everything else
+                carouselInput.click();
             });
 
             carouselInput.addEventListener('change', () => {
@@ -557,7 +662,8 @@
             function handleCarouselFiles(newFiles) {
                 carouselInput.value = '';
 
-                if (selectedFiles.length + newFiles.length > MAX_CAROUSEL_FILES) {
+                const totalCount = existingImageData.length + selectedFiles.length + newFiles.length;
+                if (totalCount > MAX_CAROUSEL_FILES) {
                     showTemporaryMessage(`Maximum ${MAX_CAROUSEL_FILES} images allowed.`, 'error');
                     return;
                 }
@@ -568,7 +674,6 @@
                     return;
                 }
 
-                // Compress images before adding
                 compressCarouselImages(newFiles);
             }
 
@@ -604,90 +709,11 @@
                 } catch (error) {
                     console.error('Batch compression failed:', error);
                     showTemporaryMessage('Some images could not be compressed', 'error');
-                } finally {}
-            }
-
-            function renderCarouselPreviews() {
-                carouselPreviewContainer.innerHTML = '';
-
-                selectedFiles.forEach((file, index) => {
-                    const div = document.createElement('div');
-                    div.className = 'relative rounded overflow-hidden border shadow-sm group aspect-square';
-                    div.dataset.carouselIndex = index;
-
-                    if (file.isExisting) {
-                        // Render existing image (already in database)
-                        div.innerHTML = `
-                <img src="${file.url}" class="w-full h-full object-cover">
-                <div class="absolute inset-x-0 bottom-0 bg-black/60 text-white text-xs p-1 truncate">
-                    ${file.name}
-                </div>
-                <div class="absolute top-1 left-1 bg-green-600 text-white text-xs px-1 rounded">
-                    Saved
-                </div>
-            `;
-                    } else {
-                        // Render new uploaded file
-                        const reader = new FileReader();
-                        reader.onload = e => {
-                            div.innerHTML = `
-                    <img src="${e.target.result}" class="w-full h-full object-cover">
-                    <div class="absolute inset-x-0 bottom-0 bg-black/60 text-white text-xs p-1 truncate">
-                        ${file.name}
-                    </div>
-                    <div class="absolute top-1 left-1 bg-black/60 text-white text-xs px-1 rounded">
-                        ${(file.size / 1024 / 1024).toFixed(2)}MB
-                    </div>
-                    <button type="button" 
-                        class="remove-carousel-btn absolute top-1 right-1 bg-red-500 text-white w-6 h-6 rounded-full
-                        flex items-center justify-center text-lg hover:bg-red-600 transition-colors
-                        opacity-0 group-hover:opacity-100"
-                        title="Remove">
-                        ×
-                    </button>
-                `;
-                        };
-                        reader.readAsDataURL(file);
-                    }
-
-                    carouselPreviewContainer.appendChild(div);
-                });
-
-                updateCarouselPlaceholderVisibility();
-            }
-
-
-            function updateCarouselInputFiles() {
-                const dt = new DataTransfer();
-                selectedFiles.forEach(file => dt.items.add(file));
-                carouselInput.files = dt.files;
-            }
-
-            function updateUploadIconVisibility() {
-                const icon = carouselUploadBox.querySelector('img:first-child');
-                const text = carouselUploadBox.querySelector('span');
-                const display = selectedFiles.length > 0 ? 'none' : '';
-                if (icon) icon.style.display = display;
-                if (text) text.style.display = display;
-            }
-
-            function updateCarouselPlaceholderVisibility() {
-                const carouselPlaceholder = document.getElementById('carouselPlaceholder');
-                if (carouselPlaceholder) {
-                    carouselPlaceholder.style.display = selectedFiles.length > 0 ? 'none' : '';
                 }
             }
 
-            function resetCarouselImages() {
-                selectedFiles = [];
-                carouselPreviewContainer.innerHTML = '';
-                carouselInput.value = '';
-                updateCarouselPlaceholderVisibility();
-            }
-
-            // Event delegation for carousel remove buttons - DEBUGGING VERSION
+            // Event delegation for carousel remove buttons
             carouselPreviewContainer.addEventListener('click', function(e) {
-
                 const removeBtn = e.target.closest('.remove-carousel-btn');
 
                 if (removeBtn) {
@@ -697,14 +723,25 @@
                     const carouselItem = removeBtn.closest('[data-carousel-index]');
 
                     if (carouselItem) {
+                        const type = carouselItem.dataset.carouselType;
                         const index = parseInt(carouselItem.dataset.carouselIndex);
-                        selectedFiles.splice(index, 1);
+
+                        if (type === 'existing') {
+                            // Removing an existing image
+                            const removedImg = existingImageData[index];
+                            removedExistingImageIds.push(removedImg.id);
+                            existingImageData.splice(index, 1);
+                            addRemovedImageHiddenInputs();
+                        } else if (type === 'new') {
+                            // Removing a new file
+                            selectedFiles.splice(index, 1);
+                            updateCarouselInputFiles();
+                        }
+
                         renderCarouselPreviews();
-                        updateCarouselInputFiles();
                     }
                 }
-            }, true); // Added capture phase
-
+            }, true);
 
             // Video upload functionality
             const maxVideoSizeMB = 50;
@@ -1197,17 +1234,17 @@
                                 <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                             </div>
                             ${rangeKey !== "closed" ? `
-                                                                                                                                                                                                                                                                <div class="flex gap-2 ml-4">
-                                                                                                                                                                                                                                                                    <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                                                                                                                                                                                                            data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                                                                                                                                                                                                                                                        Edit
-                                                                                                                                                                                                                                                                    </button>
-                                                                                                                                                                                                                                                                    <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                                                                                                                                                                                                            data-days='${JSON.stringify(group.days)}'>
-                                                                                                                                                                                                                                                                        Delete
-                                                                                                                                                                                                                                                                    </button>
-                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                            ` : ''}
+                                                                                                                                                                                                                                                                                                                        <div class="flex gap-2 ml-4">
+                                                                                                                                                                                                                                                                                                                            <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                                                                                                                                                                                                                                                    data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                                                                                                                                                                                                                                                                                                Edit
+                                                                                                                                                                                                                                                                                                                            </button>
+                                                                                                                                                                                                                                                                                                                            <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                                                                                                                                                                                                                                                    data-days='${JSON.stringify(group.days)}'>
+                                                                                                                                                                                                                                                                                                                                Delete
+                                                                                                                                                                                                                                                                                                                            </button>
+                                                                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                                                    ` : ''}
                         </div>
                     `;
 
@@ -1411,6 +1448,16 @@
                     });
                 });
             }
+
+            console.log('Carousel container exists:', !!document.querySelector(
+                '[data-existing-carousel-container]'));
+            console.log('Images with data-existing-carousel-id:', document.querySelectorAll(
+                '[data-existing-carousel-id]').length);
+            console.log('All images in carousel section:', document.querySelectorAll('#carousel-images-section img')
+                .length);
+
+            // Load existing carousel images
+            loadExistingCarouselImages();
 
             // Initial render
             renderOfficeHours();
