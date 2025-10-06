@@ -3,7 +3,7 @@
 @section('content')
     <x-floating-actions />
 
-    <div class="max-w-4xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-6 dark:bg-gray-800">
+    <div class="max-w-4xl mx-auto mt-10 mb-10 rounded-lg border-2 shadow-2xl border-primary p-6 dark:bg-gray-800">
         <h2 class="text-2xl text-center mb-6 dark:text-gray-300"><span class="text-primary">Edit</span> Office</h2>
 
         <x-upload-progress-modal>
@@ -58,37 +58,12 @@
 
                 <!-- Description (Full Width) -->
                 <div class="relative mb-4">
-                    <textarea name="description" id="description" placeholder="Description" class="{{ $inputClasses }}" rows="3">{{ old('description', $room->description) }}</textarea>
+                    <textarea name="description" id="description" placeholder="Description"
+                        class="{{ $inputClasses }} resize-none overflow-hidden" rows="3">{{ old('description', $room->description) }}</textarea>
                     <label class="{{ $labelClasses }}">Description</label>
                     @error('description')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror
-
-                    <!-- Description Preview with Read More/Less -->
-                    @if ($room->description && strlen($room->description) > 150)
-                        <div
-                            class="mt-3 p-3 bg-gray-50 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600">
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1 font-semibold">Current Description:</p>
-                            <div class="text-sm text-gray-700 dark:text-gray-300">
-                                <p id="descriptionPreview" class="description-preview">
-                                    {{ Str::limit($room->description, 150) }}
-                                </p>
-                                <p id="descriptionFull" class="description-full hidden">
-                                    {{ $room->description }}
-                                </p>
-                                <button type="button" id="toggleDescription"
-                                    class="text-primary hover:text-primary-dark font-medium text-xs mt-1 focus:outline-none">
-                                    Read more
-                                </button>
-                            </div>
-                        </div>
-                    @elseif($room->description)
-                        <div
-                            class="mt-3 p-3 bg-gray-50 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600">
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1 font-semibold">Current Description:</p>
-                            <p class="text-sm text-gray-700 dark:text-gray-300">{{ $room->description }}</p>
-                        </div>
-                    @endif
                 </div>
 
                 <!-- Media Uploads Row -->
@@ -218,15 +193,31 @@
                     @enderror
                 </div>
 
-                <!-- Office Hours (same as create form) -->
                 <div class="mb-6 conditional-field" id="office-hours-section">
-                    <label class="block font-semibold mb-2 dark:text-gray-300">Office Hours</label>
+                    <label class="block font-semibold mb-3 text-lg dark:text-gray-300">Office Hours</label>
 
-                    <div class="mb-6 p-4 border border-primary rounded dark:bg-gray-800">
-                        <p class="font-semibold mb-3 dark:text-gray-300">Set Time Range for Multiple Days</p>
+                    <!-- Setup Section -->
+                    <div class="mb-4 p-5 border-2 border-primary rounded-lg dark:bg-gray-800 space-y-4">
 
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-2 dark:text-gray-300">Select Days:</label>
+                        <!-- Days Selection -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2 dark:text-gray-300">Select Days</label>
+
+                            <div class="flex gap-2 mb-3 flex-wrap">
+                                <button type="button"
+                                    class="quick-select px-3 py-1.5 rounded text-sm bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white transition-colors"
+                                    data-days="Mon,Tue,Wed,Thu,Fri">Weekdays</button>
+                                <button type="button"
+                                    class="quick-select px-3 py-1.5 rounded text-sm bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white transition-colors"
+                                    data-days="Sat,Sun">Weekends</button>
+                                <button type="button"
+                                    class="quick-select px-3 py-1.5 rounded text-sm bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white transition-colors"
+                                    data-days="Mon,Tue,Wed,Thu,Fri,Sat,Sun">All Days</button>
+                                <button type="button"
+                                    class="clear-select px-3 py-1.5 rounded text-sm bg-secondary hover:bg-white hover:text-secondary border border-secondary dark:bg-gray-600 dark:hover:bg-gray-800 text-white transition-colors cursor-pointer shadow-secondary-hover">Clear
+                                    All</button>
+                            </div>
+
                             <div class="flex gap-2 flex-wrap">
                                 @php
                                     $daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -241,68 +232,56 @@
                                     </label>
                                 @endforeach
                             </div>
-
-                            <div class="mt-2 flex gap-2 flex-wrap">
-                                <button type="button"
-                                    class="quick-select bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white px-3 py-1 rounded text-sm transition-colors"
-                                    data-days="Mon,Tue,Wed,Thu,Fri">Weekdays</button>
-                                <button type="button"
-                                    class="quick-select bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white px-3 py-1 rounded text-sm transition-colors"
-                                    data-days="Sat,Sun">Weekends</button>
-                                <button type="button"
-                                    class="quick-select bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white px-3 py-1 rounded text-sm transition-colors"
-                                    data-days="Mon,Tue,Wed,Thu,Fri,Sat,Sun">All Days</button>
-                                <button type="button"
-                                    class="clear-select bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300 px-3 py-1 rounded text-sm transition-colors">Clear
-                                    All</button>
-                            </div>
                         </div>
 
-                        <div class="bulk-time-ranges mb-4">
-                            <label class="block text-sm font-medium mb-2 dark:text-gray-300">Time Range:</label>
-                            <div class="bulk-ranges-container">
-                                <div class="flex gap-2 mb-2 bulk-range-row max-w-md">
-                                    <div class="relative flex-1">
-                                        <input type="time"
-                                            class="custom-time-input bulk-start-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary">
-                                        <button type="button"
-                                            class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
-                                            title="Clear">&times;</button>
-                                    </div>
-                                    <div class="relative flex-1">
-                                        <input type="time"
-                                            class="custom-time-input bulk-end-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary">
-                                        <button type="button"
-                                            class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
-                                            title="Clear">&times;</button>
+                        <!-- Time Range -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2 dark:text-gray-300">Time Range</label>
+                            <div class="bulk-time-ranges">
+                                <div class="bulk-ranges-container">
+                                    <div
+                                        class="flex flex-col sm:flex-row gap-2 sm:gap-3 bulk-range-row max-w-full sm:max-w-md">
+                                        <div class="relative flex-1">
+                                            <input type="time"
+                                                class="custom-time-input bulk-start-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary">
+                                            <button type="button"
+                                                class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 text-xl"
+                                                title="Clear">&times;</button>
+                                        </div>
+                                        <div class="relative flex-1">
+                                            <input type="time"
+                                                class="custom-time-input bulk-end-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary">
+                                            <button type="button"
+                                                class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 text-xl"
+                                                title="Clear">&times;</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- Apply Button -->
                         <button type="button"
-                            class="apply-bulk bg-primary text-center text-white px-4 py-2 rounded-md hover:text-primary border-2 border-primary hover:bg-white dark:hover:bg-gray-800 duration-300 ease-in-out transition-all cursor-pointer shadow-primary-hover">
+                            class="apply-bulk bg-primary text-white px-4 py-2 rounded-md hover:text-primary border-2 border-primary hover:bg-white dark:hover:bg-gray-800 duration-300 ease-in-out transition-all cursor-pointer shadow-primary-hover">
                             Apply to Selected Days
                         </button>
                     </div>
 
-                    <div class="p-4 border border-primary rounded dark:bg-gray-800">
-                        <p class="mb-3 dark:text-gray-300">Saved Office Hours</p>
+                    <!-- Saved Hours Display -->
+                    <div class="p-5 border-2 border-primary rounded-lg dark:bg-gray-800">
+                        <p class="font-medium mb-3 dark:text-gray-300">Saved Office Hours</p>
                         <ul id="officeHoursDisplay" class="space-y-2 text-sm text-gray-700 dark:text-gray-300"></ul>
                     </div>
+
                     @error('office_hours')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror
                 </div>
 
                 <!-- Submit Button -->
-                <div class="flex justify-end gap-2">
-                    <a href="{{ route('room.index') }}"
-                        class="px-8 bg-gray-500 text-white py-2 rounded-md hover:bg-gray-600 transition-all duration-300">
-                        Cancel
-                    </a>
+                <div>
                     <button type="submit" id="submit-btn"
-                        class="px-8 bg-primary text-white py-2 rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
+                        class="w-full px-8 bg-primary text-white py-2 rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
                         Update Office
                     </button>
                 </div>
@@ -1185,17 +1164,17 @@
                                 <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                             </div>
                             ${rangeKey !== "closed" ? `
-                                                                                                                                                                                                                                    <div class="flex gap-2 ml-4">
-                                                                                                                                                                                                                                        <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                                                                                                                                                                                data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                                                                                                                                                                                                                            Edit
-                                                                                                                                                                                                                                        </button>
-                                                                                                                                                                                                                                        <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                                                                                                                                                                                data-days='${JSON.stringify(group.days)}'>
-                                                                                                                                                                                                                                            Delete
-                                                                                                                                                                                                                                        </button>
-                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                ` : ''}
+                                                                                                                                                                                                                                                    <div class="flex gap-2 ml-4">
+                                                                                                                                                                                                                                                        <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                                                                                                                                                                                data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                                                                                                                                                                                                                            Edit
+                                                                                                                                                                                                                                                        </button>
+                                                                                                                                                                                                                                                        <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                                                                                                                                                                                data-days='${JSON.stringify(group.days)}'>
+                                                                                                                                                                                                                                                            Delete
+                                                                                                                                                                                                                                                        </button>
+                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                ` : ''}
                         </div>
                     `;
 
@@ -1356,12 +1335,9 @@
             function showTemporaryFeedback(button, text) {
                 const old = button.textContent;
                 button.textContent = text;
-                button.classList.add('bg-green-500');
-                button.classList.remove('bg-primary');
+
                 setTimeout(() => {
                     button.textContent = old;
-                    button.classList.remove('bg-green-500');
-                    button.classList.add('bg-primary');
                 }, 2000);
             }
 
@@ -1420,25 +1396,21 @@
                 }
             });
 
-            // Description Read More/Less Toggle
-            const toggleBtn = document.getElementById('toggleDescription');
-            if (toggleBtn) {
-                const preview = document.getElementById('descriptionPreview');
-                const full = document.getElementById('descriptionFull');
+            // Auto-resize textarea based on content
+            const descriptionTextarea = document.getElementById('description');
+            if (descriptionTextarea) {
+                function autoResize() {
+                    descriptionTextarea.style.height = 'auto';
+                    descriptionTextarea.style.height = descriptionTextarea.scrollHeight + 'px';
+                }
 
-                toggleBtn.addEventListener('click', function() {
-                    if (preview.classList.contains('hidden')) {
-                        // Show preview, hide full
-                        preview.classList.remove('hidden');
-                        full.classList.add('hidden');
-                        this.textContent = 'Read more';
-                    } else {
-                        // Show full, hide preview
-                        preview.classList.add('hidden');
-                        full.classList.remove('hidden');
-                        this.textContent = 'Read less';
-                    }
-                });
+                // Resize on page load if there's existing content
+                if (descriptionTextarea.value) {
+                    autoResize();
+                }
+
+                // Resize on input
+                descriptionTextarea.addEventListener('input', autoResize);
             }
         });
     </script>
