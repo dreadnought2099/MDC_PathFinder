@@ -90,7 +90,7 @@
                                     <td class="px-4 sm:px-6 py-3 sm:py-4">
                                         <div class="flex flex-wrap justify-end gap-2 sm:gap-3 items-center">
                                             {{-- View --}}
-                                            @if (auth()->user()->hasRole('Admin') || auth()->user()->can('view staffs'))
+                                            @if (auth()->user()->hasRole('Admin') || auth()->user()->can('view staff'))
                                                 <div class="relative inline-block group">
                                                     <a href="{{ route('staff.show', $staff->id) }}"
                                                         class="hover-underline inline-flex items-center justify-center p-2 rounded-lg hover:scale-125 transition duration-200">
@@ -109,7 +109,7 @@
                                             @endif
 
                                             {{-- Edit --}}
-                                            @if (auth()->user()->hasRole('Admin') || auth()->user()->can('edit staffs'))
+                                            @if (auth()->user()->hasRole('Admin') || auth()->user()->can('edit staff'))
                                                 <div class="relative inline-block group">
                                                     <a href="{{ route('staff.edit', $staff->id) }}"
                                                         class="hover-underline-edit inline-flex items-center justify-center p-2 rounded-lg hover:scale-125 transition duration-200">
