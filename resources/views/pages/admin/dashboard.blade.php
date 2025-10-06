@@ -16,7 +16,7 @@
             <!-- Quick Stats Section -->
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-2 border-primary mb-8">
                 <h2 class="text-xl font-semibold text-primary mb-6 text-center">Quick Overview</h2>
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="grid gap-4 @if (auth()->user()->hasRole('Admin')) grid-cols-2 lg:grid-cols-4 @else grid-cols-1 sm:grid-cols-3 @endif">
 
                     <!-- Total Staff -->
                     <div
@@ -70,7 +70,8 @@
                         class="group card-shadow-hover shadow-primary-hover p-5 border-2 border-primary bg-white dark:bg-gray-800 rounded-lg transition-all duration-300">
                         <div class="flex flex-col items-center text-center space-y-3">
                             <div class="bg-primary-10 hover:bg-primary-20 p-3 rounded-full transition-all duration-300">
-                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/navigation.png" alt="Manage Paths"
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/navigation.png"
+                                    alt="Manage Paths"
                                     class="h-10 w-10 object-contain group-hover:scale-120 transition-transform duration-300" />
                             </div>
                             <div>
@@ -90,7 +91,8 @@
                         class="group card-shadow-hover shadow-primary-hover p-5 border-2 border-primary bg-white dark:bg-gray-800 rounded-lg transition-all duration-300">
                         <div class="flex flex-col items-center text-center space-y-3">
                             <div class="bg-primary-10 hover:bg-primary-20 p-3 rounded-full transition-all duration-300">
-                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/manage-office.png" alt="Manage Offices"
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/manage-office.png"
+                                    alt="Manage Offices"
                                     class="h-10 w-10 object-contain group-hover:scale-120 transition-transform duration-300" />
                             </div>
                             <div>
@@ -110,7 +112,8 @@
                         class="group card-shadow-hover shadow-primary-hover p-5 border-2 border-primary bg-white dark:bg-gray-800 rounded-lg transition-all duration-300">
                         <div class="flex flex-col items-center text-center space-y-3">
                             <div class="bg-primary-10 hover:bg-primary-20 p-3 rounded-full transition-all duration-300">
-                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/manage-user.png" alt="Manage Staff"
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/manage-user.png"
+                                    alt="Manage Staff"
                                     class="h-10 w-10 object-contain group-hover:scale-120 transition-transform duration-300" />
                             </div>
                             <div>
@@ -130,7 +133,8 @@
                         class="group card-shadow-hover shadow-primary-hover p-5 border-2 border-primary bg-white dark:bg-gray-800 rounded-lg transition-all duration-300">
                         <div class="flex flex-col items-center text-center space-y-3">
                             <div class="bg-primary-10 hover:bg-primary-20 p-3 rounded-full transition-all duration-300">
-                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/manager.png" alt="Manage Staff"
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/manager.png"
+                                    alt="Manage Staff"
                                     class="h-10 w-10 object-contain group-hover:scale-120 transition-transform duration-300" />
                             </div>
                             <div>
@@ -150,7 +154,8 @@
                         class="group card-shadow-hover shadow-primary-hover p-5 border-2 border-primary bg-white dark:bg-gray-800 rounded-lg transition-all duration-300">
                         <div class="flex flex-col items-center text-center space-y-3">
                             <div class="bg-primary-10 hover:bg-primary-20 p-3 rounded-full transition-all duration-300">
-                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/assign-staff.png" alt="Assign Staff"
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/assign-staff.png"
+                                    alt="Assign Staff"
                                     class="h-10 w-10 object-contain group-hover:scale-120 transition-transform duration-300" />
                             </div>
                             <div>
@@ -170,7 +175,8 @@
                         class="group card-shadow-hover shadow-primary-hover p-5 border-2 border-primary bg-white dark:bg-gray-800 rounded-lg transition-all duration-300">
                         <div class="flex flex-col items-center text-center space-y-3">
                             <div class="bg-primary-10 hover:bg-primary-20 p-3 rounded-full transition-all duration-300">
-                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/recycle-bin.png" alt="Recycle Bin"
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/recycle-bin.png"
+                                    alt="Recycle Bin"
                                     class="h-10 w-10 object-contain group-hover:scale-120 transition-transform duration-300" />
                             </div>
                             <div>
