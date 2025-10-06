@@ -182,6 +182,10 @@
         color: var(--color-tertiary);
     }
 
+    .hover\:text-edit:hover {
+        color: var(--color-edit);
+    }
+
     .hover\:text-dark:hover {
         color: var(--color-dark);
     }

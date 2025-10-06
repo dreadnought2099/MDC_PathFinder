@@ -201,13 +201,13 @@
 
                             <div class="flex gap-2 mb-3 flex-wrap">
                                 <button type="button"
-                                    class="quick-select px-3 py-1.5 rounded text-sm bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white transition-colors"
+                                    class="quick-select px-3 py-1.5 rounded text-sm bg-gray-500 hover:bg-white hover:text-gray-600 dark:bg-gray-600 dark:hover:bg-gray-800 dark:hover:text-white text-white border border-gray-600 transition-colors shadow-cancel-hover cursor-pointer"
                                     data-days="Mon,Tue,Wed,Thu,Fri">Weekdays</button>
                                 <button type="button"
-                                    class="quick-select px-3 py-1.5 rounded text-sm bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white transition-colors"
+                                    class="quick-select px-3 py-1.5 rounded text-sm bg-gray-500 hover:bg-white hover:text-gray-600 dark:bg-gray-600 dark:hover:bg-gray-800 dark:hover:text-white text-white border border-gray-600 transition-colors shadow-cancel-hover cursor-pointer"
                                     data-days="Sat,Sun">Weekends</button>
                                 <button type="button"
-                                    class="quick-select px-3 py-1.5 rounded text-sm bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-500 text-white transition-colors"
+                                    class="quick-select px-3 py-1.5 rounded text-sm bg-gray-500 hover:bg-white hover:text-gray-600 dark:bg-gray-600 dark:hover:bg-gray-800 dark:hover:text-white text-white border border-gray-600 transition-colors shadow-cancel-hover cursor-pointer"
                                     data-days="Mon,Tue,Wed,Thu,Fri,Sat,Sun">All Days</button>
                                 <button type="button"
                                     class="clear-select px-3 py-1.5 rounded text-sm bg-secondary hover:bg-white hover:text-secondary border border-secondary dark:bg-gray-600 dark:hover:bg-gray-800 text-white transition-colors cursor-pointer shadow-secondary-hover">Clear
@@ -1229,20 +1229,20 @@
                                 <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                             </div>
                             ${rangeKey !== "closed" ? `
-                                                                                                                                                                                                                                                                                                                            <div class="flex flex-col sm:flex-row gap-2 ml-0 sm:ml-4 mt-2 sm:mt-0">
+                            <div class="flex flex-col sm:flex-row gap-2 ml-0 sm:ml-4 mt-2 sm:mt-0">
                                 <button type="button" 
-                                    class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-3 py-1.5 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800 w-full sm:w-auto" 
+                                    class="edit-schedule-btn bg-edit text-white hover:text-edit hover:bg-white text-sm px-3 py-1.5 rounded-md border border-edit transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800 w-full sm:w-auto shadow-edit-hover" 
                                     data-days='${JSON.stringify(group.days)}' 
                                     data-ranges='${JSON.stringify(group.ranges)}'>
                                     Edit
                                 </button>
                                 <button type="button" 
-                                    class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-3 py-1.5 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800 w-full sm:w-auto" 
+                                    class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-3 py-1.5 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800 w-full sm:w-auto shadow-secondary-hover" 
                                     data-days='${JSON.stringify(group.days)}'>
                                     Delete
                                 </button>
                             </div>
-                                                                                                                                                                                                                                                                                                                        ` : ''}
+                         ` : ''}
                         </div>
                     `;
 
