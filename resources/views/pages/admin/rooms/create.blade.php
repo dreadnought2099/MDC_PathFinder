@@ -194,19 +194,20 @@
                             <label class="block text-sm font-medium mb-2 dark:text-gray-300">Time Range</label>
                             <div class="bulk-time-ranges">
                                 <div class="bulk-ranges-container">
-                                    <div class="flex gap-2 bulk-range-row max-w-md">
+                                    <div
+                                        class="flex flex-col sm:flex-row gap-2 sm:gap-3 bulk-range-row max-w-full sm:max-w-md">
                                         <div class="relative flex-1">
                                             <input type="time"
                                                 class="custom-time-input bulk-start-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary">
                                             <button type="button"
-                                                class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
+                                                class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 text-xl"
                                                 title="Clear">&times;</button>
                                         </div>
                                         <div class="relative flex-1">
                                             <input type="time"
                                                 class="custom-time-input bulk-end-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary">
                                             <button type="button"
-                                                class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400"
+                                                class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 text-xl"
                                                 title="Clear">&times;</button>
                                         </div>
                                     </div>
@@ -1112,17 +1113,17 @@
                                 <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                             </div>
                             ${rangeKey !== "closed" ? `
-                                                                                                                                                                                                                                    <div class="flex gap-2 ml-4">
-                                                                                                                                                                                                                                        <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                                                                                                                                                                                data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
-                                                                                                                                                                                                                                            Edit
-                                                                                                                                                                                                                                        </button>
-                                                                                                                                                                                                                                        <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
-                                                                                                                                                                                                                                                data-days='${JSON.stringify(group.days)}'>
-                                                                                                                                                                                                                                            Delete
-                                                                                                                                                                                                                                        </button>
-                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                ` : ''}
+                                                                                                                                                                                                                                        <div class="flex gap-2 ml-4">
+                                                                                                                                                                                                                                            <button type="button" class="edit-schedule-btn bg-primary text-white hover:text-primary hover:bg-white text-sm px-2 py-1 rounded-md border border-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                                                                                                                                                                    data-days='${JSON.stringify(group.days)}' data-ranges='${JSON.stringify(group.ranges)}'>
+                                                                                                                                                                                                                                                Edit
+                                                                                                                                                                                                                                            </button>
+                                                                                                                                                                                                                                            <button type="button" class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-2 py-1 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800" 
+                                                                                                                                                                                                                                                    data-days='${JSON.stringify(group.days)}'>
+                                                                                                                                                                                                                                                Delete
+                                                                                                                                                                                                                                            </button>
+                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                    ` : ''}
                         </div>
                     `;
 
@@ -1283,7 +1284,7 @@
             function showTemporaryFeedback(button, text) {
                 const old = button.textContent;
                 button.textContent = text;
-                
+
                 setTimeout(() => {
                     button.textContent = old;
                 }, 2000);
