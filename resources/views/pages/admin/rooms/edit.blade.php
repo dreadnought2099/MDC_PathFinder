@@ -418,7 +418,7 @@
             const coverInput = document.getElementById('image_path');
             const coverUploadBox = document.getElementById('uploadBox');
             let coverPreview = document.getElementById('previewImage');
-            
+
             if (!coverPreview) {
                 coverPreview = document.createElement('img');
                 coverPreview.id = 'previewImage';
@@ -1448,13 +1448,6 @@
                     });
                 });
             }
-
-            console.log('Carousel container exists:', !!document.querySelector(
-                '[data-existing-carousel-container]'));
-            console.log('Images with data-existing-carousel-id:', document.querySelectorAll(
-                '[data-existing-carousel-id]').length);
-            console.log('All images in carousel section:', document.querySelectorAll('#carousel-images-section img')
-                .length);
 
             // Load existing carousel images
             loadExistingCarouselImages();
