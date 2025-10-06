@@ -20,7 +20,7 @@
 
                 <!-- Separate Crop Button -->
                 <button onclick="openModal()"
-                    class="bg-primary text-white text-xs px-2 py-1 rounded-md hover:bg-white dark:hover:bg-gray-800 hover:text-primary border border-primary transition-all duration-300 cursor-pointer">
+                    class="bg-primary text-white text-xs px-2 py-1 rounded-md hover:bg-white dark:hover:bg-gray-800 hover:text-primary border border-primary transition-all duration-300 cursor-pointer shadow-primary-hover">
                     Update Profile
                 </button>
             </div>
@@ -113,7 +113,7 @@
 
                 {{-- Setup section hidden until clicked --}}
                 <div x-show="showSetup" x-cloak
-                    class="mt-4 border rounded-lg p-4 bg-white dark:bg-gray-800 dark:text-gray-300">
+                    class="mt-4 border border-primary rounded-lg p-4 bg-white dark:bg-gray-800 dark:text-gray-300">
                     <p class="text-center font-semibold mb-2">Step 1: Scan QR Code</p>
                     <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 text-center">
                         Use an authenticator app like Google Authenticator, Authy, or Microsoft Authenticator
