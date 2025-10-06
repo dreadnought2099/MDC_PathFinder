@@ -7,86 +7,55 @@
 
     <div class="container mx-auto max-w-6xl px-4 py-6">
         <!-- Header -->
-        <div class="mb-6 text-center ">
+        <div class="mb-12 text-center">
             <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">
                 <span class="text-primary">Path</span> Details
             </h1>
+            <p class="text-sm sm:text-base lg:text-base text-gray-600 dark:text-gray-300 mt-1 sm:mt-2">
+                Overview of the route from the starting office to the destination office.
+            </p>
+
         </div>
 
-        <!-- Path Info & Visualization -->
-        <div class="grid md:grid-cols-2 gap-6 mb-6">
-            <!-- Path Info Card -->
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-5 text-center border-2 border-primary">
-                <h2 class="text-lg mb-4 dark:text-gray-300">Path Info</h2>
-                <dl class="space-y-3 text-sm text-gray-700 dark:text-gray-300">
-                    <!-- Path ID -->
-                    <div class="flex justify-between">
-                        <dt class="font-medium dark:text-gray-300">Path ID:</dt>
-                        <dd>{{ $path->id }}</dd>
+        <div class="container mx-auto max-w-3xl px-4 py-6">
+            <!-- Room Visualization -->
+            <div
+                class="bg-white dark:bg-gray-800 border border-primary rounded-md shadow-lg px-4 py-3 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mx-auto">
+                <!-- From Room -->
+                <div class="text-center flex-1">
+                    <div class="text-gray-700 dark:text-gray-300">
+                        <div class="text-md font-semibold truncate">
+                            {{ $path->fromRoom->name ?? 'Room #' . $path->from_room_id }}
+                        </div>
                     </div>
-                    <!-- From Room -->
-                    <div class="flex justify-between items-center">
-                        <dt class="font-medium dark:text-gray-300">From Room:</dt>
-                        <dd>
-                            <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
-                                {{ $path->fromRoom->name ?? 'Room #' . $path->from_room_id }}
-                            </span>
-                            @if ($path->fromRoom?->description)
-                                <br><small class="text-gray-400">{{ Str::limit($path->fromRoom->description, 50) }}</small>
-                            @endif
-                        </dd>
-                    </div>
-                    <!-- To Room -->
-                    <div class="flex justify-between items-center">
-                        <dt class="font-medium dark:text-gray-300">To Room:</dt>
-                        <dd>
-                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">
-                                {{ $path->toRoom->name ?? 'Room #' . $path->to_room_id }}
-                            </span>
-                            @if ($path->toRoom?->description)
-                                <br><small class="text-gray-400">{{ Str::limit($path->toRoom->description, 50) }}</small>
-                            @endif
-                        </dd>
-                    </div>
-                    <!-- Created At -->
-                    <div class="flex justify-between">
-                        <dt class="font-medium dark:text-gray-300">Created:</dt>
-                        <dd>{{ $path->created_at?->format('M d, Y H:i') }}</dd>
-                    </div>
-                    <!-- Number of Images -->
-                    <div class="flex justify-between">
-                        <dt class="font-medium dark:text-gray-300">Images:</dt>
-                        <dd>
-                            <span class="px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm">
-                                {{ $path->images->count() }}
-                            </span>
-                        </dd>
-                    </div>
-                </dl>
-            </div>
-
-            <!-- Path Visualization Card -->
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-5 flex items-center justify-around border-2 border-primary">
-                <div class="text-center p-4 bg-blue-500 text-white rounded shadow">
-                    <i class="fas fa-door-open fa-2x mb-2"></i>
-                    <div>{{ $path->fromRoom->name ?? 'Room #' . $path->from_room_id }}</div>
                 </div>
-                <i class="fas fa-arrow-right fa-2x text-gray-400 mx-4"></i>
-                <div class="text-center p-4 bg-green-500 text-white rounded shadow">
-                    <i class="fas fa-door-open fa-2x mb-2"></i>
-                    <div>{{ $path->toRoom->name ?? 'Room #' . $path->to_room_id }}</div>
+
+                <div class="flex-shrink-0 my-2 sm:my-0">
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/arrow.png"
+                        alt="Path Arrow" class="w-6 h-6 sm:w-8 sm:h-8 object-contain">
+                </div>
+
+                <!-- To Room -->
+                <div class="text-center flex-1">
+                    <div class="text-gray-700 dark:text-gray-300">
+                        <div class="text-md font-semibold truncate">
+                            {{ $path->toRoom->name ?? 'Room #' . $path->to_room_id }}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Path Images Card -->
-        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-5 text-center border-2 border-primary">
-            <h2 class="text-xl font-semibold mb-4 dark:text-gray-300"><i class="fas fa-images mr-2"></i> Path Images
-                ({{ $path->images->count() }})</h2>
-            @if ($path->images->count() > 0)
+
+        <!-- Path Images -->
+        <div class="bg-white dark:bg-gray-800 border-2 border-primary rounded-lg shadow p-5 text-center">
+            <h2 class="text-xl font-semibold mb-4 dark:text-gray-300">
+                <i class="fas fa-images mr-2"></i> Path Images ({{ $path->images->count() }})
+            </h2>
+
+            @if ($path->images->count())
                 <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     @foreach ($path->images as $image)
-                        <!-- GLightbox Wrapper -->
                         <a href="{{ asset('storage/' . $image->image_file) }}" class="glightbox"
                             data-gallery="path-{{ $path->id }}"
                             data-title="{{ $image->description ?? 'Path ' . $image->image_order }}">
@@ -94,20 +63,12 @@
                                 <img src="{{ asset('storage/' . $image->image_file) }}"
                                     class="w-full h-48 object-cover transform group-hover:scale-105 transition"
                                     alt="Path Image {{ $image->image_order }}">
-                                @if ($image->description)
-                                    <div
-                                        class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-sm p-2 truncate">
-                                        {{ Str::limit($image->description, 40) }}
-                                    </div>
-                                @else
-                                    <div
-                                        class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-sm p-2 text-center">
-                                        Path {{ $image->image_order }}
-                                    </div>
-                                @endif
+                                <div
+                                    class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-sm p-2 truncate">
+                                    {{ $image->description ?? 'Path ' . $image->image_order }}
+                                </div>
                             </div>
                         </a>
-                        <!-- End GLightbox Wrapper -->
                     @endforeach
                 </div>
             @else
