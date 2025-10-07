@@ -157,10 +157,12 @@
                             emailError.classList.remove('invisible');
                             submitBtn.disabled = true;
                             submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                            submitBtn.classList.remove('cursor-pointer');
                         } else {
                             emailError.classList.add('invisible');
                             submitBtn.disabled = false;
                             submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                            submitBtn.classList.add('cursor-pointer');
                         }
                     } catch (err) {
                         console.error('Email check failed:', err);
