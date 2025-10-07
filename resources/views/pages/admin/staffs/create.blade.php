@@ -98,10 +98,11 @@
                 </div>
 
                 <div class="relative">
-                    <input type="number" name="phone_num" placeholder="Phone Number" class="{{ $inputClasses }}"
-                        placeholder="0900 000 0000">
+                    <input type="tel" name="phone_num" placeholder="Phone Number" class="{{ $inputClasses }}"
+                        pattern="[0-9]{11}" maxlength="11" oninput="this.value = this.value.replace(/\D/g,'').slice(0,11);">
                     <label class="{{ $labelClasses }}">Phone Number</label>
                 </div>
+
             </div>
 
             <!-- Photo Upload - Full width in grid -->
