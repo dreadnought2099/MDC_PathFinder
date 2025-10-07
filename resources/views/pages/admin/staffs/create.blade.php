@@ -134,17 +134,30 @@
             const emailError = document.getElementById('email_error');
             const submitBtn = document.getElementById("submitBtn");
 
-            // ===== Live email check =====
+            // ===== Live email check with proper debounce =====
             let debounceTimer;
+            function isValidEmail(email) {
+                // Simple email format check
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            }
+
             emailInput.addEventListener('input', function() {
+                const email = emailInput.value.trim();
+
+                // Disable button immediately while typing
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                submitBtn.classList.remove('cursor-pointer');
+
+                emailError.classList.add('invisible'); // hide error while typing
+
                 clearTimeout(debounceTimer);
                 debounceTimer = setTimeout(async () => {
-                    const email = emailInput.value.trim();
-
-                    if (!email) {
-                        emailError.classList.add('invisible');
-                        submitBtn.disabled = false;
-                        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    if (!email || !isValidEmail(email)) {
+                        // Keep disabled if empty or invalid format
+                        emailError.textContent = !email ? '' : 'Invalid email format';
+                        if (!email) emailError.classList.add('invisible');
+                        else emailError.classList.remove('invisible');
                         return;
                     }
 
@@ -154,6 +167,7 @@
                         const data = await response.json();
 
                         if (data.exists) {
+                            emailError.textContent = 'Email already exists';
                             emailError.classList.remove('invisible');
                             submitBtn.disabled = true;
                             submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
@@ -166,12 +180,11 @@
                         }
                     } catch (err) {
                         console.error('Email check failed:', err);
-                        emailError.classList.add('invisible');
-                        submitBtn.disabled = false;
-                        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        submitBtn.disabled = true; // keep disabled on error
                     }
-                }, 500);
+                }, 500); // 500ms debounce
             });
+
 
             // ===== Photo upload and compression =====
             const photoInput = document.getElementById("photo_path");
@@ -202,23 +215,22 @@
                 }, 3000);
             }
 
-            async function compressImageCanvas(file, maxDimension = 2000, quality = 0.85) {
-                return new Promise(resolve => {
+            async function compressImageCanvas(file, maxDimension = 1500, quality = 0.55) {
+                return new Promise((resolve, reject) => {
+                    if (!file.type.startsWith('image/')) return reject("Not an image file");
+
                     const reader = new FileReader();
                     reader.onload = e => {
                         const img = new Image();
                         img.onload = () => {
+                            // Scale down to maxDimension if bigger, or reduce anyway for large size
                             let width = img.width;
                             let height = img.height;
-                            if (width > maxDimension || height > maxDimension) {
-                                if (width > height) {
-                                    height = Math.round(height * maxDimension / width);
-                                    width = maxDimension;
-                                } else {
-                                    width = Math.round(width * maxDimension / height);
-                                    height = maxDimension;
-                                }
-                            }
+                            const scale = Math.min(maxDimension / width, maxDimension / height,
+                                1); // never scale up
+                            width = Math.round(width * scale);
+                            height = Math.round(height * scale);
+
                             const canvas = document.createElement('canvas');
                             canvas.width = width;
                             canvas.height = height;
@@ -226,17 +238,24 @@
                             ctx.imageSmoothingEnabled = true;
                             ctx.imageSmoothingQuality = 'high';
                             ctx.drawImage(img, 0, 0, width, height);
+
+                            // Force JPEG conversion with lower quality
                             canvas.toBlob(blob => {
-                                if (blob && blob.size < file.size) {
-                                    const originalName = file.name.replace(/\.[^/.]+$/,
-                                        '');
-                                    const compressed = new File([blob],
-                                        `${originalName}.jpg`, {
-                                            type: 'image/jpeg',
-                                            lastModified: Date.now()
-                                        });
-                                    resolve(compressed);
-                                } else resolve(file);
+                                if (!blob) return reject("Compression failed");
+                                const originalName = file.name.replace(/\.[^/.]+$/, '');
+                                const compressedFile = new File([blob],
+                                    `${originalName}.jpg`, {
+                                        type: 'image/jpeg',
+                                        lastModified: Date.now()
+                                    });
+
+                                // Check final size and warn if still big
+                                if (compressedFile.size > 0.5 * 1024 * 1024) {
+                                    console.warn('File still large:', (compressedFile
+                                        .size / 1024 / 1024).toFixed(2), 'MB');
+                                }
+
+                                resolve(compressedFile);
                             }, 'image/jpeg', quality);
                         };
                         img.src = e.target.result;
@@ -268,11 +287,11 @@
                 const reader = new FileReader();
                 reader.onload = e => {
                     previewContainer.innerHTML = `
-            <div class="relative w-full h-full">
-                <img src="${e.target.result}" class="w-full h-full object-cover rounded" alt="Staff photo preview">
-                <button type="button" id="removePhotoBtn" class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors font-bold">×</button>
-                <div class="absolute bottom-0 left-0 right-0 bg-green-600 text-white text-xs p-2 font-medium">1 IMAGE(S) COMPRESSED: ${formatFileSize(originalSize)} → ${formatFileSize(compressedSize)}</div>
-            </div>`;
+                    <div class="relative w-full h-full">
+                        <img src="${e.target.result}" class="w-full h-full object-cover rounded" alt="Staff photo preview">
+                        <button type="button" id="removePhotoBtn" class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors font-bold">×</button>
+                        <div class="absolute bottom-0 left-0 right-0 bg-green-600 text-white text-xs p-2 font-medium">1 IMAGE(S) COMPRESSED: ${formatFileSize(originalSize)} → ${formatFileSize(compressedSize)}</div>
+                    </div>`;
                     document.getElementById('removePhotoBtn').addEventListener('click', e => {
                         e.stopPropagation();
                         photoInput.value = '';
