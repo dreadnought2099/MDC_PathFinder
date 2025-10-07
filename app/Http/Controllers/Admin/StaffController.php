@@ -14,6 +14,13 @@ use Intervention\Image\ImageManager;
 
 class StaffController extends Controller
 {
+    private ImageManager $manager;
+
+    public function __construct()
+    {
+        $this->manager = new ImageManager(new Driver());
+    }
+
     public function index(Request $request)
     {
         $sort = $request->get('sort', 'last_name');   // default sort column
@@ -50,20 +57,12 @@ class StaffController extends Controller
 
         // Create staff first
         $staff = Staff::create($validated);
-        $manager = new ImageManager(new Driver());
 
-        // Then handle photo upload
         if ($request->hasFile('photo_path')) {
-
-            $baseName = uniqid('', true);
-            $folder   = "staffs/{$staff->id}";
-            $webpPath = "{$folder}/{$baseName}.webp";
-
-            $image = $manager->read($request->file('photo_path'))->encode(new WebpEncoder(90));
-            Storage::disk('public')->put($webpPath, (string) $image);
-
+            $webpPath = $this->processAndSaveImage($request->file('photo_path'), $staff->id);
             $staff->update(['photo_path' => $webpPath]);
         }
+
 
         session()->flash('success', "{$staff->full_name} was added successfully.");
 
@@ -121,26 +120,16 @@ class StaffController extends Controller
 
         // Remove photo_path from validated data to handle it separately
         unset($validated['photo_path']);
-        $manager = new ImageManager(new Driver());
 
-        // Handle photo upload
         if ($request->hasFile('photo_path')) {
-            // Delete old photo if exists
             if ($staff->photo_path && Storage::disk('public')->exists($staff->photo_path)) {
                 Storage::disk('public')->delete($staff->photo_path);
             }
 
-            // Store new photo under staffs/{staff_id}/
-            $baseName = uniqid('', true);
-            $folder   = "staffs/{$staff->id}";
-            $webpPath = "{$folder}/{$baseName}.webp";
-
-            $image = $manager->read($request->file('photo_path'))->encode(new WebpEncoder(90));
-            Storage::disk('public')->put($webpPath, (string) $image);
-
-            // Add the new path to the data to be updated
+            $webpPath = $this->processAndSaveImage($request->file('photo_path'), $staff->id);
             $validated['photo_path'] = $webpPath;
         }
+
 
         // Update staff with all validated data (including photo_path if uploaded)
         $staff->update($validated);
@@ -208,5 +197,43 @@ class StaffController extends Controller
         });
 
         return response()->json($results);
+    }
+
+    private function processAndSaveImage($file, $staffId)
+    {
+        $baseName = uniqid('', true);
+        $folder = "staffs/{$staffId}";
+        $webpPath = "{$folder}/{$baseName}.webp";
+
+        $image = $this->manager->read($file);
+
+        // Resize if too large
+        $width = $image->width();
+        $height = $image->height();
+        $maxDimension = 2000;
+
+        if ($width > $maxDimension || $height > $maxDimension) {
+            if ($width > $height) {
+                $image->scale(width: $maxDimension);
+            } else {
+                $image->scale(height: $maxDimension);
+            }
+        }
+
+        // Adjust quality based on file size
+        $quality = 80;
+        if ($file->getSize() > 5 * 1024 * 1024) {
+            $quality = 70;
+        } elseif ($file->getSize() > 2 * 1024 * 1024) {
+            $quality = 75;
+        }
+
+        $encodedImage = $image->encode(new WebpEncoder($quality));
+        unset($image);
+
+        Storage::disk('public')->put($webpPath, (string) $encodedImage);
+        unset($encodedImage);
+
+        return $webpPath;
     }
 }

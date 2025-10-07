@@ -170,7 +170,7 @@ class Room extends Model
         $attempts = 0;
 
         do {
-            $token = bin2hex(random_bytes(16)); // 32 character hex string
+            $token = bin2hex(random_bytes(32)); // 64 character hex string
             $attempts++;
 
             if ($attempts >= $maxAttempts) {

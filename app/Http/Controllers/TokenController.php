@@ -66,10 +66,10 @@ class TokenController extends Controller
         $room = Room::findByValidToken($token);
 
         if (!$room) {
-            abort(404, 'Room not found');
+            abort(404, 'Office not found');
         }
 
         // Pass to scanner controller
-        return app(\App\Http\Controllers\ScannerController::class)->showRoom($room);
+        return app(ScannerController::class)->showRoom($room);
     }
 }

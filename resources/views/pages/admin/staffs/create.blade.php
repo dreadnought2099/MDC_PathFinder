@@ -3,7 +3,8 @@
 @section('content')
     <x-floating-actions />
 
-    <div class="max-w-4xl mx-auto mt-10 mb-10 rounded-lg border-2 shadow-2xl border-primary p-4 sm:p-6 md:p-8 dark:bg-gray-800">
+    <div
+        class="max-w-4xl mx-auto mt-10 mb-10 rounded-lg border-2 shadow-2xl border-primary p-4 sm:p-6 md:p-8 dark:bg-gray-800">
         <h2 class="text-2xl text-center mb-8"><span class="text-primary">Add</span> <span class="dark:text-gray-300">Staff
                 Member</span></h2>
 
@@ -149,7 +150,7 @@
             });
 
             // ===== Live email check =====
-            emailInput.addEventListener('input', function() {
+            emailInput?.addEventListener('input', function() {
                 const email = emailInput.value.trim();
 
                 if (email.length > 0) {
@@ -166,16 +167,104 @@
                                 submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
                             }
                         })
-                        .catch(() => {
-                            // fallback: hide error
-                            emailError.classList.add('invisible');
-                        });
+                        .catch(() => emailError.classList.add('invisible'));
                 } else {
                     emailError.classList.add('invisible');
                     submitBtn.disabled = false;
                     submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
                 }
             });
+
+            // ===== Image compression + feedback =====
+            fileInput?.addEventListener("change", async function() {
+                if (this.files.length > 0) {
+                    const file = this.files[0];
+                    if (!file.type.startsWith("image/")) return;
+
+                    showTemporaryMessage('Compressing image...', 'info');
+
+                    const img = new Image();
+                    const reader = new FileReader();
+
+                    reader.onload = async function(e) {
+                        img.src = e.target.result;
+                        img.onload = async function() {
+                            const canvas = document.createElement("canvas");
+                            const MAX_DIMENSION = 2000;
+
+                            let width = img.width;
+                            let height = img.height;
+
+                            // Scale down large images
+                            if (width > height && width > MAX_DIMENSION) {
+                                height *= MAX_DIMENSION / width;
+                                width = MAX_DIMENSION;
+                            } else if (height > MAX_DIMENSION) {
+                                width *= MAX_DIMENSION / height;
+                                height = MAX_DIMENSION;
+                            }
+
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext("2d");
+                            ctx.drawImage(img, 0, 0, width, height);
+
+                            try {
+                                const blob = await new Promise(resolve =>
+                                    canvas.toBlob(resolve, "image/webp", 0.75)
+                                );
+
+                                if (!blob) throw new Error('Compression failed');
+
+                                const compressedFile = new File([blob], file.name
+                                    .replace(/\.\w+$/, ".webp"), {
+                                        type: "image/webp",
+                                        lastModified: Date.now()
+                                    });
+
+                                const dataTransfer = new DataTransfer();
+                                dataTransfer.items.add(compressedFile);
+                                fileInput.files = dataTransfer.files;
+
+                                showTemporaryMessage(
+                                    `Image compressed successfully: ${(file.size / 1024).toFixed(1)}KB → ${(compressedFile.size / 1024).toFixed(1)}KB`,
+                                    'success'
+                                );
+                            } catch {
+                                showTemporaryMessage(
+                                    'Compression failed, using original image.',
+                                    'error');
+                            }
+                        };
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // ===== Flash-style message handler =====
+            function showTemporaryMessage(message, type = 'info') {
+                const container = document.getElementById('success-message-container');
+                if (!container) return;
+
+                const div = document.createElement('div');
+                const colorClasses = {
+                    success: 'bg-green-100 text-green-700 border-green-300 dark:bg-green-800 dark:text-green-200 dark:border-green-600',
+                    error: 'bg-red-100 text-red-700 border-red-300 dark:bg-red-800 dark:text-red-200 dark:border-red-600',
+                    info: 'bg-yellow-100 text-yellow-700 border-yellow-300 dark:bg-yellow-700 dark:text-yellow-200 dark:border-yellow-500',
+                    warning: 'bg-orange-100 text-orange-700 border-orange-300 dark:bg-orange-800 dark:text-orange-200 dark:border-orange-600'
+                };
+
+                div.className =
+                    `p-3 sm:p-4 rounded-md shadow-lg border-l-4 text-sm sm:text-base transition-opacity duration-500 ${colorClasses[type] || colorClasses.info}`;
+                div.textContent = message;
+
+                container.appendChild(div);
+
+                setTimeout(() => {
+                    div.classList.add('opacity-0');
+                    setTimeout(() => div.remove(), 500);
+                }, 3000);
+            }
         });
     </script>
 @endpush

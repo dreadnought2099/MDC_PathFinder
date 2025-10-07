@@ -17,7 +17,7 @@ class ScannerController extends Controller
     {
         // Handle invalid token scenarios
         if (request()->is('scan-marker/*') && is_null($room)) {
-            return redirect()->route('scan.index')->with('error', 'Invalid room token.');
+            return redirect()->route('scan.index')->with('error', 'Invalid office token.');
         }
 
         // Get fact for room or general fact
@@ -33,7 +33,7 @@ class ScannerController extends Controller
     {
         // Additional security check
         if (!Room::isValidTokenFormat($room->token)) {
-            abort(404, 'Invalid room token');
+            abort(404, 'Invalid office token');
         }
 
         // Get fact for this specific room

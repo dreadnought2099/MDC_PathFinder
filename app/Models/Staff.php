@@ -44,7 +44,7 @@ class Staff extends Model
     {
         static::creating(function ($staff) {
             if (empty($staff->token)) {
-                $staff->token = Str::random(64);
+                $staff->token = bin2hex(random_bytes(32)); // 64-char secure hex token
             }
         });
     }

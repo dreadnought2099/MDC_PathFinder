@@ -38,13 +38,6 @@ Route::middleware(['web'])->group(function () {
     Route::get('/navigation/select', [PathController::class, 'selection'])->name('paths.select');
     Route::post('/navigation/results', [PathController::class, 'results'])->name('paths.results');
     Route::get('/paths/return-to-results', [PathController::class, 'returnToResults'])->name('paths.return-to-results');
-
-    // Test error page
-    Route::get('/test-error/{code}', function ($code) {
-        $allowedCodes = [401, 402, 403, 404, 405, 419, 429, 500, 503];
-        if (!in_array($code, $allowedCodes)) abort(400, 'Invalid test error code.');
-        abort($code);
-    });
 });
 
 // Admin login

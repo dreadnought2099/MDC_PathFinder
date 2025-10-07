@@ -312,7 +312,7 @@
     @endif
     @if ($room)
         <script>
-            console.log('Office details loaded for room:', @json($room->id ?? null));
+            console.log('Details loaded for office:', @json($room->id ?? null));
         </script>
     @endif
 @endsection

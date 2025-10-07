@@ -48,7 +48,7 @@
                             </th>
                             <th
                                 class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm text-gray-700 uppercase tracking-wide dark:text-gray-300">
-                                Room ID
+                                Office ID
                             </th>
                             <th
                                 class="px-4 sm:px-6 py-3 sm:py-4 text-right text-xs sm:text-sm text-gray-700 uppercase tracking-wide dark:text-gray-300">
