@@ -35,8 +35,9 @@ class RoomController extends Controller
             'recycleBin'
         ]);
 
-        ini_set('memory_limit', '512M');
-        ini_set('max_execution_time', '300');
+        // Reduced memory since images are pre-compressed by frontend
+        ini_set('memory_limit', '256M');
+        ini_set('max_execution_time', '180');
 
         $this->manager = new ImageManager(new Driver());
     }
@@ -100,16 +101,16 @@ class RoomController extends Controller
                 }
             }
 
-            // Process cover image
+            // Process cover image - Convert to WebP
             if ($request->hasFile('image_path')) {
                 try {
-                    $webpPath = $this->processAndSaveImage(
+                    $webpPath = $this->convertToWebP(
                         $request->file('image_path'),
                         "offices/{$room->id}/cover_images"
                     );
                     $room->image_path = $webpPath;
                 } catch (\Exception $e) {
-                    Log::error('Cover image processing failed', [
+                    Log::error('Cover image WebP conversion failed', [
                         'room_id' => $room->id,
                         'error' => $e->getMessage()
                     ]);
@@ -140,14 +141,14 @@ class RoomController extends Controller
                 'qr_code_path' => $qrPath,
             ]);
 
-            // Process carousel images
+            // Process carousel images - Convert to WebP
             if ($request->hasFile('carousel_images')) {
                 $uploadedCount = 0;
                 $failedCount = 0;
 
                 foreach ($request->file('carousel_images') as $carouselImage) {
                     try {
-                        $webpPath = $this->processAndSaveImage(
+                        $webpPath = $this->convertToWebP(
                             $carouselImage,
                             "offices/{$room->id}/carousel"
                         );
@@ -158,10 +159,9 @@ class RoomController extends Controller
                         ]);
 
                         $uploadedCount++;
-                        gc_collect_cycles();
                     } catch (\Exception $e) {
                         $failedCount++;
-                        Log::error('Carousel image processing failed', [
+                        Log::error('Carousel image WebP conversion failed', [
                             'room_id' => $room->id,
                             'file' => $carouselImage->getClientOriginalName(),
                             'error' => $e->getMessage()
@@ -307,20 +307,20 @@ class RoomController extends Controller
                 $room->image_path = null;
             }
 
-            // Update cover image
+            // Update cover image - Convert to WebP
             if ($request->hasFile('image_path')) {
                 if ($room->image_path && Storage::disk('public')->exists($room->image_path)) {
                     Storage::disk('public')->delete($room->image_path);
                 }
 
                 try {
-                    $webpPath = $this->processAndSaveImage(
+                    $webpPath = $this->convertToWebP(
                         $request->file('image_path'),
                         "offices/{$room->id}/cover_images"
                     );
                     $room->image_path = $webpPath;
                 } catch (\Exception $e) {
-                    Log::error('Cover image update failed', [
+                    Log::error('Cover image WebP conversion failed', [
                         'room_id' => $room->id,
                         'error' => $e->getMessage()
                     ]);
@@ -360,14 +360,14 @@ class RoomController extends Controller
                 }
             }
 
-            // Add new carousel images
+            // Add new carousel images - Convert to WebP
             if ($request->hasFile('carousel_images')) {
                 $uploadedCount = 0;
                 $failedCount = 0;
 
                 foreach ($request->file('carousel_images') as $carouselImage) {
                     try {
-                        $webpPath = $this->processAndSaveImage(
+                        $webpPath = $this->convertToWebP(
                             $carouselImage,
                             "offices/{$room->id}/carousel"
                         );
@@ -378,10 +378,9 @@ class RoomController extends Controller
                         ]);
 
                         $uploadedCount++;
-                        gc_collect_cycles();
                     } catch (\Exception $e) {
                         $failedCount++;
-                        Log::error('Carousel image update failed', [
+                        Log::error('Carousel image WebP conversion failed', [
                             'room_id' => $room->id,
                             'file' => $carouselImage->getClientOriginalName(),
                             'error' => $e->getMessage()
@@ -578,39 +577,25 @@ class RoomController extends Controller
     }
 
     /**
-     * Process and save an uploaded image with optimization
+     * Convert already-compressed image to WebP format
+     * Frontend handles compression, backend handles format optimization
      */
-    private function processAndSaveImage($file, $folder)
+    private function convertToWebP($file, $folder)
     {
         $baseName = uniqid('', true);
         $webpPath = "{$folder}/{$baseName}.webp";
 
+        // Read the already-compressed image from frontend
         $image = $this->manager->read($file);
 
-        // Resize if too large
-        $width = $image->width();
-        $height = $image->height();
-        $maxDimension = 2000;
+        // NO resizing - image is already properly sized by frontend
+        // Just convert to WebP with high quality since it's pre-compressed
+        $encodedImage = $image->encode(new WebpEncoder(quality: 90));
 
-        if ($width > $maxDimension || $height > $maxDimension) {
-            if ($width > $height) {
-                $image->scale(width: $maxDimension);
-            } else {
-                $image->scale(height: $maxDimension);
-            }
-        }
-
-        // Adjust quality based on file size
-        $quality = 80;
-        if ($file->getSize() > 5 * 1024 * 1024) {
-            $quality = 70;
-        } elseif ($file->getSize() > 2 * 1024 * 1024) {
-            $quality = 75;
-        }
-
-        $encodedImage = $image->encode(new WebpEncoder($quality));
+        // Clean up
         unset($image);
 
+        // Store the WebP image
         Storage::disk('public')->put($webpPath, (string) $encodedImage);
         unset($encodedImage);
 
