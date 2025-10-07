@@ -101,7 +101,7 @@
 
             <!-- Bio -->
             <div class="relative mb-4">
-                <textarea name="bio" placeholder="Bio" rows="4" class="{{ $inputClasses }}">{{ old('bio', $staff->bio) }}</textarea>
+                <textarea name="bio" id="bio" placeholder="Bio" rows="4" class="{{ $inputClasses }}">{{ old('bio', $staff->bio) }}</textarea>
                 <label class="{{ $labelClasses }}">Bio</label>
                 @error('bio')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -369,6 +369,22 @@
                 if (e.dataTransfer.files.length > 0) await compressAndPreviewImage(e.dataTransfer.files[
                     0]);
             });
+
+            const bioTextArea = document.getElementById('bio');
+            if (bioTextArea) {
+                function autoResize() {
+                    bioTextArea.style.height = 'auto';
+                    bioTextArea.style.height = bioTextArea.scrollHeight + 'px';
+                }
+
+                // Resize on page load if there's existing content
+                if (bioTextArea.value) {
+                    autoResize();
+                }
+
+                // Resize on input
+                bioTextArea.addEventListener('input', autoResize);
+            }
         });
     </script>
 @endpush
