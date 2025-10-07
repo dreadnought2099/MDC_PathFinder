@@ -257,8 +257,67 @@
             const MAX_IMAGE_SIZE_MB = 10;
             const MAX_VIDEO_SIZE_MB = 50;
 
-            // Track which files have been compressed
-            let compressedFileNames = new Set();
+            // Track compressed files
+            let compressedCoverFile = null;
+            let compressedCarouselFiles = new Map();
+
+            // ==================== UTILITIES ====================
+
+            // Single unified notification function
+            function showTemporaryMessage(message, type = "info") {
+                let msgDiv = document.getElementById('temp-message');
+
+                if (!msgDiv) {
+                    msgDiv = document.createElement('div');
+                    msgDiv.id = 'temp-message';
+                    document.body.appendChild(msgDiv);
+                }
+
+                msgDiv.textContent = message;
+
+                const baseClasses =
+                    'fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2 rounded shadow-lg transition-opacity duration-500';
+                const typeClasses = {
+                    success: 'bg-green-500 text-white',
+                    error: 'bg-red-500 text-white',
+                    info: 'bg-blue-500 text-white'
+                };
+
+                msgDiv.className = `${baseClasses} ${typeClasses[type] || typeClasses.info}`;
+                msgDiv.style.display = 'block';
+                msgDiv.style.opacity = '1';
+
+                setTimeout(() => {
+                    msgDiv.style.opacity = '0';
+                    setTimeout(() => {
+                        msgDiv.style.display = 'none';
+                    }, 500);
+                }, 3500);
+            }
+
+            function showTemporaryFeedback(button, text) {
+                const old = button.textContent;
+                button.textContent = text;
+                setTimeout(() => {
+                    button.textContent = old;
+                }, 2000);
+            }
+
+            function showError(row, msg) {
+                row.classList.add("bg-red-50", "border", "border-red-400");
+                if (!row.querySelector(".error-msg")) {
+                    const p = document.createElement("p");
+                    p.className = "error-msg text-red-600 text-xs mt-1";
+                    p.textContent = msg;
+                    row.appendChild(p);
+                }
+            }
+
+            function clearError(row) {
+                row.classList.remove("bg-red-50", "border", "border-red-400");
+                const msg = row.querySelector(".error-msg");
+                if (msg) msg.remove();
+            }
 
             // Canvas-based image compression
             async function compressImageCanvas(file, maxDimension = 2000, quality = 0.85) {
@@ -269,6 +328,7 @@
                         img.onload = () => {
                             let width = img.width;
                             let height = img.height;
+
                             if (width > maxDimension || height > maxDimension) {
                                 if (width > height) {
                                     height = Math.round((height * maxDimension) / width);
@@ -278,67 +338,92 @@
                                     height = maxDimension;
                                 }
                             }
+
                             const canvas = document.createElement('canvas');
                             canvas.width = width;
                             canvas.height = height;
                             const ctx = canvas.getContext('2d');
+
+                            ctx.imageSmoothingEnabled = true;
+                            ctx.imageSmoothingQuality = 'high';
                             ctx.drawImage(img, 0, 0, width, height);
+
+                            let targetQuality = quality;
+                            const sizeMB = file.size / 1024 / 1024;
+
+                            if (sizeMB > 8) targetQuality = 0.75;
+                            else if (sizeMB > 5) targetQuality = 0.80;
+
                             canvas.toBlob(
                                 (blob) => {
                                     if (blob && blob.size < file.size) {
-                                        const compressedFile = new File([blob], file.name, {
-                                            type: 'image/jpeg',
-                                            lastModified: Date.now()
-                                        });
+                                        const originalName = file.name.replace(/\.[^/.]+$/,
+                                            '');
+                                        const compressedFile = new File([blob],
+                                            `${originalName}.jpg`, {
+                                                type: 'image/jpeg',
+                                                lastModified: Date.now()
+                                            });
                                         resolve(compressedFile);
                                     } else {
                                         resolve(file);
                                     }
                                 },
                                 'image/jpeg',
-                                quality
+                                targetQuality
                             );
                         };
+                        img.onerror = () => {
+                            console.error('Image load failed');
+                            resolve(file);
+                        };
                         img.src = e.target.result;
+                    };
+                    reader.onerror = () => {
+                        console.error('FileReader error');
+                        resolve(file);
                     };
                     reader.readAsDataURL(file);
                 });
             }
 
+            function validateImageFile(file, showError = true) {
+                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+                if (!allowedTypes.includes(file.type)) {
+                    if (showError) showTemporaryMessage('Invalid image type.', 'error');
+                    return false;
+                }
+                if (file.size > MAX_IMAGE_SIZE_MB * 1024 * 1024) {
+                    if (showError) showTemporaryMessage('Image too large.', 'error');
+                    return false;
+                }
+                return true;
+            }
+
+            // ==================== FORM SETUP ====================
             const form = document.getElementById('room-form');
             const nameInput = document.querySelector('#name');
-            const feedback = document.querySelector('#name-feedback');
             const submitBtn = document.querySelector('#submit-btn');
 
-            // Show loading overlay on form submit
             form.addEventListener('submit', function(e) {
-                e.preventDefault(); // Prevent default submission
-
-                const carouselFiles = document.getElementById('carousel_images').files;
-                const coverFile = document.getElementById('image_path').files[0];
-
-                // Check if we need to show loading (images to compress)
-                if ((carouselFiles && carouselFiles.length > 0) || coverFile) {
-                    compressAndSubmitForm();
-                } else {
-                    form.submit();
-                }
+                e.preventDefault();
+                submitFormWithProgress();
             });
 
-            // Name uniqueness check with debouncing
+            // Name uniqueness check
             let typingTimer;
             const typingDelay = 500;
 
             nameInput.addEventListener('input', () => {
                 clearTimeout(typingTimer);
                 typingTimer = setTimeout(async () => {
-                    // TODO: AJAX uniqueness check here if needed
+                    // TODO: AJAX uniqueness check
                 }, typingDelay);
             });
 
             nameInput.addEventListener('keydown', () => clearTimeout(typingTimer));
 
-            // Room type change handler
+            // Room type handler
             const roomTypeSelect = document.getElementById('room_type');
             const conditionalFields = document.querySelectorAll('.conditional-field');
 
@@ -349,31 +434,26 @@
                 });
             }
 
-            let isPageLoad = true;
             toggleConditionalFields();
-            setTimeout(() => {
-                isPageLoad = false;
-            }, 100);
-            roomTypeSelect.addEventListener('change', () => {
-                isPageLoad = false;
-                toggleConditionalFields();
-            });
+            roomTypeSelect.addEventListener('change', toggleConditionalFields);
 
-            // Cover image functionality
+            // ==================== COVER IMAGE ====================
             const coverInput = document.getElementById('image_path');
             const coverUploadBox = document.getElementById('uploadBox');
             let coverPreview = document.getElementById('previewImage');
+
             if (!coverPreview) {
                 coverPreview = document.createElement('img');
                 coverPreview.id = 'previewImage';
-                coverPreview.className = 'hidden w-full h-32 object-cover rounded mt-2';
+                coverPreview.className = 'absolute inset-0 object-cover w-full h-full hidden';
                 coverUploadBox.appendChild(coverPreview);
             }
 
             coverUploadBox.addEventListener('click', () => coverInput.click());
-            coverInput.addEventListener('change', () => {
+
+            coverInput.addEventListener('change', async () => {
                 if (coverInput.files && coverInput.files[0]) {
-                    compressAndPreviewCoverImage(coverInput.files[0]);
+                    await compressAndPreviewCoverImage(coverInput.files[0]);
                 }
             });
 
@@ -397,25 +477,31 @@
             }
 
             async function compressAndPreviewCoverImage(file) {
+                if (!validateImageFile(file, true)) return;
+
                 try {
                     showTemporaryMessage('Compressing cover image...', 'info');
-                    const compressedFile = await compressImageCanvas(file, 2000, 0.85);
-                    compressedFileNames.add(file.name);
-                    // Update the file input with compressed file
-                    const dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(new File([compressedFile], file.name, {
-                        type: compressedFile.type,
-                        lastModified: Date.now()
-                    }));
-                    coverInput.files = dataTransfer.files;
-                    showCoverPreview(compressedFile);
                     const originalSizeMB = (file.size / 1024 / 1024).toFixed(2);
+
+                    const compressedFile = await compressImageCanvas(file, 2000, 0.85);
                     const compressedSizeMB = (compressedFile.size / 1024 / 1024).toFixed(2);
-                    showTemporaryMessage(`Cover image compressed: ${originalSizeMB}MB → ${compressedSizeMB}MB`,
-                        'success');
+
+                    compressedCoverFile = compressedFile;
+
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(compressedFile);
+                    coverInput.files = dataTransfer.files;
+
+                    showCoverPreview(compressedFile);
+
+                    showTemporaryMessage(
+                        `Cover image compressed: ${originalSizeMB}MB → ${compressedSizeMB}MB`,
+                        'success'
+                    );
                 } catch (error) {
                     console.error('Compression failed:', error);
                     showTemporaryMessage('Compression failed, using original image', 'error');
+                    compressedCoverFile = file;
                     showCoverPreview(file);
                 }
             }
@@ -425,21 +511,16 @@
                 reader.onload = e => {
                     coverPreview.src = e.target.result;
                     coverPreview.classList.remove('hidden');
+
+                    const icon = coverUploadBox.querySelector('img:not(#previewImage)');
+                    const text = coverUploadBox.querySelector('span');
+                    if (icon) icon.style.display = 'none';
+                    if (text) text.style.display = 'none';
                 };
                 reader.readAsDataURL(file);
             }
 
-            function resetCoverImage() {
-                coverPreview.classList.add('hidden');
-                coverPreview.src = '';
-                const icon = coverUploadBox.querySelector('img:not(#previewImage)');
-                const text = coverUploadBox.querySelector('span');
-                if (icon) icon.style.display = '';
-                if (text) text.style.display = '';
-                coverInput.value = '';
-            }
-
-            // Carousel images functionality
+            // ==================== CAROUSEL IMAGES ====================
             const carouselInput = document.getElementById('carousel_images');
             const carouselUploadBox = document.getElementById('carouselUploadBox');
             const carouselPreviewContainer = document.getElementById('carouselPreviewContainer');
@@ -447,15 +528,11 @@
             let selectedFiles = [];
 
             carouselUploadBox.addEventListener('click', function(e) {
-                // Only block if clicking directly on an image preview div or remove button
                 const clickedPreviewItem = e.target.closest('[data-carousel-index]');
                 const clickedRemoveBtn = e.target.closest('.remove-carousel-btn');
 
-                if (clickedPreviewItem || clickedRemoveBtn) {
-                    return; // Don't open file dialog when clicking on existing images
-                }
-
-                carouselInput.click(); // Open file dialog for everything else
+                if (clickedPreviewItem || clickedRemoveBtn) return;
+                carouselInput.click();
             });
 
             carouselInput.addEventListener('change', () => {
@@ -493,43 +570,60 @@
                     return;
                 }
 
-                // Compress images before adding
                 compressCarouselImages(newFiles);
             }
 
             async function compressCarouselImages(newFiles) {
                 showTemporaryMessage(`Compressing ${newFiles.length} image(s)...`, 'info');
+
                 try {
+                    const batchSize = 3;
                     const compressedFiles = [];
-                    for (let i = 0; i < newFiles.length; i++) {
-                        const file = newFiles[i];
-                        try {
-                            const compressedFile = await compressImageCanvas(file, 2000, 0.85);
-                            const finalFile = new File([compressedFile], file.name, {
-                                type: compressedFile.type,
+                    let totalOriginalSize = 0;
+                    let totalCompressedSize = 0;
+
+                    for (let i = 0; i < newFiles.length; i += batchSize) {
+                        const batch = newFiles.slice(i, i + batchSize);
+
+                        const batchResults = await Promise.all(
+                            batch.map(file => {
+                                totalOriginalSize += file.size;
+                                return compressImageCanvas(file, 2000, 0.85);
+                            })
+                        );
+
+                        batchResults.forEach((compressed, idx) => {
+                            const originalFile = batch[idx];
+                            const compressedFile = new File([compressed], originalFile.name.replace(
+                                /\.[^/.]+$/, '.jpg'), {
+                                type: 'image/jpeg',
                                 lastModified: Date.now()
                             });
-                            compressedFileNames.add(file.name);
-                            compressedFiles.push(finalFile);
-                        } catch (error) {
-                            console.error(`Failed to compress ${file.name}:`, error);
-                            compressedFiles.push(file);
-                        }
+
+                            totalCompressedSize += compressedFile.size;
+                            compressedFiles.push(compressedFile);
+                            compressedCarouselFiles.set(originalFile.name, compressedFile);
+                        });
+
+                        const progress = Math.round((i + batch.length) / newFiles.length * 100);
+                        showTemporaryMessage(`Compressing: ${progress}%`, 'info');
                     }
+
                     selectedFiles = selectedFiles.concat(compressedFiles);
                     renderCarouselPreviews();
                     updateCarouselInputFiles();
-                    const totalOriginalSize = newFiles.reduce((sum, f) => sum + f.size, 0) / 1024 / 1024;
-                    const totalCompressedSize = compressedFiles.reduce((sum, f) => sum + f.size, 0) / 1024 /
-                        1024;
+
+                    const originalMB = (totalOriginalSize / 1024 / 1024).toFixed(2);
+                    const compressedMB = (totalCompressedSize / 1024 / 1024).toFixed(2);
+
                     showTemporaryMessage(
-                        `${newFiles.length} image(s) compressed: ${totalOriginalSize.toFixed(2)}MB → ${totalCompressedSize.toFixed(2)}MB`,
+                        `${newFiles.length} image(s) compressed: ${originalMB}MB → ${compressedMB}MB`,
                         'success'
                     );
                 } catch (error) {
                     console.error('Batch compression failed:', error);
                     showTemporaryMessage('Some images could not be compressed', 'error');
-                } finally {}
+                }
             }
 
             function renderCarouselPreviews() {
@@ -539,25 +633,23 @@
                     const reader = new FileReader();
                     const div = document.createElement('div');
                     div.className = 'relative rounded overflow-hidden border shadow-sm group aspect-square';
-                    div.dataset.carouselIndex = index; // Add this for identification
+                    div.dataset.carouselIndex = index;
 
                     reader.onload = e => {
                         div.innerHTML = `
-                <img src="${e.target.result}" class="w-full h-full object-cover">
-                <div class="absolute inset-x-0 bottom-0 bg-black/60 text-white text-xs p-1 truncate">
-                    ${file.name}
-                </div>
-                <div class="absolute top-1 left-1 bg-black/60 text-white text-xs px-1 rounded">
-                    ${(file.size / 1024 / 1024).toFixed(2)}MB
-                </div>
-                <button type="button" 
-                    class="remove-carousel-btn absolute top-1 right-1 bg-red-500 text-white w-6 h-6 rounded-full
-                    flex items-center justify-center text-lg hover:bg-red-600 transition-colors
-                    opacity-0 group-hover:opacity-100"
-                    title="Remove">
-                    ×
-                </button>
-            `;
+                    <img src="${e.target.result}" class="w-full h-full object-cover">
+                    <div class="absolute inset-x-0 bottom-0 bg-black/60 text-white text-xs p-1 truncate">
+                        ${file.name}
+                    </div>
+                    <div class="absolute top-1 left-1 bg-black/60 text-white text-xs px-1 rounded">
+                        ${(file.size / 1024 / 1024).toFixed(2)}MB
+                    </div>
+                    <button type="button" 
+                        class="remove-carousel-btn absolute top-1 right-1 bg-red-500 text-white w-6 h-6 rounded-full
+                        flex items-center justify-center text-lg hover:bg-red-600 transition-colors
+                        opacity-0 group-hover:opacity-100"
+                        title="Remove">×</button>
+                `;
                     };
 
                     reader.readAsDataURL(file);
@@ -567,19 +659,10 @@
                 updateCarouselPlaceholderVisibility();
             }
 
-
             function updateCarouselInputFiles() {
                 const dt = new DataTransfer();
                 selectedFiles.forEach(file => dt.items.add(file));
                 carouselInput.files = dt.files;
-            }
-
-            function updateUploadIconVisibility() {
-                const icon = carouselUploadBox.querySelector('img:first-child');
-                const text = carouselUploadBox.querySelector('span');
-                const display = selectedFiles.length > 0 ? 'none' : '';
-                if (icon) icon.style.display = display;
-                if (text) text.style.display = display;
             }
 
             function updateCarouselPlaceholderVisibility() {
@@ -589,16 +672,7 @@
                 }
             }
 
-            function resetCarouselImages() {
-                selectedFiles = [];
-                carouselPreviewContainer.innerHTML = '';
-                carouselInput.value = '';
-                updateCarouselPlaceholderVisibility();
-            }
-
-            // Event delegation for carousel remove buttons - DEBUGGING VERSION
             carouselPreviewContainer.addEventListener('click', function(e) {
-
                 const removeBtn = e.target.closest('.remove-carousel-btn');
 
                 if (removeBtn) {
@@ -606,21 +680,19 @@
                     e.preventDefault();
 
                     const carouselItem = removeBtn.closest('[data-carousel-index]');
-
                     if (carouselItem) {
                         const index = parseInt(carouselItem.dataset.carouselIndex);
+                        const removedFile = selectedFiles[index];
+
+                        compressedCarouselFiles.delete(removedFile.name);
                         selectedFiles.splice(index, 1);
                         renderCarouselPreviews();
                         updateCarouselInputFiles();
                     }
                 }
-            }, true); // Added capture phase
+            }, true);
 
-
-            // Video upload functionality
-            const maxVideoSizeMB = 50;
-            const allowedVideoTypes = ['video/mp4', 'video/avi', 'video/mpeg'];
-
+            // ==================== VIDEO UPLOAD ====================
             const videoDropZone = document.getElementById('videoDropZone');
             const videoInput = document.getElementById('video_path');
             const videoThumbnailPreview = document.getElementById('videoThumbnailPreview');
@@ -630,8 +702,9 @@
             const videoUploadText = document.getElementById('videoUploadText');
             const videoFormatText = videoDropZone.querySelector('p.text-xs');
 
+            const allowedVideoTypes = ['video/mp4', 'video/avi', 'video/mpeg'];
+
             videoDropZone.addEventListener('click', (e) => {
-                // Don't open file dialog if clicking on the remove button
                 if (e.target.closest('#removeVideoThumbnailBtn')) {
                     e.stopPropagation();
                     e.preventDefault();
@@ -646,25 +719,24 @@
                 }
             });
 
-            videoDropZone.addEventListener('dragover', e => {
-                e.preventDefault();
-                videoDropZone.classList.add('border-primary', 'bg-gray-50');
+            ['dragover', 'dragleave', 'drop'].forEach(eventName => {
+                videoDropZone.addEventListener(eventName, handleVideoDrag);
             });
 
-            videoDropZone.addEventListener('dragleave', e => {
+            function handleVideoDrag(e) {
                 e.preventDefault();
-                videoDropZone.classList.remove('border-primary', 'bg-gray-50');
-            });
-
-            videoDropZone.addEventListener('drop', e => {
-                e.preventDefault();
-                videoDropZone.classList.remove('border-primary', 'bg-gray-50');
-
-                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                    videoInput.files = e.dataTransfer.files;
-                    showVideoThumbnailPreview(e.dataTransfer.files[0]);
+                if (e.type === 'dragover') {
+                    videoDropZone.classList.add('border-primary', 'bg-gray-50');
+                } else if (e.type === 'dragleave') {
+                    videoDropZone.classList.remove('border-primary', 'bg-gray-50');
+                } else if (e.type === 'drop') {
+                    videoDropZone.classList.remove('border-primary', 'bg-gray-50');
+                    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                        videoInput.files = e.dataTransfer.files;
+                        showVideoThumbnailPreview(e.dataTransfer.files[0]);
+                    }
                 }
-            });
+            }
 
             removeVideoThumbnailBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -674,29 +746,24 @@
             });
 
             function showVideoThumbnailPreview(file) {
-                // Size check
-                if (file.size / 1024 / 1024 > maxVideoSizeMB) {
-                    showTemporaryMessage(`"${file.name}" is too large. Max size is ${maxVideoSizeMB} MB.`, 'error');
+                if (file.size / 1024 / 1024 > MAX_VIDEO_SIZE_MB) {
+                    showTemporaryMessage(`Video is too large. Max size is ${MAX_VIDEO_SIZE_MB}MB.`, 'error');
                     clearVideoThumbnail();
                     videoInput.value = '';
                     return;
                 }
 
-                // Type check
                 if (!allowedVideoTypes.includes(file.type)) {
-                    showTemporaryMessage(`"${file.name}" is not a valid format. Only MP4, AVI, or MPEG allowed.`,
-                        'error');
+                    showTemporaryMessage('Invalid video format. Only MP4, AVI, or MPEG allowed.', 'error');
                     clearVideoThumbnail();
                     videoInput.value = '';
                     return;
                 }
 
-                // Show thumbnail preview
                 const url = URL.createObjectURL(file);
                 videoThumbnail.src = url;
                 videoThumbnailPreview.classList.remove('hidden');
 
-                // Hide upload icon and text
                 if (videoIcon) videoIcon.style.display = 'none';
                 if (videoUploadText) videoUploadText.style.display = 'none';
                 if (videoFormatText) videoFormatText.style.display = 'none';
@@ -706,78 +773,21 @@
                 videoThumbnail.src = '';
                 videoThumbnailPreview.classList.add('hidden');
 
-                // Show upload icon and text again
                 if (videoIcon) videoIcon.style.display = '';
                 if (videoUploadText) videoUploadText.style.display = '';
                 if (videoFormatText) videoFormatText.style.display = '';
             }
 
-
-            // Validation functions
-            function validateImageFile(file, showError = true) {
-                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-                if (!allowedTypes.includes(file.type)) {
-                    if (showError) showTemporaryMessage('Invalid image type.', 'error');
-                    return false;
-                }
-                if (file.size > MAX_IMAGE_SIZE_MB * 1024 * 1024) {
-                    if (showError) showTemporaryMessage('Image too large.', 'error');
-                    return false;
-                }
-                return true;
-            }
-
-            // Show temporary messages
-            function showTemporaryMessage(message, type = "info") {
-                let msgDiv = document.getElementById('temp-message');
-                if (!msgDiv) {
-                    msgDiv = document.createElement('div');
-                    msgDiv.id = 'temp-message';
-                    msgDiv.className =
-                        'fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2 rounded shadow-lg';
-                    document.body.appendChild(msgDiv);
-                }
-                msgDiv.textContent = message;
-                msgDiv.className =
-                    'fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2 rounded shadow-lg ' +
-                    (type === 'success' ? 'bg-green-500 text-white' :
-                        type === 'error' ? 'bg-red-500 text-white' :
-                        'bg-blue-500 text-white');
-                msgDiv.style.display = 'block';
-                setTimeout(() => {
-                    msgDiv.style.display = 'none';
-                }, 3500);
-            }
-
-            async function compressAndSubmitForm() {
+            // ==================== FORM SUBMISSION ====================
+            async function submitFormWithProgress() {
                 isUploading = true;
                 window.dispatchEvent(new CustomEvent('upload-start'));
                 submitBtn.disabled = true;
 
-                const carouselFiles = Array.from(document.getElementById('carousel_images').files || []);
-                const coverFile = document.getElementById('image_path').files[0];
-
                 try {
-                    // Compress cover image if needed
-                    if (coverFile && !compressedFileNames.has(coverFile.name)) {
-                        const compressedCover = await compressImageCanvas(coverFile, 2000, 0.85);
-                        const dataTransfer = new DataTransfer();
-                        dataTransfer.items.add(new File([compressedCover], coverFile.name, {
-                            type: compressedCover.type,
-                            lastModified: Date.now()
-                        }));
-                        document.getElementById('image_path').files = dataTransfer.files;
-                    }
-
-                    // Compress carousel images if needed
-                    const filesToCompress = carouselFiles.filter(f => !compressedFileNames.has(f.name));
-                    if (filesToCompress.length > 0) {
-                        await compressCarouselImages(filesToCompress);
-                    }
-
-                    // Submit the form with AJAX to track progress
                     const formData = new FormData(form);
                     const xhr = new XMLHttpRequest();
+
                     xhr.open('POST', form.action, true);
                     xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
@@ -796,6 +806,7 @@
                         isUploading = false;
                         window.dispatchEvent(new CustomEvent('upload-finish'));
                         submitBtn.disabled = false;
+
                         if (xhr.status >= 200 && xhr.status < 300) {
                             try {
                                 const data = JSON.parse(xhr.responseText);
@@ -805,6 +816,7 @@
                                     return;
                                 }
                             } catch {}
+
                             window.onbeforeunload = null;
                             window.location.href = '/admin/rooms';
                         } else {
@@ -830,7 +842,8 @@
                     isUploading = false;
                     window.dispatchEvent(new CustomEvent('upload-finish'));
                     submitBtn.disabled = false;
-                    showTemporaryMessage('Error during image compression. Please try again.', 'error');
+                    showTemporaryMessage('Error submitting form. Please try again.', 'error');
+                    console.error('Form submission error:', error);
                 }
             }
 
@@ -1108,20 +1121,20 @@
                                 <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                             </div>
                             ${rangeKey !== "closed" ? `
-                                <div class="flex flex-col sm:flex-row gap-2 ml-0 sm:ml-4 mt-2 sm:mt-0">
-                                    <button type="button" 
-                                        class="edit-schedule-btn bg-edit text-white hover:text-edit hover:bg-white text-sm px-3 py-1.5 rounded-md border border-edit transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800 w-full sm:w-auto shadow-edit-hover" 
-                                        data-days='${JSON.stringify(group.days)}' 
-                                        data-ranges='${JSON.stringify(group.ranges)}'>
-                                        Edit
-                                    </button>
-                                    <button type="button" 
-                                        class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-3 py-1.5 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800 w-full sm:w-auto shadow-secondary-hover" 
-                                        data-days='${JSON.stringify(group.days)}'>
-                                        Delete
-                                    </button>
-                                </div>
-                             ` : ''}
+                                                <div class="flex flex-col sm:flex-row gap-2 ml-0 sm:ml-4 mt-2 sm:mt-0">
+                                                    <button type="button" 
+                                                        class="edit-schedule-btn bg-edit text-white hover:text-edit hover:bg-white text-sm px-3 py-1.5 rounded-md border border-edit transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800 w-full sm:w-auto shadow-edit-hover" 
+                                                        data-days='${JSON.stringify(group.days)}' 
+                                                        data-ranges='${JSON.stringify(group.ranges)}'>
+                                                        Edit
+                                                    </button>
+                                                    <button type="button" 
+                                                        class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-3 py-1.5 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800 w-full sm:w-auto shadow-secondary-hover" 
+                                                        data-days='${JSON.stringify(group.days)}'>
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                             ` : ''}
                         </div>
                     `;
 
