@@ -18,9 +18,9 @@
             <!-- Room Selection Combobox -->
             <div x-data="{
                 roomId: '{{ $selectedRoom->id ?? '' }}',
-                open: false,
+                isOpen: false,
                 search: '',
-                selectedName: '{{ $selectedRoom->name ?? '' }}',
+                selectedName: @js($selectedRoom->name ?? ''),
                 filteredRooms: [],
                 rooms: @js($rooms->map(fn($room) => ['id' => $room->id, 'name' => $room->name])->values()),
             
@@ -29,44 +29,41 @@
                 },
             
                 filterRooms() {
-                    if (this.search === '') {
-                        this.filteredRooms = this.rooms;
-                    } else {
-                        this.filteredRooms = this.rooms.filter(room =>
+                    this.filteredRooms = this.search === '' ?
+                        this.rooms :
+                        this.rooms.filter(room =>
                             room.name.toLowerCase().includes(this.search.toLowerCase())
                         );
-                    }
                 },
             
                 selectRoom(room) {
                     this.selectedName = room.name;
                     this.roomId = room.id;
                     this.search = '';
-                    this.open = false;
+                    this.isOpen = false;
                     this.filteredRooms = this.rooms;
                     this.fetchRoomData();
                 },
             
                 toggleDropdown() {
-                    this.open = !this.open;
-                    if (this.open) {
+                    this.isOpen = !this.isOpen;
+                    if (this.isOpen) {
                         this.search = '';
                         this.filteredRooms = this.rooms;
-                        this.$nextTick(() => {
-                            this.$refs.searchInput?.focus();
-                        });
+                        this.$nextTick(() => this.$refs.searchInput?.focus());
                     }
                 },
             
                 closeDropdown() {
-                    this.open = false;
+                    this.isOpen = false;
                     this.search = '';
                     this.filteredRooms = this.rooms;
                 },
             
                 fetchRoomData() {
                     if (!this.roomId) {
-                        document.querySelector('#staff-content').innerHTML = '<div class=\'text-center py-12 text-gray-500 dark:text-gray-400\'>Select a room to assign staff</div>';
+                        document.querySelector('#staff-content').innerHTML =
+                            '<div class=\'text-center py-12 text-gray-500 dark:text-gray-400\'>Select a room to assign staff</div>';
                         return;
                     }
             
@@ -75,9 +72,7 @@
             
                     window.history.replaceState({}, '', url);
             
-                    fetch(url, {
-                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                        })
+                    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
                         .then(res => res.text())
                         .then(html => {
                             let parser = new DOMParser();
@@ -91,6 +86,7 @@
                         .finally(() => window.hideSpinner());
                 }
             }">
+
                 <!-- Sticky Combobox -->
                 <div class="sticky top-16 z-[49] bg-white dark:bg-gray-900 py-4 -mx-4 px-4 mb-6">
                     <div class="max-w-7xl mx-auto flex justify-center">
@@ -111,7 +107,7 @@
                             </button>
 
                             <!-- Dropdown Panel -->
-                            <div x-show="open" x-transition:enter="transition ease-out duration-100"
+                            <div x-show="isOpen" x-transition:enter="transition ease-out duration-100"
                                 x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
                                 x-transition:leave="transition ease-in duration-75"
                                 x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
