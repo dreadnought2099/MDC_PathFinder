@@ -68,7 +68,7 @@
                         @if ($user->room)
                             <div class="flex items-center gap-3">
                                 <span
-                                    class="px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                                    class="px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-50 text-primary dark:bg-blue-900/30 dark:text-blue-300">
                                     {{ $user->room->name }}
                                 </span>
                             </div>
@@ -87,9 +87,9 @@
                                     <span
                                         class="px-3 py-1.5 rounded-lg text-sm font-medium
                                 {{ $role->name === 'Admin'
-                                    ? 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                                    ? 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                                     : ($role->name === 'Office Manager'
-                                        ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                                        ? 'bg-blue-50 text-primary dark:bg-blue-900/30 dark:text-blue-300'
                                         : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300') }}">
                                         {{ $role->name }}
                                     </span>
