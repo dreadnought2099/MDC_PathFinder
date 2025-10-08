@@ -15,9 +15,55 @@
                 </p>
             </div>
 
-            <!-- Room Selection Dropdown -->
+            <!-- Room Selection Combobox -->
             <div x-data="{
                 roomId: '{{ $selectedRoom->id ?? '' }}',
+                open: false,
+                search: '',
+                selectedName: '{{ $selectedRoom->name ?? '' }}',
+                filteredRooms: [],
+                rooms: @js($rooms->map(fn($room) => ['id' => $room->id, 'name' => $room->name])->values()),
+            
+                init() {
+                    this.filteredRooms = this.rooms;
+                },
+            
+                filterRooms() {
+                    if (this.search === '') {
+                        this.filteredRooms = this.rooms;
+                    } else {
+                        this.filteredRooms = this.rooms.filter(room =>
+                            room.name.toLowerCase().includes(this.search.toLowerCase())
+                        );
+                    }
+                },
+            
+                selectRoom(room) {
+                    this.selectedName = room.name;
+                    this.roomId = room.id;
+                    this.search = '';
+                    this.open = false;
+                    this.filteredRooms = this.rooms;
+                    this.fetchRoomData();
+                },
+            
+                toggleDropdown() {
+                    this.open = !this.open;
+                    if (this.open) {
+                        this.search = '';
+                        this.filteredRooms = this.rooms;
+                        this.$nextTick(() => {
+                            this.$refs.searchInput?.focus();
+                        });
+                    }
+                },
+            
+                closeDropdown() {
+                    this.open = false;
+                    this.search = '';
+                    this.filteredRooms = this.rooms;
+                },
+            
                 fetchRoomData() {
                     if (!this.roomId) {
                         document.querySelector('#staff-content').innerHTML = '<div class=\'text-center py-12 text-gray-500 dark:text-gray-400\'>Select a room to assign staff</div>';
@@ -45,18 +91,67 @@
                         .finally(() => window.hideSpinner());
                 }
             }">
-                <!-- Sticky Dropdown Below Title -->
-                <div class="sticky top-16 z-49 bg-white dark:bg-gray-900 py-4 -mx-4 px-4 mb-6">
+                <!-- Sticky Combobox -->
+                <div class="sticky top-16 z-[49] bg-white dark:bg-gray-900 py-4 -mx-4 px-4 mb-6">
                     <div class="max-w-7xl mx-auto flex justify-center">
-                        <select x-model="roomId" @change="fetchRoomData()"
-                            class="w-full max-w-md border border-primary dark:bg-gray-800 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-primary dark:text-gray-300 bg-white dark:bg-gray-800 shadow-md">
-                            @foreach ($rooms as $room)
-                                <option value="{{ $room->id }}"
-                                    {{ isset($selectedRoom) && $selectedRoom->id == $room->id ? 'selected' : '' }}>
-                                    {{ $room->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <div @click.away="closeDropdown()" class="relative w-full max-w-md">
+
+                            <!-- Display Button -->
+                            <button type="button" @click="toggleDropdown()"
+                                class="w-full border border-primary dark:bg-gray-800 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-primary dark:text-gray-300 bg-white dark:bg-gray-800 shadow-md flex items-center justify-between text-left">
+                                <span x-text="selectedName || 'Select a room...'"
+                                    :class="!selectedName ? 'text-gray-400' : ''">
+                                </span>
+                                <svg class="w-5 h-5 text-gray-400 transition-transform duration-200"
+                                    :class="{ 'rotate-180': open }" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+
+                            <!-- Dropdown Panel -->
+                            <div x-show="open" x-transition:enter="transition ease-out duration-100"
+                                x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-75"
+                                x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                                class="absolute z-50 w-full mt-2 bg-white text-gray-800 dark:bg-gray-800 border border-primary rounded-md shadow-lg overflow-hidden"
+                                style="display: none;">
+
+                                <!-- Search Input -->
+                                <div class="p-2 border-b border-gray-200 dark:border-gray-700">
+                                    <input x-ref="searchInput" type="text" x-model="search" @input="filterRooms()"
+                                        placeholder="Search offices..."
+                                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-gray-300 text-sm">
+                                </div>
+
+                                <!-- Room Options List -->
+                                <div class="max-h-60 overflow-auto">
+                                    <!-- No Results -->
+                                    <div x-show="filteredRooms.length === 0"
+                                        class="px-4 py-3 text-gray-500 dark:text-gray-400 text-center text-sm">
+                                        No offices found
+                                    </div>
+
+                                    <!-- Room Options -->
+                                    <template x-for="room in filteredRooms" :key="room.id">
+                                        <button type="button" @click="selectRoom(room)"
+                                            class="w-full text-left px-4 py-3 hover:bg-primary hover:text-white hover:bg-opacity-10 dark:hover:bg-gray-700 hover:pl-6 hover:border-l-4 hover:border-primary transition-all duration-200 dark:text-gray-300 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
+                                            :class="{
+                                                'bg-primary bg-opacity-5 font-medium text-white': roomId == room.id,
+                                                'text-gray-700 dark:text-gray-300': roomId != room.id
+                                            }">
+                                            <span x-text="room.name"></span>
+
+                                            <!-- Checkmark for selected -->
+                                            <span x-show="roomId == room.id" class="float-right text-primary">
+                                                ✓
+                                            </span>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
