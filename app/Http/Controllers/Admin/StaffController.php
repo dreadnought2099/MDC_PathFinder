@@ -26,10 +26,19 @@ class StaffController extends Controller
         $sort = $request->get('sort', 'last_name');
         $direction = $request->get('direction', 'asc');
 
-        $staffs = Staff::with('room')
-            ->orderBy($sort, $direction)
-            ->paginate(10)
-            ->appends(['sort' => $sort, 'direction' => $direction]);
+        // Handle full name sorting
+        if ($sort === 'full_name') {
+            $staffs = Staff::with('room')
+                ->orderBy('first_name', $direction)
+                ->orderBy('last_name', $direction)
+                ->paginate(10)
+                ->appends(['sort' => $sort, 'direction' => $direction]);
+        } else {
+            $staffs = Staff::with('room')
+                ->orderBy($sort, $direction)
+                ->paginate(10)
+                ->appends(['sort' => $sort, 'direction' => $direction]);
+        }
 
         return view('pages.admin.staffs.index', compact('staffs', 'sort', 'direction'));
     }
