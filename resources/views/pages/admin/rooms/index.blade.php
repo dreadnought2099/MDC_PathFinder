@@ -18,7 +18,11 @@
 
             <!-- Sort Options -->
             <div class="py-3">
-                <x-sort-by :route="route('room.index')" :fields="['name' => 'Name', 'created_at' => 'Created At']" :current-sort="$sort" :current-direction="$direction" />
+                <x-sort-by :route="route('room.index')" :fields="[
+                    'name' => 'Office Name',
+                    'created_at' => 'Date Created',
+                    'updated_at' => 'Date Modified',
+                ]" :currentSort="$sort" :currentDirection="$direction" />
             </div>
         </div>
 
