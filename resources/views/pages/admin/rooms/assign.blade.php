@@ -16,7 +16,7 @@
             </div>
 
             <!-- Room Selection Dropdown -->
-            <div class="flex justify-center mb-6" x-data="{
+            <div x-data="{
                 roomId: '{{ $selectedRoom->id ?? '' }}',
                 fetchRoomData() {
                     if (!this.roomId) {
@@ -45,25 +45,30 @@
                         .finally(() => window.hideSpinner());
                 }
             }">
-                <select x-model="roomId" @change="fetchRoomData()"
-                    class="border border-primary dark:bg-gray-800 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary dark:text-gray-300">
-                    @foreach ($rooms as $room)
-                        <option value="{{ $room->id }}"
-                            {{ isset($selectedRoom) && $selectedRoom->id == $room->id ? 'selected' : '' }}>
-                            {{ $room->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+                <!-- Sticky Dropdown Below Title -->
+                <div class="sticky top-16 z-49 bg-white dark:bg-gray-900 py-4 -mx-4 px-4 mb-6">
+                    <div class="max-w-7xl mx-auto flex justify-center">
+                        <select x-model="roomId" @change="fetchRoomData()"
+                            class="w-full max-w-md border border-primary dark:bg-gray-800 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-primary dark:text-gray-300 bg-white dark:bg-gray-800 shadow-md">
+                            @foreach ($rooms as $room)
+                                <option value="{{ $room->id }}"
+                                    {{ isset($selectedRoom) && $selectedRoom->id == $room->id ? 'selected' : '' }}>
+                                    {{ $room->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
 
-            <!-- Staff Content Area -->
-            <div id="staff-content">
-                @if (isset($selectedRoom))
-                    @include('pages.admin.rooms.partials.staff-assignment', [
-                        'selectedRoom' => $selectedRoom,
-                        'staff' => $staff,
-                    ])
-                @endif
+                <!-- Staff Content Area -->
+                <div id="staff-content">
+                    @if (isset($selectedRoom))
+                        @include('pages.admin.rooms.partials.staff-assignment', [
+                            'selectedRoom' => $selectedRoom,
+                            'staff' => $staff,
+                        ])
+                    @endif
+                </div>
             </div>
         </div>
     @endif
