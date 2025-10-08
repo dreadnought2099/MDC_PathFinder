@@ -20,12 +20,31 @@ class PathController extends Controller
         $sort = $request->get('sort', 'id');
         $direction = $request->get('direction', 'asc');
 
-        $paths = Path::with(['fromRoom', 'toRoom', 'images'])
-            ->whereNull('deleted_at') // ensure trashed paths are excluded
-            ->whereHas('fromRoom')   // only paths where fromRoom exists
-            ->whereHas('toRoom')     // only paths where toRoom exists
-            ->orderBy($sort, $direction)
-            ->paginate(10)
+        // Handle sorting by room names and image count
+        $query = Path::with(['fromRoom', 'toRoom', 'images'])
+            ->whereNull('paths.deleted_at') // Specify the table name
+            ->whereHas('fromRoom')
+            ->whereHas('toRoom');
+
+        // Sort by related room names or image count
+        if ($sort === 'from_room') {
+            $query->join('rooms as from_rooms', 'paths.from_room_id', '=', 'from_rooms.id')
+                ->whereNull('from_rooms.deleted_at') // Specify the table name
+                ->orderBy('from_rooms.name', $direction)
+                ->select('paths.*');
+        } elseif ($sort === 'to_room') {
+            $query->join('rooms as to_rooms', 'paths.to_room_id', '=', 'to_rooms.id')
+                ->whereNull('to_rooms.deleted_at') // Specify the table name
+                ->orderBy('to_rooms.name', $direction)
+                ->select('paths.*');
+        } elseif ($sort === 'images_count') {
+            $query->withCount('images')
+                ->orderBy('images_count', $direction);
+        } else {
+            $query->orderBy($sort, $direction);
+        }
+
+        $paths = $query->paginate(10)
             ->appends(['sort' => $sort, 'direction' => $direction]);
 
         return view('pages.admin.paths.index', compact('paths', 'sort', 'direction'));

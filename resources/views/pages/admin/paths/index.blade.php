@@ -19,11 +19,12 @@
             <!-- Sort -->
             <div class="py-2 sm:py-4">
                 <x-sort-by :route="route('path.index')" :fields="[
-                    'id' => 'ID',
-                    'from_room_id' => 'From Room',
-                    'to_room_id' => 'To Room',
-                    'created_at' => 'Created At',
-                ]" :current-sort="$sort" :current-direction="$direction" />
+                    'from_room' => 'From Office',
+                    'to_room' => 'To Office',
+                    'created_at' => 'Date Created',
+                    'updated_at' => 'Date Modified',
+                    'images_count' => 'Images Uploaded',
+                ]" :currentSort="$sort" :currentDirection="$direction" />
             </div>
         </div>
 
