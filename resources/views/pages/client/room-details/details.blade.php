@@ -156,7 +156,6 @@
     <img id="modalImage" src="" alt="Full Image" class="max-w-full max-h-full rounded shadow-lg" />
 </div>
 
-<!-- Modal Script -->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         function openModal(src) {

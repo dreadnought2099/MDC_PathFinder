@@ -13,7 +13,7 @@ class ScannerController extends Controller
     /**
      * Show QR scanner page or room details
      */
-   public function index(?Room $room = null)
+    public function index(?Room $room = null)
     {
         // Handle invalid token scenarios
         if (request()->is('scan-marker/*') && is_null($room)) {
@@ -50,11 +50,7 @@ class ScannerController extends Controller
      */
     private function getFact(?Room $room): string
     {
-        $cacheKey = $room ? "room_fact:{$room->id}" : 'general_fact';
-
-        return Cache::remember($cacheKey, 300, function () use ($room) {
-            return $this->loadFactFromFile($room);
-        });
+        return $this->loadFactFromFile($room);
     }
 
     /**
@@ -63,7 +59,7 @@ class ScannerController extends Controller
     private function loadFactFromFile(?Room $room): string
     {
         $defaultFact = "No history facts available at the moment.";
-        $filePath = storage_path('app/facts.json');
+        $filePath = public_path('data/facts.json');
 
         if (!file_exists($filePath)) {
             Log::warning('Facts file not found', ['path' => $filePath]);
