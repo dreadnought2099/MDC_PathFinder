@@ -142,7 +142,7 @@
                                     class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
                                     Manage Office User
                                 </h3>
-                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Organize room users</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Organize office users</p>
                             </div>
                         </div>
                     </a>
@@ -163,7 +163,7 @@
                                     class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
                                     Assign Staff
                                 </h3>
-                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Link staff to rooms</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Assign staff to office</p>
                             </div>
                         </div>
                     </a>
@@ -184,7 +184,7 @@
                                     class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
                                     Recycle Bin
                                 </h3>
-                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Restore deleted items</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Restore or Permanently delete items</p>
                             </div>
                         </div>
                     </a>
