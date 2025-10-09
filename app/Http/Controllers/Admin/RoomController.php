@@ -54,6 +54,12 @@ class RoomController extends Controller
             ->paginate(10)
             ->appends(['sort' => $sort, 'direction' => $direction, 'search' => $search]);
 
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => view('pages.admin.rooms.partials.room-table', compact('rooms'))->render(),
+            ]);
+        }
+
         return view('pages.admin.rooms.index', compact('rooms', 'sort', 'direction', 'search'));
     }
 
