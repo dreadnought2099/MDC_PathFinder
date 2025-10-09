@@ -31,7 +31,10 @@ class StaffController extends Controller
             ->when($search, function ($query, $search) {
                 $query->where('first_name', 'like', "%{$search}%")
                     ->orWhere('last_name', 'like', "%{$search}%")
-                    ->orWhereRaw("CONCAT_WS(' ', first_name, middle_name, last_name) LIKE ?", ["%{$search}%"]);
+                    ->orWhereRaw("CONCAT_WS(' ', first_name, middle_name, last_name) LIKE ?", ["%{$search}%"])
+                    ->orWhereRaw("CONCAT_WS(' ', last_name, middle_name, first_name) LIKE ?", ["%{$search}%"])
+                    ->orWhereRaw("CONCAT_WS(' ', first_name, last_name) LIKE ?", ["%{$search}%"])
+                    ->orWhereRaw("CONCAT_WS(' ', last_name, first_name) LIKE ?", ["%{$search}%"]);
             });
 
         // Handle full name sorting
