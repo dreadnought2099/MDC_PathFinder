@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\PathController;
 use App\Http\Controllers\Admin\PathImageController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\RecycleBinController;
+use App\Http\Controllers\Admin\RoomAssignmentController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\RoomUserController;
 use App\Http\Controllers\Admin\StaffController;
@@ -89,8 +90,8 @@ Route::middleware(['auth', 'role:Admin|Office Manager', '2fa'])->prefix('admin')
         Route::get('/check-name', [RoomController::class, 'checkName'])->name('check-name');
         Route::get('/', [RoomController::class, 'index'])->middleware('permission:view rooms')->name('index');
         Route::get('/create', [RoomController::class, 'create'])->middleware('permission:create rooms')->name('create');
-        Route::get('/assign/{roomId?}', [RoomController::class, 'assign'])->middleware('permission:edit staff')->name('assign');
-        Route::put('/assign', [RoomController::class, 'assignStaff'])->middleware('permission:edit staff')->name('assign.update');
+        Route::get('/assign/{roomId?}', [RoomAssignmentController::class, 'assign'])->middleware('permission:edit staff')->name('assign');
+        Route::put('/assign', [RoomAssignmentController::class, 'assignStaff'])->middleware('permission:edit staff')->name('assign.update');
 
         Route::get('/{room}', [RoomController::class, 'show'])->middleware('permission:view rooms')->name('show');
         Route::get('/{room}/edit', [RoomController::class, 'edit'])->middleware('permission:edit rooms')->name('edit');
@@ -105,7 +106,7 @@ Route::middleware(['auth', 'role:Admin|Office Manager', '2fa'])->prefix('admin')
 
         Route::delete('/{room}/carousel/{image}', [RoomController::class, 'removeCarouselImage'])
             ->middleware('permission:edit rooms')->name('carousel.remove');
-        Route::delete('/staff/{id}/remove', [RoomController::class, 'removeFromRoom'])
+        Route::delete('/staff/{id}/remove', [RoomAssignmentController::class, 'removeFromRoom'])
             ->middleware('permission:edit staff')->name('staff.remove');
     });
 
