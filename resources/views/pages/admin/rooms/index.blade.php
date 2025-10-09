@@ -13,7 +13,7 @@
 
             <!-- Sort Options -->
             <div class="py-2 sm:py-4">
-                <x-filter-header :route="route('room.index')" placeholder="room" :fields="[
+                <x-filter-header :route="route('room.index')" placeholder="office" :fields="[
                     'name' => 'Office Name',
                     'created_at' => 'Date Created',
                     'updated_at' => 'Date Modified',

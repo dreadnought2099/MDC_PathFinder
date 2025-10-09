@@ -23,7 +23,7 @@
     <!-- Search -->
     <form @submit.prevent="submitSearch" class="flex items-center gap-2 w-full sm:w-auto">
         <input type="text" x-model="search" value="{{ request('search', '') }}"
-            placeholder="Search {{ $placeholder }}..." @input.debounce.300ms="submitSearch()"
+            placeholder="Search {{ $placeholder }}" @input.debounce.300ms="submitSearch()"
             class="font-sofia border border-primary rounded-md px-3 py-2 w-full sm:w-64 outline-none focus:ring focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white">
 
         <template x-if="search">
