@@ -136,6 +136,7 @@
 
             // ===== Live email check with proper debounce =====
             let debounceTimer;
+
             function isValidEmail(email) {
                 // Simple email format check
                 return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -144,23 +145,29 @@
             emailInput.addEventListener('input', function() {
                 const email = emailInput.value.trim();
 
-                // Disable button immediately while typing
-                submitBtn.disabled = true;
-                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                submitBtn.classList.remove('cursor-pointer');
-
                 emailError.classList.add('invisible'); // hide error while typing
 
                 clearTimeout(debounceTimer);
                 debounceTimer = setTimeout(async () => {
-                    if (!email || !isValidEmail(email)) {
-                        // Keep disabled if empty or invalid format
-                        emailError.textContent = !email ? '' : 'Invalid email format';
-                        if (!email) emailError.classList.add('invisible');
-                        else emailError.classList.remove('invisible');
+                    // If empty, enable submit (nullable)
+                    if (!email) {
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        submitBtn.classList.add('cursor-pointer');
                         return;
                     }
 
+                    // Simple email format check
+                    if (!isValidEmail(email)) {
+                        emailError.textContent = 'Invalid email format';
+                        emailError.classList.remove('invisible');
+                        submitBtn.disabled = true;
+                        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                        submitBtn.classList.remove('cursor-pointer');
+                        return;
+                    }
+
+                    // Check for duplication only if email is valid and non-empty
                     try {
                         const response = await fetch("{{ route('staff.checkEmail') }}?email=" +
                             encodeURIComponent(email));
@@ -180,9 +187,12 @@
                         }
                     } catch (err) {
                         console.error('Email check failed:', err);
-                        submitBtn.disabled = true; // keep disabled on error
+                        // Optional: allow submission on error
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        submitBtn.classList.add('cursor-pointer');
                     }
-                }, 500); // 500ms debounce
+                }, 500); // debounce
             });
 
 

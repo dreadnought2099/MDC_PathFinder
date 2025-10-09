@@ -188,9 +188,17 @@
 
                 clearTimeout(debounceTimer);
                 debounceTimer = setTimeout(async () => {
-                    if (!email || !isValidEmail(email)) {
-                        emailError.textContent = !email ? '' : 'Invalid email format';
-                        if (email) emailError.classList.remove('invisible');
+                    if (!email) { // empty
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        submitBtn.classList.add('cursor-pointer');
+                        emailError.classList.add('invisible');
+                        return;
+                    }
+
+                    if (!isValidEmail(email)) { // invalid format
+                        emailError.textContent = 'Invalid email format';
+                        emailError.classList.remove('invisible');
                         return;
                     }
 
@@ -213,7 +221,7 @@
                         }
                     } catch (err) {
                         console.error('Email check failed:', err);
-                        submitBtn.disabled = true;
+                        submitBtn.disabled = false;
                     }
                 }, 500);
             });
