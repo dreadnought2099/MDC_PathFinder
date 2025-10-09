@@ -53,7 +53,7 @@ class TokenController extends Controller
         return response()->json([
             'valid'               => Room::isValidTokenFormat($token),
             'token'               => $token,
-            'format_requirements' => '32 character hexadecimal string',
+            'format_requirements' => '64 character hexadecimal string',
         ]);
     }
 

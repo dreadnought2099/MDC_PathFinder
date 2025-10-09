@@ -196,7 +196,7 @@ class Room extends Model
      */
     public static function isValidTokenFormat(string $token): bool
     {
-        return preg_match('/^[a-f0-9]{32}$/', $token) === 1;
+        return preg_match('/^[a-f0-9]{64}$/', $token) === 1;
     }
 
     /**
