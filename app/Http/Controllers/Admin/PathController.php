@@ -19,12 +19,22 @@ class PathController extends Controller
     {
         $sort = $request->get('sort', 'id');
         $direction = $request->get('direction', 'asc');
+        $search = $request->get('search');
 
         // Handle sorting by room names and image count
         $query = Path::with(['fromRoom', 'toRoom', 'images'])
             ->whereNull('paths.deleted_at') // Specify the table name
             ->whereHas('fromRoom')
             ->whereHas('toRoom');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('fromRoom', fn($sub) =>
+                $sub->where('name', 'like', "%{$search}%"))
+                    ->orWhereHas('toRoom', fn($sub) =>
+                    $sub->where('name', 'like', "%{$search}%"));
+            });
+        }
 
         // Sort by related room names or image count
         if ($sort === 'from_room') {
@@ -45,9 +55,9 @@ class PathController extends Controller
         }
 
         $paths = $query->paginate(10)
-            ->appends(['sort' => $sort, 'direction' => $direction]);
+            ->appends(['sort' => $sort, 'direction' => $direction, 'search' => $search]);
 
-        return view('pages.admin.paths.index', compact('paths', 'sort', 'direction'));
+        return view('pages.admin.paths.index', compact('paths', 'sort', 'direction', 'search'));
     }
 
     // Show images for a specific path

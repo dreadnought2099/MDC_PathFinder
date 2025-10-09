@@ -44,12 +44,17 @@ class RoomController extends Controller
     {
         $sort = $request->get('sort', 'name');
         $direction = $request->get('direction', 'asc');
+        $search = $request->get('search');
 
-        $rooms = Room::orderBy($sort, $direction)
+        $rooms = Room::when($search, function ($query, $search) {
+            $query->where('name', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%");
+        })
+            ->orderBy($sort, $direction)
             ->paginate(10)
-            ->appends(['sort' => $sort, 'direction' => $direction]);
+            ->appends(['sort' => $sort, 'direction' => $direction, 'search' => $search]);
 
-        return view('pages.admin.rooms.index', compact('rooms', 'sort', 'direction'));
+        return view('pages.admin.rooms.index', compact('rooms', 'sort', 'direction', 'search'));
     }
 
     public function create()

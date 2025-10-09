@@ -18,11 +18,12 @@
 
             <!-- Sort Options -->
             <div class="py-3">
-                <x-sort-by :route="request()->url()" :fields="[
+                <x-filter-header :route="route('staff.index')" placeholder="staff" :fields="[
                     'full_name' => 'Full Name',
                     'created_at' => 'Date Created',
                     'updated_at' => 'Date Modified',
-                ]" :currentSort="$sort" :currentDirection="$direction" />
+                ]" :currentSort="$sort"
+                    :currentDirection="$direction" />
             </div>
         </div>
 

@@ -19,9 +19,16 @@ class RoomAssignmentController extends Controller
         $rooms = Room::all();
         $roomId = $roomId ?? $request->query('roomId') ?? ($rooms->first()->id ?? null);
         $selectedRoom = $roomId ? Room::find($roomId) : null;
-        $staff = Staff::with('room')->paginate(12);
+        $search = $request->get('search');
 
-        return view('pages.admin.rooms.assign', compact('rooms', 'staff', 'selectedRoom'));
+        $staff = Staff::with('room')
+            ->when($search, fn($q) =>
+            $q->where('first_name', 'like', "%{$search}%")
+                ->orWhere('last_name', 'like', "%{$search}%"))
+            ->paginate(12)
+            ->appends(['search' => $search]);
+
+        return view('pages.admin.rooms.assign', compact('rooms', 'staff', 'selectedRoom', 'search'));
     }
 
     public function assignStaff(Request $request)

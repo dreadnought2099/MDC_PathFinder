@@ -18,11 +18,25 @@
 
             <!-- Sort Options -->
             <div class="py-3">
-                <x-sort-by :route="route('room.index')" :fields="[
-                    'name' => 'Office Name',
-                    'created_at' => 'Date Created',
-                    'updated_at' => 'Date Modified',
-                ]" :currentSort="$sort" :currentDirection="$direction" />
+                <div class="py-2 sm:py-4">
+                    <form method="GET" action="{{ route('room.index') }}" class="flex items-center gap-2">
+                        <input type="text" name="search" value="{{ request('search') }}"
+                            placeholder="Search office name..."
+                            class="border border-gray-300 rounded-lg px-3 py-2 w-full sm:w-64 focus:outline-none focus:ring focus:ring-blue-300 dark:bg-gray-800 dark:text-white">
+
+                        <button type="submit" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/80">
+                            Search
+                        </button>
+                    </form>
+                </div>
+
+                <div class="py-2 sm:py-4">
+                    <x-sort-by :route="route('room.index')" :fields="[
+                        'name' => 'Office Name',
+                        'created_at' => 'Date Created',
+                        'updated_at' => 'Date Modified',
+                    ]" :currentSort="$sort" :currentDirection="$direction" />
+                </div>
             </div>
         </div>
 

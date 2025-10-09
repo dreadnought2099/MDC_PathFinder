@@ -25,22 +25,27 @@ class StaffController extends Controller
     {
         $sort = $request->get('sort', 'last_name');
         $direction = $request->get('direction', 'asc');
+        $search = $request->get('search');
+
+        $query = Staff::with('room')
+            ->when($search, function ($query, $search) {
+                $query->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhereRaw("CONCAT(first_name, ' ', last_name) like ?", ["%{$search}%"]);
+            });
 
         // Handle full name sorting
         if ($sort === 'full_name') {
-            $staffs = Staff::with('room')
-                ->orderBy('first_name', $direction)
-                ->orderBy('last_name', $direction)
-                ->paginate(10)
-                ->appends(['sort' => $sort, 'direction' => $direction]);
+            $query->orderBy('first_name', $direction)
+                ->orderBy('last_name', $direction);
         } else {
-            $staffs = Staff::with('room')
-                ->orderBy($sort, $direction)
-                ->paginate(10)
-                ->appends(['sort' => $sort, 'direction' => $direction]);
+            $query->orderBy($sort, $direction);
         }
 
-        return view('pages.admin.staffs.index', compact('staffs', 'sort', 'direction'));
+        $staffs = $query->paginate(10)
+            ->appends(['sort' => $sort, 'direction' => $direction, 'search' => $search]);
+
+        return view('pages.admin.staffs.index', compact('staffs', 'sort', 'direction', 'search'));
     }
 
     public function create()

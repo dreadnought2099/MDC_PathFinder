@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class SortBy extends Component
+class FilterHeader extends Component
 {
     /**
      * Create a new component instance.
@@ -21,6 +21,6 @@ class SortBy extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.sort-by');
+        return view('components.filter-header');
     }
 }
