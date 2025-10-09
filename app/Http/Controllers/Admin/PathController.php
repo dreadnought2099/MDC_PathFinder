@@ -27,6 +27,7 @@ class PathController extends Controller
             ->whereHas('fromRoom')
             ->whereHas('toRoom');
 
+        // Searching across related room names
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->whereHas('fromRoom', fn($sub) =>
@@ -36,15 +37,15 @@ class PathController extends Controller
             });
         }
 
-        // Sort by related room names or image count
+        // Sorting logic
         if ($sort === 'from_room') {
             $query->join('rooms as from_rooms', 'paths.from_room_id', '=', 'from_rooms.id')
-                ->whereNull('from_rooms.deleted_at') // Specify the table name
+                ->whereNull('from_rooms.deleted_at')
                 ->orderBy('from_rooms.name', $direction)
                 ->select('paths.*');
         } elseif ($sort === 'to_room') {
             $query->join('rooms as to_rooms', 'paths.to_room_id', '=', 'to_rooms.id')
-                ->whereNull('to_rooms.deleted_at') // Specify the table name
+                ->whereNull('to_rooms.deleted_at')
                 ->orderBy('to_rooms.name', $direction)
                 ->select('paths.*');
         } elseif ($sort === 'images_count') {
@@ -54,11 +55,22 @@ class PathController extends Controller
             $query->orderBy($sort, $direction);
         }
 
+        // Paginate
         $paths = $query->paginate(10)
             ->appends(['sort' => $sort, 'direction' => $direction, 'search' => $search]);
 
+        // Handle AJAX requests (only return table partial)
+        if ($request->ajax()) {
+            // Return partial **with the same wrapper** used in your Blade view
+            return response()->json([
+                'html' => view('pages.admin.paths.partials.path-table', compact('paths'))->render(),
+            ]);
+        }
+
+        // Otherwise render full page
         return view('pages.admin.paths.index', compact('paths', 'sort', 'direction', 'search'));
     }
+
 
     // Show images for a specific path
     public function show(Path $path)
