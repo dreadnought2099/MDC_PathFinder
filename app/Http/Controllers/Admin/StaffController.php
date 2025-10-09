@@ -31,12 +31,13 @@ class StaffController extends Controller
             ->when($search, function ($query, $search) {
                 $query->where('first_name', 'like', "%{$search}%")
                     ->orWhere('last_name', 'like', "%{$search}%")
-                    ->orWhereRaw("CONCAT(first_name, ' ', last_name) like ?", ["%{$search}%"]);
+                    ->orWhereRaw("CONCAT_WS(' ', first_name, middle_name, last_name) LIKE ?", ["%{$search}%"]);
             });
 
         // Handle full name sorting
         if ($sort === 'full_name') {
             $query->orderBy('first_name', $direction)
+                ->orderBy('middle_name', $direction)
                 ->orderBy('last_name', $direction);
         } else {
             $query->orderBy($sort, $direction);
@@ -44,6 +45,12 @@ class StaffController extends Controller
 
         $staffs = $query->paginate(10)
             ->appends(['sort' => $sort, 'direction' => $direction, 'search' => $search]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => view('pages.admin.staffs.partials.staff-table', compact('staffs'))->render(),
+            ]);
+        }
 
         return view('pages.admin.staffs.index', compact('staffs', 'sort', 'direction', 'search'));
     }

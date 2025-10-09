@@ -24,7 +24,7 @@
     <form @submit.prevent="submitSearch" class="flex items-center gap-2 w-full sm:w-auto">
         <input type="text" x-model="search" value="{{ request('search', '') }}"
             placeholder="Search {{ $placeholder }}..."
-            class="border border-gray-300 rounded-lg px-3 py-2 w-full sm:w-64 focus:outline-none focus:ring focus:ring-primary/40 dark:bg-gray-800 dark:text-white">
+            class="font-sofia border border-gray-300 rounded-lg px-3 py-2 w-full sm:w-64 focus:outline-none focus:ring focus:ring-primary/40 dark:bg-gray-800 dark:text-white">
 
         <button type="submit"
             class="px-4 bg-primary text-white py-2 rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">

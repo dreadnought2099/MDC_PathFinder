@@ -11,11 +11,6 @@
                 Manage offices and assign staff members
             </p>
 
-            <!-- Pagination -->
-            <div class="mt-3 flex justify-center">
-                {{ $rooms->appends(request()->query())->links('pagination::tailwind') }}
-            </div>
-
             <!-- Sort Options -->
             <div class="py-2 sm:py-4">
                 <x-filter-header :route="route('room.index')" placeholder="room" :fields="[
@@ -35,8 +30,13 @@
         <!-- Room Table Container -->
         <div id="records-table" class="bg-white rounded-xl shadow-sm border-2 border-primary overflow-hidden">
             <div class="overflow-x-auto">
-               @include('pages.admin.rooms.partials.room-table', ['rooms' => $rooms])
+                @include('pages.admin.rooms.partials.room-table', ['rooms' => $rooms])
             </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="mt-3 flex justify-center">
+            {{ $rooms->appends(request()->query())->links('pagination::tailwind') }}
         </div>
     </div>
     <!-- Room Delete Modal -->
