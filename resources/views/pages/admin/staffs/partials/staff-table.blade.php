@@ -123,12 +123,12 @@
                     <div class="flex flex-col items-center justify-center space-y-4">
                         <div
                             class="w-14 h-14 sm:w-16 sm:h-16 bg-primary-10 dark:bg-gray-800 rounded-full flex items-center justify-center">
-                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/group.png"
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/user.png"
                                 alt="Group icon" class="w-9 h-8 sm:w-11 sm:h-10">
                         </div>
                         <div class="text-center">
                             <h3 class="text-base sm:text-lg font-medium dark:text-gray-300 text-gray-700 mb-2">
-                                No staff members found
+                                No staff found
                             </h3>
                             @if (auth()->user()->hasRole('Admin'))
                                 <p class="text-gray-500 text-xs sm:text-sm dark:text-gray-400">
