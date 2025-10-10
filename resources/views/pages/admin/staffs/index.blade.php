@@ -17,8 +17,8 @@
                     'full_name' => 'Full Name',
                     'created_at' => 'Date Created',
                     'updated_at' => 'Date Modified',
-                ]" :currentSort="$sort"
-                    :currentDirection="$direction" />
+                ]" :currentSort="$sort" :currentDirection="$direction"
+                    :currentSearch="$search" />
             </div>
         </div>
 

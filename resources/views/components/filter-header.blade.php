@@ -1,18 +1,25 @@
-@props(['route', 'fields' => [], 'currentSort' => 'id', 'currentDirection' => 'asc', 'placeholder' => 'records'])
+@props([
+    'route',
+    'fields' => [],
+    'currentSort' => 'id',
+    'currentDirection' => 'asc',
+    'placeholder' => 'records',
+    'currentSearch' => '',
+])
 
-<div x-data="searchSortHandler('{{ $route }}')" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+<div x-data="searchSortHandler()" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
     <!-- Sort -->
     <div class="flex items-center gap-2 dark:text-gray-300">
         <label for="sort" class="text-sm font-medium">Sort By:</label>
         <div class="flex gap-2">
-            <select x-model="sort" @change="submitSearch"
+            <select x-model="sort" @change="handleChange"
                 class="border border-primary rounded p-1 text-sm dark:bg-gray-800 dark:text-white">
                 @foreach ($fields as $key => $label)
                     <option value="{{ $key }}">{{ $label }}</option>
                 @endforeach
             </select>
 
-            <select x-model="direction" @change="submitSearch"
+            <select x-model="direction" @change="handleChange"
                 class="border border-primary rounded p-1 text-sm dark:bg-gray-800 dark:text-white">
                 <option value="asc">Ascending</option>
                 <option value="desc">Descending</option>
@@ -21,9 +28,9 @@
     </div>
 
     <!-- Search -->
-    <form @submit.prevent="submitSearch" class="flex items-center gap-2 w-full sm:w-auto">
-        <input type="text" x-model="search" value="{{ request('search', '') }}"
-            placeholder="Search {{ $placeholder }}" @input.debounce.300ms="submitSearch()"
+    <form @submit.prevent="handleChange" class="flex items-center gap-2 w-full sm:w-auto">
+        <input type="text" x-model="search" placeholder="Search {{ $placeholder }}"
+            @input.debounce.500ms="handleChange"
             class="font-sofia border border-primary rounded-md px-3 py-2 w-full sm:w-64 outline-none focus:ring focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white">
 
         <template x-if="search">
@@ -37,55 +44,92 @@
 
 <script>
     document.addEventListener('alpine:init', () => {
-        Alpine.data('searchSortHandler', (route) => ({
-            search: '',
-            sort: '',
-            direction: '',
+        Alpine.data('searchSortHandler', () => ({
+            search: @json($currentSearch ?? ''),
+            sort: @json($currentSort),
+            direction: @json($currentDirection),
+            route: @json($route),
 
             init() {
-                // Restore previous state from sessionStorage
-                const storedSearch = sessionStorage.getItem('search');
-                const storedSort = sessionStorage.getItem('sort');
-                const storedDirection = sessionStorage.getItem('direction');
-
-                this.search = storedSearch ?? @json(request('search', ''));
-                this.sort = storedSort ?? @json(request('sort', $currentSort));
-                this.direction = storedDirection ?? @json(request('direction', $currentDirection));
-
-                // Persist future changes
-                this.$watch('search', value => sessionStorage.setItem('search', value));
-                this.$watch('sort', value => sessionStorage.setItem('sort', value));
-                this.$watch('direction', value => sessionStorage.setItem('direction', value));
+                // Listen for pagination link clicks
+                this.$nextTick(() => {
+                    this.setupPaginationListener();
+                });
             },
 
-            async submitSearch() {
+            setupPaginationListener() {
+                // Delegate event listener for pagination links
+                document.addEventListener('click', (e) => {
+                    const link = e.target.closest('a[href*="page="]');
+                    if (link && link.href.includes(this.route.split('?')[0])) {
+                        e.preventDefault();
+                        const url = new URL(link.href);
+                        const page = url.searchParams.get('page');
+                        this.loadPage(page);
+                    }
+                });
+            },
+
+            async loadPage(page = 1) {
                 const params = new URLSearchParams({
-                    search: this.search,
+                    search: this.search || '',
                     sort: this.sort,
                     direction: this.direction,
+                    page: page
                 });
 
+                const url = `${this.route}?${params.toString()}`;
+
                 try {
-                    const response = await fetch(`${route}?${params.toString()}`, {
+                    const response = await fetch(url, {
                         headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
                         }
                     });
 
-                    const data = await response.json();
-                    if (data.html) {
-                        document.querySelector('#records-table').innerHTML = data.html;
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
                     }
+
+                    const data = await response.json();
+
+                    if (data.html) {
+                        const tableElement = document.querySelector('#records-table');
+                        if (tableElement) {
+                            tableElement.innerHTML = data.html;
+                            // Re-setup pagination listener for new links
+                            this.$nextTick(() => {
+                                window.scrollTo({
+                                    top: 0,
+                                    behavior: 'smooth'
+                                });
+                            });
+                        }
+                    }
+
+                    // Update browser URL without reload
+                    window.history.pushState({}, '', url);
                 } catch (err) {
-                    console.error(err);
+                    console.error('Error fetching data:', err);
+                    // Fallback to full page reload if AJAX fails
+                    window.location.href = url;
                 }
+            },
+
+            async handleChange() {
+                await this.loadPage(1); // Reset to page 1 when filtering
             },
 
             clearSearch() {
                 this.search = '';
-                sessionStorage.removeItem('search');
-                this.submitSearch();
+                this.handleChange();
             }
         }));
+    });
+
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', () => {
+        window.location.reload();
     });
 </script>

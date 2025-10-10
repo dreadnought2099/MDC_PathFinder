@@ -42,34 +42,46 @@ class RoomController extends Controller
 
     public function index(Request $request)
     {
-        $sort = $request->get('sort', 'name');
-        $direction = $request->get('direction', 'asc');
-        $search = $request->get('search');
+        // Get parameters (from request or session)
+        $sort = $request->input('sort', session('rooms.sort', 'name'));
+        $direction = $request->input('direction', session('rooms.direction', 'asc'));
+        $search = $request->input('search', session('rooms.search', ''));
 
-        // Base query with conditional image count
-        $query = Room::query()
-            ->when($search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%")
+        // Always save to session
+        session([
+            'rooms.sort' => $sort,
+            'rooms.direction' => $direction,
+            'rooms.search' => $search,
+        ]);
+
+        // Build query
+        $query = Room::query();
+
+        // Apply search
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%");
             });
+        }
 
-        // Only add image count if needed
+        // Add image count if sorting by it
         if ($sort === 'images_count') {
             $query->withCount('images');
         }
 
-        // Restrict sorting to real/allowed fields
-        $allowedSorts = ['id', 'name', 'description', 'room_type', 'images_count'];
+        // Apply sorting
+        $allowedSorts = ['id', 'name', 'description', 'room_type', 'images_count', 'created_at', 'updated_at'];
         if (in_array($sort, $allowedSorts)) {
             $query->orderBy($sort, $direction);
         } else {
-            $query->orderBy('id', 'asc'); // fallback
+            $query->orderBy('name', 'asc');
         }
 
-        $rooms = $query->paginate(10)
-            ->appends(['sort' => $sort, 'direction' => $direction, 'search' => $search]);
+        // Paginate
+        $rooms = $query->paginate(10)->withQueryString();
 
-        // AJAX support for dynamic updates
+        // Handle AJAX requests
         if ($request->ajax()) {
             return response()->json([
                 'html' => view('pages.admin.rooms.partials.room-table', compact('rooms'))->render(),

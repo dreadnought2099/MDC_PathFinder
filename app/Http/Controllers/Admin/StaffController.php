@@ -23,27 +23,38 @@ class StaffController extends Controller
 
     public function index(Request $request)
     {
-        $sort = $request->get('sort', 'last_name');
-        $direction = $request->get('direction', 'asc');
-        $search = $request->get('search');
+        // Get parameters (from request or session)
+        $sort = $request->input('sort', session('staff.sort', 'full_name'));
+        $direction = $request->input('direction', session('staff.direction', 'asc'));
+        $search = $request->input('search', session('staff.search', ''));
 
-        $query = Staff::with('room')
-            ->when($search, function ($query, $search) {
-                $query->where('full_name', 'like', "%{$search}%");
-            });
+        // Always save to session
+        session([
+            'staff.sort' => $sort,
+            'staff.direction' => $direction,
+            'staff.search' => $search,
+        ]);
 
-        // Restrict sorting to valid fields
-        $allowedSorts = ['id', 'full_name', 'last_name', 'email', 'position'];
+        // Build query
+        $query = Staff::with('room');
 
+        // Apply search
+        if (!empty($search)) {
+            $query->where('full_name', 'like', "%{$search}%");
+        }
+
+        // Apply sorting
+        $allowedSorts = ['id', 'full_name', 'last_name', 'email', 'position', 'created_at', 'updated_at'];
         if (in_array($sort, $allowedSorts)) {
             $query->orderBy($sort, $direction);
         } else {
-            $query->orderBy('id', 'asc'); // fallback sort
+            $query->orderBy('full_name', 'asc');
         }
 
-        $staffs = $query->paginate(10)
-            ->appends(['sort' => $sort, 'direction' => $direction, 'search' => $search]);
+        // Paginate
+        $staffs = $query->paginate(10)->withQueryString();
 
+        // Handle AJAX requests
         if ($request->ajax()) {
             return response()->json([
                 'html' => view('pages.admin.staffs.partials.staff-table', compact('staffs'))->render(),
@@ -52,7 +63,6 @@ class StaffController extends Controller
 
         return view('pages.admin.staffs.index', compact('staffs', 'sort', 'direction', 'search'));
     }
-
     public function create()
     {
         return view('pages.admin.staffs.create');
