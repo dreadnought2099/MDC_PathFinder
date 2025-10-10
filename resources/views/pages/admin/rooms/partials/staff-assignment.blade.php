@@ -16,7 +16,7 @@
 
         <!-- Staff Cards Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-12">
-            @foreach ($staff as $member)
+            @forelse ($staff as $member)
                 @php
                     $assignedRoomId = $member->room_id;
                     $isSelectedRoom = $assignedRoomId == $selectedRoom->id;
@@ -78,7 +78,15 @@
                         </div>
                     </div>
                 </div>
-            @endforeach
+            @empty
+                <!-- No Staff Found -->
+                <div
+                    class="col-span-full flex flex-col items-center justify-center py-16 text-center text-gray-500 dark:text-gray-400">
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/user.png"
+                        alt="No staff" class="w-20 h-20 mb-4 opacity-80">
+                    <p class="font-sofia text-lg">No staff found.</p>
+                </div>
+            @endforelse
         </div>
     </div>
 
