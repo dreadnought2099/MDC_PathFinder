@@ -21,10 +21,6 @@
                              placeholder="Enter 6-digit code" required autofocus x-ref="otpInput">
                      </div>
 
-                     @error('otp')
-                         <p class="text-red-600 text-sm text-center">{{ $message }}</p>
-                     @enderror
-
                      <button type="submit"
                          class="w-full bg-primary text-white px-6 py-3 rounded-md hover:bg-white hover:text-primary dark:hover:bg-gray-800 border-2 border-primary transition-all duration-300 cursor-pointer shadow-primary-hover">
                          Verify Code
@@ -54,10 +50,6 @@
                              class="w-full py-4 text-center text-lg rounded-md dark:text-gray-300 text-gray-700 ring-1 px-4 ring-gray-400 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-colors duration-200"
                              placeholder="Enter recovery code" required x-ref="recoveryInput">
                      </div>
-
-                     @error('recovery_code')
-                         <p class="text-red-600 text-sm text-center">{{ $message }}</p>
-                     @enderror
 
                      <button type="submit"
                          class="w-full bg-primary text-white px-6 py-3 rounded-md hover:bg-white hover:text-primary dark:hover:bg-gray-800 border-2 border-primary transition-all duration-300 cursor-pointer shadow-primary-hover">
