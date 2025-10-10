@@ -228,27 +228,6 @@
             });
 
             // ===== Photo Upload & Compression =====
-            function showTemporaryMessage(message, type = "info") {
-                const existing = document.getElementById("temp-message");
-                if (existing) existing.remove();
-                const div = document.createElement("div");
-                div.id = "temp-message";
-                div.textContent = message;
-                const base =
-                    "fixed top-24 right-4 p-3 rounded shadow-lg z-50 transition-opacity duration-500 border-l-4";
-                const colors = {
-                    success: "bg-green-100 text-green-700 border border-green-300 dark:bg-green-800 dark:text-green-200 dark:border-green-600",
-                    error: "bg-red-100 text-red-700 border border-red-300 dark:bg-red-800 dark:text-red-200 dark:border-red-600",
-                    info: "bg-yellow-100 text-yellow-700 border border-yellow-300 dark:bg-yellow-700 dark:text-yellow-200 dark:border-yellow-500"
-                };
-                div.className = `${base} ${colors[type] || colors.info}`;
-                document.body.appendChild(div);
-                setTimeout(() => {
-                    div.style.opacity = "0";
-                    setTimeout(() => div.remove(), 500);
-                }, 3000);
-            }
-
             async function compressImageCanvas(file, maxDimension = 1500, quality = 0.55) {
                 return new Promise((resolve, reject) => {
                     if (!file.type.startsWith('image/')) return reject("Not an image file");

@@ -262,39 +262,6 @@
             let compressedCarouselFiles = new Map();
 
             // ==================== UTILITIES ====================
-
-            // Single unified notification function
-            function showTemporaryMessage(message, type = "info") {
-                let msgDiv = document.getElementById('temp-message');
-
-                if (!msgDiv) {
-                    msgDiv = document.createElement('div');
-                    msgDiv.id = 'temp-message';
-                    document.body.appendChild(msgDiv);
-                }
-
-                msgDiv.textContent = message;
-
-                const baseClasses =
-                    'fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2 rounded shadow-lg transition-opacity duration-500';
-                const typeClasses = {
-                    success: 'bg-green-500 text-white',
-                    error: 'bg-red-500 text-white',
-                    info: 'bg-blue-500 text-white'
-                };
-
-                msgDiv.className = `${baseClasses} ${typeClasses[type] || typeClasses.info}`;
-                msgDiv.style.display = 'block';
-                msgDiv.style.opacity = '1';
-
-                setTimeout(() => {
-                    msgDiv.style.opacity = '0';
-                    setTimeout(() => {
-                        msgDiv.style.display = 'none';
-                    }, 500);
-                }, 3500);
-            }
-
             function showTemporaryFeedback(button, text) {
                 const old = button.textContent;
                 button.textContent = text;
@@ -1264,32 +1231,6 @@
 
                 // Otherwise, return comma-separated list
                 return sortedDays.join(", ");
-            }
-
-            // Show temporary message notifications
-            function showTemporaryMessage(message, type = "info") {
-                const existing = document.getElementById("temp-message");
-                if (existing) existing.remove();
-
-                const div = document.createElement("div");
-                div.id = "temp-message";
-                div.textContent = message;
-
-                const base =
-                    "fixed top-24 right-4 p-3 rounded shadow-lg z-50 transition-opacity duration-500 border-l-4";
-                const colors = {
-                    success: "bg-green-100 text-green-700 border border-green-300 dark:bg-green-800 dark:text-green-200 dark:border-green-600",
-                    error: "bg-red-100 text-red-700 border border-red-300 dark:bg-red-800 dark:text-red-200 dark:border-red-600",
-                    info: "bg-yellow-100 text-yellow-700 border border-yellow-300 dark:bg-yellow-700 dark:text-yellow-200 dark:border-yellow-500"
-                };
-
-                div.className = `${base} ${colors[type] || colors.info}`;
-                document.body.appendChild(div);
-
-                setTimeout(() => {
-                    div.style.opacity = "0";
-                    setTimeout(() => div.remove(), 500);
-                }, 3000);
             }
 
             function showTemporaryFeedback(button, text) {
