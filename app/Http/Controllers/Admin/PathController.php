@@ -17,9 +17,17 @@ class PathController extends Controller
     // Show all paths with their images
     public function index(Request $request)
     {
-        $sort = $request->get('sort', 'id');
-        $direction = $request->get('direction', 'asc');
-        $search = $request->get('search');
+        // Get from request first, then fall back to session, then defaults
+        $sort = $request->input('sort', session('paths.sort', 'id'));
+        $direction = $request->input('direction', session('paths.direction', 'asc'));
+        $search = $request->input('search', session('paths.search', ''));
+
+        // Store in session
+        session([
+            'paths.sort' => $sort,
+            'paths.direction' => $direction,
+            'paths.search' => $search,
+        ]);
 
         // Handle sorting by room names and image count
         $query = Path::with(['fromRoom', 'toRoom'])
@@ -29,7 +37,7 @@ class PathController extends Controller
             ->whereHas('toRoom');
 
         // Searching across related room names
-        if ($search) {
+        if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->whereHas('fromRoom', fn($sub) =>
                 $sub->where('name', 'like', "%{$search}%"))
@@ -53,22 +61,25 @@ class PathController extends Controller
             $query->withCount('images')
                 ->orderBy('images_count', $direction);
         } else {
-            $query->orderBy($sort, $direction);
+            // Fallback to default sort
+            $allowedSorts = ['id', 'created_at', 'updated_at'];
+            if (in_array($sort, $allowedSorts)) {
+                $query->orderBy($sort, $direction);
+            } else {
+                $query->orderBy('id', 'asc');
+            }
         }
 
-        // Paginate
-        $paths = $query->paginate(10)
-            ->appends(['sort' => $sort, 'direction' => $direction, 'search' => $search]);
+        // Paginate with query string
+        $paths = $query->paginate(10)->withQueryString();
 
-        // Handle AJAX requests (only return table partial)
+        // Handle AJAX requests
         if ($request->ajax()) {
-            // Return partial **with the same wrapper** used in your Blade view
             return response()->json([
                 'html' => view('pages.admin.paths.partials.path-table', compact('paths'))->render(),
             ]);
         }
 
-        // Otherwise render full page
         return view('pages.admin.paths.index', compact('paths', 'sort', 'direction', 'search'));
     }
 

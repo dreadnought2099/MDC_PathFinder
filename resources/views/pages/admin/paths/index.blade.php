@@ -18,8 +18,8 @@
                     'created_at' => 'Date Created',
                     'updated_at' => 'Date Modified',
                     'images_count' => 'Images Uploaded',
-                ]" :currentSort="$sort"
-                    :currentDirection="$direction" />
+                ]" :currentSort="$sort" :currentDirection="$direction"
+                    :currentSearch="$search" />
             </div>
 
             <div id="records-table">

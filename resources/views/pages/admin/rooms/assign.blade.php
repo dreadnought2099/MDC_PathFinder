@@ -79,7 +79,7 @@
                     if (page) this.currentPage = page;
             
                     window.showSpinner();
-                    let url = `{{ route('room.assign') }}?roomId=${this.roomId}&search=${encodeURIComponent(this.staffSearch)}&page=${this.currentPage}`;
+                       let url = `{{ route('room.assign') }}?roomId=${this.roomId}&search=${encodeURIComponent(this.staffSearch)}&page=${this.currentPage}`;
             
                     window.history.replaceState({}, '', url);
             

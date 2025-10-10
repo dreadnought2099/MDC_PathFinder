@@ -19,14 +19,19 @@ class RoomAssignmentController extends Controller
         $rooms = Room::all();
         $roomId = $roomId ?? $request->query('roomId') ?? ($rooms->first()->id ?? null);
         $selectedRoom = $roomId ? Room::find($roomId) : null;
-        $search = $request->get('search');
+
+        // Get search from request or session
+        $search = $request->input('search', session('assign.search', ''));
+
+        // Store in session
+        session(['assign.search' => $search]);
 
         $staff = Staff::with('room')
-            ->when($search, fn($q) => $q->where('full_name', 'like', "%{$search}%"))
+            ->when(!empty($search), fn($q) => $q->where('full_name', 'like', "%{$search}%"))
             ->paginate(12)
-            ->appends(['search' => $search]);
+            ->withQueryString();
 
-        if (request()->ajax()) {
+        if ($request->ajax()) {
             return response()->json([
                 'html' => view('pages.admin.rooms.partials.staff-assignment', compact('staff', 'selectedRoom', 'search'))->render(),
             ]);
