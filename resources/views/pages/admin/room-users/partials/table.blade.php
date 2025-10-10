@@ -22,7 +22,7 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 dark:divide-gray-600 font-sofia">
-                @foreach ($users as $user)
+                @forelse ($users as $user)
                     <tr class="hover:bg-gray-50 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-800">
                         <td class="px-4 sm:px-6 py-2 text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-300">
                             {{ $user->name ?? '-' }}</td>
@@ -129,7 +129,29 @@
                             @endif
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="5"
+                            class="px-4 sm:px-6 py-16 text-center dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+                            <div class="flex flex-col items-center justify-center space-y-4">
+                                <div
+                                    class="w-14 h-14 sm:w-16 sm:h-16 bg-primary-10 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/user.png"
+                                        alt="No users" class="w-9 h-8 sm:w-11 sm:h-10">
+                                </div>
+                                <div class="text-center">
+                                    <h3 class="text-base sm:text-lg font-medium dark:text-gray-300 text-gray-700 mb-2">
+                                        No users found</h3>
+                                    @if (auth()->user()->hasRole('Admin'))
+                                        <p class="text-gray-500 text-xs sm:text-sm dark:text-gray-400">
+                                            There are no users available. Please add users to manage room assignments.
+                                        </p>
+                                    @endif
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
