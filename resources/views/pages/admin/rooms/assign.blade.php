@@ -19,6 +19,7 @@
             <div x-data="{
                 roomId: '{{ $selectedRoom->id ?? '' }}',
                 staffSearch: '{{ $search ?? '' }}',
+                currentPage: {{ request('page', 1) }},
                 isOpen: false,
                 search: '',
                 selectedName: @js($selectedRoom->name ?? ''),
@@ -27,6 +28,7 @@
             
                 init() {
                     this.filteredRooms = this.rooms;
+                    this.setupEventListeners();
                 },
             
                 filterRooms() {
@@ -38,6 +40,7 @@
                 },
             
                 filterStaff() {
+                    this.currentPage = 1;
                     this.fetchRoomData();
                 },
             
@@ -47,6 +50,7 @@
                     this.search = '';
                     this.isOpen = false;
                     this.filteredRooms = this.rooms;
+                    this.currentPage = 1;
                     this.fetchRoomData();
                 },
             
@@ -65,29 +69,131 @@
                     this.filteredRooms = this.rooms;
                 },
             
-                fetchRoomData() {
+                fetchRoomData(page = null) {
                     if (!this.roomId) {
                         document.querySelector('#staff-content').innerHTML =
                             '<div class=\'text-center py-12 text-gray-500 dark:text-gray-400\'>Select an office to assign staff</div>';
                         return;
                     }
             
+                    if (page) this.currentPage = page;
+            
                     window.showSpinner();
-                    let url = `{{ route('room.assign') }}?roomId=${this.roomId}&search=${this.staffSearch}`;
+                    let url = `{{ route('room.assign') }}?roomId=${this.roomId}&search=${encodeURIComponent(this.staffSearch)}&page=${this.currentPage}`;
             
                     window.history.replaceState({}, '', url);
             
-                    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                        .then(res => res.text())
-                        .then(html => {
-                            let parser = new DOMParser();
-                            let doc = parser.parseFromString(html, 'text/html');
-                            let content = doc.querySelector('#staff-content');
-                            if (content) {
-                                document.querySelector('#staff-content').innerHTML = content.innerHTML;
+                    fetch(url, {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json'
                             }
                         })
-                        .catch(err => console.error(err))
+                        .then(res => res.json())
+                        .then(data => {
+                            document.querySelector('#staff-content').innerHTML = data.html;
+                            this.$nextTick(() => this.setupEventListeners());
+                        })
+                        .catch(err => {
+                            console.error('Fetch error:', err);
+                            alert('Failed to load staff data. Please try again.');
+                        })
+                        .finally(() => window.hideSpinner());
+                },
+            
+                setupEventListeners() {
+                    const content = document.querySelector('#staff-content');
+                    if (!content) return;
+            
+                    content.querySelectorAll('a[href*=\'page=\']').forEach(link => {
+                        link.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            const url = new URL(link.href);
+                            const page = url.searchParams.get('page');
+                            if (page) this.fetchRoomData(parseInt(page));
+                        });
+                    });
+            
+                    const form = content.querySelector('#assignForm');
+                    if (form) {
+                        form.addEventListener('submit', (e) => {
+                            e.preventDefault();
+                            this.submitForm(form);
+                        });
+                    }
+            
+                    content.querySelectorAll('input[type=\'checkbox\'][data-staff-id]').forEach(checkbox => {
+                        checkbox.addEventListener('click', (e) => {
+                            if (!e.target.checked) {
+                                e.preventDefault();
+                                e.target.checked = true;
+                                const staffCard = e.target.closest('.staff-card');
+                                const staffName = staffCard.querySelector('h3').textContent.trim();
+                                window.currentAlpineInstance = this;
+                                window.openModal(e.target.dataset.staffId, staffName);
+                            }
+                        });
+                    });
+                },
+            
+                submitForm(form) {
+                    const formData = new FormData(form);
+            
+                    window.showSpinner();
+            
+                    fetch(form.action, {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json'
+                            }
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                this.fetchRoomData();
+                                alert(data.message);
+                            } else {
+                                alert(data.message || 'An error occurred');
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Submit error:', err);
+                            alert('Failed to update assignment');
+                        })
+                        .finally(() => window.hideSpinner());
+                },
+            
+                unassignStaff(staffId) {
+                    window.showSpinner();
+            
+                    const formData = new FormData();
+                    formData.append('_token', document.querySelector('meta[name=\'csrf-token\']').content);
+                    formData.append('_method', 'DELETE');
+            
+                    fetch(`/admin/rooms/staff/${staffId}/remove?page=${this.currentPage}`, {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json'
+                            }
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                window.closeModal();
+                                this.fetchRoomData();
+                                alert(data.message);
+                            } else {
+                                alert(data.message || 'Failed to unassign staff');
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Unassign error:', err);
+                            alert('Failed to unassign staff');
+                        })
                         .finally(() => window.hideSpinner());
                 }
             }">
@@ -185,15 +291,14 @@
     <script>
         let currentStaffId = null;
 
-        function openModal(staffId, staffName) {
+        // Make these functions globally accessible
+        window.openModal = function(staffId, staffName) {
             const modal = document.getElementById('confirmModal');
             const nameSpan = document.getElementById('modalMessage');
-            const unassignForm = document.getElementById('unassignForm');
             const currentPage = new URLSearchParams(window.location.search).get('page') || '1';
 
             currentStaffId = staffId;
             nameSpan.textContent = staffName;
-            unassignForm.action = `/admin/rooms/staff/${staffId}/remove?page=${currentPage}`;
 
             modal.classList.remove('hidden', 'opacity-0');
             const content = modal.querySelector('.bg-white');
@@ -203,7 +308,7 @@
             document.body.style.overflow = 'hidden';
         }
 
-        function closeModal() {
+        window.closeModal = function() {
             const modal = document.getElementById('confirmModal');
             const content = modal.querySelector('.bg-white');
 
@@ -218,23 +323,25 @@
             }, 300);
         }
 
-        // Handle checkbox clicks for unassignment confirmation
-        document.addEventListener('click', function(e) {
-            if (e.target.type === 'checkbox' && e.target.hasAttribute('data-staff-id')) {
-                if (!e.target.checked) {
-                    e.preventDefault();
-                    e.target.checked = true;
-                    const staffCard = e.target.closest('.staff-card');
-                    const staffName = staffCard.querySelector('h3').textContent.trim();
-                    openModal(e.target.dataset.staffId, staffName);
-                }
+        // Add the missing confirmUnassign function
+        window.confirmUnassign = function() {
+            if (!currentStaffId) {
+                alert('No staff selected');
+                return;
             }
-        });
+
+            // Call the Alpine.js unassignStaff method
+            if (window.currentAlpineInstance) {
+                window.currentAlpineInstance.unassignStaff(currentStaffId);
+            } else {
+                alert('Unable to process request. Please refresh the page.');
+            }
+        }
 
         // Escape key closes modal
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                closeModal();
+                window.closeModal();
             }
         });
     </script>

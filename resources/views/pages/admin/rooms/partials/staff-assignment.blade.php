@@ -83,8 +83,7 @@
     </div>
 
     <!-- Submit Button -->
-    <div
-        class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 py-4 z-40">
+    <div class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 py-4 z-40">
         <div class="max-w-7xl mx-auto flex justify-center">
             <button type="submit"
                 class="bg-primary text-white px-6 py-3 rounded-md hover:text-primary border-2 border-primary hover:bg-white dark:hover:bg-gray-800 transition-all duration-300 cursor-pointer font-medium shadow-lg hover:shadow-xl">
@@ -141,14 +140,10 @@
                     class="px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover">
                     Cancel
                 </button>
-                <form id="unassignForm" method="POST" style="display: inline;">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit"
-                        class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-secondary rounded-md hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover">
-                        Unassign Staff
-                    </button>
-                </form>
+                <button type="button" onclick="confirmUnassign()"
+                    class="px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-secondary rounded-md hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover">
+                    Unassign Staff
+                </button>
             </div>
         </div>
     </div>

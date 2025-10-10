@@ -26,6 +26,12 @@ class RoomAssignmentController extends Controller
             ->paginate(12)
             ->appends(['search' => $search]);
 
+        if (request()->ajax()) {
+            return response()->json([
+                'html' => view('pages.admin.rooms.partials.staff-assignment', compact('staff', 'selectedRoom', 'search'))->render(),
+            ]);
+        }
+
         return view('pages.admin.rooms.assign', compact('rooms', 'staff', 'selectedRoom', 'search'));
     }
 
@@ -58,28 +64,57 @@ class RoomAssignmentController extends Controller
             ->toArray();
 
         $staffNames = !empty($assignedStaff) ? implode(', ', $assignedStaff) : 'No staff';
-        $page = $request->input('page', 1);
+        $message = "{$staffNames} was successfully assigned to {$room->name}.";
 
+        // Check if AJAX request
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message
+            ]);
+        }
+
+        // Fallback for non-AJAX
         return redirect()
             ->route('room.assign', ['roomId' => $room->id])
-            ->with('success', "{$staffNames} was successfully assigned to {$room->name}.")
-            ->withInput(['roomId' => $room->id, 'page' => $page]);
+            ->with('success', $message);
     }
 
     public function removeFromRoom(Request $request, $id)
     {
         $staff = Staff::findOrFail($id);
         $room = $staff->room;
+
+        if (!$room) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Staff is not assigned to any room.'
+                ], 400);
+            }
+            return redirect()->back()->with('error', 'Staff is not assigned to any room.');
+        }
+
         $name = $staff->full_name;
+        $roomName = $room->name;
+        $roomId = $room->id;
 
         $staff->room_id = null;
         $staff->save();
 
-        $page = $request->input('page') ?? session('current_page', 1);
+        $message = "{$name} was successfully removed from {$roomName}.";
 
+        // Check if AJAX request
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message
+            ]);
+        }
+
+        // Fallback for non-AJAX
         return redirect()
-            ->route('room.assign', ['roomId' => $room->id])
-            ->with('success', "{$name} was successfully removed from {$room->name}.")
-            ->withInput(['roomId' => $room->id, 'page' => $page]);
+            ->route('room.assign', ['roomId' => $roomId])
+            ->with('success', $message);
     }
 }
