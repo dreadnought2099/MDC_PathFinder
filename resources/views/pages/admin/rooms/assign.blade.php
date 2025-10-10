@@ -11,7 +11,7 @@
                     <span class="text-primary">Assign</span> Staff to Office
                 </h1>
                 <p class="text-base lg:text-lg text-gray-600 dark:text-gray-300">
-                    Select an office and assign staff members to it.
+                    Select an office and assign staff members to it
                 </p>
             </div>
 
@@ -93,11 +93,12 @@
             }">
 
                 <!-- Sticky Combobox -->
-                <div class="sticky top-16 z-49 bg-white dark:bg-gray-900 py-4 -mx-4 px-4 mb-6">
-                    <div class="max-w-7xl mx-auto flex justify-center">
-                        <div @click.away="closeDropdown()" class="relative w-full max-w-md">
+                <div
+                    class="sticky top-16 z-50 bg-white dark:bg-gray-900 py-4 mb-4 border-b border-gray-200 dark:border-gray-700">
+                    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
 
-                            <!-- Display Button -->
+                        <!-- Room Dropdown -->
+                        <div class="relative w-full md:w-1/2" @click.away="closeDropdown()">
                             <button type="button" @click="toggleDropdown()"
                                 class="w-full border border-primary rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-primary dark:text-gray-300 bg-white dark:bg-gray-800 shadow-md flex items-center justify-between text-left">
                                 <span x-text="selectedName || 'Select an office'"
@@ -119,22 +120,20 @@
                                 class="absolute z-50 w-full mt-2 bg-white text-gray-800 dark:bg-gray-800 border border-primary rounded-md shadow-lg overflow-hidden"
                                 style="display: none;">
 
-                                <!-- Search Input -->
+                                <!-- Search Input inside Dropdown -->
                                 <div class="p-2 border-b border-gray-200 dark:border-gray-700">
                                     <input x-ref="searchInput" type="text" x-model="search" @input="filterRooms()"
                                         placeholder="Search offices"
                                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-gray-300 text-sm">
                                 </div>
 
-                                <!-- Room Options List -->
+                                <!-- Room Options -->
                                 <div class="max-h-60 overflow-auto">
-                                    <!-- No Results -->
                                     <div x-show="filteredRooms.length === 0"
                                         class="px-4 py-3 text-gray-500 dark:text-gray-400 text-center text-sm">
                                         No offices found
                                     </div>
 
-                                    <!-- Room Options -->
                                     <template x-for="room in filteredRooms" :key="room.id">
                                         <button type="button" @click="selectRoom(room)"
                                             class="w-full text-left px-4 py-3 hover:bg-primary hover:text-white hover:bg-opacity-10 dark:hover:bg-gray-700 hover:pl-6 hover:border-l-4 hover:border-primary transition-all duration-200 dark:text-gray-300 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
@@ -157,13 +156,14 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <div class="sticky top-12 max-w-md mx-auto mb-4">
-                    <input type="text" x-model="staffSearch" @input.debounce.300="filterStaff()"
-                        placeholder="Search staff"
-                        class="w-full px-3 py-2 border border-primary rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-800 dark:text-gray-300">
+                        <!-- Staff Search Input -->
+                        <div class="w-full md:w-1/2">
+                            <input type="text" x-model="staffSearch" @input.debounce.300="filterStaff()"
+                                placeholder="Search staff"
+                                class="w-full px-3 py-2 border border-primary rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-800 dark:text-gray-300">
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Staff Content Area -->

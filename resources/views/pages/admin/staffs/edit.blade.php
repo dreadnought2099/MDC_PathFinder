@@ -58,6 +58,7 @@
                         <option value="II" {{ old('suffix', $staff->suffix) == 'II' ? 'selected' : '' }}>II</option>
                         <option value="III" {{ old('suffix', $staff->suffix) == 'III' ? 'selected' : '' }}>III</option>
                         <option value="IV" {{ old('suffix', $staff->suffix) == 'IV' ? 'selected' : '' }}>IV</option>
+                        <option value="IV" {{ old('suffix', $staff->suffix) == 'IV' ? 'selected' : '' }}>IV</option>
                         <option value="V" {{ old('suffix', $staff->suffix) == 'V' ? 'selected' : '' }}>V</option>
                         <option value="VI" {{ old('suffix', $staff->suffix) == 'VI' ? 'selected' : '' }}>VI</option>
                         <option value="VII" {{ old('suffix', $staff->suffix) == 'VII' ? 'selected' : '' }}>VII</option>
