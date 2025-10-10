@@ -114,8 +114,22 @@
                      @endif
                  @empty
                      <tr>
-                         <td colspan="6" class="px-4 py-12 text-center text-gray-600 dark:text-gray-300 text-sm">
-                             No paths found.
+                         <td colspan="5"
+                             class="px-4 sm:px-6 py-16 text-center dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+                             <div class="flex flex-col items-center justify-center space-y-4">
+                                 <div
+                                     class="w-14 h-14 sm:w-16 sm:h-16 bg-primary-10 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                                     <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
+                                         alt="No paths" class="w-9 h-8 sm:w-11 sm:h-10">
+                                 </div>
+                                 <div class="text-center">
+                                     <h3 class="text-base sm:text-lg font-medium dark:text-gray-300 text-gray-700 mb-2">
+                                         No paths found</h3>
+                                     <p class="text-gray-500 text-xs sm:text-sm dark:text-gray-400">
+                                         There are no paths available.
+                                     </p>
+                                 </div>
+                             </div>
                          </td>
                      </tr>
                  @endforelse
