@@ -82,7 +82,7 @@
                 <!-- No Staff Found -->
                 <div
                     class="col-span-full flex flex-col items-center justify-center py-16 text-center text-gray-500 dark:text-gray-400">
-                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/user.png"
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder@cac2411/public/icons/staff.png"
                         alt="No staff" class="w-20 h-20 mb-4 opacity-80">
                     <p class="font-sofia text-lg">No staff found.</p>
                 </div>

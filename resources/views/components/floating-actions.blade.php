@@ -32,7 +32,7 @@
                     <a href="{{ route('staff.create') }}" class="group flex items-center space-x-2">
                         <div
                             class="flex items-center justify-center w-12 h-12 hover:scale-120 transition-all duration-300">
-                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/staff.png" alt="Add Staff Member" />
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder@cac2411/public/icons/staff.png" alt="Add Staff Member" />
                         </div>
                         <span class="text-sm text-gray-700 hover-underline dark:text-gray-300">Add Staff Member</span>
                     </a>
@@ -41,7 +41,7 @@
                     <a href="{{ route('room-user.create') }}" class="group flex items-center space-x-2">
                         <div
                             class="flex items-center justify-center w-12 h-12 hover:scale-120 transition-all duration-300">
-                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/user.png" alt="Add Staff Member" />
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder@cac2411/public/icons/user.png" alt="Add Staff Member" />
                         </div>
                         <span class="text-sm text-gray-700 hover-underline dark:text-gray-300">Add Office User</span>
                     </a>
