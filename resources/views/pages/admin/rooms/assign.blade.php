@@ -18,6 +18,7 @@
             <!-- Room Selection Combobox -->
             <div x-data="{
                 roomId: '{{ $selectedRoom->id ?? '' }}',
+                staffSearch: '{{ $search ?? '' }}',
                 isOpen: false,
                 search: '',
                 selectedName: @js($selectedRoom->name ?? ''),
@@ -34,6 +35,10 @@
                         this.rooms.filter(room =>
                             room.name.toLowerCase().includes(this.search.toLowerCase())
                         );
+                },
+            
+                filterStaff() {
+                    this.fetchRoomData();
                 },
             
                 selectRoom(room) {
@@ -63,12 +68,12 @@
                 fetchRoomData() {
                     if (!this.roomId) {
                         document.querySelector('#staff-content').innerHTML =
-                            '<div class=\'text-center py-12 text-gray-500 dark:text-gray-400\'>Select a room to assign staff</div>';
+                            '<div class=\'text-center py-12 text-gray-500 dark:text-gray-400\'>Select an office to assign staff</div>';
                         return;
                     }
             
                     window.showSpinner();
-                    let url = `{{ route('room.assign') }}?roomId=${this.roomId}`;
+                    let url = `{{ route('room.assign') }}?roomId=${this.roomId}&search=${this.staffSearch}`;
             
                     window.history.replaceState({}, '', url);
             
@@ -88,14 +93,14 @@
             }">
 
                 <!-- Sticky Combobox -->
-                <div class="sticky top-16 z-[49] bg-white dark:bg-gray-900 py-4 -mx-4 px-4 mb-6">
+                <div class="sticky top-16 z-49 bg-white dark:bg-gray-900 py-4 -mx-4 px-4 mb-6">
                     <div class="max-w-7xl mx-auto flex justify-center">
                         <div @click.away="closeDropdown()" class="relative w-full max-w-md">
 
                             <!-- Display Button -->
                             <button type="button" @click="toggleDropdown()"
-                                class="w-full border border-primary dark:bg-gray-800 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-primary dark:text-gray-300 bg-white dark:bg-gray-800 shadow-md flex items-center justify-between text-left">
-                                <span x-text="selectedName || 'Select a room...'"
+                                class="w-full border border-primary rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-primary dark:text-gray-300 bg-white dark:bg-gray-800 shadow-md flex items-center justify-between text-left">
+                                <span x-text="selectedName || 'Select an office'"
                                     :class="!selectedName ? 'text-gray-400' : ''">
                                 </span>
                                 <svg class="w-5 h-5 text-gray-400 transition-transform duration-200"
@@ -117,7 +122,7 @@
                                 <!-- Search Input -->
                                 <div class="p-2 border-b border-gray-200 dark:border-gray-700">
                                     <input x-ref="searchInput" type="text" x-model="search" @input="filterRooms()"
-                                        placeholder="Search offices..."
+                                        placeholder="Search offices"
                                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-gray-300 text-sm">
                                 </div>
 
@@ -139,9 +144,13 @@
                                             }">
                                             <span x-text="room.name"></span>
 
-                                            <!-- Checkmark for selected -->
                                             <span x-show="roomId == room.id" class="float-right text-primary">
-                                                ✓
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                                    fill="currentColor">
+                                                    <path fill-rule="evenodd"
+                                                        d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l7-7a1 1 0 000-1.414z"
+                                                        clip-rule="evenodd" />
+                                                </svg>
                                             </span>
                                         </button>
                                     </template>
@@ -149,6 +158,12 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <div class="sticky top-12 max-w-md mx-auto mb-4">
+                    <input type="text" x-model="staffSearch" @input.debounce.300="filterStaff()"
+                        placeholder="Search staff"
+                        class="w-full px-3 py-2 border border-primary rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-800 dark:text-gray-300">
                 </div>
 
                 <!-- Staff Content Area -->
