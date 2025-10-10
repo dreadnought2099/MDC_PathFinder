@@ -375,6 +375,7 @@
         document.getElementById("unassignForm")?.addEventListener("submit", window.showSpinner);
     </script>
 
+    {{-- showTemporaryMessage --}}
     <script>
         window.showTemporaryMessage = function(message, type = 'info') {
             // Remove any existing messages
