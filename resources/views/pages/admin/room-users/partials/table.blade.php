@@ -142,11 +142,9 @@
                                 <div class="text-center">
                                     <h3 class="text-base sm:text-lg font-medium dark:text-gray-300 text-gray-700 mb-2">
                                         No users found</h3>
-                                    @if (auth()->user()->hasRole('Admin'))
-                                        <p class="text-gray-500 text-xs sm:text-sm dark:text-gray-400">
-                                            There are no users available. Please add users to manage room assignments.
-                                        </p>
-                                    @endif
+                                    <p class="text-gray-500 text-xs sm:text-sm dark:text-gray-400">
+                                        There are no office users available.
+                                    </p>
                                 </div>
                             </div>
                         </td>
