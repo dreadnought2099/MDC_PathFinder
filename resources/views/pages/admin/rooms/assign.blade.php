@@ -96,7 +96,7 @@
                         })
                         .catch(err => {
                             console.error('Fetch error:', err);
-                            alert('Failed to load staff data. Please try again.');
+                            showTemporaryMessage('Failed to load staff data. Please try again.', 'error');
                         })
                         .finally(() => window.hideSpinner());
                 },
@@ -153,14 +153,14 @@
                         .then(data => {
                             if (data.success) {
                                 this.fetchRoomData();
-                                alert(data.message);
+                                showTemporaryMessage(data.message, 'success');
                             } else {
-                                alert(data.message || 'An error occurred');
+                                showTemporaryMessage(data.message || 'An error occurred', 'error');
                             }
                         })
                         .catch(err => {
                             console.error('Submit error:', err);
-                            alert('Failed to update assignment');
+                            showTemporaryMessage('Failed to update assignment', 'error');
                         })
                         .finally(() => window.hideSpinner());
                 },
@@ -185,18 +185,18 @@
                             if (data.success) {
                                 window.closeModal();
                                 this.fetchRoomData();
-                                alert(data.message);
+                                showTemporaryMessage(data.message, 'success');
                             } else {
-                                alert(data.message || 'Failed to unassign staff');
+                                showTemporaryMessage(data.message || 'Failed to unassign staff', 'error');
                             }
                         })
                         .catch(err => {
                             console.error('Unassign error:', err);
-                            alert('Failed to unassign staff');
+                            showTemporaryMessage('Failed to unassign staff', 'error');
                         })
                         .finally(() => window.hideSpinner());
-                }
-            }">
+                    }
+                }">
 
                 <!-- Sticky Combobox -->
                 <!-- Sticky container for dropdown and staff search -->
@@ -326,7 +326,7 @@
         // Add the missing confirmUnassign function
         window.confirmUnassign = function() {
             if (!currentStaffId) {
-                alert('No staff selected');
+                showTemporaryMessage('No staff selected', 'error');
                 return;
             }
 
@@ -334,7 +334,7 @@
             if (window.currentAlpineInstance) {
                 window.currentAlpineInstance.unassignStaff(currentStaffId);
             } else {
-                alert('Unable to process request. Please refresh the page.');
+                showTemporaryMessage('Unable to process request. Please refresh the page.', 'error');
             }
         }
 
