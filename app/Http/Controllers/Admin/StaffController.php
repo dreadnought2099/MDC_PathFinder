@@ -32,11 +32,13 @@ class StaffController extends Controller
                 $query->where('full_name', 'like', "%{$search}%");
             });
 
-        // Handle full name sorting
-        if ($sort === 'full_name') {
-            $query->orderBy('full_name', $direction);
-        } else {
+        // Restrict sorting to valid fields
+        $allowedSorts = ['id', 'full_name', 'last_name', 'email', 'position'];
+
+        if (in_array($sort, $allowedSorts)) {
             $query->orderBy($sort, $direction);
+        } else {
+            $query->orderBy('id', 'asc'); // fallback sort
         }
 
         $staffs = $query->paginate(10)

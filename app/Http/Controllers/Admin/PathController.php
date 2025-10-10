@@ -22,8 +22,9 @@ class PathController extends Controller
         $search = $request->get('search');
 
         // Handle sorting by room names and image count
-        $query = Path::with(['fromRoom', 'toRoom', 'images'])
-            ->whereNull('paths.deleted_at') // Specify the table name
+        $query = Path::with(['fromRoom', 'toRoom'])
+            ->when($sort === 'images_count', fn($q) => $q->withCount('images'))
+            ->whereNull('paths.deleted_at')
             ->whereHas('fromRoom')
             ->whereHas('toRoom');
 

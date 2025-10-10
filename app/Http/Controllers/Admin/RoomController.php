@@ -46,14 +46,30 @@ class RoomController extends Controller
         $direction = $request->get('direction', 'asc');
         $search = $request->get('search');
 
-        $rooms = Room::when($search, function ($query, $search) {
-            $query->where('name', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%");
-        })
-            ->orderBy($sort, $direction)
-            ->paginate(10)
+        // Base query with conditional image count
+        $query = Room::query()
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+
+        // Only add image count if needed
+        if ($sort === 'images_count') {
+            $query->withCount('images');
+        }
+
+        // Restrict sorting to real/allowed fields
+        $allowedSorts = ['id', 'name', 'description', 'room_type', 'images_count'];
+        if (in_array($sort, $allowedSorts)) {
+            $query->orderBy($sort, $direction);
+        } else {
+            $query->orderBy('id', 'asc'); // fallback
+        }
+
+        $rooms = $query->paginate(10)
             ->appends(['sort' => $sort, 'direction' => $direction, 'search' => $search]);
 
+        // AJAX support for dynamic updates
         if ($request->ajax()) {
             return response()->json([
                 'html' => view('pages.admin.rooms.partials.room-table', compact('rooms'))->render(),
