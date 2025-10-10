@@ -36,8 +36,8 @@
 
                             <!-- Staff name -->
                             <h3
-                                class="text-gray-800 dark:text-gray-100 mb-2 {{ $isAssignedOtherRoom ? 'text-gray-400 dark:text-gray-500' : '' }}">
-                                {{ $member->first_name }} {{ $member->last_name }}
+                                class="font-sofia text-gray-800 dark:text-gray-100 mb-2 {{ $isAssignedOtherRoom ? 'text-gray-400 dark:text-gray-500' : '' }}">
+                                {{ $member->full_name }}
                             </h3>
 
                             <!-- Status badge -->

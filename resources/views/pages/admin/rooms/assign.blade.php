@@ -93,9 +93,11 @@
             }">
 
                 <!-- Sticky Combobox -->
+                <!-- Sticky container for dropdown and staff search -->
                 <div
-                    class="sticky top-16 z-50 bg-white dark:bg-gray-900 py-4 mb-4 border-b border-gray-200 dark:border-gray-700">
-                    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+                    class="font-sofia sticky top-16 z-50 bg-white dark:bg-gray-900 py-4 mb-4 border-b border-gray-200 dark:border-gray-700">
+                    <div
+                        class="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
 
                         <!-- Room Dropdown -->
                         <div class="relative w-full md:w-1/2" @click.away="closeDropdown()">
@@ -120,7 +122,7 @@
                                 class="absolute z-50 w-full mt-2 bg-white text-gray-800 dark:bg-gray-800 border border-primary rounded-md shadow-lg overflow-hidden"
                                 style="display: none;">
 
-                                <!-- Search Input inside Dropdown -->
+                                <!-- Search input inside dropdown -->
                                 <div class="p-2 border-b border-gray-200 dark:border-gray-700">
                                     <input x-ref="searchInput" type="text" x-model="search" @input="filterRooms()"
                                         placeholder="Search offices"
@@ -142,7 +144,6 @@
                                                 'text-gray-700 dark:text-gray-300': roomId != room.id
                                             }">
                                             <span x-text="room.name"></span>
-
                                             <span x-show="roomId == room.id" class="float-right text-primary">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                                     fill="currentColor">
@@ -157,7 +158,7 @@
                             </div>
                         </div>
 
-                        <!-- Staff Search Input -->
+                        <!-- Staff Search Input aligned to dropdown width -->
                         <div class="w-full md:w-1/2">
                             <input type="text" x-model="staffSearch" @input.debounce.300="filterStaff()"
                                 placeholder="Search staff"

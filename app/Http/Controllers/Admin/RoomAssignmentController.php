@@ -22,9 +22,7 @@ class RoomAssignmentController extends Controller
         $search = $request->get('search');
 
         $staff = Staff::with('room')
-            ->when($search, fn($q) =>
-            $q->where('first_name', 'like', "%{$search}%")
-                ->orWhere('last_name', 'like', "%{$search}%"))
+            ->when($search, fn($q) => $q->where('full_name', 'like', "%{$search}%"))
             ->paginate(12)
             ->appends(['search' => $search]);
 

@@ -29,19 +29,12 @@ class StaffController extends Controller
 
         $query = Staff::with('room')
             ->when($search, function ($query, $search) {
-                $query->where('first_name', 'like', "%{$search}%")
-                    ->orWhere('last_name', 'like', "%{$search}%")
-                    ->orWhereRaw("CONCAT_WS(' ', first_name, middle_name, last_name) LIKE ?", ["%{$search}%"])
-                    ->orWhereRaw("CONCAT_WS(' ', last_name, middle_name, first_name) LIKE ?", ["%{$search}%"])
-                    ->orWhereRaw("CONCAT_WS(' ', first_name, last_name) LIKE ?", ["%{$search}%"])
-                    ->orWhereRaw("CONCAT_WS(' ', last_name, first_name) LIKE ?", ["%{$search}%"]);
+                $query->where('full_name', 'like', "%{$search}%");
             });
 
         // Handle full name sorting
         if ($sort === 'full_name') {
-            $query->orderBy('first_name', $direction)
-                ->orderBy('middle_name', $direction)
-                ->orderBy('last_name', $direction);
+            $query->orderBy('full_name', $direction);
         } else {
             $query->orderBy($sort, $direction);
         }

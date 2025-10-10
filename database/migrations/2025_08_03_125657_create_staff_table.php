@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->string('phone_num')->nullable();
             $table->string('photo_path')->nullable();
+            $table->string('full_name')->nullable()->index(); // For easier searching and sorting
             $table->unique(['id', 'room_id']);
             $table->softDeletes();
             $table->timestamps();

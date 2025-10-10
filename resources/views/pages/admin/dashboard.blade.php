@@ -24,7 +24,7 @@
                         <div class="text-2xl lg:text-3xl font-bold text-blue-600 mb-1 dark:text-blue-400">
                             {{ \App\Models\Staff::count() }}
                         </div>
-                        <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Total Staff</div>
+                        <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Total Staffs</div>
                     </div>
 
                     <!-- Total Rooms -->

@@ -46,5 +46,14 @@ class Staff extends Model
                 $staff->token = bin2hex(random_bytes(32)); // 64-char secure hex token
             }
         });
+
+        static::saving(function ($staff) {
+            $staff->full_name = trim(
+                $staff->first_name . ' ' .
+                    ($staff->middle_name ? $staff->middle_name . ' ' : '') .
+                    $staff->last_name .
+                    ($staff->suffix ? ' ' . $staff->suffix : '')
+            );
+        });
     }
 }
