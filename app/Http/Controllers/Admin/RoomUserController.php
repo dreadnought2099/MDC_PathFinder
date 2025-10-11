@@ -144,14 +144,25 @@ class RoomUserController extends Controller
             'room_id' => 'nullable|exists:rooms,id',
         ]);
 
+        // Prepare data for update
         $data = [
             'name' => $request->name,
             'username' => $request->username,
-            'room_id' => $request->room_id ?: null,
         ];
 
-        $passwordChanged = false;
+        // Handle room assignment
+        if ($user->hasRole('Admin')) {
+            // Prevent Admin from being assigned any room
+            $data['room_id'] = null;
+            if ($request->filled('room_id')) {
+                return back()->with('error', 'Admins cannot be assigned to any room.');
+            }
+        } else {
+            $data['room_id'] = $request->room_id ?: null;
+        }
 
+        // Handle password update
+        $passwordChanged = false;
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
             $passwordChanged = true;
@@ -159,18 +170,16 @@ class RoomUserController extends Controller
 
         $user->update($data);
 
+        // If password changed, log out sessions
         if ($passwordChanged) {
-            // Always log out the updated user's sessions
             DB::table('sessions')->where('user_id', $user->id)->delete();
 
-            // If the logged-in admin updated their own account
             if (Auth::id() === $user->id) {
                 Auth::logout();
                 return redirect()->route('login')
                     ->with('success', 'Your password was changed. Please log in again.');
             }
 
-            // Otherwise, admin updated another user's password
             return redirect()->route('room-user.index')
                 ->with('success', 'User password updated successfully. That user has been logged out.');
         }
@@ -178,8 +187,6 @@ class RoomUserController extends Controller
         return redirect()->route('room-user.index')
             ->with('success', 'Office user updated successfully!');
     }
-
-
 
     /**
      * Soft delete a room user

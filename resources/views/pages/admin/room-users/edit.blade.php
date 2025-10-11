@@ -111,25 +111,25 @@
                 </div>
 
                 <!-- Room Selection -->
-                <div>
-                    <label for="room_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Assign Room
-                    </label>
-                    <select name="room_id" id="room_id"
-                        class="font-sofia mt-1 px-4 py-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm 
-                            focus:ring-2 focus:ring-primary focus:border-primary outline-none
-                            dark:bg-gray-700 dark:text-gray-200">
-                        <option value="" {{ $user->room_id === null ? 'selected' : '' }}>No Room Assigned</option>
-                        @foreach ($rooms as $room)
-                            <option value="{{ $room->id }}" {{ $user->room_id == $room->id ? 'selected' : '' }}>
-                                {{ $room->name }}
+                @if (!$user->hasRole('Admin'))
+                    <div>
+                        <label for="room_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Assign Room
+                        </label>
+                        <select name="room_id" id="room_id"
+                            class="font-sofia mt-1 px-4 py-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm 
+                                    focus:ring-2 focus:ring-primary focus:border-primary outline-none
+                                    dark:bg-gray-700 dark:text-gray-200">
+                            <option value="" {{ $user->room_id === null ? 'selected' : '' }}>No Room Assigned
                             </option>
-                        @endforeach
-                    </select>
-                    @error('room_id')
-                        <small class="text-red-600">{{ $message }}</small>
-                    @enderror
-                </div>
+                            @foreach ($rooms as $room)
+                                <option value="{{ $room->id }}" {{ $user->room_id == $room->id ? 'selected' : '' }}>
+                                    {{ $room->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endif
 
                 <!-- Action Buttons -->
                 <div>

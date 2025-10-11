@@ -59,6 +59,14 @@ class User extends Authenticatable
         ];
     }
 
+    protected static function booted(){
+        static::saving(function ($user) {
+            if ($user->hasRole('Admin')) {
+                $user->room_id = null; // Admins should not be assigned to any room
+            }
+        });
+    }
+
     public function room()
     {
         return $this->belongsTo(Room::class);
