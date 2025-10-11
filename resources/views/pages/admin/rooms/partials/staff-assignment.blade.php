@@ -52,7 +52,11 @@
                                 <span
                                     class="inline-flex items-center px-4 py-2 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 mb-3 dark:text-yellow-200">
                                     <img src="{{ asset('icons/warning.png') }}" class="w-4 h-4 mr-2" alt="Other Room">
-                                    Other Room
+                                    @if ($member->room && $selectedRoom->name != $member->room->name)
+                                        Assigned to {{ $member->room->name }}
+                                    @else
+                                        Assigned
+                                    @endif
                                 </span>
                             @else
                                 <span
