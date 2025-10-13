@@ -17,7 +17,6 @@
             font-family: "Cubano", Verdana, sans-serif;
             margin: 0;
             padding: 20px 10px;
-            /* Reduced padding for small screens */
         }
 
         .email-container {
@@ -106,7 +105,6 @@
             color: #157ee1;
         }
 
-        /* Mobile adjustments */
         @media only screen and (max-width: 480px) {
             .header h1 {
                 font-size: 20px;

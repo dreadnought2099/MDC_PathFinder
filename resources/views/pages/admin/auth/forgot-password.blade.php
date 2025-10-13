@@ -7,7 +7,7 @@
     <form action="{{ route('password.email') }}" method="POST" class="space-y-5">
         @csrf
 
-        <p class="text-gray-600 dark:text-gray-400 text-sm sm:text-base text-center mb-10">
+        <p class="font-sofia text-gray-600 dark:text-gray-400 text-sm sm:text-base text-center mb-10">
             Enter your registered email address and we’ll send you a link to reset your password.
         </p>
 
