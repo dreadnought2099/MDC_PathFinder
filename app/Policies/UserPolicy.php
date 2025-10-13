@@ -14,7 +14,7 @@ class UserPolicy
     {
         return $user->hasRole('Admin')
             ? Response::allow()
-            : Response::deny('You do not have permission to create room user accounts.');
+            : Response::deny('You do not have permission to create office user accounts.');
     }
 
     /**
@@ -24,7 +24,7 @@ class UserPolicy
     {
         return ($authUser->hasRole('Admin') || $authUser->can('edit room users'))
             ? Response::allow()
-            : Response::deny('You do not have permission to edit room user accounts.');
+            : Response::deny('You do not have permission to edit office user accounts.');
     }
 
     /**
