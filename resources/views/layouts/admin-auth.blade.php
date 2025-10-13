@@ -59,17 +59,102 @@
         </div>
 
         {{-- Flash messages --}}
-        @if (session('status'))
-            <div
-                class="mb-4 text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 p-3 rounded-lg text-center">
-                {{ session('status') }}
-            </div>
-        @elseif (session('error'))
-            <div
-                class="mb-4 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 p-3 rounded-lg text-center">
-                {{ session('error') }}
-            </div>
-        @endif
+        <div id="success-message-container" class="fixed top-4 right-4 z-[9999] max-w-md">
+            @if (session('success') || session('error') || session('info') || session('warning') || $errors->any())
+                @php
+                    $messageType = 'info';
+                    $message = '';
+
+                    if (session('success')) {
+                        $messageType = 'success';
+                        $message = session('success');
+                    } elseif (session('error')) {
+                        $messageType = 'error';
+                        $message = session('error');
+                    } elseif (session('warning')) {
+                        $messageType = 'warning';
+                        $message = session('warning');
+                    } elseif (session('info')) {
+                        $messageType = 'info';
+                        $message = session('info');
+                    } elseif ($errors->any()) {
+                        $messageType = 'error';
+                        $message = $errors->first();
+                    }
+
+                    $colors = [
+                        'success' => 'bg-green-500 border-green-600',
+                        'error' => 'bg-red-500 border-red-600',
+                        'warning' => 'bg-yellow-500 border-yellow-600',
+                        'info' => 'bg-blue-500 border-blue-600',
+                    ];
+                @endphp
+
+                <div id="flash-message"
+                    class="text-white px-6 py-4 rounded-lg shadow-2xl border-l-4 transform transition-all duration-300 ease-in-out {{ $colors[$messageType] }}"
+                    style="opacity: 0; transform: translateX(100%);">
+                    <div class="flex items-center space-x-3">
+                        <div class="flex-shrink-0">
+                            @if ($messageType === 'success')
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/success.png"
+                                    alt="Success Icon" class="w-8 h-8 object-contain">
+                            @elseif ($messageType === 'error')
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/warning-red.png"
+                                    alt="Error Icon" class="w-8 h-8 object-contain">
+                            @elseif ($messageType === 'warning')
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/warning.png"
+                                    alt="Warning Icon" class="w-8 h-8 object-contain">
+                            @else
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/information.png"
+                                    alt="Information Icon" class="w-8 h-8 object-contain">
+                            @endif
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium text-sm break-words">{{ $message }}</p>
+                            @if ($errors->count() > 1)
+                                <ul class="mt-2 text-xs space-y-1">
+                                    @foreach ($errors->all() as $error)
+                                        @if (!$loop->first)
+                                            <li class="break-words">• {{ $error }}</li>
+                                        @endif
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </div>
+                        <button onclick="this.parentElement.parentElement.remove()"
+                            class="flex-shrink-0 ml-2 hover:bg-white/20 rounded p-1 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                @push('scripts')
+                    <script>
+                        // Animate in the flash message
+                        setTimeout(() => {
+                            const msg = document.getElementById('flash-message');
+                            if (msg) {
+                                msg.style.opacity = '1';
+                                msg.style.transform = 'translateX(0)';
+                            }
+                        }, 10);
+
+                        // Auto remove after 5 seconds
+                        setTimeout(() => {
+                            const msg = document.getElementById('flash-message');
+                            if (msg) {
+                                msg.style.opacity = '0';
+                                msg.style.transform = 'translateX(100%)';
+                                setTimeout(() => msg.remove(), 300);
+                            }
+                        }, 5000);
+                    </script>
+                @endpush
+            @endif
+        </div>
 
         @yield('content')
     </div>

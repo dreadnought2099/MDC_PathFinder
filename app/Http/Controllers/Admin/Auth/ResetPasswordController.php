@@ -61,7 +61,7 @@ class ResetPasswordController extends Controller
             $message->subject('Password Reset Request');
         });
 
-        return back()->with('status', 'We have emailed your password reset link!');
+        return back()->with('success', 'We have emailed your password reset link!');
     }
 
     /**
@@ -113,6 +113,6 @@ class ResetPasswordController extends Controller
 
         DB::table('reset_password')->where('email', $request->email)->delete();
 
-        return redirect()->route('login')->with('status', 'Your password has been reset!');
+        return redirect()->route('login')->with('success', 'Your password has been reset!');
     }
 }
