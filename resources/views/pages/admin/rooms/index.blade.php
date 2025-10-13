@@ -73,7 +73,7 @@
                     </div>
                     <div>
                         <p class="text-gray-700 text-sm leading-relaxed dark:text-gray-300">
-                            Are you sure you want to delete <span id="roomName" class="text-red-600"></span>?
+                            Are you sure you want to delete <span id="roomName" class="text-secondary"></span>?
                             This action cannot be undone.
                         </p>
                     </div>

@@ -140,7 +140,7 @@
                 <div>
                     <p class="text-gray-700 text-sm leading-relaxed dark:text-gray-300">
                         Are you sure you want to unassign <span id="modalMessage" class="text-secondary"></span>?
-                        This will remove them from the current room.
+                        This will remove them from the current office.
                     </p>
                 </div>
             </div>
