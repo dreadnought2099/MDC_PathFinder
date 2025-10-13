@@ -22,7 +22,7 @@
                     <div
                         class="text-center p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-primary dark:border-blue-800">
                         <div class="text-2xl lg:text-3xl font-bold text-blue-600 mb-1 dark:text-blue-400">
-                            {{ \App\Models\Staff::count() }}
+                            {{ $totalStaffs }}
                         </div>
                         <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Total Staffs</div>
                     </div>
@@ -40,7 +40,7 @@
                     <div
                         class="text-center p-4 bg-purple-50 dark:bg-purple-900/30 rounded-lg border border-purple dark:border-purple-800">
                         <div class="text-2xl lg:text-3xl font-bold text-purple-600 mb-1 dark:text-purple-400">
-                            {{ \App\Models\Staff::whereNotNull('room_id')->count() }}
+                            {{ $totalAssignments }}
                         </div>
                         <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Assignments</div>
                     </div>
@@ -50,7 +50,7 @@
                         <div
                             class="text-center p-4 bg-orange-50 dark:bg-orange-900/30 rounded-lg border border-orange dark:border-orange-800">
                             <div class="text-2xl lg:text-3xl font-bold text-orange-600 mb-1 dark:text-orange-400">
-                                {{ \App\Models\Path::whereHas('fromRoom')->whereHas('toRoom')->count() }}
+                                {{ $totalPaths }}
                             </div>
                             <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Paths</div>
                         </div>

@@ -228,7 +228,7 @@ class RoomController extends Controller
                 'request' => $request->except(['image_path', 'video_path', 'carousel_images'])
             ]);
 
-            return back()->withInput()->with('error', 'Failed to create room: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Failed to create office: ' . $e->getMessage());
         }
     }
 
