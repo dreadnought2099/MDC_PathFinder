@@ -19,8 +19,8 @@
         @endphp
 
         <div class="relative">
-            <input type="email" name="email" id="email" required autofocus placeholder="Email Address"
-                class="{{ $inputClasses }}">
+            <input type="email" name="email" id="email" placeholder="Email Address"
+                class="{{ $inputClasses }}" required autofocus>
             <label for="email" class="{{ $labelClasses }}">
                 Email Address
             </label>

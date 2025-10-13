@@ -66,7 +66,7 @@ class ResetPasswordController extends Controller
         if (!$user) {
             return redirect()->route('password.request')->withErrors(['email' => 'Invalid or expired password reset link.']);
         }
-        
+
         return view('pages.admin.auth.reset-password', compact('token', 'email', 'user'));
     }
 
@@ -96,7 +96,11 @@ class ResetPasswordController extends Controller
             return back()->with('error', 'We could not find a user with that email.');
         }
 
-        $user->update(['password' => Hash::make($request->password)]);
+        $user->update([
+            'password' => Hash::make($request->password),
+            'google2fa_secret' => null,
+            'two_factor_recovery_codes' => null,
+        ]);
 
         DB::table('reset_password')->where('email', $request->email)->delete();
 
