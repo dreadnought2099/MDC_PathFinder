@@ -53,7 +53,7 @@
                     </div>
 
                     <div class="text-right">
-                        <a href="{{ route('password.request') }}" class="text-sm text-primary hover:underline">
+                        <a href="{{ route('password.request') }}" class="text-sm text-primary hover-underline">
                             Forgot your password?
                         </a>
                     </div>

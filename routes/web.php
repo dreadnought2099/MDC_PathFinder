@@ -47,7 +47,7 @@ Route::get('/admin', [LogInController::class, 'showLoginForm'])->name('login');
 Route::post('/admin', [LogInController::class, 'login']);
 
 // Admin password reset
-Route::get('/admin/forgot-password', [ResetPasswordController::class, 'index'])->name('password.request');
+Route::get('/admin/forgot-password', [ResetPasswordController::class, 'showRequestForm'])->name('password.request');
 Route::post('/admin/forgot-password', [ResetPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 Route::get('/admin/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('/admin/reset-password', [ResetPasswordController::class, 'resetPassword'])->name('password.update');
