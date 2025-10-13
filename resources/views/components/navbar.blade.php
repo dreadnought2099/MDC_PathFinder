@@ -1,4 +1,4 @@
-<nav class="bg-white dark:bg-gray-900 sticky top-0 z-51 dark-border-b-primary">
+<nav class="bg-white dark:bg-gray-900 sticky top-0 z-50 dark-border-b-primary">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 items-center">
             <!-- Left side (back button) -->
@@ -32,7 +32,7 @@
 
                     <!-- Dropdown -->
                     <div x-show="open" x-cloak x-transition @click.away="open = false"
-                        class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border-2 border-primary rounded shadow-lg z-50">
+                        class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border-2 border-primary rounded shadow-lg z-51">
                         <a href="{{ route('admin.profile') }}"
                             class="block px-4 py-2 text-sm text-primary hover:bg-gray-100 dark:hover:bg-gray-700">
                             Profile

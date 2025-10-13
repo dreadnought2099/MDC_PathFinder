@@ -201,7 +201,7 @@
                 <!-- Sticky Combobox -->
                 <!-- Sticky container for dropdown and staff search -->
                 <div
-                    class="font-sofia sticky top-16 z-50 bg-white dark:bg-gray-900 py-4 mb-4 border-b border-gray-200 dark:border-gray-700">
+                    class="font-sofia sticky top-16 z-49 bg-white dark:bg-gray-900 py-4 mb-4 border-b border-gray-200 dark:border-gray-700">
                     <div
                         class="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
 
