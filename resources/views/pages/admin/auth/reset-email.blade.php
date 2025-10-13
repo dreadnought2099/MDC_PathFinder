@@ -51,7 +51,6 @@
 
         .header {
             background: linear-gradient(to right, #157ee1, #93c5fd);
-            /* Tailwind blue-500 → blue-300 */
             color: #ffffff;
             padding: 24px;
         }
@@ -77,34 +76,55 @@
         }
 
         .content p {
-            font-family: "Sofia Pro", Verdana, sans-serif;
+            font-family: "Cubano", Verdana, sans-serif;
             font-size: 16px;
-            color: #374151;
+            color: #434549;
             line-height: 1.6;
         }
 
         .button {
-            display: inline-block;
+            width: 100%;
             background-color: #157ee1;
-            /* blue-600 */
             color: #ffffff;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            font-size: 0.875rem;
+            border-radius: 0.375rem;
+            border: 1px solid #157ee1;
+            transition: all 0.3s;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(21, 126, 225, 0.3);
             text-decoration: none;
-            padding: 12px 28px;
-            border-radius: 8px;
-            font-weight: 500;
-            margin: 24px 0;
-            font-family: "Sofia Pro", Verdana, sans-serif;
+            display: inline-block
+        }
+
+        .button:hover {
+            background-color: #ffffff;
+            color: #157ee1;
+        }
+
+        /* Responsive for small screens (sm: prefix in Tailwind = min-width: 640px) */
+        @media (min-width: 640px) {
+            .btn-primary {
+                padding-top: 0.625rem;
+                padding-bottom: 0.625rem;
+                font-size: 1rem;
+            }
         }
 
         .footer {
+            color: #434549;
             padding: 16px 32px 32px;
             font-size: 14px;
-            color: #6b7280;
             text-align: left;
         }
 
         .footer p {
-            margin: 4px 0;
+            margin: 4px 0
+        }
+
+        span {
+            color: #157ee1
         }
     </style>
 </head>
@@ -118,11 +138,11 @@
             </div>
 
             <div class="content">
-                <p>Hello, {{ $user->name ?? 'User' }}</p>
+                <p>Hello, <span>{{ $user->name ?? 'User' }}</span></p>
                 <p>We received a request to reset the password for your account.</p>
 
                 <p style="text-align:center;">
-                    <a href="{{ url('/admin/reset-password/' . $token) }}" class="button">Reset Password</a>
+                    <a href="{{ $resetLink }}" class="button">Reset Password</a>
                 </p>
 
                 <p>If you didn’t request a password reset, you can safely ignore this message.</p>
@@ -130,7 +150,7 @@
 
             <div class="footer">
                 <p>Thank you,</p>
-                <p><strong>{{ config('app.name') }} Team</strong></p>
+                <p><span>{{ config('app.name') }} Team</span></p>
             </div>
         </div>
     </div>

@@ -26,29 +26,38 @@ class ResetPasswordController extends Controller
      */
     public function sendResetLinkEmail(Request $request)
     {
-        $request->validate(['email' => 'required|email']);
+        // Validate email
+        $request->validate([
+            'email' => 'required|email',
+        ]);
 
+        // Find the user
         $user = User::where('email', $request->email)->first();
         if (!$user) {
             return back()->with('error', 'We could not find a user with that email.');
         }
 
+        // Generate a token
         $token = Str::random(64);
 
+        // Store or update the reset token
         DB::table('reset_password')->updateOrInsert(
-            ['email' => $request->email],
+            ['email' => $user->email],
             [
                 'token' => $token,
                 'created_at' => Carbon::now(),
             ]
         );
 
-        // Use full URL for password reset link
-        $resetLink = url('/reset-password/' . $token . '?email=' . urlencode($request->email));
+        // Generate reset link using named route
+        $resetLink = route('password.reset', ['token' => $token]);
 
-        // Send reset email
-        Mail::send('pages.admin.auth.reset-email', ['token' => $token], function ($message) use ($request) {
-            $message->to($request->email);
+        // Send the email
+        Mail::send('pages.admin.auth.reset-email', [
+            'user' => $user,
+            'resetLink' => $resetLink,
+        ], function ($message) use ($user) {
+            $message->to($user->email);
             $message->subject('Password Reset Request');
         });
 

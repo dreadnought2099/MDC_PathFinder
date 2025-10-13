@@ -76,7 +76,7 @@
         </button>
 
         <div class="text-center mt-4">
-            <a href="{{ route('login') }}" class="text-primary hover:underline text-sm">
+            <a href="{{ route('login') }}" class="text-primary hover-underline text-sm">
                 Back to Login
             </a>
         </div>

@@ -7,7 +7,7 @@
     <form action="{{ route('password.email') }}" method="POST" class="space-y-5">
         @csrf
 
-        <p class="text-gray-600 dark:text-gray-400 text-sm text-center mb-10">
+        <p class="text-gray-600 dark:text-gray-400 text-sm sm:text-base text-center mb-10">
             Enter your registered email address and we’ll send you a link to reset your password.
         </p>
 
@@ -19,8 +19,8 @@
         @endphp
 
         <div class="relative">
-            <input type="email" name="email" id="email" placeholder="Email Address"
-                class="{{ $inputClasses }}" required autofocus>
+            <input type="email" name="email" id="email" placeholder="Email Address" class="{{ $inputClasses }}" required
+                autofocus>
             <label for="email" class="{{ $labelClasses }}">
                 Email Address
             </label>

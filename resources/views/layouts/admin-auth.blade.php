@@ -46,7 +46,9 @@
     @stack('styles')
 </head>
 
-<body class="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900">
+<body class="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 sm:p-6 p-4">
+
+    {{-- Container --}}
     <div class="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border-2 border-primary">
         <div class="text-center mb-6">
             <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png" alt="MDC Logo"
