@@ -136,7 +136,7 @@
     <div class="email-container">
         <div class="card">
             <div class="header">
-                <img src="{{ asset('images/mdc.png') }}" alt="MDC Logo">
+                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png" alt="MDC Logo">
                 <h1>{{ config('app.name') }}</h1>
             </div>
 
