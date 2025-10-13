@@ -1,16 +1,17 @@
 <?php
 
+use App\Http\Controllers\Admin\Auth\LogInController;
+use App\Http\Controllers\Admin\Auth\ResetPasswordController;
+use App\Http\Controllers\Admin\Auth\TwoFactorController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\LogInController;
-use App\Http\Controllers\Admin\PathController;
-use App\Http\Controllers\Admin\PathImageController;
+use App\Http\Controllers\Admin\Path\PathController;
+use App\Http\Controllers\Admin\Path\PathImageController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\RecycleBinController;
-use App\Http\Controllers\Admin\RoomAssignmentController;
-use App\Http\Controllers\Admin\RoomController;
-use App\Http\Controllers\Admin\RoomUserController;
-use App\Http\Controllers\Admin\StaffController;
-use App\Http\Controllers\Admin\TwoFactorController;
+use App\Http\Controllers\Admin\Room\RoomAssignmentController;
+use App\Http\Controllers\Admin\Room\RoomController;
+use App\Http\Controllers\Admin\Room\RoomUserController;
+use App\Http\Controllers\Admin\Staff\StaffController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ScannerController;
 use App\Http\Controllers\TokenController;
@@ -44,6 +45,12 @@ Route::middleware(['web'])->group(function () {
 // Admin login
 Route::get('/admin', [LogInController::class, 'showLoginForm'])->name('login');
 Route::post('/admin', [LogInController::class, 'login']);
+
+// Admin password reset
+Route::get('/admin/forgot-password', [ResetPasswordController::class, 'index'])->name('password.request');
+Route::post('/admin/forgot-password', [ResetPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/admin/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('/admin/reset-password', [ResetPasswordController::class, 'resetPassword'])->name('password.update');
 
 // Routes available after login, before 2FA
 Route::middleware(['auth', 'role:Admin|Office Manager'])->group(function () {
