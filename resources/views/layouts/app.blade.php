@@ -110,17 +110,17 @@
                 <div class="flex items-center space-x-3">
                     <div class="flex-shrink-0">
                         @if ($messageType === 'success')
-                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/success.png" alt="Success Icon"
-                                class="w-8 h-8 object-contain">
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/success.png"
+                                alt="Success Icon" class="w-8 h-8 object-contain">
                         @elseif ($messageType === 'error')
-                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/warning-red.png" alt="Error Icon"
-                                class="w-8 h-8 object-contain">
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/warning-red.png"
+                                alt="Error Icon" class="w-8 h-8 object-contain">
                         @elseif ($messageType === 'warning')
-                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/warning.png" alt="Warning Icon"
-                                class="w-8 h-8 object-contain">
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/warning.png"
+                                alt="Warning Icon" class="w-8 h-8 object-contain">
                         @else
-                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/information.png" alt="Information Icon"
-                                class="w-8 h-8 object-contain">
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/information.png"
+                                alt="Information Icon" class="w-8 h-8 object-contain">
                         @endif
                     </div>
                     <div class="flex-1">
