@@ -119,7 +119,7 @@
                              <div class="flex flex-col items-center justify-center space-y-4">
                                  <div
                                      class="w-14 h-14 sm:w-16 sm:h-16 bg-primary-10 dark:bg-gray-800 rounded-full flex items-center justify-center">
-                                     <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
+                                     <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/navigation.png"
                                          alt="No paths" class="w-9 h-8 sm:w-11 sm:h-10">
                                  </div>
                                  <div class="text-center">

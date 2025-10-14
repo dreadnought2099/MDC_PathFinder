@@ -124,7 +124,7 @@
                         </div>
                         <div class="text-center">
                             <h3 class="text-base sm:text-lg font-medium dark:text-gray-300 text-gray-700 mb-2">
-                                No rooms found
+                                No office found
                             </h3>
                             <p class="text-gray-500 text-xs sm:text-sm dark:text-gray-400">
                                 Add your first room to get started.
