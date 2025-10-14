@@ -18,29 +18,26 @@ use App\Http\Controllers\TokenController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::middleware(['web'])->group(function () {
+// Public pages
+Route::get('/', [HomeController::class, 'index'])->name('index');
+Route::get('/about', fn() => view('pages.client.about.index'))->name('about');
+Route::get('/meet-the-team', fn() => view('pages.client.team.index'))->name('pages.team');
 
-    // Public pages
-    Route::get('/', [HomeController::class, 'index'])->name('index');
-    Route::get('/about', fn() => view('pages.client.about.index'))->name('about');
-    Route::get('/meet-the-team', fn() => view('pages.client.team.index'))->name('pages.team');
+// Scanner & token-based room routes
+Route::get('/scan-marker', [ScannerController::class, 'index'])->name('scan.index');
+Route::get('/scan-marker/{token}', [TokenController::class, 'getRoomByToken'])
+    ->name('scan.room')->where('token', '[a-f0-9]{64}');
+Route::get('/rooms/{token}/exists', [TokenController::class, 'checkRoomExists'])
+    ->name('rooms.exists')->where('token', '[a-f0-9]{64}');
 
-    // Scanner & token-based room routes
-    Route::get('/scan-marker', [ScannerController::class, 'index'])->name('scan.index');
-    Route::get('/scan-marker/{token}', [TokenController::class, 'getRoomByToken'])
-        ->name('scan.room')->where('token', '[a-f0-9]{64}');
-    Route::get('/rooms/{token}/exists', [TokenController::class, 'checkRoomExists'])
-        ->name('rooms.exists')->where('token', '[a-f0-9]{64}');
+// Client-facing staff
+Route::get('/staff/search', [StaffController::class, 'search'])->name('search');
+Route::get('/staff/{staffToken}', [StaffController::class, 'clientShow'])->name('staff.client-show');
 
-    // Client-facing staff
-    Route::get('/staffs/{staffToken}', [StaffController::class, 'clientShow'])->name('staff.client-show');
-    Route::get('/staff/search', [StaffController::class, 'search'])->name('search');
-
-    // Client-side navigation
-    Route::get('/navigation/select', [PathController::class, 'selection'])->name('paths.select');
-    Route::post('/navigation/results', [PathController::class, 'results'])->name('paths.results');
-    Route::get('/paths/return-to-results', [PathController::class, 'returnToResults'])->name('paths.return-to-results');
-});
+// Client-side navigation
+Route::get('/navigation/select', [PathController::class, 'selection'])->name('paths.select');
+Route::post('/navigation/results', [PathController::class, 'results'])->name('paths.results');
+Route::get('/navigation/return-to-results', [PathController::class, 'returnToResults'])->name('paths.return-to-results');
 
 // Admin login
 Route::get('/admin', [LogInController::class, 'showLoginForm'])->name('login');

@@ -27,7 +27,7 @@
             </div>
         </div>
 
-        <x-floating-q-r href="{{ route('scan.index') }}" icon="{{ asset('icons/qr-code.png') }}" alt="Scan Office"
+        <x-floating-q-r href="{{ route('scan.index') }}" icon="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/qr-code.png" alt="Scan Office"
             title="Scan office to know more" />
 
         <div class="flex justify-center mt-4 sm:mt-8 px-4 sm:px-0">
