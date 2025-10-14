@@ -99,6 +99,12 @@ class RoomUserController extends Controller
             'room_id' => 'required|exists:rooms,id',
         ]);
 
+        $existingUser = User::where('room_id', $request->room_id)->first();
+
+        if($existingUser) {
+            return back()->withInput()->with('error', 'This office already has an assigned Office Manager.');
+        }
+
         $user = User::create([
             'name' => $request->name,
             'username' => $request->username,
