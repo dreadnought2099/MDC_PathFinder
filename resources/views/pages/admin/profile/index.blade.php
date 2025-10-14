@@ -39,8 +39,9 @@
 
         </div>
     </div>
-    <div class="max-w-lg mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border-2 border-primary relative">
-        <div class="border-2 border-primary mt-4 text-primary text-2xl text-center font-semibold">
+
+    <div class="max-w-lg mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border-2 border-primary relative mb-8">
+        <div class="mt-4 text-primary text-2xl text-center font-semibold">
             Two Factor Authentication
         </div>
 
@@ -48,12 +49,9 @@
         @if ($user->google2fa_secret)
             <div class="mt-4 text-center">
                 <div
-                    class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200">
-                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clip-rule="evenodd"></path>
-                    </svg>
+                    class="inline-flex items-center gap-x-2 px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200">
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/success.png"
+                        class="w-4 h-4 object-contain" alt="Success Icon">
                     Two-Factor Authentication Enabled
                 </div>
             </div>
@@ -82,15 +80,21 @@
             {{-- Show QR if regenerate triggered --}}
             @if (session('qrCode'))
                 <div class="mt-4 border rounded-lg p-4 bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
-                    <p class="text-center font-semibold">Scan this new QR code with your Authenticator app:</p>
-                    <div class="my-3 flex justify-center">{!! session('qrCode') !!}</div>
+                    <p class="text-center font-semibold">
+                        Scan this new QR code with your Authenticator app:
+                    </p>
+                    <div class="my-3 flex justify-center">
+                        {!! session('qrCode') !!}
+                    </div>
                     <p class="text-center"><strong>Manual Key:</strong> <code
                             class="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-sm">{{ session('secret') }}</code>
                     </p>
 
                     <form method="POST" action="{{ route('admin.profile.2fa.enable') }}" class="mt-4">
                         @csrf
-                        <label class="block text-center font-medium mb-2">Enter the 6-digit code from your app:</label>
+                        <label class="block text-center font-medium mb-2">
+                            Enter the 6-digit code from your app:
+                        </label>
                         <input type="text" name="otp" maxlength="6"
                             class="w-full px-3 py-3 border rounded-lg text-center text-lg font-mono tracking-widest"
                             placeholder="000000" required>
@@ -106,7 +110,10 @@
         @else
             <div x-data="{ showSetup: false }" class="mt-4">
                 <button @click="showSetup = !showSetup"
-                    class="w-full px-4 py-2 text-sm font-medium text-white bg-primary border-2 border-primary rounded-md hover:bg-white hover:text-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
+                    :class="showSetup
+                        ?
+                        'w-full px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-secondary rounded-md hover:bg-white hover:text-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover' :
+                        'w-full px-4 py-2 text-sm font-medium text-white bg-primary border-2 border-primary rounded-md hover:bg-white hover:text-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover'">
                     <span x-show="!showSetup">Enable Two-Factor Authentication</span>
                     <span x-show="showSetup">Cancel Setup</span>
                 </button>
@@ -114,23 +121,26 @@
                 {{-- Setup section hidden until clicked --}}
                 <div x-show="showSetup" x-cloak
                     class="mt-4 border border-primary rounded-lg p-4 bg-white dark:bg-gray-800 dark:text-gray-300">
-                    <p class="text-center font-semibold mb-2">Step 1: Scan QR Code</p>
+                    <p class="text-center font-semibold mb-2">
+                        Scan QR Code
+                    </p>
                     <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 text-center">
-                        Use an authenticator app like Google Authenticator, Authy, or Microsoft Authenticator
+                        Use an authenticator app like <span class="text-primary">Google Authenticator</span>, <span
+                            class="text-primary">Authy</span>, or <span class="text-primary">Microsoft Authenticator</span>
                     </p>
                     <div class="my-4 flex justify-center py-4 bg-white rounded">{!! $qrCode !!}</div>
 
                     <p class="text-center mb-4"><strong>Manual Entry Key:</strong></p>
                     <p class="text-center mb-4">
                         <code
-                            class="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-sm break-all">{{ $secret }}</code>
+                            class="bg-gray-200 dark:bg-gray-600 px-2 py-1 font-sofia rounded text-sm break-all">{{ $secret }}</code>
                     </p>
 
                     <form method="POST" action="{{ route('admin.profile.2fa.enable') }}" class="mt-4">
                         @csrf
-                        <label class="block text-center font-semibold mb-2">Step 2: Enter Verification Code</label>
+                        <label class="block text-center mb-2">Enter Verification Code</label>
                         <input type="text" name="otp" maxlength="6"
-                            class="w-full px-3 py-3 border rounded-lg text-center text-lg font-mono tracking-widest mb-4"
+                            class="w-full px-3 py-3 border border-primary outline-none focus:ring focus:ring-primary rounded-lg text-center text-lg tracking-widest mb-4"
                             placeholder="000000" required>
                         <button type="submit"
                             class="w-full px-4 py-2 text-sm font-medium text-white bg-primary border-2 border-primary rounded-md hover:bg-white hover:text-primary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
@@ -161,9 +171,9 @@
 
                 <div class="grid grid-cols-2 gap-2 mb-4">
                     @foreach (session('recovery_codes') as $index => $code)
-                        <div class="px-3 py-2 bg-white dark:bg-gray-700 rounded border text-center">
+                        <div class="px-3 py-2 bg-white dark:bg-gray-800 rounded border border-amber-300 text-center">
                             <span class="text-xs text-gray-500">{{ $index + 1 }}.</span>
-                            <span class="font-mono text-sm">{{ $code }}</span>
+                            <span class="dark:text-gray-300 text-sm">{{ $code }}</span>
                         </div>
                     @endforeach
                 </div>
@@ -195,7 +205,7 @@
                 </div>
 
                 <p class="text-xs text-amber-600 dark:text-amber-400 mt-3 text-center">
-                    ⚠️ These codes will disappear if you reload this page or after you download them.<br>
+                    These codes will disappear if you reload this page or after you download them.
                     Save them now in a secure location.
                 </p>
             </div>
