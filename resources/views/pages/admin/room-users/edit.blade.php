@@ -9,7 +9,7 @@
                 <span class="text-primary">Edit</span> Office User
             </h1>
             <p class="text-base lg:text-lg text-gray-600 dark:text-gray-300">
-                Update user details and assign them to a room.
+                Update Office Manager details and settings
             </p>
         </div>
 
@@ -110,7 +110,7 @@
                             Assign Room
                         </label>
                         <select name="room_id" id="room_id"
-                            class="font-sofia mt-1 px-4 py-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm 
+                            class="font-sofia mt-1 px-4 py-2 block w-full rounded-md border border-gray-400 dark:border-gray-600 shadow-sm 
                                     focus:ring-2 focus:ring-primary focus:border-primary outline-none
                                     dark:bg-gray-700 dark:text-gray-200">
                             <option value="" {{ $user->room_id === null ? 'selected' : '' }}>No Room Assigned
