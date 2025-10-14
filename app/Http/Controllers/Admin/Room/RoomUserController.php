@@ -36,7 +36,13 @@ class RoomUserController extends Controller
         if ($authUser->hasRole('Admin')) {
             $rooms = Room::all();
         } elseif ($authUser->hasRole('Office Manager')) {
-            $rooms = Room::where('id', $authUser->room_id)->get();
+            if ($authUser->room_id) {
+                // Only their assigned office
+                $rooms = Room::where('id', $authUser->room_id)->get();
+            } else {
+                // No assigned office → no dropdown at all
+                $rooms = collect();
+            }
         } else {
             $rooms = collect(); // no dropdown for other roles
         }
@@ -50,12 +56,17 @@ class RoomUserController extends Controller
                 $userQuery->where('room_id', $roomId);
             }
         } elseif ($authUser->hasRole('Office Manager')) {
-            // Office Managers can only ever see their own room
-            $userQuery->where('room_id', $authUser->room_id);
+            if (is_null($authUser->room_id)) {
+                // No assigned office → show only themselves
+                $userQuery->where('id', $authUser->id);
+            } else {
+                // Show users from their assigned office only
+                $userQuery->where('room_id', $authUser->room_id);
 
-            // Block URL tampering (?roomId=999)
-            if ($roomId && $roomId != $authUser->room_id) {
-                abort(403, 'Unauthorized room access.');
+                // Prevent tampering (?roomId=999)
+                if ($roomId && $roomId != $authUser->room_id) {
+                    abort(403, 'Unauthorized office access.');
+                }
             }
         } else {
             // Other users: show only their own room
@@ -68,7 +79,6 @@ class RoomUserController extends Controller
 
         return view('pages.admin.room-users.index', compact('users', 'rooms', 'roomId'));
     }
-
 
     // Show form
     public function create(Request $request)
@@ -101,7 +111,7 @@ class RoomUserController extends Controller
 
         $existingUser = User::where('room_id', $request->room_id)->first();
 
-        if($existingUser) {
+        if ($existingUser) {
             return back()->withInput()->with('error', 'This office already has an assigned Office Manager.');
         }
 
