@@ -8,7 +8,7 @@
                 </span>
             @else
                 <a href="{{ $paginator->previousPageUrl() }}" 
-                   class="px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm bg-primary text-white rounded-lg hover:bg-primary/90 hover:text-primary border-2 border-primary transition-all duration-300 ease-out dark:hover:bg-gray-800">
+                   class="px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm bg-primary text-white hover:text-primary hover:bg-white rounded-lg hover:bg-primary/90 hover:text-primary border-2 border-primary transition-all duration-300 ease-out dark:hover:bg-gray-800">
                     Prev
                 </a>
             @endif
@@ -38,7 +38,7 @@
                     </span>
                 @else
                     <a href="{{ $paginator->url($page) }}" 
-                       class="px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-primary/20 transition dark:hover:bg-gray-800 dark:text-gray-300">
+                       class="px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm bg-white border-2 border-primary hover:bg-primary hover:text-white text-gray-700 rounded-lg hover:bg-primary/20 dark:bg-gray-800 dark:text-gray-300 duration-300 ease-in-out transition-all">
                         {{ $page }}
                     </a>
                 @endif
@@ -56,7 +56,7 @@
             {{-- Next Page Link --}}
             @if ($paginator->hasMorePages())
                 <a href="{{ $paginator->nextPageUrl() }}" 
-                   class="px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm bg-primary text-white rounded-lg hover:bg-primary/90 hover:text-primary border-2 border-primary transition-all duration-300 ease-out dark:hover:bg-gray-800">
+                   class="px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm bg-primary hover:text-primary hover:bg-white text-white rounded-lg hover:bg-primary/90 hover:text-primary border-2 border-primary transition-all duration-300 ease-in-out dark:hover:bg-gray-800">
                     Next
                 </a>
             @else
