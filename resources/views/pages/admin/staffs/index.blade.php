@@ -28,15 +28,8 @@
         </div>
 
         <!-- Staff Table Container -->
-        <div id="records-table" class="bg-white rounded-xl shadow-sm border-2 border-primary overflow-hidden">
-            <div class="overflow-x-auto">
-                @include('pages.admin.staffs.partials.staff-table', ['staffs' => $staffs])
-            </div>
-        </div>
-
-        <!-- Pagination -->
-        <div class="mt-3 flex justify-center">
-            {{ $staffs->appends(request()->query())->links('pagination::tailwind') }}
+        <div id="records-table">
+            @include('pages.admin.staffs.partials.staff-table', ['staffs' => $staffs])
         </div>
     </div>
 

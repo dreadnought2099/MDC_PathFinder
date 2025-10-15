@@ -29,15 +29,8 @@
         </div>
 
         <!-- Room Table Container -->
-        <div id="records-table" class="bg-white rounded-xl shadow-sm border-2 border-primary overflow-hidden">
-            <div class="overflow-x-auto">
-                @include('pages.admin.rooms.partials.room-table', ['rooms' => $rooms])
-            </div>
-        </div>
-
-        <!-- Pagination -->
-        <div class="mt-3 flex justify-center">
-            {{ $rooms->appends(request()->query())->links('pagination::tailwind') }}
+        <div id="records-table">
+            @include('pages.admin.rooms.partials.room-table', ['rooms' => $rooms])
         </div>
     </div>
     <!-- Room Delete Modal -->
