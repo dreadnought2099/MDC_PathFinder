@@ -444,12 +444,12 @@ class RoomController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            Log::error('Room update error: ' . $e->getMessage(), [
+            Log::error('Office update error: ' . $e->getMessage(), [
                 'room_id' => $room->id,
                 'request' => $request->except(['image_path', 'video_path', 'carousel_images'])
             ]);
 
-            return back()->withInput()->with('error', 'Failed to update room: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Failed to update office: ' . $e->getMessage());
         }
     }
 
@@ -466,7 +466,7 @@ class RoomController extends Controller
         $room->delete();
 
         return redirect()->route('room.index')
-            ->with('success', 'Room deleted successfully.');
+            ->with('success', 'Office deleted successfully.');
     }
 
     public function restore($id, EntrancePointService $entrancePointService)
@@ -502,7 +502,7 @@ class RoomController extends Controller
         }
 
         return redirect()->route('recycle-bin')
-            ->with('success', 'Room and paths restored successfully, including connections to new rooms.');
+            ->with('success', 'Office and paths restored successfully, including connections to new offices.');
     }
 
     public function forceDelete($id)
@@ -525,7 +525,7 @@ class RoomController extends Controller
         $room->forceDelete();
 
         return redirect()->route('recycle-bin')
-            ->with('success', 'Room permanently deleted.');
+            ->with('success', 'Office permanently deleted.');
     }
 
     public function removeCarouselImage(RoomImage $image)

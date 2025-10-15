@@ -119,7 +119,7 @@ class PathController extends Controller
         $toRoom = Room::find($toRoomId);
 
         if (!$fromRoom || !$toRoom) {
-            return redirect()->route('paths.select')->with('error', 'Invalid room selection.');
+            return redirect()->route('paths.select')->with('error', 'Invalid office selection.');
         }
 
         if ($fromRoomId == $toRoomId) {
@@ -201,7 +201,7 @@ class PathController extends Controller
 
         if (!$fromRoom || !$toRoom) {
             return redirect()->route('paths.select')
-                ->with('error', 'Previous search rooms no longer exist. Please make a new search.');
+                ->with('error', 'Previous search offices no longer exist. Please make a new search.');
         }
 
         // Find paths directly - same logic as results() method

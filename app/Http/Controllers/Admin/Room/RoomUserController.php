@@ -171,7 +171,7 @@ class RoomUserController extends Controller
             // Prevent Admin from being assigned any room
             $data['room_id'] = null;
             if ($request->filled('room_id')) {
-                return back()->with('error', 'Admins cannot be assigned to any room.');
+                return back()->with('error', 'Admins cannot be assigned to any office.');
             }
         } else {
             $data['room_id'] = $request->room_id ?: null;
