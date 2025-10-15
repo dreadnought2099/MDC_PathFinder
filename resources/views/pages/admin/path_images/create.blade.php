@@ -448,8 +448,12 @@
                 xhr.addEventListener('load', function() {
                     window.dispatchEvent(new CustomEvent('upload-finish'));
                     if (xhr.status >= 200 && xhr.status < 400) {
-                        const pathId = pathSelect.value;
-                        window.location.href = `/admin/paths/${pathId}`;
+                        const response = JSON.parse(xhr.responseText);
+                        
+                        if (response.redirect) {
+                            window.location.href = response.redirect; // Laravel will now show the flashed message
+                        }
+                        
                     } else {
                         showError(['Upload failed. Please try again.']);
                         isSubmitting = false;

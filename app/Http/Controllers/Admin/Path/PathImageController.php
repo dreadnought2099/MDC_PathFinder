@@ -86,28 +86,56 @@ class PathImageController extends Controller
                 $errors[] = "Failed to upload {$file->getClientOriginalName()}: " . $e->getMessage();
 
                 Log::error("Image upload failed", [
-                    'file' => $file->getClientOriginalName(),
-                    'size' => $file->getSize(),
-                    'error' => $e->getMessage()
+                    'file'  => $file->getClientOriginalName(),
+                    'size'  => $file->getSize(),
+                    'error' => $e->getMessage(),
                 ]);
-
-                continue;
             }
         }
 
+        // --- Prepare messages ---
         $message = "{$uploadedCount} image(s) uploaded successfully.";
 
         if (count($errors) > 0) {
+            $warningMessage = $message . ' However, ' . count($errors) . ' file(s) failed.';
+
+            // Flash the warning message
+            session()->flash('warning', $warningMessage);
+
+            // If it's AJAX, respond with JSON
+            if ($request->ajax()) {
+                return response()->json([
+                    'redirect' => route('path.show', $path),
+                    'status'   => 'warning',
+                    'message'  => $warningMessage,
+                    'errors'   => $errors,
+                ]);
+            }
+
+            // Non-AJAX fallback
             return redirect()
                 ->route('path.show', $path)
-                ->with('warning', $message . ' However, ' . count($errors) . ' file(s) failed.')
+                ->with('warning', $warningMessage)
                 ->withErrors($errors);
         }
 
+        // --- Success case ---
+        session()->flash('success', $message);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'redirect' => route('path.show', $path),
+                'status'   => 'success',
+                'message'  => $message,
+            ]);
+        }
+
+        // Fallback for non-AJAX
         return redirect()
             ->route('path.show', $path)
             ->with('success', $message);
     }
+
 
     public function edit(Request $request, Path $path, PathImage $pathImage = null)
     {
