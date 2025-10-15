@@ -47,6 +47,6 @@ class StaffPolicy
     {
         return $user->hasPermissionTo('delete staff') && $user->hasRole('Admin')
             ? Response::allow()
-            : Response::deny('Only Admins can delete staff members.');
+            : Response::deny('Only an Admin can delete staff members.');
     }
 }

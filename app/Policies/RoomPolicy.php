@@ -16,7 +16,7 @@ class RoomPolicy
         return $user->hasPermissionTo('view rooms') &&
             ($user->hasRole('Admin') || $user->room_id === $room->id)
             ? Response::allow()
-            : Response::deny('You cannot view this room.');
+            : Response::deny('You cannot view this office.');
     }
 
     /**
@@ -26,7 +26,7 @@ class RoomPolicy
     {
         return $user->hasRole('Admin') || $user->hasPermissionTo('create rooms')
             ? Response::allow()
-            : Response::deny('You are not allowed to create rooms.');
+            : Response::deny('You are not allowed to create offices.');
     }
 
     /**
@@ -37,7 +37,7 @@ class RoomPolicy
         return $user->hasPermissionTo('edit rooms') &&
             ($user->hasRole('Admin') || $user->room_id === $room->id)
             ? Response::allow()
-            : Response::deny('You are not allowed to update this room.');
+            : Response::deny('You are not allowed to update this office.');
     }
 
     /**
@@ -47,7 +47,7 @@ class RoomPolicy
     {
         return $user->hasPermissionTo('delete rooms') && $user->hasRole('Admin')
             ? Response::allow()
-            : Response::deny('Only Admins can delete rooms.');
+            : Response::deny('Only an Admin can delete offices.');
     }
 
     /**
@@ -58,6 +58,6 @@ class RoomPolicy
         return $user->hasPermissionTo('edit staff') &&
             ($user->hasRole('Admin') || $user->room_id === $room->id)
             ? Response::allow()
-            : Response::deny('You cannot assign staff to this room.');
+            : Response::deny('You cannot assign staff to this office.');
     }
 }
