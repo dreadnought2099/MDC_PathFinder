@@ -214,13 +214,13 @@
 
     <!-- Cropper Modal -->
     <div id="cropperModal"
-        class="modal fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex justify-center items-center cursor-pointer"
+        class="modal fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex justify-center items-center"
         onclick="handleOutsideClick(event)">
         <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative dark:bg-gray-800 border-2 border-primary">
             <button type="button" onclick="closeModal()"
                 class="absolute top-2 right-4 text-gray-500 hover:text-red-600">
                 <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png" alt="Close"
-                    class="w-6 h-6">
+                    class="w-6 h-6 cursor-pointer">
             </button>
 
             <h3 class="text-xl mb-4 text-primary">Crop Image</h3>
@@ -252,7 +252,7 @@
 
     <!-- View Image Modal -->
     <div id="viewModal"
-        class="modal fixed inset-0 hidden bg-black/50 flex justify-center items-center p-4 cursor-pointer z-50"
+        class="modal fixed inset-0 hidden bg-black/50 flex justify-center items-center p-4 cursor-pointer z-50 backdrop-blur-sm"
         onclick="handleViewOutsideClick(event)">
         <div class="relative max-w-[95vw] max-h-[95vh] flex justify-center items-center">
             <!-- Image wrapper (scales independently) -->
