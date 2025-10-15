@@ -70,9 +70,8 @@
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                                     fill="currentColor">
                                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586
-                                                                                6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
-                                                                                0 001.414 0l7-7a1 1 0 000-1.414z"
-                                                        clip-rule="evenodd" />
+                                                                6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
+                                                                0 001.414 0l7-7a1 1 0 000-1.414z" clip-rule="evenodd" />
                                                 </svg>
                                             </span>
                                         </button>
@@ -155,10 +154,6 @@
                     this.isOpen = false;
                     this.search = '';
                     this.filterPaths();
-
-                    // Redirect to the selected path
-                    const baseUrl = "{{ url('/admin/path-images/create') }}";
-                    window.location.href = `${baseUrl}/${path.id}`;
                 },
             };
         }
@@ -425,7 +420,7 @@
                 <span><strong>${files.length}</strong> of ${MAX_FILES} files</span>
                 <span><strong>${formatFileSize(totalSize)}</strong> of ${formatFileSize(MAX_TOTAL_SIZE)}</span>
             </div>
-        `;
+            `;
                 selectedFilesContainer.appendChild(infoBanner);
 
                 files.forEach((file, index) => {
