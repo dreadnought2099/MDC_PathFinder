@@ -17,16 +17,72 @@
 
                     {{-- Path Selector --}}
                     <div class="mb-4 dark:text-gray-300">
-                        <label for="path_id" class="block text-gray-700 mb-2 dark:text-gray-300">Select Path</label>
-                        <select name="path_id" id="path_id" required
-                            class="w-full border border-primary rounded px-3 py-2 dark:bg-gray-800">
-                            @foreach ($paths as $p)
-                                <option value="{{ $p->id }}" {{ $p->id == $defaultPath->id ? 'selected' : '' }}>
-                                    {{ $p->fromRoom->name ?? 'Room #' . $p->from_room_id }} →
-                                    {{ $p->toRoom->name ?? 'Room #' . $p->to_room_id }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <div x-data="pathDropdown({{ $paths->toJson() }}, {{ $defaultPath->id ?? 'null' }})" class="mb-4 dark:text-gray-300 relative w-full"
+                            @click.away="closeDropdown()">
+                            <label class="block text-gray-700 mb-2 dark:text-gray-300">Select Path</label>
+
+                            <!-- Dropdown Button -->
+                            <button type="button" @click="toggleDropdown()"
+                                class="w-full border border-primary rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-primary 
+                                    dark:text-gray-300 bg-white dark:bg-gray-800 shadow-md flex items-center justify-between text-left">
+                                <span x-text="selectedName || 'Select a path'"
+                                    :class="!selectedName ? 'text-gray-400' : ''"></span>
+                                <svg class="w-5 h-5 text-gray-400 transition-transform duration-200"
+                                    :class="{ 'rotate-180': isOpen }" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+
+                            <!-- Dropdown Panel -->
+                            <div x-show="isOpen" x-transition
+                                class="absolute z-50 w-full mt-2 bg-white text-gray-800 dark:bg-gray-800 
+                                        border border-primary rounded-md shadow-lg overflow-hidden"
+                                style="display: none;">
+
+                                <!-- Search input inside dropdown -->
+                                <div class="p-2 border-b border-gray-200 dark:border-gray-700">
+                                    <input x-ref="searchInput" type="text" x-model="search" @input="filterPaths()"
+                                        placeholder="Search paths"
+                                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                        focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-gray-300 text-sm">
+                                </div>
+
+                                <!-- Path Options -->
+                                <div class="max-h-60 overflow-auto">
+                                    <div x-show="filteredPaths.length === 0"
+                                        class="px-4 py-3 text-gray-500 dark:text-gray-400 text-center text-sm">
+                                        No paths found
+                                    </div>
+
+                                    <template x-for="path in filteredPaths" :key="path.id">
+                                        <button type="button" @click="selectPath(path)"
+                                            class="w-full text-left px-4 py-3 hover:bg-primary hover:text-white hover:bg-opacity-10 
+                                                dark:hover:bg-gray-700 hover:pl-6 hover:border-l-4 hover:border-primary 
+                                                transition-all duration-200 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
+                                            :class="{
+                                                'bg-primary bg-opacity-5 font-medium text-white': selectedId == path.id,
+                                                'text-gray-700 dark:text-gray-300': selectedId != path.id
+                                            }">
+                                            <span x-text="path.display_name"></span>
+                                            <span x-show="selectedId == path.id" class="float-right text-primary">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                                    fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586
+                                                                                6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
+                                                                                0 001.414 0l7-7a1 1 0 000-1.414z"
+                                                        clip-rule="evenodd" />
+                                                </svg>
+                                            </span>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Hidden input to store selected path -->
+                            <input type="hidden" name="path_id" x-model="selectedId">
+                        </div>
                     </div>
 
                     {{-- Dropzone --}}
@@ -51,29 +107,84 @@
                 </form>
                 {{-- Progress Modal handled in the component --}}
             </x-upload-progress-modal>
-
-
         </div>
     @endif
 @endsection
 
 @push('scripts')
     <script>
+        function pathDropdown(paths, defaultPathId) {
+            return {
+                isOpen: false,
+                search: '',
+                paths: paths.map(p => ({
+                    id: p.id,
+                    display_name: `${p.from_room?.name || 'Room #' + p.from_room_id} → ${p.to_room?.name || 'Room #' + p.to_room_id}`
+                })),
+                filteredPaths: [],
+                selectedId: defaultPathId,
+                selectedName: '',
+
+                init() {
+                    const selected = this.paths.find(p => p.id === this.selectedId);
+                    this.selectedName = selected ? selected.display_name : '';
+                    this.filteredPaths = this.paths;
+                },
+
+                toggleDropdown() {
+                    this.isOpen = !this.isOpen;
+                    if (this.isOpen) {
+                        this.$nextTick(() => this.$refs.searchInput.focus());
+                    }
+                },
+
+                closeDropdown() {
+                    this.isOpen = false;
+                },
+
+                filterPaths() {
+                    const term = this.search.toLowerCase();
+                    this.filteredPaths = this.paths.filter(p =>
+                        p.display_name.toLowerCase().includes(term)
+                    );
+                },
+
+                selectPath(path) {
+                    this.selectedId = path.id;
+                    this.selectedName = path.display_name;
+                    this.isOpen = false;
+                    this.search = '';
+                    this.filterPaths();
+
+                    // Redirect to the selected path
+                    const baseUrl = "{{ url('/admin/path-images/create') }}";
+                    window.location.href = `${baseUrl}/${path.id}`;
+                },
+            };
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const fileInput = document.getElementById('fileInput');
             const selectedFilesContainer = document.getElementById('selectedFiles');
             const submitBtn = document.getElementById('submitBtn');
             const uploadForm = document.getElementById('uploadForm');
-            const pathSelect = document.getElementById('path_id');
+            const pathIdInput = document.querySelector('input[name="path_id"]');
+
+            // Exit early if required elements don't exist
+            if (!fileInput || !selectedFilesContainer || !submitBtn || !uploadForm || !pathIdInput) {
+                console.error('Required form elements not found');
+                return;
+            }
 
             let files = [];
             let isSubmitting = false;
 
             // ===== CONFIGURATION =====
             const MAX_FILES = 20;
-            const MAX_FILE_SIZE = 10 * 1024 * 1024;
-            const MAX_TOTAL_SIZE = 100 * 1024 * 1024;
-            const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif',
+            const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+            const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // 100 MB
+            const ALLOWED_TYPES = [
+                'image/jpeg', 'image/jpg', 'image/png', 'image/gif',
                 'image/bmp', 'image/svg+xml', 'image/webp'
             ];
 
@@ -81,19 +192,6 @@
             const COMPRESS_ENABLED = true;
             const MAX_DIMENSION = 2000;
             const COMPRESSION_QUALITY = 0.85;
-
-            const createRouteBase = "{{ url('/admin/path-images/create') }}";
-
-            // Handle path selection change
-            function handlePathChange() {
-                const selectedPathId = pathSelect.value;
-                if (selectedPathId) {
-                    const newUrl = `${createRouteBase}/${selectedPathId}`;
-                    window.location.href = newUrl;
-                }
-            }
-
-            pathSelect.addEventListener('change', handlePathChange);
 
             function updateSubmitButton() {
                 submitBtn.disabled = files.length === 0 || isSubmitting;
@@ -365,10 +463,12 @@
                 });
             }
 
+            // File input change handler
             fileInput.addEventListener('change', function() {
                 addFiles(Array.from(this.files));
             });
 
+            // Drag and drop handlers
             const dropzone = fileInput.parentElement;
 
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -398,6 +498,7 @@
                 addFiles(droppedFiles);
             });
 
+            // Form submit handler
             uploadForm.addEventListener('submit', function(e) {
                 e.preventDefault();
 
@@ -414,7 +515,9 @@
                 }
 
                 if (files.length > MAX_FILES) {
-                    showError([`Number of files (${files.length}) exceeds maximum allowed (${MAX_FILES})`]);
+                    showError([
+                        `Number of files (${files.length}) exceeds maximum allowed (${MAX_FILES})`
+                    ]);
                     return;
                 }
 
@@ -426,7 +529,7 @@
 
                 const formData = new FormData();
                 formData.append('_token', document.querySelector('input[name="_token"]').value);
-                formData.append('path_id', pathSelect.value);
+                formData.append('path_id', pathIdInput.value);
 
                 files.forEach(file => {
                     formData.append('files[]', file);
@@ -449,11 +552,9 @@
                     window.dispatchEvent(new CustomEvent('upload-finish'));
                     if (xhr.status >= 200 && xhr.status < 400) {
                         const response = JSON.parse(xhr.responseText);
-                        
                         if (response.redirect) {
-                            window.location.href = response.redirect; // Laravel will now show the flashed message
+                            window.location.href = response.redirect;
                         }
-                        
                     } else {
                         showError(['Upload failed. Please try again.']);
                         isSubmitting = false;
@@ -479,7 +580,7 @@
 
                 xhr.open('POST', uploadForm.action);
                 xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-                xhr.timeout = 300000;
+                xhr.timeout = 300000; // 5 minutes
                 xhr.send(formData);
             });
 

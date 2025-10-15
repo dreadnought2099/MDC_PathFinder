@@ -205,7 +205,7 @@
                     <div
                         class="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
 
-                        <!-- Room Dropdown -->
+                        <!-- Office Dropdown -->
                         <div class="relative w-full md:w-1/2" @click.away="closeDropdown()">
                             <button type="button" @click="toggleDropdown()"
                                 class="w-full border border-primary rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-primary dark:text-gray-300 bg-white dark:bg-gray-800 shadow-md flex items-center justify-between text-left">
