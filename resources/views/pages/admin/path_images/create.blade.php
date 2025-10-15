@@ -70,8 +70,9 @@
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                                     fill="currentColor">
                                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586
-                                                                6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
-                                                                0 001.414 0l7-7a1 1 0 000-1.414z" clip-rule="evenodd" />
+                                                                    6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
+                                                                    0 001.414 0l7-7a1 1 0 000-1.414z"
+                                                        clip-rule="evenodd" />
                                                 </svg>
                                             </span>
                                         </button>
@@ -125,8 +126,15 @@
                 selectedName: '',
 
                 init() {
-                    const selected = this.paths.find(p => p.id === this.selectedId);
+                    // Load from sessionStorage
+                    const storedId = sessionStorage.getItem('selectedPathId');
+                    const selectedId = storedId ? parseInt(storedId, 10) : this.selectedId;
+
+                    const selected = this.paths.find(p => p.id === selectedId);
+
+                    this.selectedId = selected ? selected.id : defaultPathId;
                     this.selectedName = selected ? selected.display_name : '';
+
                     this.filteredPaths = this.paths;
                 },
 
@@ -154,6 +162,9 @@
                     this.isOpen = false;
                     this.search = '';
                     this.filterPaths();
+
+                    // Save selection to sessionStorage
+                    sessionStorage.setItem('selectedPathId', path.id);
                 },
             };
         }
