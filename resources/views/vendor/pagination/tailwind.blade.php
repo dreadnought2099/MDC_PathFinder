@@ -24,7 +24,7 @@
             {{-- First Page --}}
             @if ($showEllipsisStart)
                 <a href="{{ $paginator->url(1) }}" 
-                   class="hidden sm:inline-flex px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm bg-white border-2 border-primary text-gray-700 rounded-lg hover:bg-primary/20 transition dark:hover:bg-gray-800 dark:text-gray-300 dark:bg-gray-800">
+                   class="hidden sm:inline-flex px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm bg-white border-2 border-primary text-gray-700 rounded-lg hover:bg-primary/20 transition dark:hover:bg-gray-800 dark:text-gray-300 dark:bg-gray-800 hover:bg-primary hover:text-white">
                     1
                 </a>
                 <span class="hidden sm:inline-flex px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm text-gray-500">...</span>
@@ -48,7 +48,7 @@
             @if ($showEllipsisEnd)
                 <span class="hidden sm:inline-flex px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm text-gray-500">...</span>
                 <a href="{{ $paginator->url($paginator->lastPage()) }}" 
-                   class="hidden sm:inline-flex px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm bg-white border-2 border-primary text-gray-700 rounded-lg hover:bg-primary/20 transition dark:hover:bg-gray-800 dark:text-gray-300 dark:bg-gray-800">
+                   class="hidden sm:inline-flex px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm bg-white border-2 border-primary text-gray-700 rounded-lg hover:bg-primary/20 transition dark:hover:bg-gray-800 dark:text-gray-300 dark:bg-gray-800 hover:bg-primary hover:text-white">
                     {{ $paginator->lastPage() }}
                 </a>
             @endif
