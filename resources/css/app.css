@@ -63,30 +63,19 @@
         text-transform: none;
     }
 
-    .cursor-dot,
-    .cursor-outline {
-        position: fixed;
-        top: 0;
-        left: 0;
-        pointer-events: none;
-        border-radius: 50%;
-        z-index: 9999;
-        transform: translate(-50%, -50%);
-    }
-
-    /* Small dot in the center */
     .cursor-dot {
-        width: 8px;
-        height: 8px;
-        background: #00ff99;
+        @apply w-2 h-2 bg-blue-600; /* small dot */
     }
 
-    /* Outer outline that follows with lag */
     .cursor-outline {
-        width: 35px;
-        height: 35px;
-        border: 2px solid #00ff99;
-        mix-blend-mode: difference;
+        @apply w-9 h-9 border-2 border-blue-600;
+        transition-property: transform, border-color, background-color;
+        transition-duration: 100ms;
+        mix-blend-mode: normal; /* ensures consistent color on light/dark */
+    }
+
+    .cursor-particles .particle {
+        @apply w-1 h-1 bg-teal-400 rounded-full absolute;
     }
 
     @media print {

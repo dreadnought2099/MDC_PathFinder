@@ -432,8 +432,10 @@
         }
     </script>
 
-    <div class="cursor-dot"></div>
-    <div class="cursor-outline"></div>
+    <div class="cursor-dot fixed pointer-events-none rounded-full z-[9999]"></div>
+    <div class="cursor-outline fixed pointer-events-none rounded-full z-[9999]"></div>
+
+    <div class="cursor-particles fixed pointer-events-none z-[9998]"></div>
 </body>
 
 </html>
