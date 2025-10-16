@@ -64,18 +64,18 @@
     }
 
     .cursor-dot {
-        @apply w-2 h-2 bg-blue-600; /* small dot */
+        @apply w-2 h-2 bg-[#157ee1]; /* small dot */
     }
 
     .cursor-outline {
-        @apply w-9 h-9 border-2 border-blue-600;
+        @apply w-9 h-9 border-2 border-[#157ee1];
         transition-property: transform, border-color, background-color;
         transition-duration: 100ms;
         mix-blend-mode: normal; /* ensures consistent color on light/dark */
     }
 
     .cursor-particles .particle {
-        @apply w-1 h-1 bg-teal-400 rounded-full absolute;
+        @apply w-1 h-1 bg-[#157ee1] rounded-full absolute;
     }
 
     @media print {

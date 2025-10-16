@@ -160,6 +160,11 @@
     </div>
 
     @stack('scripts')
+
+    <div class="cursor-dot fixed pointer-events-none rounded-full z-[9999]"></div>
+    <div class="cursor-outline fixed pointer-events-none rounded-full z-[9999]"></div>
+
+    <div class="cursor-particles fixed pointer-events-none z-[9998]"></div>
 </body>
 
 </html>
