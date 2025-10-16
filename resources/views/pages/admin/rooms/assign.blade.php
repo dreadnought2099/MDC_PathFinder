@@ -79,7 +79,7 @@
                     if (page) this.currentPage = page;
             
                     window.showSpinner();
-                       let url = `{{ route('room.assign') }}?roomId=${this.roomId}&search=${encodeURIComponent(this.staffSearch)}&page=${this.currentPage}`;
+                    let url = `{{ route('room.assign') }}?roomId=${this.roomId}&search=${encodeURIComponent(this.staffSearch)}&page=${this.currentPage}`;
             
                     window.history.replaceState({}, '', url);
             
@@ -126,10 +126,11 @@
                         checkbox.addEventListener('click', (e) => {
                             if (!e.target.checked) {
                                 e.preventDefault();
-                                e.target.checked = true;
+                                // Don't set it back to checked - leave it unchecked
                                 const staffCard = e.target.closest('.staff-card');
                                 const staffName = staffCard.querySelector('h3').textContent.trim();
                                 window.currentAlpineInstance = this;
+                                window.currentCheckbox = e.target; // Store reference to checkbox
                                 window.openModal(e.target.dataset.staffId, staffName);
                             }
                         });
@@ -195,8 +196,8 @@
                             showTemporaryMessage('Failed to unassign staff', 'error');
                         })
                         .finally(() => window.hideSpinner());
-                    }
-                }">
+                }
+            }">
 
                 <!-- Sticky Combobox -->
                 <!-- Sticky container for dropdown and staff search -->
@@ -290,18 +291,17 @@
 @push('scripts')
     <script>
         let currentStaffId = null;
+        let currentCheckbox = null;
 
-        // Make these functions globally accessible
         window.openModal = function(staffId, staffName) {
             const modal = document.getElementById('confirmModal');
             const nameSpan = document.getElementById('modalMessage');
-            const currentPage = new URLSearchParams(window.location.search).get('page') || '1';
 
             currentStaffId = staffId;
             nameSpan.textContent = staffName;
 
             modal.classList.remove('hidden', 'opacity-0');
-            const content = modal.querySelector('.bg-white');
+            const content = modal.querySelector('.bg-white, .dark\\:bg-gray-800');
             content.classList.remove('scale-95');
             content.classList.add('scale-100');
 
@@ -310,7 +310,7 @@
 
         window.closeModal = function() {
             const modal = document.getElementById('confirmModal');
-            const content = modal.querySelector('.bg-white');
+            const content = modal.querySelector('.bg-white, .dark\\:bg-gray-800');
 
             modal.classList.add('opacity-0');
             content.classList.remove('scale-100');
@@ -319,16 +319,25 @@
             setTimeout(() => {
                 modal.classList.add('hidden');
                 document.body.style.overflow = 'auto';
+
+                // Re-check the checkbox if user cancelled
+                if (window.currentCheckbox) {
+                    window.currentCheckbox.checked = true;
+                    window.currentCheckbox = null;
+                }
+
                 currentStaffId = null;
             }, 300);
         }
 
-        // Add the missing confirmUnassign function
         window.confirmUnassign = function() {
             if (!currentStaffId) {
                 showTemporaryMessage('No staff selected', 'error');
                 return;
             }
+
+            // Clear the checkbox reference so closeModal doesn't re-check it
+            window.currentCheckbox = null;
 
             // Call the Alpine.js unassignStaff method
             if (window.currentAlpineInstance) {

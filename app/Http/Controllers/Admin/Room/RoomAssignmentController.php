@@ -51,25 +51,31 @@ class RoomAssignmentController extends Controller
         $roomId = $request->room_id;
         $staffIds = $request->staff_ids ?? [];
 
+        // Get currently assigned staff for THIS room only
         $currentlyAssigned = Staff::where('room_id', $roomId)->pluck('id')->toArray();
-        $toUnassign = array_diff($currentlyAssigned, $staffIds);
+
+        // Find staff to assign (checked but not currently assigned to this room)
         $toAssign = array_diff($staffIds, $currentlyAssigned);
 
-        if (!empty($toUnassign)) {
-            Staff::whereIn('id', $toUnassign)->update(['room_id' => null]);
-        }
+        // Assign new staff members only
         if (!empty($toAssign)) {
             Staff::whereIn('id', $toAssign)->update(['room_id' => $roomId]);
         }
 
         $room = Room::findOrFail($roomId);
-        $assignedStaff = Staff::whereIn('id', $toAssign)
-            ->get()
-            ->map(fn($s) => $s->full_name)
-            ->toArray();
 
-        $staffNames = !empty($assignedStaff) ? implode(', ', $assignedStaff) : 'No staff';
-        $message = "{$staffNames} was successfully assigned to {$room->name}.";
+        // Prepare success message
+        if (!empty($toAssign)) {
+            $assignedStaff = Staff::whereIn('id', $toAssign)
+                ->get()
+                ->map(fn($s) => $s->full_name)
+                ->toArray();
+
+            $staffNames = implode(', ', $assignedStaff);
+            $message = "{$staffNames} " . (count($assignedStaff) > 1 ? 'were' : 'was') . " successfully assigned to {$room->name}.";
+        } else {
+            $message = "No new staff members to assign.";
+        }
 
         // Check if AJAX request
         if ($request->ajax()) {
