@@ -123,8 +123,8 @@
             @else
                 <div class="text-center py-8">
                     <div class="rounded-2xl p-8 border-2 border-primary flex flex-col items-center dark:bg-gray-800">
-                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/group.png"
-                            alt="Assigned Staff Icon" class="w-10 h-8">
+                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/staff.png"
+                            alt="Assigned Staff Icon" class="w-8 h-8">
                         <p class="text-slate-500 text-lg font-medium">No staff assigned to this room yet.</p>
                     </div>
                 </div>
