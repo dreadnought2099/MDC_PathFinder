@@ -18,40 +18,108 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-start mb-6 space-y-2 sm:space-y-0 sm:space-x-4"
             x-data="{
                 roomId: '{{ $roomId }}',
+                search: '',
+                isOpen: false,
+                selectedName: @js($rooms->firstWhere('id', $roomId)?->name ?? 'All Office Users'),
+                filteredRooms: [{ id: '', name: 'All Office Users' }, ...@js($rooms->map(fn($r) => ['id' => $r->id, 'name' => $r->name])->values())],
+            
+                toggleDropdown() {
+                    this.isOpen = !this.isOpen;
+                    if (this.isOpen) {
+                        this.search = '';
+                        this.filteredRooms = [{ id: '', name: 'All Office Users' }, ...@js($rooms->map(fn($r) => ['id' => $r->id, 'name' => $r->name])->values())];
+                        this.$nextTick(() => this.$refs.searchInput?.focus());
+                    }
+                },
+                closeDropdown() {
+                    this.isOpen = false;
+                    this.search = '';
+                    this.filteredRooms = [{ id: '', name: 'All Office Users' }, ...@js($rooms->map(fn($r) => ['id' => $r->id, 'name' => $r->name])->values())];
+                },
+                filterRooms() {
+                    const allRooms = [{ id: '', name: 'All Office Users' }, ...@js($rooms->map(fn($r) => ['id' => $r->id, 'name' => $r->name])->values())];
+                    this.filteredRooms = this.search === '' ?
+                        allRooms :
+                        allRooms.filter(r => r.name.toLowerCase().includes(this.search.toLowerCase()));
+                },
+                selectRoom(room) {
+                    this.roomId = room.id;
+                    this.selectedName = room.name;
+                    this.isOpen = false;
+                    this.search = '';
+                    this.filteredRooms = [{ id: '', name: 'All Office Users' }, ...@js($rooms->map(fn($r) => ['id' => $r->id, 'name' => $r->name])->values())];
+                    this.fetchUsers();
+                },
                 fetchUsers() {
                     window.showSpinner();
-                    let url = `{{ route('room-user.index') }}?roomId=${this.roomId}`;
-            
-                    // Push to browser history (so it stays on reload)
+                    let url = `{{ route('room-user.index') }}${this.roomId ? '?roomId=' + this.roomId : ''}`;
                     window.history.replaceState({}, '', url);
             
-                    fetch(url, {
-                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                        })
+                    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
                         .then(res => res.text())
                         .then(html => {
-                            let parser = new DOMParser();
-                            let doc = parser.parseFromString(html, 'text/html');
-                            let table = doc.querySelector('#users-table');
-                            if (table) {
-                                document.querySelector('#users-table').innerHTML = table.innerHTML;
-                            }
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+                            const table = doc.querySelector('#users-table');
+                            if (table) document.querySelector('#users-table').innerHTML = table.innerHTML;
                         })
-                        .catch(err => console.error(err))
+                        .catch(console.error)
                         .finally(() => window.hideSpinner());
                 }
-            }">
-            <select x-model="roomId" @change="fetchUsers"
-                class="w-full sm:w-auto border border-primary dark:bg-gray-800 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary dark:text-gray-300">
-                <option value="">All Office Users</option>
-                @if (auth()->user()->hasRole('Admin') || auth()->user()->can('view room users'))
-                    @foreach ($rooms as $room)
-                        <option value="{{ $room->id }}" {{ $roomId == $room->id ? 'selected' : '' }}>
-                            {{ $room->name }}
-                        </option>
-                    @endforeach
-                @endif
-            </select>
+            }" @click.away="closeDropdown()">
+
+            <!-- Sticky Combobox Container -->
+            <div class="relative w-full sm:w-auto sticky top-16 z-50 bg-white dark:bg-gray-900 p-2 rounded-md shadow">
+                <!-- Button -->
+                <button type="button" @click="toggleDropdown()"
+                    class="w-full sm:w-64 border border-primary rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-primary dark:text-gray-300 bg-white dark:bg-gray-800 shadow-md flex items-center justify-between text-left truncate">
+                    <span x-text="selectedName || 'All Office Users'" class="truncate"></span>
+                    <svg class="w-5 h-5 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': isOpen }"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+
+                <!-- Dropdown Panel -->
+                <div x-show="isOpen" x-transition:enter="transition ease-out duration-100"
+                    x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                    x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100"
+                    x-transition:leave-end="opacity-0 scale-95"
+                    class="absolute z-50 w-full sm:w-64 mt-2 bg-white dark:bg-gray-800 border border-primary rounded-md shadow-lg overflow-hidden"
+                    style="display: none; min-width: 16rem;">
+
+                    <!-- Search Input -->
+                    <div class="p-2 border-b border-gray-200 dark:border-gray-700">
+                        <input x-ref="searchInput" type="text" x-model.debounce.300ms="search" @input="filterRooms()"
+                            placeholder="Search offices"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-gray-300 text-sm">
+                    </div>
+
+                    <!-- Room Options -->
+                    <div class="max-h-60 overflow-auto">
+                        <template x-for="room in filteredRooms" :key="room.id">
+                            <button type="button" @click="selectRoom(room)"
+                                class="w-full text-left px-4 py-3 hover:bg-primary hover:text-white hover:bg-opacity-10 dark:hover:bg-gray-700 hover:pl-6 hover:border-l-4 hover:border-primary transition-all duration-200 dark:text-gray-300 border-b border-gray-100 dark:border-gray-700 last:border-b-0 truncate"
+                                :class="{ 'bg-primary bg-opacity-5 font-medium text-white': roomId == room.id }">
+                                <span x-text="room.name" class="truncate"></span>
+                                <span x-show="roomId == room.id" class="float-right text-primary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l7-7a1 1 0 000-1.414z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </span>
+                            </button>
+                        </template>
+
+                        <div x-show="filteredRooms.length === 0"
+                            class="px-4 py-3 text-gray-500 dark:text-gray-400 text-center text-sm">
+                            No offices found
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Table (dynamic reload zone) -->
