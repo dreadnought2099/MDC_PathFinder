@@ -22,6 +22,10 @@
 
     <!-- Custom Scrollbar -->
     <style>
+        [x-cloak] {
+            display: none !important;
+        }
+
         /* Modern thin scrollbar with custom color */
         ::-webkit-scrollbar {
             width: 8px;

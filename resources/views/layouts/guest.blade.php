@@ -30,6 +30,10 @@
     <link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet">
 
     <style>
+        [x-cloak] {
+            display: none !important;
+        }
+
         /* Modern thin scrollbar with custom color */
         ::-webkit-scrollbar {
             width: 8px;

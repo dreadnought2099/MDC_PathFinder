@@ -24,6 +24,10 @@
             display: none !important;
         }
 
+        [x-cloak] {
+            display: none !important;
+        }
+
         /* Modern thin scrollbar with custom color */
         ::-webkit-scrollbar {
             width: 8px;
@@ -59,7 +63,7 @@
             background: transparent;
             /* hide corner */
         }
-        
+
         /* Dark mode adjustments if needed */
         @media (prefers-color-scheme: dark) {
             ::-webkit-scrollbar-thumb {
