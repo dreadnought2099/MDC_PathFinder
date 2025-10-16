@@ -2,8 +2,7 @@
     class="min-h-screen p-8 rounded-xl shadow-lg container mx-auto max-w-4xl space-y-12 border-2 border-primary dark:bg-gray-800">
     <!-- Room Title -->
     <h1
-        class="text-4xl font-extrabold text-primary
-           dark:border-b border-b-primary dark:border-b-primary text-center pb-3">
+        class="text-4xl font-extrabold text-primary text-center pb-3">
         {{ $room->name }}
     </h1>
 

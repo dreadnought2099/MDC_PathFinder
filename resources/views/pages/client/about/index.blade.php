@@ -11,7 +11,7 @@
 
         <!-- Top Bar -->
         <div
-            class="w-full flex items-center p-4 dark:border-b border-b-primary dark:border-b-primary bg-white dark:bg-gray-900 sticky top-0 z-50">
+            class="w-full flex items-center p-4 bg-white dark:bg-gray-900 sticky top-0 z-50">
 
             <!-- Left: fixed width container for back button -->
             <div class="w-48 flex items-center">

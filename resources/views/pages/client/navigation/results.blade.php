@@ -4,7 +4,7 @@
     <div class="min-h-screen dark:bg-gray-900 flex flex-col">
         <!-- Top bar -->
         <div
-            class="w-full flex items-center p-2 sm:p-4 dark:border-b border-b-primary dark:border-b-primary bg-white dark:bg-gray-900 sticky top-0 z-50">
+            class="w-full flex items-center p-2 sm:p-4 bg-white dark:bg-gray-900 sticky top-0 z-50">
             <div class="w-full sm:w-48 flex items-center justify-start">
                 <!-- Left: Back button -->
                 <a href="{{ route('paths.select') }}"
