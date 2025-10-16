@@ -431,6 +431,9 @@
             }, 5000);
         }
     </script>
+
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
 </body>
 
 </html>
