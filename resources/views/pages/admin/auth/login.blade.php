@@ -10,7 +10,7 @@
 
             {{-- Left - Login --}}
             <div class="w-full md:w-1/2 p-6 sm:p-8 space-y-4 sm:space-y-6 flex flex-col justify-center">
-                <h2 class="text-xl sm:text-2xl text-center font-semibold">Log <span class="text-primary">In</span></h2>
+                <h2 class="text-xl sm:text-2xl text-center font-medium text-gray-800">Log <span class="text-primary">In</span></h2>
 
                 <form action="{{ route('login') }}" method="POST" class="space-y-4 sm:space-y-6">
                     @csrf
@@ -53,7 +53,7 @@
                     </div>
 
                     <div class="text-right">
-                        <a href="{{ route('password.request') }}" class="text-sm text-primary hover-underline">
+                        <a href="{{ route('password.request') }}" class="text-sm text-primary hover-underline mb-2">
                             Forgot your password?
                         </a>
                     </div>
