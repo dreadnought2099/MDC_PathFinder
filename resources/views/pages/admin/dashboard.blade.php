@@ -20,41 +20,56 @@
                     class="grid gap-4 @if (auth()->user()->hasRole('Admin')) grid-cols-2 lg:grid-cols-4 @else grid-cols-1 sm:grid-cols-3 @endif">
 
                     <!-- Total Staff -->
-                    <div
-                        class="text-center p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-primary dark:border-blue-800">
-                        <div class="text-2xl lg:text-3xl font-bold text-blue-600 mb-1 dark:text-blue-400">
-                            {{ $totalStaffs }}
+                    <img-reveal>
+                        <div
+                            class="text-center p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-primary dark:border-blue-800">
+                            <span class="trigger-text text-2xl lg:text-3xl font-bold text-blue-600 mb-1 dark:text-blue-400">
+                                {{ $totalStaffs }}
+                            </span>
+                            <img src="{{ asset('gif/dance.gif') }}" alt="GIF" class="reveal-img">
+                            <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Total Staffs</div>
                         </div>
-                        <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Total Staffs</div>
-                    </div>
+                    </img-reveal>
 
                     <!-- Total Rooms -->
-                    <div
-                        class="text-center p-4 bg-green-50 dark:bg-green-900/30 rounded-lg border border-tertiary dark:border-green-800">
-                        <div class="text-2xl lg:text-3xl font-bold text-green-600 mb-1 dark:text-green-400">
-                            {{ $totalRooms }}
+                    <img-reveal>
+                        <div
+                            class="text-center p-4 bg-green-50 dark:bg-green-900/30 rounded-lg border border-tertiary dark:border-green-800">
+                            <span
+                                class="trigger-text text-2xl lg:text-3xl font-bold text-green-600 mb-1 dark:text-green-400">
+                                {{ $totalRooms }}
+                            </span>
+                            <img src="{{ asset('gif/dance.gif') }}" alt="GIF" class="reveal-img">
+                            <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Total Offices</div>
                         </div>
-                        <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Total Offices</div>
-                    </div>
+                    </img-reveal>
 
                     <!-- Assignments -->
-                    <div
-                        class="text-center p-4 bg-purple-50 dark:bg-purple-900/30 rounded-lg border border-purple dark:border-purple-800">
-                        <div class="text-2xl lg:text-3xl font-bold text-purple-600 mb-1 dark:text-purple-400">
-                            {{ $totalAssignments }}
+                    <img-reveal>
+                        <div
+                            class="text-center p-4 bg-purple-50 dark:bg-purple-900/30 rounded-lg border border-purple dark:border-purple-800">
+                            <span
+                                class="trigger-text text-2xl lg:text-3xl font-bold text-purple-600 mb-1 dark:text-purple-400">
+                                {{ $totalAssignments }}
+                            </span>
+                            <img src="{{ asset('gif/dance.gif') }}" alt="GIF" class="reveal-img">
+                            <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Assignments</div>
                         </div>
-                        <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Assignments</div>
-                    </div>
+                    </img-reveal>
 
                     <!-- Paths -->
                     @if (auth()->user()->hasRole('Admin'))
-                        <div
-                            class="text-center p-4 bg-orange-50 dark:bg-orange-900/30 rounded-lg border border-orange dark:border-orange-800">
-                            <div class="text-2xl lg:text-3xl font-bold text-orange-600 mb-1 dark:text-orange-400">
-                                {{ $totalPaths }}
+                        <img-reveal>
+                            <div
+                                class="text-center p-4 bg-orange-50 dark:bg-orange-900/30 rounded-lg border border-orange dark:border-orange-800">
+                                <span
+                                    class="trigger-text text-2xl lg:text-3xl font-bold text-orange-600 mb-1 dark:text-orange-400">
+                                    {{ $totalPaths }}
+                                </span>
+                                <img src="{{ asset('gif/dance.gif') }}" alt="GIF" class="reveal-img">
+                                <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Paths</div>
                             </div>
-                            <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Paths</div>
-                        </div>
+                        </img-reveal>
                     @endif
                 </div>
             </div>
@@ -191,12 +206,6 @@
                         </div>
                     </a>
                 @endif
-
-                <img-reveal>
-                    <span class="trigger-text">Hover over this text</span>
-                    <img src="{{ asset('gif/dance.gif') }}" alt="Preview" class="reveal-img">
-                </img-reveal>
-
             </div>
         </div>
     </div>
