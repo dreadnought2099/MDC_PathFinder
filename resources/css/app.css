@@ -63,21 +63,6 @@
         text-transform: none;
     }
 
-    .cursor-dot {
-        @apply w-2 h-2 bg-[#157ee1]; /* small dot */
-    }
-
-    .cursor-outline {
-        @apply w-9 h-9 border-2 border-[#157ee1];
-        transition-property: transform, border-color, background-color;
-        transition-duration: 100ms;
-        mix-blend-mode: normal; /* ensures consistent color on light/dark */
-    }
-
-    .cursor-particles .particle {
-        @apply w-1 h-1 bg-[#157ee1] rounded-full absolute;
-    }
-
     @media print {
         .print-border-primary {
             border-color: var(--color-primary) !important;
@@ -348,6 +333,51 @@
 }
 
 @layer components {
+    
+    .cursor-dot {
+        @apply w-2 h-2 bg-[#157ee1]; /* small dot */
+    }
+
+    .cursor-outline {
+        @apply w-9 h-9 border-2 border-[#157ee1];
+        transition-property: transform, border-color, background-color;
+        transition-duration: 100ms;
+        mix-blend-mode: normal; /* ensures consistent color on light/dark */
+    }
+
+    .cursor-particles .particle {
+        @apply w-1 h-1 bg-[#157ee1] rounded-full absolute;
+    }
+
+    img-reveal {
+        position: relative;
+        display: inline-block;
+    }
+
+    .reveal-img {
+        position: absolute;
+        top: 100%; /* appears below the text */
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        width: 200px; /* adjust size */
+        border-radius: 10px;
+        z-index: 10;
+    }
+
+    img-reveal:hover .reveal-img {
+        opacity: 1;
+        transform: translate(-50%, 10px); /* slight slide up */
+    }
+
+    .trigger-text {
+        cursor: pointer;
+        color: #007bff;
+        font-weight: 600;
+    }
+
     .custom-time-input {
         color-scheme: light;
         accent-color: var(--color-primary);

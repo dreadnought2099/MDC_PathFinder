@@ -16,7 +16,8 @@
             <!-- Quick Stats Section -->
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-2 border-primary mb-8">
                 <h2 class="text-xl font-semibold text-primary mb-6 text-center">Quick Overview</h2>
-                <div class="grid gap-4 @if (auth()->user()->hasRole('Admin')) grid-cols-2 lg:grid-cols-4 @else grid-cols-1 sm:grid-cols-3 @endif">
+                <div
+                    class="grid gap-4 @if (auth()->user()->hasRole('Admin')) grid-cols-2 lg:grid-cols-4 @else grid-cols-1 sm:grid-cols-3 @endif">
 
                     <!-- Total Staff -->
                     <div
@@ -184,11 +185,18 @@
                                     class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
                                     Recycle Bin
                                 </h3>
-                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Restore or Permanently delete items</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Restore or Permanently delete items
+                                </p>
                             </div>
                         </div>
                     </a>
                 @endif
+
+                <img-reveal>
+                    <span class="trigger-text hover-underline">Hover over this text</span>
+                    <img src="{{ asset('gif/dance.gif') }}" alt="Preview" class="reveal-img">
+                </img-reveal>
+
             </div>
         </div>
     </div>
