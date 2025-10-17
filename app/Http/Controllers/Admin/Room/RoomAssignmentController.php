@@ -20,14 +20,13 @@ class RoomAssignmentController extends Controller
         $roomId = $roomId ?? $request->query('roomId') ?? ($rooms->first()->id ?? null);
         $selectedRoom = $roomId ? Room::find($roomId) : null;
 
-        // Get search from request or session
         $search = $request->input('search', session('assign.search', ''));
-
-        // Store in session
         session(['assign.search' => $search]);
 
         $staff = Staff::with('room')
             ->when(!empty($search), fn($q) => $q->where('full_name', 'like', "%{$search}%"))
+            ->orderByRaw("CASE WHEN room_id = ? THEN 0 ELSE 1 END", [$roomId])
+            ->orderBy('full_name') // Secondary sort by name
             ->paginate(12)
             ->withQueryString();
 
