@@ -1,6 +1,9 @@
 import "./bootstrap";
 import gsap from "gsap";
 
+class ImgReveal extends HTMLElement {}
+customElements.define("img-reveal", ImgReveal);
+
 const initCursor = () => {
     const cursorDot = document.querySelector(".cursor-dot");
     const cursorOutline = document.querySelector(".cursor-outline");
