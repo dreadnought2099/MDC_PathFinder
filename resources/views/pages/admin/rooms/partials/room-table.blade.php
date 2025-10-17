@@ -144,6 +144,8 @@
 
 
 <!-- Pagination -->
-<div class="mt-3 flex justify-center">
-    {{ $rooms->appends(request()->query())->links('pagination::tailwind') }}
-</div>
+@if (auth()->user()->hasRole('Admin') && method_exists($rooms, 'links'))
+    <div class="mt-3 flex justify-center">
+        {{ $rooms->appends(request()->query())->links('pagination::tailwind') }}
+    </div>
+@endif

@@ -57,6 +57,11 @@ class RoomController extends Controller
         // Build query
         $query = Room::query();
 
+        // Filter by office manager's assigned room
+        if (auth()->user()->hasRole('Office Manager')) {
+            $query->where('id', auth()->user()->room_id);
+        }
+
         // Apply search
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
@@ -78,8 +83,14 @@ class RoomController extends Controller
             $query->orderBy('name', 'asc');
         }
 
-        // Paginate
-        $rooms = $query->paginate(10)->withQueryString();
+        // Conditional pagination based on user role
+        if (auth()->user()->hasRole('Admin')) {
+            // Admin: paginate all rooms
+            $rooms = $query->paginate(10)->withQueryString();
+        } else {
+            // Office Manager: get their assigned room only (no pagination needed)
+            $rooms = $query->get();
+        }
 
         // Handle AJAX requests
         if ($request->ajax()) {
