@@ -38,6 +38,20 @@ class StaffController extends Controller
         // Build query
         $query = Staff::with('room');
 
+        // Filter by role - Office Managers only see their office staff
+        $user = auth()->user();
+
+        if ($user->hasRole('Office Manager')) {
+            // Use the room_id directly from the user
+            if ($user->room_id) {
+                $query->where('room_id', $user->room_id);
+            } else {
+                // No office assigned, show nothing
+                $query->whereRaw('1 = 0');
+            }
+        }
+        // Admins see all staff (no filter)
+
         // Apply search
         if (!empty($search)) {
             $query->where('full_name', 'like', "%{$search}%");
@@ -52,7 +66,11 @@ class StaffController extends Controller
         }
 
         // Paginate
-        $staffs = $query->paginate(10)->withQueryString();
+        $staffs = $query->paginate(10)->appends([
+            'sort' => $sort,
+            'direction' => $direction,
+            'search' => $search,
+        ]);
 
         // Handle AJAX requests
         if ($request->ajax()) {
@@ -63,6 +81,7 @@ class StaffController extends Controller
 
         return view('pages.admin.staffs.index', compact('staffs', 'sort', 'direction', 'search'));
     }
+    
     public function create()
     {
         return view('pages.admin.staffs.create');
