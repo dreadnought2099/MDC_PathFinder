@@ -25,7 +25,13 @@ class RoomAssignmentController extends Controller
 
         $staff = Staff::with('room')
             ->when(!empty($search), fn($q) => $q->where('full_name', 'like', "%{$search}%"))
-            ->orderByRaw("CASE WHEN room_id = ? THEN 0 ELSE 1 END", [$roomId])
+            ->orderByRaw("
+            CASE 
+                WHEN room_id = ? THEN 0
+                WHEN room_id IS NULL THEN 1
+                ELSE 2
+            END
+        ", [$roomId])
             ->orderBy('full_name') // Secondary sort by name
             ->paginate(12)
             ->withQueryString();
