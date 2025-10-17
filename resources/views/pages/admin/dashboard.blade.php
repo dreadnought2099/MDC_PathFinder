@@ -193,7 +193,7 @@
                 @endif
 
                 <img-reveal>
-                    <span class="trigger-text hover-underline">Hover over this text</span>
+                    <span class="trigger-text">Hover over this text</span>
                     <img src="{{ asset('gif/dance.gif') }}" alt="Preview" class="reveal-img">
                 </img-reveal>
 
