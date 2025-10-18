@@ -1,4 +1,4 @@
-@extends('errors::minimal')
+@extends('errors::layout')
 
 @section('title', __('Method Not Allowed'))
 @section('code', '405')

@@ -55,6 +55,10 @@
 
     body {
         font-family: "Cubano", Verdana, sans-serif;
+        cursor: auto;
+    }
+
+    body.custom-cursor-enabled {
         cursor: none;
     }
 

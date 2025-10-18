@@ -9,7 +9,17 @@ const initCursor = () => {
     const cursorOutline = document.querySelector(".cursor-outline");
     const particleContainer = document.querySelector(".cursor-particles");
 
-    if (!cursorDot || !cursorOutline || !particleContainer) return;
+    // Check if essential elements exist
+    if (!cursorDot || !cursorOutline || !particleContainer) {
+        console.warn(
+            "Custom cursor elements not found. Default cursor will be used."
+        );
+        document.body.classList.remove("custom-cursor-enabled");
+        return;
+    }
+
+    // Add class to hide system cursor only when initialized
+    document.body.classList.add("custom-cursor-enabled");
 
     let currentX = window.innerWidth / 2;
     let currentY = window.innerHeight / 2;
@@ -38,6 +48,7 @@ const initCursor = () => {
     currentX = lastPos.x;
     currentY = lastPos.y;
 
+    // --- Initial placement ---
     gsap.set([cursorDot, cursorOutline], {
         xPercent: -50,
         yPercent: -50,
@@ -189,21 +200,7 @@ const initCursor = () => {
     }
 };
 
-// --- DYNAMIC HANDLER ---
-const cursorElements = () =>
-    document.querySelectorAll(
-        ".cursor-dot, .cursor-outline, .cursor-particles"
-    );
-
-const enableCursor = () => {
-    cursorElements().forEach((el) => (el.style.display = ""));
-    initCursor();
-};
-
-const disableCursor = () => {
-    cursorElements().forEach((el) => (el.style.display = "none"));
-};
-
+// --- Fallback-safe initialization ---
 const init = () => {
     if (window.__cursorInitialized) return;
     window.__cursorInitialized = true;
@@ -211,12 +208,27 @@ const init = () => {
     const media = window.matchMedia("(max-width: 768px)");
 
     const handleChange = (e) => {
-        if (e.matches) disableCursor(); // Mobile
-        else enableCursor(); // Desktop
+        if (e.matches) {
+            document.body.classList.remove("custom-cursor-enabled");
+            cursorElements().forEach((el) => (el.style.display = "none"));
+        } else {
+            try {
+                cursorElements().forEach((el) => (el.style.display = ""));
+                initCursor();
+            } catch (err) {
+                console.error("Cursor initialization failed:", err);
+                document.body.classList.remove("custom-cursor-enabled");
+            }
+        }
     };
 
-    handleChange(media); // Run once on load
-    media.addEventListener("change", handleChange); // Listen for window resize changes
+    const cursorElements = () =>
+        document.querySelectorAll(
+            ".cursor-dot, .cursor-outline, .cursor-particles"
+        );
+
+    handleChange(media);
+    media.addEventListener("change", handleChange);
 };
 
 if (document.readyState === "loading") {
