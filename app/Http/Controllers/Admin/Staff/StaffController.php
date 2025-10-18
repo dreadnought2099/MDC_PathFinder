@@ -210,22 +210,38 @@ class StaffController extends Controller
 
     public function search(Request $request)
     {
-        $query = $request->query('q', '');
+        $query = trim($request->query('q', ''));
+
+        if ($query === '') {
+            return response()->json([]);
+        }
 
         $staffs = Staff::with('room')
-            ->where('first_name', 'like', "%{$query}%")
-            ->orWhere('last_name', 'like', "%{$query}%")
-            ->orWhereRaw("concat(first_name, ' ', last_name) like ?", ["%{$query}%"])
+            ->select('id', 'first_name', 'middle_name', 'last_name', 'suffix', 'room_id', 'full_name')
+            ->when(strlen($query) >= 3, function ($q) use ($query) {
+                // Use FULLTEXT for longer queries
+                $q->whereRaw("MATCH(first_name, middle_name, last_name, suffix, full_name) AGAINST(? IN BOOLEAN MODE)", [$query])
+                    ->orWhere('first_name', 'like', "%{$query}%")
+                    ->orWhere('middle_name', 'like', "%{$query}%")
+                    ->orWhere('last_name', 'like', "%{$query}%")
+                    ->orWhere('suffix', 'like', "%{$query}%")
+                    ->orWhere('full_name', 'like', "%{$query}%");
+            }, function ($q) use ($query) {
+                // Use only LIKE for short queries
+                $q->where('first_name', 'like', "%{$query}%")
+                    ->orWhere('middle_name', 'like', "%{$query}%")
+                    ->orWhere('last_name', 'like', "%{$query}%")
+                    ->orWhere('suffix', 'like', "%{$query}%")
+                    ->orWhere('full_name', 'like', "%{$query}%");
+            })
             ->limit(10)
-            ->get(['id', 'first_name', 'middle_name', 'last_name', 'suffix', 'room_id']);
+            ->get();
 
-        $results = $staffs->map(function ($s) {
-            return [
-                'id' => $s->id,
-                'name' => $s->full_name,
-                'room' => $s->room ? ['id' => $s->room->id, 'name' => $s->room->name] : null,
-            ];
-        });
+        $results = $staffs->map(fn($s) => [
+            'id' => $s->id,
+            'name' => $s->full_name,
+            'room' => $s->room ? ['id' => $s->room->id, 'name' => $s->room->name] : null,
+        ]);
 
         return response()->json($results);
     }
