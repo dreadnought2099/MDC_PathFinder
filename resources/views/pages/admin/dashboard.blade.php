@@ -26,7 +26,7 @@
                             <span class="trigger-text text-2xl lg:text-3xl font-bold text-blue-600 mb-1 dark:text-blue-400">
                                 {{ $totalStaffs }}
                             </span>
-                            <img src="{{ asset('gif/glowing-phone.gif') }}" alt="GIF" class="reveal-img">
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/dance.gif" alt="GIF" class="reveal-img">
                             <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Total Staffs</div>
                         </div>
                     </img-reveal>
@@ -39,7 +39,7 @@
                                 class="trigger-text text-2xl lg:text-3xl font-bold text-green-600 mb-1 dark:text-green-400">
                                 {{ $totalRooms }}
                             </span>
-                            <img src="{{ asset('gif/dance.gif') }}" alt="GIF" class="reveal-img">
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/dance.gif" alt="GIF" class="reveal-img">
                             <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Total Offices</div>
                         </div>
                     </img-reveal>
@@ -52,7 +52,7 @@
                                 class="trigger-text text-2xl lg:text-3xl font-bold text-purple-600 mb-1 dark:text-purple-400">
                                 {{ $totalAssignments }}
                             </span>
-                            <img src="{{ asset('gif/dance.gif') }}" alt="GIF" class="reveal-img">
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/girl-map.gif" alt="GIF" class="reveal-img">
                             <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Assignments</div>
                         </div>
                     </img-reveal>
@@ -66,7 +66,7 @@
                                     class="trigger-text text-2xl lg:text-3xl font-bold text-orange-600 mb-1 dark:text-orange-400">
                                     {{ $totalPaths }}
                                 </span>
-                                <img src="{{ asset('gif/dance.gif') }}" alt="GIF" class="reveal-img">
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/dance.gif" alt="GIF" class="reveal-img">
                                 <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Paths</div>
                             </div>
                         </img-reveal>
