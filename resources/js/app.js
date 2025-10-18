@@ -82,8 +82,20 @@ const initCursor = () => {
             isVisible = true;
         }
 
-        // Instant movement (no delay)
-        gsap.set([cursorDot, cursorOutline], { x: currentX, y: currentY });
+        // Smooth movement with natural trailing
+        gsap.to(cursorDot, {
+            x: currentX,
+            y: currentY,
+            duration: 0.12,
+            ease: "power3.out",
+        });
+
+        gsap.to(cursorOutline, {
+            x: currentX,
+            y: currentY,
+            duration: 0.18,
+            ease: "power3.out",
+        });
 
         clearTimeout(saveTimeout);
         saveTimeout = setTimeout(() => savePosition(currentX, currentY), 100);
@@ -175,26 +187,32 @@ const initCursor = () => {
         savePosition(currentX, currentY)
     );
 
+    // Particle creation with slight delay to sync with trailing outline
     function createParticles(x, y) {
-        const fragment = document.createDocumentFragment();
-        for (let i = 0; i < 8; i++) {
-            const particle = document.createElement("div");
-            particle.className = "particle";
-            fragment.appendChild(particle);
-            const angle = (Math.PI * 2 * i) / 8;
-            const distance = Math.random() * 40 + 20;
-            gsap.set(particle, { x, y, position: "absolute" });
-            gsap.to(particle, {
-                x: x + Math.cos(angle) * distance,
-                y: y + Math.sin(angle) * distance,
-                opacity: 0,
-                scale: 0,
-                duration: 0.6,
-                ease: "power2.out",
-                onComplete: () => particle.remove(),
-            });
-        }
-        particleContainer.appendChild(fragment);
+        // Delay particles slightly (matches cursorOutline motion)
+        gsap.delayedCall(0.08, () => {
+            const fragment = document.createDocumentFragment();
+            for (let i = 0; i < 8; i++) {
+                const particle = document.createElement("div");
+                particle.className = "particle";
+                fragment.appendChild(particle);
+
+                const angle = (Math.PI * 2 * i) / 8;
+                const distance = Math.random() * 40 + 20;
+
+                gsap.set(particle, { x, y, position: "absolute" });
+                gsap.to(particle, {
+                    x: x + Math.cos(angle) * distance,
+                    y: y + Math.sin(angle) * distance,
+                    opacity: 0,
+                    scale: 0,
+                    duration: 0.6,
+                    ease: "power2.out",
+                    onComplete: () => particle.remove(),
+                });
+            }
+            particleContainer.appendChild(fragment);
+        });
     }
 };
 
