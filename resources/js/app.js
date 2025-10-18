@@ -9,7 +9,6 @@ const initCursor = () => {
     const cursorOutline = document.querySelector(".cursor-outline");
     const particleContainer = document.querySelector(".cursor-particles");
 
-    // Check if essential elements exist
     if (!cursorDot || !cursorOutline || !particleContainer) {
         console.warn(
             "Custom cursor elements not found. Default cursor will be used."
@@ -18,7 +17,6 @@ const initCursor = () => {
         return;
     }
 
-    // Add class to hide system cursor only when initialized
     document.body.classList.add("custom-cursor-enabled");
 
     let currentX = window.innerWidth / 2;
@@ -48,7 +46,7 @@ const initCursor = () => {
     currentX = lastPos.x;
     currentY = lastPos.y;
 
-    // --- Initial placement ---
+    // Initial placement
     gsap.set([cursorDot, cursorOutline], {
         xPercent: -50,
         yPercent: -50,
@@ -78,17 +76,15 @@ const initCursor = () => {
     const onMouseMove = (e) => {
         currentX = e.clientX;
         currentY = e.clientY;
+
         if (!isVisible) {
             gsap.to([cursorDot, cursorOutline], { opacity: 1, duration: 0.2 });
             isVisible = true;
         }
-        gsap.set(cursorDot, { x: currentX, y: currentY });
-        gsap.to(cursorOutline, {
-            x: currentX,
-            y: currentY,
-            duration: 0.1,
-            ease: "power1.out",
-        });
+
+        // Instant movement (no delay)
+        gsap.set([cursorDot, cursorOutline], { x: currentX, y: currentY });
+
         clearTimeout(saveTimeout);
         saveTimeout = setTimeout(() => savePosition(currentX, currentY), 100);
     };
@@ -99,31 +95,33 @@ const initCursor = () => {
         if (el.dataset.cursorHover) return;
         el.dataset.cursorHover = "true";
         el.addEventListener("mouseenter", () => {
+            // Instant hover grow (no easing)
             gsap.to(cursorDot, {
                 scale: 2,
                 backgroundColor: "#16c47f",
-                duration: 0.3,
-                ease: "power2.out",
+                duration: 0.1,
+                ease: "none",
             });
             gsap.to(cursorOutline, {
                 scale: 1.5,
                 borderColor: "#16c47f",
-                duration: 0.3,
-                ease: "power2.out",
+                duration: 0.1,
+                ease: "none",
             });
         });
         el.addEventListener("mouseleave", () => {
+            // Instant revert (no easing)
             gsap.to(cursorDot, {
                 scale: 1,
                 backgroundColor: "#157ee1",
-                duration: 0.3,
-                ease: "power2.out",
+                duration: 0.1,
+                ease: "none",
             });
             gsap.to(cursorOutline, {
                 scale: 1,
                 borderColor: "#157ee1",
-                duration: 0.3,
-                ease: "power2.out",
+                duration: 0.1,
+                ease: "none",
             });
         });
     };
