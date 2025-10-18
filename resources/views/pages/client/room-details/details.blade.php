@@ -1,27 +1,61 @@
 <div
     class="min-h-screen p-8 rounded-xl shadow-lg container mx-auto max-w-4xl space-y-12 border-2 border-primary dark:bg-gray-800">
-    <!-- Room Title -->
-    <h1
-        class="text-4xl font-extrabold text-primary text-center pb-3">
-        {{ $room->name }}
-    </h1>
-
-    <!-- Description -->
-    @if ($room->description)
-        <p class="text-gray-700 dark:text-gray-300 leading-relaxed text-lg">
-            {{ $room->description }}
-        </p>
-    @endif
 
     <!-- Cover Image -->
     @if ($room->image_path)
-        <div>
-            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 text-center">Cover Image</h2>
-            <img src="{{ Storage::url($room->image_path) }}" alt="Cover Image"
-                class="w-full max-h-[500px] object-cover cursor-pointer hover:scale-105 transition-all duration-500 rounded-lg"
+        <section
+            class="relative w-full h-[400px] sm:h-[500px] md:h-[600px] rounded-2xl overflow-hidden shadow-xl border-2 border-primary mb-12 group transition-all duration-700 ease-out">
+
+            <!-- Background Image -->
+            <img src="{{ Storage::url($room->image_path) }}" alt="{{ $room->name }}"
+                class="absolute inset-0 w-full h-full object-cover brightness-75 transition-transform duration-700 ease-out group-hover:scale-105 cursor-pointer"
                 onclick="openModal('{{ asset('storage/' . $room->image_path) }}')" />
+
+            <!-- Gradient Overlay -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent pointer-events-none">
+            </div>
+
+            <!-- Overlay Content -->
+            <div class="absolute bottom-8 left-8 sm:left-12 text-white space-y-4 max-w-3xl">
+                <h1 class="text-5xl sm:text-6xl font-extrabold drop-shadow-2xl">
+                    {{ $room->name }}
+                </h1>
+
+                @if ($room->description)
+                    <div class="relative max-w-3xl">
+                        <p id="roomDescription"
+                            class="text-gray-200 text-lg sm:text-xl leading-relaxed drop-shadow transition-all duration-300 overflow-y-auto max-h-32 pr-2 scrollbar-thin scrollbar-thumb-primary relative"
+                            data-full-text="{{ $room->description }}">
+                            {{ $room->description }}
+                        </p>
+
+                        <!-- Fade overlay -->
+                        <div id="fadeOverlay"
+                            class="pointer-events-none absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-black/70 via-black/0 to-transparent transition-opacity duration-300">
+                        </div>
+
+                        <button id="toggleDescriptionBtn"
+                            class="mt-2 text-primary font-semibold hover-underline focus:outline-none">
+                            See more
+                        </button>
+                    </div>
+                @endif
+            </div>
+        </section>
+    @else
+        <!-- Fallback if no cover image -->
+        <div class="p-8 rounded-xl shadow-lg container mx-auto max-w-4xl border-2 border-primary dark:bg-gray-800">
+            <h1 class="text-4xl font-extrabold text-primary text-center pb-3">
+                {{ $room->name }}
+            </h1>
+            @if ($room->description)
+                <p class="text-gray-700 dark:text-gray-300 leading-relaxed text-lg">
+                    {{ $room->description }}
+                </p>
+            @endif
         </div>
     @endif
+
 
     <!-- Video -->
     @if ($room->video_path)
@@ -157,6 +191,47 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        const desc = document.getElementById('roomDescription');
+        const btn = document.getElementById('toggleDescriptionBtn');
+        const overlay = document.getElementById('fadeOverlay');
+
+        if (!desc || !btn || !overlay) return;
+
+        const fullText = desc.dataset.fullText.trim();
+        desc.textContent = fullText;
+
+        // Function to check if text overflows
+        function isOverflowing(el) {
+            return el.scrollHeight > el.clientHeight;
+        }
+
+        // Only show toggle + fade if text overflows initially
+        if (!isOverflowing(desc)) {
+            btn.style.display = 'none';
+            overlay.style.display = 'none';
+            return;
+        }
+
+        let expanded = false;
+
+        btn.addEventListener('click', () => {
+            expanded = !expanded;
+
+            if (expanded) {
+                // Expand: larger scrollable area
+                desc.classList.remove('max-h-32');
+                desc.classList.add('max-h-96', 'overflow-y-auto');
+                overlay.style.opacity = 0; // hide fade
+                btn.textContent = 'See less';
+            } else {
+                // Collapse: preview height
+                desc.classList.remove('max-h-96');
+                desc.classList.add('max-h-32', 'overflow-y-auto');
+                overlay.style.opacity = 1; // show fade
+                btn.textContent = 'See more';
+            }
+        });
+
         function openModal(src) {
             const modal = document.getElementById('imageModal');
             const modalImage = document.getElementById('modalImage');
