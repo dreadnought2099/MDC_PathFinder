@@ -4,7 +4,7 @@
     <!-- Cover Image -->
     @if ($room->image_path)
         <section
-            class="relative w-full h-[400px] sm:h-[500px] md:h-[600px] rounded-2xl overflow-hidden shadow-xl border-2 border-primary mb-12 group transition-all duration-700 ease-out">
+            class="relative w-full h-[400px] sm:h-[500px] md:h-[600px] rounded-2xl shadow-xl border-2 border-primary mb-12 group transition-all duration-700 ease-out overflow-hidden">
 
             <!-- Background Image -->
             <img src="{{ Storage::url($room->image_path) }}" alt="{{ $room->name }}"
@@ -16,31 +16,33 @@
             </div>
 
             <!-- Overlay Content -->
-            <div class="absolute bottom-8 left-8 sm:left-12 text-white space-y-4 max-w-3xl">
-                <h1 class="text-5xl sm:text-6xl font-extrabold drop-shadow-2xl">
-                    {{ $room->name }}
-                </h1>
+            <div
+                class="absolute bottom-0 left-0 right-0 top-0 flex flex-col justify-end p-8 sm:p-12 text-white pointer-events-none">
+                <div class="space-y-4 max-w-3xl pointer-events-auto">
+                    <h1 class="text-5xl sm:text-6xl font-extrabold drop-shadow-2xl">
+                        {{ $room->name }}
+                    </h1>
 
-                @if ($room->description)
-                    <div class="relative max-w-3xl">
-                        <p id="roomDescription"
-                            class="text-gray-200 text-lg sm:text-xl leading-relaxed drop-shadow transition-all duration-300 overflow-y-auto max-h-32 pr-2 scrollbar-thin scrollbar-thumb-primary relative"
-                            data-full-text="{{ $room->description }}">
-                            {{ $room->description }}
-                        </p>
+                    @if ($room->description)
+                        <div class="relative max-w-3xl">
+                            <p id="roomDescription"
+                                class="text-gray-200 text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed drop-shadow transition-all duration-300 max-h-20 sm:max-h-24 md:max-h-32 lg:max-h-40 overflow-hidden pr-2 scrollbar-thin scrollbar-thumb-primary relative"
+                                data-full-text="{{ $room->description }}">
+                                {{ $room->description }}
+                            </p>
 
-                        <!-- Fade overlay -->
-                        <div id="fadeOverlay"
-                            class="pointer-events-none absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-black/70 via-black/0 to-transparent transition-opacity duration-300">
+                            <!-- Fade overlay -->
+                            <div id="fadeOverlay"
+                                class="pointer-events-none absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-black/70 via-black/0 to-transparent transition-opacity duration-300">
+                            </div>
+
+                            <button id="toggleDescriptionBtn"
+                                class="mt-2 text-primary font-semibold hover-underline focus:outline-none">
+                                See more
+                            </button>
                         </div>
-
-                        <button id="toggleDescriptionBtn"
-                            class="mt-2 text-primary font-semibold hover-underline focus:outline-none">
-                            See more
-                        </button>
-                    </div>
-                @endif
-            </div>
+                    @endif
+                </div>
         </section>
     @else
         <!-- Fallback if no cover image -->
@@ -55,7 +57,6 @@
             @endif
         </div>
     @endif
-
 
     <!-- Video -->
     @if ($room->video_path)
@@ -200,12 +201,10 @@
         const fullText = desc.dataset.fullText.trim();
         desc.textContent = fullText;
 
-        // Function to check if text overflows
         function isOverflowing(el) {
             return el.scrollHeight > el.clientHeight;
         }
 
-        // Only show toggle + fade if text overflows initially
         if (!isOverflowing(desc)) {
             btn.style.display = 'none';
             overlay.style.display = 'none';
@@ -218,16 +217,18 @@
             expanded = !expanded;
 
             if (expanded) {
-                // Expand: larger scrollable area
-                desc.classList.remove('max-h-32');
-                desc.classList.add('max-h-96', 'overflow-y-auto');
-                overlay.style.opacity = 0; // hide fade
+                desc.classList.remove('max-h-20', 'sm:max-h-24', 'md:max-h-32', 'lg:max-h-40',
+                    'overflow-hidden');
+                desc.classList.add('overflow-y-auto');
+                desc.style.maxHeight = '200px';
+                overlay.style.opacity = 0;
                 btn.textContent = 'See less';
             } else {
-                // Collapse: preview height
-                desc.classList.remove('max-h-96');
-                desc.classList.add('max-h-32', 'overflow-y-auto');
-                overlay.style.opacity = 1; // show fade
+                desc.classList.remove('overflow-y-auto');
+                desc.classList.add('max-h-20', 'sm:max-h-24', 'md:max-h-32', 'lg:max-h-40',
+                    'overflow-hidden');
+                desc.style.maxHeight = null;
+                overlay.style.opacity = 1;
                 btn.textContent = 'See more';
             }
         });
