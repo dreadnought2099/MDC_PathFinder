@@ -35,42 +35,26 @@ class StaffController extends Controller
             'staff.search' => $search,
         ]);
 
-        // Build query
-        $query = Staff::with('room');
-
-        // Filter by role - Office Managers only see their office staff
+        // Get current user
         $user = auth()->user();
 
-        if ($user->hasRole('Office Manager')) {
-            // Use the room_id directly from the user
-            if ($user->room_id) {
-                $query->where('room_id', $user->room_id);
-            } else {
-                // No office assigned, show nothing
-                $query->whereRaw('1 = 0');
-            }
-        }
-        // Admins see all staff (no filter)
+        // Build query using model scopes
+        $query = Staff::with('room')
+            ->when(
+                $user->hasRole('Office Manager') && $user->room_id,
+                fn($q) =>
+                $q->where('room_id', $user->room_id)
+            )
+            ->when(
+                $user->hasRole('Office Manager') && !$user->room_id,
+                fn($q) =>
+                $q->whereRaw('1 = 0') // no assigned room → show nothing
+            )
+            ->search($search)
+            ->sortBy($sort, $direction);
 
-        // Apply search
-        if (!empty($search)) {
-            $query->where('full_name', 'like', "%{$search}%");
-        }
-
-        // Apply sorting
-        $allowedSorts = ['id', 'full_name', 'last_name', 'email', 'position', 'created_at', 'updated_at'];
-        if (in_array($sort, $allowedSorts)) {
-            $query->orderBy($sort, $direction);
-        } else {
-            $query->orderBy('full_name', 'asc');
-        }
-
-        // Paginate
-        $staffs = $query->paginate(10)->appends([
-            'sort' => $sort,
-            'direction' => $direction,
-            'search' => $search,
-        ]);
+        // Paginate results
+        $staffs = $query->paginate(10)->withQueryString();
 
         // Handle AJAX requests
         if ($request->ajax()) {
@@ -81,7 +65,8 @@ class StaffController extends Controller
 
         return view('pages.admin.staffs.index', compact('staffs', 'sort', 'direction', 'search'));
     }
-    
+
+
     public function create()
     {
         return view('pages.admin.staffs.create');

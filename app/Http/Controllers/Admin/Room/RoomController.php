@@ -42,63 +42,45 @@ class RoomController extends Controller
 
     public function index(Request $request)
     {
-        // Get parameters (from request or session)
-        $sort = $request->input('sort', session('rooms.sort', 'name'));
-        $direction = $request->input('direction', session('rooms.direction', 'asc'));
-        $search = $request->input('search', session('rooms.search', ''));
+        $user = auth()->user();
 
-        // Always save to session
+        // Retrieve inputs with session fallback
+        $sort = $request->input('sort', session('rooms.sort', 'name'));
+        $direction = strtolower($request->input('direction', session('rooms.direction', 'asc'))) === 'desc' ? 'desc' : 'asc';
+        $search = trim($request->input('search', session('rooms.search', '')));
+
+        // Store in session
         session([
             'rooms.sort' => $sort,
             'rooms.direction' => $direction,
             'rooms.search' => $search,
         ]);
 
-        // Build query
-        $query = Room::query();
+        // Build query using new scopes
+        $query = Room::withCount('images')
+            ->when($user->hasRole('Office Manager'), fn($q) => $q->where('id', $user->room_id))
+            ->search($search)
+            ->sortBy($sort, $direction);
 
-        // Filter by office manager's assigned room
-        if (auth()->user()->hasRole('Office Manager')) {
-            $query->where('id', auth()->user()->room_id);
-        }
-
-        // Apply search
-        if (!empty($search)) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
-            });
-        }
-
-        // Add image count if sorting by it
-        if ($sort === 'images_count') {
-            $query->withCount('images');
-        }
-
-        // Apply sorting
-        $allowedSorts = ['id', 'name', 'description', 'room_type', 'images_count', 'created_at', 'updated_at'];
-        if (in_array($sort, $allowedSorts)) {
-            $query->orderBy($sort, $direction);
+        // Role-based data access
+        if ($user->hasRole('Admin')) {
+            $rooms = $query->paginate(10)->appends([
+                'sort' => $sort,
+                'direction' => $direction,
+                'search' => $search,
+            ]);
         } else {
-            $query->orderBy('name', 'asc');
-        }
-
-        // Conditional pagination based on user role
-        if (auth()->user()->hasRole('Admin')) {
-            // Admin: paginate all rooms
-            $rooms = $query->paginate(10)->withQueryString();
-        } else {
-            // Office Manager: get their assigned room only (no pagination needed)
             $rooms = $query->get();
         }
 
-        // Handle AJAX requests
+        // AJAX partial rendering
         if ($request->ajax()) {
             return response()->json([
                 'html' => view('pages.admin.rooms.partials.room-table', compact('rooms'))->render(),
             ]);
         }
 
+        // Render full view
         return view('pages.admin.rooms.index', compact('rooms', 'sort', 'direction', 'search'));
     }
 

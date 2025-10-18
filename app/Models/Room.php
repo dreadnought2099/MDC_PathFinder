@@ -247,4 +247,32 @@ class Room extends Model
             || (str_contains($uri, '/rooms/') && !str_contains($uri, '/admin/'))
             || str_contains($uri, '/api/');
     }
+
+    /**
+     * Scope for searching by name or description.
+     */
+    public function scopeSearch($query, ?string $term)
+    {
+        if (!empty($term)) {
+            $query->where(function ($q) use ($term) {
+                $q->where('name', 'like', "%{$term}%")
+                    ->orWhere('description', 'like', "%{$term}%");
+            });
+        }
+
+        return $query;
+    }
+
+    /**
+     * Scope for sorting rooms by allowed columns.
+     */
+    public function scopeSortBy($query, ?string $column, string $direction = 'asc')
+    {
+        $allowed = ['id', 'name', 'description', 'room_type', 'images_count', 'created_at', 'updated_at'];
+
+        $column = in_array($column, $allowed) ? $column : 'name';
+        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+
+        return $query->orderBy($column, $direction);
+    }
 }

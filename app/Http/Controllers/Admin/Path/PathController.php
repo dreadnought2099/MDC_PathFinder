@@ -17,72 +17,40 @@ class PathController extends Controller
     // Show all paths with their images
     public function index(Request $request)
     {
-        // Get from request first, then fall back to session, then defaults
+        // Use validated inputs or fallback to session
         $sort = $request->input('sort', session('paths.sort', 'id'));
-        $direction = $request->input('direction', session('paths.direction', 'asc'));
-        $search = $request->input('search', session('paths.search', ''));
+        $direction = strtolower($request->input('direction', session('paths.direction', 'asc'))) === 'desc' ? 'desc' : 'asc';
+        $search = trim($request->input('search', session('paths.search', '')));
 
-        // Store in session
+        // Save preferences to session
         session([
             'paths.sort' => $sort,
             'paths.direction' => $direction,
             'paths.search' => $search,
         ]);
 
-        // Handle sorting by room names and image count
-        $query = Path::with(['fromRoom', 'toRoom'])
-            ->when($sort === 'images_count', fn($q) => $q->withCount('images'))
+        // Build query using model scopes
+        $query = Path::query()
+            ->with(['fromRoom', 'toRoom'])
             ->whereNull('paths.deleted_at')
             ->whereHas('fromRoom')
-            ->whereHas('toRoom');
+            ->whereHas('toRoom')
+            ->search($search)
+            ->sortBy($sort, $direction);
 
-        // Searching across related room names
-        if (!empty($search)) {
-            $query->where(function ($q) use ($search) {
-                $q->whereHas('fromRoom', fn($sub) =>
-                $sub->where('name', 'like', "%{$search}%"))
-                    ->orWhereHas('toRoom', fn($sub) =>
-                    $sub->where('name', 'like', "%{$search}%"));
-            });
-        }
-
-        // Sorting logic
-        if ($sort === 'from_room') {
-            $query->join('rooms as from_rooms', 'paths.from_room_id', '=', 'from_rooms.id')
-                ->whereNull('from_rooms.deleted_at')
-                ->orderBy('from_rooms.name', $direction)
-                ->select('paths.*');
-        } elseif ($sort === 'to_room') {
-            $query->join('rooms as to_rooms', 'paths.to_room_id', '=', 'to_rooms.id')
-                ->whereNull('to_rooms.deleted_at')
-                ->orderBy('to_rooms.name', $direction)
-                ->select('paths.*');
-        } elseif ($sort === 'images_count') {
-            $query->withCount('images')
-                ->orderBy('images_count', $direction);
-        } else {
-            // Fallback to default sort
-            $allowedSorts = ['id', 'created_at', 'updated_at'];
-            if (in_array($sort, $allowedSorts)) {
-                $query->orderBy($sort, $direction);
-            } else {
-                $query->orderBy('id', 'asc');
-            }
-        }
-
-        // Paginate with query string
+        // Paginate and keep query string
         $paths = $query->paginate(10)->withQueryString();
 
-        // Handle AJAX requests
+        // AJAX response
         if ($request->ajax()) {
             return response()->json([
                 'html' => view('pages.admin.paths.partials.path-table', compact('paths'))->render(),
             ]);
         }
 
+        // Full view
         return view('pages.admin.paths.index', compact('paths', 'sort', 'direction', 'search'));
     }
-
 
     // Show images for a specific path
     public function show(Path $path)
