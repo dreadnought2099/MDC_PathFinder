@@ -42,94 +42,96 @@
     </form>
 </div>
 
-<script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('searchSortHandler', () => ({
-            search: @json($currentSearch ?? ''),
-            sort: @json($currentSort),
-            direction: @json($currentDirection),
-            route: @json($route),
+@push('scripts')
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('searchSortHandler', () => ({
+                search: @json($currentSearch ?? ''),
+                sort: @json($currentSort),
+                direction: @json($currentDirection),
+                route: @json($route),
 
-            init() {
-                // Listen for pagination link clicks
-                this.$nextTick(() => {
-                    this.setupPaginationListener();
-                });
-            },
+                init() {
+                    // Listen for pagination link clicks
+                    this.$nextTick(() => {
+                        this.setupPaginationListener();
+                    });
+                },
 
-            setupPaginationListener() {
-                // Delegate event listener for pagination links
-                document.addEventListener('click', (e) => {
-                    const link = e.target.closest('a[href*="page="]');
-                    if (link && link.href.includes(this.route.split('?')[0])) {
-                        e.preventDefault();
-                        const url = new URL(link.href);
-                        const page = url.searchParams.get('page');
-                        this.loadPage(page);
-                    }
-                });
-            },
-
-            async loadPage(page = 1) {
-                const params = new URLSearchParams({
-                    search: this.search || '',
-                    sort: this.sort,
-                    direction: this.direction,
-                    page: page
-                });
-
-                const url = `${this.route}?${params.toString()}`;
-
-                try {
-                    const response = await fetch(url, {
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json',
+                setupPaginationListener() {
+                    // Delegate event listener for pagination links
+                    document.addEventListener('click', (e) => {
+                        const link = e.target.closest('a[href*="page="]');
+                        if (link && link.href.includes(this.route.split('?')[0])) {
+                            e.preventDefault();
+                            const url = new URL(link.href);
+                            const page = url.searchParams.get('page');
+                            this.loadPage(page);
                         }
                     });
+                },
 
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
+                async loadPage(page = 1) {
+                    const params = new URLSearchParams({
+                        search: this.search || '',
+                        sort: this.sort,
+                        direction: this.direction,
+                        page: page
+                    });
 
-                    const data = await response.json();
+                    const url = `${this.route}?${params.toString()}`;
 
-                    if (data.html) {
-                        const tableElement = document.querySelector('#records-table');
-                        if (tableElement) {
-                            tableElement.innerHTML = data.html;
-                            // Re-setup pagination listener for new links
-                            this.$nextTick(() => {
-                                window.scrollTo({
-                                    top: 0,
-                                    behavior: 'smooth'
-                                });
-                            });
+                    try {
+                        const response = await fetch(url, {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json',
+                            }
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
                         }
+
+                        const data = await response.json();
+
+                        if (data.html) {
+                            const tableElement = document.querySelector('#records-table');
+                            if (tableElement) {
+                                tableElement.innerHTML = data.html;
+                                // Re-setup pagination listener for new links
+                                this.$nextTick(() => {
+                                    window.scrollTo({
+                                        top: 0,
+                                        behavior: 'smooth'
+                                    });
+                                });
+                            }
+                        }
+
+                        // Update browser URL without reload
+                        window.history.pushState({}, '', url);
+                    } catch (err) {
+                        console.error('Error fetching data:', err);
+                        // Fallback to full page reload if AJAX fails
+                        window.location.href = url;
                     }
+                },
 
-                    // Update browser URL without reload
-                    window.history.pushState({}, '', url);
-                } catch (err) {
-                    console.error('Error fetching data:', err);
-                    // Fallback to full page reload if AJAX fails
-                    window.location.href = url;
+                async handleChange() {
+                    await this.loadPage(1); // Reset to page 1 when filtering
+                },
+
+                clearSearch() {
+                    this.search = '';
+                    this.handleChange();
                 }
-            },
+            }));
+        });
 
-            async handleChange() {
-                await this.loadPage(1); // Reset to page 1 when filtering
-            },
-
-            clearSearch() {
-                this.search = '';
-                this.handleChange();
-            }
-        }));
-    });
-
-    // Handle browser back/forward buttons
-    window.addEventListener('popstate', () => {
-        window.location.reload();
-    });
-</script>
+        // Handle browser back/forward buttons
+        window.addEventListener('popstate', () => {
+            window.location.reload();
+        });
+    </script>
+@endpush

@@ -12,9 +12,12 @@
                     <thead class="bg-gray-100 dark:bg-gray-700">
                         <tr>
                             <th class="px-6 py-4 text-left text-sm font-medium text-gray-700 dark:text-gray-300">ID</th>
-                            <th class="px-6 py-4 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Name</th>
-                            <th class="px-6 py-4 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Deleted At</th>
-                            <th class="px-6 py-4 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Actions</th>
+                            <th class="px-6 py-4 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Name
+                            </th>
+                            <th class="px-6 py-4 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Deleted
+                                At</th>
+                            <th class="px-6 py-4 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Actions
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-600">
@@ -26,10 +29,12 @@
 
                             <tr class="hover:bg-gray-50 transition-colors duration-200 dark:hover:bg-gray-700">
                                 <td class="px-6 py-4">
-                                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $item->id }}</div>
+                                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                        {{ $item->id }}</div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $displayName }}</div>
+                                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                        {{ $displayName }}</div>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="text-sm text-gray-600 dark:text-gray-300">
@@ -81,8 +86,8 @@
                                                     <div class="flex-shrink-0">
                                                         <div
                                                             class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                                                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/restore.png" class="h-8 w-8"
-                                                                alt="Restore">
+                                                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/restore.png"
+                                                                class="h-8 w-8" alt="Restore">
                                                         </div>
                                                     </div>
                                                     <div>
@@ -190,54 +195,56 @@
     @endif
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        function showModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (!modal) {
-                console.error(`Modal with ID ${modalId} not found`);
-                return;
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            function showModal(modalId) {
+                const modal = document.getElementById(modalId);
+                if (!modal) {
+                    console.error(`Modal with ID ${modalId} not found`);
+                    return;
+                }
+                const transformElement = modal.querySelector('.transform');
+                if (!transformElement) {
+                    console.error(`Transform element not found in modal ${modalId}`);
+                    return;
+                }
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    transformElement.classList.remove('scale-95');
+                }, 10);
             }
-            const transformElement = modal.querySelector('.transform');
-            if (!transformElement) {
-                console.error(`Transform element not found in modal ${modalId}`);
-                return;
-            }
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                transformElement.classList.remove('scale-95');
-            }, 10);
-        }
 
-        function hideModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (!modal) {
-                console.error(`Modal with ID ${modalId} not found`);
-                return;
+            function hideModal(modalId) {
+                const modal = document.getElementById(modalId);
+                if (!modal) {
+                    console.error(`Modal with ID ${modalId} not found`);
+                    return;
+                }
+                const transformElement = modal.querySelector('.transform');
+                if (!transformElement) {
+                    console.error(`Transform element not found in modal ${modalId}`);
+                    return;
+                }
+                modal.classList.add('opacity-0');
+                transformElement.classList.add('scale-95');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
             }
-            const transformElement = modal.querySelector('.transform');
-            if (!transformElement) {
-                console.error(`Transform element not found in modal ${modalId}`);
-                return;
-            }
-            modal.classList.add('opacity-0');
-            transformElement.classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
-        }
 
-        function closeModal(event, element) {
-            if (event.target === element) {
-                const modalId = element.id;
-                hideModal(modalId);
+            function closeModal(event, element) {
+                if (event.target === element) {
+                    const modalId = element.id;
+                    hideModal(modalId);
+                }
             }
-        }
 
-        // Expose functions to global scope for onclick handlers
-        window.showModal = showModal;
-        window.hideModal = hideModal;
-        window.closeModal = closeModal;
-    });
-</script>
+            // Expose functions to global scope for onclick handlers
+            window.showModal = showModal;
+            window.hideModal = hideModal;
+            window.closeModal = closeModal;
+        });
+    </script>
+@endpush
