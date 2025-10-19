@@ -52,7 +52,7 @@
                                 class="trigger-text text-2xl lg:text-3xl font-bold text-purple-600 mb-1 dark:text-purple-400">
                                 {{ $totalAssignments }}
                             </span>
-                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/bush2.gif" alt="GIF" class="reveal-img">
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/study.gif" alt="GIF" class="reveal-img">
                             <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Assignments</div>
                         </div>
                     </img-reveal>
