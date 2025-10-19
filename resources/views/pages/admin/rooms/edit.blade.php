@@ -303,7 +303,7 @@
                 }
             };
 
-            const MAX_CAROUSEL_FILES = 50;
+            const MAX_CAROUSEL_FILES = 15;
             const MAX_IMAGE_SIZE_MB = 10;
             const MAX_VIDEO_SIZE_MB = 50;
 
@@ -657,9 +657,16 @@
             function handleCarouselFiles(newFiles) {
                 carouselInput.value = '';
 
-                const totalCount = existingImageData.length + selectedFiles.length + newFiles.length;
-                if (totalCount > MAX_CAROUSEL_FILES) {
-                    showTemporaryMessage(`Maximum ${MAX_CAROUSEL_FILES} images allowed.`, 'error');
+                // Calculate total: existing - removed + new
+                const activeExistingCount = existingImageData.length - removedExistingImageIds.length;
+                const totalImages = activeExistingCount + selectedFiles.length + newFiles.length;
+
+                if (totalImages > MAX_CAROUSEL_FILES) {
+                    const available = MAX_CAROUSEL_FILES - activeExistingCount - selectedFiles.length;
+                    showTemporaryMessage(
+                        `You can only add ${available} more image(s). Maximum is ${MAX_CAROUSEL_FILES} total.`,
+                        'error'
+                    );
                     return;
                 }
 
@@ -673,37 +680,79 @@
             }
 
             async function compressCarouselImages(newFiles) {
-                showTemporaryMessage(`Compressing ${newFiles.length} image(s)...`, 'info');
                 try {
+                    // Create initial progress message
+                    const progressElement = createProgressMessage(`Compressing 0%`, 'info');
+
                     const compressedFiles = [];
+                    let totalOriginalSize = 0;
+                    let totalCompressedSize = 0;
+
                     for (let i = 0; i < newFiles.length; i++) {
                         const file = newFiles[i];
                         try {
+                            totalOriginalSize += file.size;
                             const compressedFile = await compressImageCanvas(file, 2000, 0.85);
                             const finalFile = new File([compressedFile], file.name, {
                                 type: compressedFile.type,
                                 lastModified: Date.now()
                             });
+                            totalCompressedSize += finalFile.size;
                             compressedFileNames.add(file.name);
                             compressedFiles.push(finalFile);
                         } catch (error) {
                             console.error(`Failed to compress ${file.name}:`, error);
                             compressedFiles.push(file);
                         }
+
+                        // Update progress
+                        const progress = Math.round(((i + 1) / newFiles.length) * 100);
+                        updateProgressMessage(progressElement, `Compressing ${progress}%`);
                     }
+
+                    // Remove progress message with fade
+                    if (progressElement) {
+                        progressElement.style.opacity = '0';
+                        progressElement.style.transform = 'translateX(100%)';
+                        setTimeout(() => {
+                            if (progressElement.parentElement) {
+                                progressElement.remove();
+                            }
+                        }, 300);
+                    }
+
                     selectedFiles = selectedFiles.concat(compressedFiles);
                     renderCarouselPreviews();
                     updateCarouselInputFiles();
-                    const totalOriginalSize = newFiles.reduce((sum, f) => sum + f.size, 0) / 1024 / 1024;
-                    const totalCompressedSize = compressedFiles.reduce((sum, f) => sum + f.size, 0) / 1024 /
-                        1024;
-                    showTemporaryMessage(
-                        `${newFiles.length} image(s) compressed: ${totalOriginalSize.toFixed(2)}MB → ${totalCompressedSize.toFixed(2)}MB`,
-                        'success'
-                    );
+
+                    // Show success message after progress disappears
+                    setTimeout(() => {
+                        const originalMB = (totalOriginalSize / 1024 / 1024).toFixed(2);
+                        const compressedMB = (totalCompressedSize / 1024 / 1024).toFixed(2);
+
+                        showTemporaryMessage(
+                            `${newFiles.length} image(s) compressed: ${originalMB}MB → ${compressedMB}MB`,
+                            'success'
+                        );
+                    }, 350);
                 } catch (error) {
                     console.error('Batch compression failed:', error);
                     showTemporaryMessage('Some images could not be compressed', 'error');
+                }
+            }
+
+
+            // Helper functions for progress updates
+            function createProgressMessage(text, type = 'info') {
+                if (typeof window.showTemporaryMessage === 'function') {
+                    window.showTemporaryMessage(text, type);
+                }
+                return document.getElementById('temp-message');
+            }
+
+            function updateProgressMessage(element, text) {
+                if (element && element.querySelector('p')) {
+                    element.querySelector('p').textContent = text;
                 }
             }
 
@@ -1207,20 +1256,20 @@
                                 <div class="text-sm text-gray-600 mt-1 dark:text-gray-300">${timeText}</div>
                             </div>
                             ${rangeKey !== "closed" ? `
-                            <div class="flex flex-col sm:flex-row gap-2 ml-0 sm:ml-4 mt-2 sm:mt-0">
-                                <button type="button" 
-                                    class="edit-schedule-btn bg-edit text-white hover:text-edit hover:bg-white text-sm px-3 py-1.5 rounded-md border border-edit transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800 w-full sm:w-auto shadow-edit-hover" 
-                                    data-days='${JSON.stringify(group.days)}' 
-                                    data-ranges='${JSON.stringify(group.ranges)}'>
-                                    Edit
-                                </button>
-                                <button type="button" 
-                                    class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-3 py-1.5 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800 w-full sm:w-auto shadow-secondary-hover" 
-                                    data-days='${JSON.stringify(group.days)}'>
-                                    Delete
-                                </button>
-                            </div>
-                         ` : ''}
+                                        <div class="flex flex-col sm:flex-row gap-2 ml-0 sm:ml-4 mt-2 sm:mt-0">
+                                            <button type="button" 
+                                                class="edit-schedule-btn bg-edit text-white hover:text-edit hover:bg-white text-sm px-3 py-1.5 rounded-md border border-edit transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800 w-full sm:w-auto shadow-edit-hover" 
+                                                data-days='${JSON.stringify(group.days)}' 
+                                                data-ranges='${JSON.stringify(group.ranges)}'>
+                                                Edit
+                                            </button>
+                                            <button type="button" 
+                                                class="delete-schedule-btn bg-secondary text-white hover:text-secondary hover:bg-white text-sm px-3 py-1.5 rounded-md border border-secondary transition-all duration-300 ease-in-out cursor-pointer dark:hover:bg-gray-800 w-full sm:w-auto shadow-secondary-hover" 
+                                                data-days='${JSON.stringify(group.days)}'>
+                                                Delete
+                                            </button>
+                                        </div>
+                                     ` : ''}
                         </div>
                     `;
 
