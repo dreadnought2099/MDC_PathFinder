@@ -4,8 +4,7 @@
     <div class="min-h-screen dark:bg-gray-900 flex flex-col">
 
         <!-- Top Bar -->
-        <div
-            class="w-full flex items-center p-4 bg-white dark:bg-gray-900 sticky top-0 z-50">
+        <div class="w-full flex items-center p-4 bg-white dark:bg-gray-900 sticky top-0 z-50">
 
             <!-- Left: reserved space (same width as back button would occupy) -->
             <div class="w-48 flex items-center">
@@ -52,25 +51,25 @@
                 <div class="relative inline-block group">
                     <a href="{{ route('paths.select') }}"
                         class="inline-flex items-center justify-center 
-              p-4 sm:p-5 lg:p-6 rounded-md bg-primary text-white 
-              border-2 border-primary shadow-lg hover:shadow-xl
-              hover:bg-white hover:text-primary dark:bg-gray-800 dark:hover:bg-gray-800
-              transition-all duration-300 ease-in-out shadow-primary-hover">
+                                p-4 sm:p-5 lg:p-6 rounded-md bg-primary text-white 
+                                border-2 border-primary shadow-lg hover:shadow-xl
+                                hover:bg-white hover:text-primary dark:bg-gray-800 dark:hover:bg-gray-800
+                                transition-all duration-300 ease-in-out shadow-primary-hover">
                         <span class="text-lg sm:text-xl">Start Navigation</span>
                     </a>
 
                     <div
                         class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium 
-                    text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible
-                    group-hover:opacity-100 group-hover:visible transition-all duration-300 
-                    whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
+                                text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible
+                                group-hover:opacity-100 group-hover:visible transition-all duration-300 
+                                whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
                         Click to start navigation inside the MDC Campus
 
                         <div
                             class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
-                        border-l-4 border-l-gray-900 dark:border-l-gray-700
-                        border-t-4 border-t-transparent 
-                        border-b-4 border-b-transparent">
+                                    border-l-4 border-l-gray-900 dark:border-l-gray-700
+                                    border-t-4 border-t-transparent 
+                                    border-b-4 border-b-transparent">
                         </div>
                     </div>
                 </div>
