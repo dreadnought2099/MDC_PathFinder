@@ -310,9 +310,4 @@
             new QRScanner();
         </script>
     @endif
-    @if ($room)
-        <script>
-            console.log('Details loaded for office:', @json($room->id ?? null));
-        </script>
-    @endif
 @endsection
