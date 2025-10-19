@@ -287,5 +287,11 @@
 @endsection
 
 @push('scripts')
+    @if (isset($existingOfficeHours))
+        <script>
+            window.existingOfficeHours = @json($existingOfficeHours);
+        </script>
+    @endif
+    
     @vite('resources/js/room-form.js')
 @endpush

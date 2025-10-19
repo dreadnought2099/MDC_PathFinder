@@ -6,6 +6,7 @@ import { initializeFormSubmission } from "./room-modules/form-submission";
 import { initializeConditionalFields } from "./room-modules/conditional-fields";
 
 document.addEventListener("DOMContentLoaded", function () {
+    window.existingOfficeHours = window.existingOfficeHours || {};
     let isUploading = false;
 
     // Prevent accidental navigation during upload

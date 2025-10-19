@@ -13,39 +13,19 @@ export function initializeOfficeHours() {
     setupBulkApplyButton();
     setupClearTimeButtons();
 
-    // If server has injected existingOfficeHours JSON on window, load it
+    // FIX: Properly load existing office hours if available on window
     if (
         typeof window.existingOfficeHours !== "undefined" &&
         window.existingOfficeHours
     ) {
         try {
-            // If existingOfficeHours is an array of objects like {day,start_time,end_time...}
-            const existing = window.existingOfficeHours;
-            if (Array.isArray(existing)) {
-                existing.forEach((hour) => {
-                    const dayKey = hour.day || hour.day_of_week;
-                    if (!dayKey) return;
-                    if (!officeHoursData[dayKey]) officeHoursData[dayKey] = [];
-                    const startTime = hour.start_time
-                        ? hour.start_time.substring(0, 5)
-                        : hour.start_time;
-                    const endTime = hour.end_time
-                        ? hour.end_time.substring(0, 5)
-                        : hour.end_time;
-                    officeHoursData[dayKey].push({
-                        start: startTime,
-                        end: endTime,
-                    });
-                });
-            } else if (typeof existing === "object") {
-                officeHoursData = existing;
-            }
+            loadExistingOfficeHours(window.existingOfficeHours);
         } catch (err) {
-            console.error("Failed to load existingOfficeHours", err);
+            console.error("Failed to load existing office hours:", err);
         }
+    } else {
+        renderOfficeHours();
     }
-
-    renderOfficeHours();
 }
 
 function setupQuickSelectButtons() {
@@ -78,6 +58,7 @@ function setupBulkApplyButton() {
             const selectedDays = Array.from(
                 document.querySelectorAll(".bulk-day-checkbox:checked")
             ).map((cb) => cb.value);
+
             if (!selectedDays.length)
                 return showTemporaryMessage("Please select at least one day.");
 
@@ -232,6 +213,7 @@ function formatDaysGroup(days) {
         return "Daily";
     if (isExactMatch(["Mon", "Tue", "Wed", "Thu", "Fri"])) return "Weekdays";
     if (isExactMatch(["Sat", "Sun"])) return "Weekends";
+
     const isConsecutive = () => {
         for (let i = 0; i < sortedDays.length - 1; i++) {
             if (
@@ -242,6 +224,7 @@ function formatDaysGroup(days) {
         }
         return true;
     };
+
     if (isConsecutive() && sortedDays.length > 2)
         return `${sortedDays[0]} - ${sortedDays[sortedDays.length - 1]}`;
     return sortedDays.join(", ");
@@ -251,6 +234,7 @@ function renderOfficeHours() {
     const container = document.getElementById("officeHoursDisplay");
     if (!container) return;
     container.innerHTML = "";
+
     const groupedSchedule = {};
     DAYS_OF_WEEK.forEach((day) => {
         const ranges = officeHoursData[day] || [];
@@ -293,31 +277,34 @@ function renderOfficeHours() {
                     rangeKey !== "closed"
                         ? `
                     <div class="flex flex-col sm:flex-row gap-2 ml-0 sm:ml-4 mt-2 sm:mt-0">
-                        <button type="button" class="edit-schedule-btn bg-edit text-white text-sm px-3 py-1.5 rounded-md border border-edit shadow-edit-hover" data-days='${JSON.stringify(
-                            group.days
-                        )}' data-ranges='${JSON.stringify(
-                              group.ranges
-                          )}'>Edit</button>
-                        <button type="button" class="delete-schedule-btn bg-secondary text-white text-sm px-3 py-1.5 rounded-md border border-secondary shadow-secondary-hover" data-days='${JSON.stringify(
-                            group.days
-                        )}'>Delete</button>
-                    </div>
-                `
+                        <button type="button" class="edit-schedule-btn bg-edit text-white text-sm px-3 py-1.5 rounded-md border border-edit shadow-edit-hover"
+                            data-days='${JSON.stringify(group.days)}'
+                            data-ranges='${JSON.stringify(
+                                group.ranges
+                            )}'>Edit</button>
+                        <button type="button" class="delete-schedule-btn bg-secondary text-white text-sm px-3 py-1.5 rounded-md border border-secondary shadow-secondary-hover"
+                            data-days='${JSON.stringify(
+                                group.days
+                            )}'>Delete</button>
+                    </div>`
                         : ""
                 }
             </div>
         `;
-        // hidden inputs
+
+        // Hidden inputs
         group.days.forEach((day) => {
             group.ranges.forEach((range, idx) => {
                 const startInput = document.createElement("input");
                 startInput.type = "hidden";
                 startInput.name = `office_hours[${day}][${idx}][start]`;
                 startInput.value = range.start;
+
                 const endInput = document.createElement("input");
                 endInput.type = "hidden";
                 endInput.name = `office_hours[${day}][${idx}][end]`;
                 endInput.value = range.end;
+
                 li.appendChild(startInput);
                 li.appendChild(endInput);
             });
@@ -353,14 +340,26 @@ function attachScheduleActionListeners() {
         btn.addEventListener("click", function () {
             const days = JSON.parse(this.dataset.days);
             const ranges = JSON.parse(this.dataset.ranges);
+
+            // FIX: properly populate all time rows if multiple ranges exist
+            document
+                .querySelectorAll(".bulk-range-row")
+                .forEach((row, index) => {
+                    const startInput = row.querySelector(".bulk-start-time");
+                    const endInput = row.querySelector(".bulk-end-time");
+                    if (ranges[index]) {
+                        startInput.value = ranges[index].start;
+                        endInput.value = ranges[index].end;
+                    } else {
+                        startInput.value = "";
+                        endInput.value = "";
+                    }
+                });
+
             document
                 .querySelectorAll(".bulk-day-checkbox")
                 .forEach((cb) => (cb.checked = days.includes(cb.value)));
-            if (ranges.length > 0) {
-                document.querySelector(".bulk-start-time").value =
-                    ranges[0].start;
-                document.querySelector(".bulk-end-time").value = ranges[0].end;
-            }
+
             document
                 .querySelector(".bulk-time-ranges")
                 ?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -384,10 +383,11 @@ function attachScheduleActionListeners() {
 }
 
 export function loadExistingOfficeHours(data) {
-    // data can be an object { Mon: [{start,end}, ...], ... } or array - keep flexible
     if (!data) return;
+
+    officeHoursData = {}; // reset before loading
+
     if (Array.isArray(data)) {
-        // transform array -> officeHoursData format
         data.forEach((hour) => {
             const dayKey = hour.day || hour.day_of_week;
             if (!dayKey) return;
@@ -403,5 +403,6 @@ export function loadExistingOfficeHours(data) {
     } else if (typeof data === "object") {
         officeHoursData = data;
     }
+
     renderOfficeHours();
 }
