@@ -41,13 +41,13 @@ Route::get('/navigation/return-to-results', [PathController::class, 'returnToRes
 
 // Admin login
 Route::get('/admin', [LogInController::class, 'showLoginForm'])->name('login');
-Route::post('/admin', [LogInController::class, 'login']);
+Route::post('/admin', [LogInController::class, 'login'])->middleware('throttle:3,1');
 
 // Admin password reset
 Route::get('/admin/forgot-password', [ResetPasswordController::class, 'showRequestForm'])->name('password.request');
-Route::post('/admin/forgot-password', [ResetPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::post('/admin/forgot-password', [ResetPasswordController::class, 'sendResetLinkEmail'])->middleware('throttle:3,1')->name('password.email');
 Route::get('/admin/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-Route::post('/admin/reset-password', [ResetPasswordController::class, 'resetPassword'])->name('password.update');
+Route::post('/admin/reset-password', [ResetPasswordController::class, 'resetPassword'])->middleware('throttle:3,1')->name('password.update');
 
 // Routes available after login, before 2FA
 Route::middleware(['auth', 'role:Admin|Office Manager'])->group(function () {
