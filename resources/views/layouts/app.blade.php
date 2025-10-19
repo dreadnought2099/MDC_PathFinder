@@ -77,8 +77,6 @@
         }
     </style>
 
-
-
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="icon" href="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png">
 

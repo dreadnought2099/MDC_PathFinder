@@ -98,7 +98,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                 @foreach ($room->staff as $member)
                     <div
-                        class="bg-gradient-to-br from-slate-50 to-white dark:from-gray-700 dark:to-gray-600 rounded-xl shadow-md hover:shadow-lg border-2 border-primary dark:border-gray-600 overflow-hidden group hover:scale-105 transition-all duration-300">
+                        class="bg-gradient-to-br from-slate-50 to-white dark:from-gray-700 dark:to-gray-800 rounded-xl shadow-md hover:shadow-lg border-2 border-primary dark:border-gray-600 overflow-hidden group hover:scale-105 transition-all duration-300">
                         <div class="cursor-pointer overflow-hidden"
                             onclick="openModal('{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/mdc.png') }}')">
                             <img src="{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/mdc.png') }}"
