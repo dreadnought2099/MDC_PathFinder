@@ -1,28 +1,36 @@
 import { showTemporaryMessage } from "./utils";
+import { prepareCarouselForSubmit } from "./carousel-images";
 
-export function initializeFormSubmission(setIsUploading) {
+export function initializeFormSubmission(setIsUploadingCallback = () => {}) {
     const form = document.getElementById("room-form");
-    const submitBtn = document.querySelector("#submit-btn");
+    if (!form) return;
 
     form.addEventListener("submit", function (e) {
         e.preventDefault();
-        submitFormWithProgress(setIsUploading);
+        submitFormWithProgress(setIsUploadingCallback);
     });
 }
 
 async function submitFormWithProgress(setIsUploading) {
     const form = document.getElementById("room-form");
     const submitBtn = document.querySelector("#submit-btn");
+    if (!form) return;
+
+    // Give modules a chance to add hidden inputs (e.g. removed image ids)
+    try {
+        prepareCarouselForSubmit();
+    } catch (err) {
+        console.warn("prepareCarouselForSubmit error", err);
+    }
 
     setIsUploading(true);
     window.dispatchEvent(new CustomEvent("upload-start"));
-    submitBtn.disabled = true;
+    if (submitBtn) submitBtn.disabled = true;
 
     try {
         const formData = new FormData(form);
         const xhr = new XMLHttpRequest();
-
-        xhr.open("POST", form.action, true);
+        xhr.open(form.method || "POST", form.action, true);
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 
         xhr.upload.onprogress = function (e) {
@@ -39,7 +47,7 @@ async function submitFormWithProgress(setIsUploading) {
         xhr.onload = function () {
             setIsUploading(false);
             window.dispatchEvent(new CustomEvent("upload-finish"));
-            submitBtn.disabled = false;
+            if (submitBtn) submitBtn.disabled = false;
 
             if (xhr.status >= 200 && xhr.status < 300) {
                 try {
@@ -49,8 +57,9 @@ async function submitFormWithProgress(setIsUploading) {
                         window.location.href = data.redirect;
                         return;
                     }
-                } catch {}
-
+                } catch (err) {
+                    /* ignore */
+                }
                 window.onbeforeunload = null;
                 window.location.href = "/admin/rooms";
             } else {
@@ -66,7 +75,7 @@ async function submitFormWithProgress(setIsUploading) {
         xhr.onerror = function () {
             setIsUploading(false);
             window.dispatchEvent(new CustomEvent("upload-finish"));
-            submitBtn.disabled = false;
+            if (submitBtn) submitBtn.disabled = false;
             showTemporaryMessage("Upload failed. Please try again.", "error");
         };
 
@@ -74,7 +83,7 @@ async function submitFormWithProgress(setIsUploading) {
     } catch (error) {
         setIsUploading(false);
         window.dispatchEvent(new CustomEvent("upload-finish"));
-        submitBtn.disabled = false;
+        if (submitBtn) submitBtn.disabled = false;
         showTemporaryMessage(
             "Error submitting form. Please try again.",
             "error"

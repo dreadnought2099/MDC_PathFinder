@@ -17,7 +17,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 
-    // Initialize all form modules
     initializeCoverImage();
     initializeCarouselImages();
     initializeVideoUpload();

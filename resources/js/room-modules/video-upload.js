@@ -9,6 +9,11 @@ export function initializeVideoUpload() {
     const removeVideoThumbnailBtn = document.getElementById(
         "removeVideoThumbnailBtn"
     );
+    if (!videoDropZone || !videoInput) return;
+
+    // If there's already a server-rendered video above the upload box (edit), keep it visible.
+    // Your Blade already prints a <video src="..."> above the drop zone if room->video_path exists,
+    // so no work is required here; our preview area (#videoThumbnailPreview) will be used when user selects a new file.
 
     videoDropZone.addEventListener("click", (e) => {
         if (e.target.closest("#removeVideoThumbnailBtn")) {
@@ -20,35 +25,38 @@ export function initializeVideoUpload() {
     });
 
     videoInput.addEventListener("change", () => {
-        if (videoInput.files && videoInput.files[0]) {
+        if (videoInput.files && videoInput.files[0])
             showVideoThumbnailPreview(videoInput.files[0]);
-        }
     });
 
     ["dragover", "dragleave", "drop"].forEach((eventName) => {
         videoDropZone.addEventListener(eventName, handleVideoDrag);
     });
 
-    removeVideoThumbnailBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        clearVideoThumbnail();
-        videoInput.value = "";
-    });
+    if (removeVideoThumbnailBtn) {
+        removeVideoThumbnailBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            clearVideoThumbnail();
+            const vi = document.getElementById("video_path");
+            if (vi) vi.value = "";
+        });
+    }
 }
 
 function handleVideoDrag(e) {
     const videoDropZone = document.getElementById("videoDropZone");
+    if (!videoDropZone) return;
     e.preventDefault();
-    if (e.type === "dragover") {
+    if (e.type === "dragover")
         videoDropZone.classList.add("border-primary", "bg-gray-50");
-    } else if (e.type === "dragleave") {
+    else if (e.type === "dragleave")
         videoDropZone.classList.remove("border-primary", "bg-gray-50");
-    } else if (e.type === "drop") {
+    else if (e.type === "drop") {
         videoDropZone.classList.remove("border-primary", "bg-gray-50");
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
             const videoInput = document.getElementById("video_path");
-            videoInput.files = e.dataTransfer.files;
+            if (videoInput) videoInput.files = e.dataTransfer.files;
             showVideoThumbnailPreview(e.dataTransfer.files[0]);
         }
     }
@@ -56,20 +64,20 @@ function handleVideoDrag(e) {
 
 function showVideoThumbnailPreview(file) {
     const videoInput = document.getElementById("video_path");
+    if (!file || !videoInput) return;
 
     if (file.size / 1024 / 1024 > MAX_VIDEO_SIZE_MB) {
         showTemporaryMessage(
-            `Video is too large. Max size is ${MAX_VIDEO_SIZE_MB}MB.`,
+            `"${file.name}" is too large. Max size is ${MAX_VIDEO_SIZE_MB} MB.`,
             "error"
         );
         clearVideoThumbnail();
         videoInput.value = "";
         return;
     }
-
     if (!ALLOWED_VIDEO_TYPES.includes(file.type)) {
         showTemporaryMessage(
-            "Invalid video format. Only MP4, AVI, or MPEG allowed.",
+            `"${file.name}" is not a valid format. Only MP4, AVI, or MPEG allowed.`,
             "error"
         );
         clearVideoThumbnail();
@@ -86,11 +94,10 @@ function showVideoThumbnailPreview(file) {
     const videoUploadText = document.getElementById("videoUploadText");
     const videoFormatText = document
         .getElementById("videoDropZone")
-        .querySelector("p.text-xs");
+        ?.querySelector("p.text-xs");
 
-    videoThumbnail.src = url;
-    videoThumbnailPreview.classList.remove("hidden");
-
+    if (videoThumbnail) videoThumbnail.src = url;
+    if (videoThumbnailPreview) videoThumbnailPreview.classList.remove("hidden");
     if (videoIcon) videoIcon.style.display = "none";
     if (videoUploadText) videoUploadText.style.display = "none";
     if (videoFormatText) videoFormatText.style.display = "none";
@@ -105,11 +112,10 @@ function clearVideoThumbnail() {
     const videoUploadText = document.getElementById("videoUploadText");
     const videoFormatText = document
         .getElementById("videoDropZone")
-        .querySelector("p.text-xs");
+        ?.querySelector("p.text-xs");
 
-    videoThumbnail.src = "";
-    videoThumbnailPreview.classList.add("hidden");
-
+    if (videoThumbnail) videoThumbnail.src = "";
+    if (videoThumbnailPreview) videoThumbnailPreview.classList.add("hidden");
     if (videoIcon) videoIcon.style.display = "";
     if (videoUploadText) videoUploadText.style.display = "";
     if (videoFormatText) videoFormatText.style.display = "";

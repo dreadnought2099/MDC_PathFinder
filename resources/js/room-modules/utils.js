@@ -9,12 +9,11 @@ export function showTemporaryMessage(text, type = "info") {
 export function showTemporaryFeedback(button, text, duration = 2000) {
     const old = button.textContent;
     button.textContent = text;
-    setTimeout(() => {
-        button.textContent = old;
-    }, duration);
+    setTimeout(() => (button.textContent = old), duration);
 }
 
 export function showError(row, msg) {
+    if (!row) return;
     row.classList.add("bg-red-50", "border", "border-red-400");
     if (!row.querySelector(".error-msg")) {
         const p = document.createElement("p");
@@ -25,6 +24,7 @@ export function showError(row, msg) {
 }
 
 export function clearError(row) {
+    if (!row) return;
     row.classList.remove("bg-red-50", "border", "border-red-400");
     const msg = row.querySelector(".error-msg");
     if (msg) msg.remove();
@@ -57,14 +57,12 @@ export async function compressImageCanvas(
                 canvas.width = width;
                 canvas.height = height;
                 const ctx = canvas.getContext("2d");
-
                 ctx.imageSmoothingEnabled = true;
                 ctx.imageSmoothingQuality = "high";
                 ctx.drawImage(img, 0, 0, width, height);
 
                 let targetQuality = quality;
                 const sizeMB = file.size / 1024 / 1024;
-
                 if (sizeMB > 8) targetQuality = 0.75;
                 else if (sizeMB > 5) targetQuality = 0.8;
 
@@ -92,16 +90,10 @@ export async function compressImageCanvas(
                     targetQuality
                 );
             };
-            img.onerror = () => {
-                console.error("Image load failed");
-                resolve(file);
-            };
+            img.onerror = () => resolve(file);
             img.src = e.target.result;
         };
-        reader.onerror = () => {
-            console.error("FileReader error");
-            resolve(file);
-        };
+        reader.onerror = () => resolve(file);
         reader.readAsDataURL(file);
     });
 }

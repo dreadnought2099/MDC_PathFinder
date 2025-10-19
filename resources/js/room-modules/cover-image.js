@@ -10,14 +10,24 @@ let compressedCoverFile = null;
 export function initializeCoverImage() {
     const coverInput = document.getElementById("image_path");
     const coverUploadBox = document.getElementById("uploadBox");
-    let coverPreview = document.getElementById("previewImage");
+    if (!coverInput || !coverUploadBox) return;
 
+    let coverPreview = document.getElementById("previewImage");
     if (!coverPreview) {
         coverPreview = document.createElement("img");
         coverPreview.id = "previewImage";
         coverPreview.className =
             "absolute inset-0 object-cover w-full h-full hidden";
         coverUploadBox.appendChild(coverPreview);
+    }
+
+    // If Blade already rendered an existing image (edit), show it
+    if (coverPreview.src && coverPreview.src.trim() !== "") {
+        coverPreview.classList.remove("hidden");
+        const icon = coverUploadBox.querySelector("img:not(#previewImage)");
+        const text = coverUploadBox.querySelector("span");
+        if (icon) icon.style.display = "none";
+        if (text) text.style.display = "none";
     }
 
     coverUploadBox.addEventListener("click", () => coverInput.click());
@@ -28,13 +38,14 @@ export function initializeCoverImage() {
         }
     });
 
-    ["dragover", "dragleave", "drop"].forEach((eventName) => {
-        coverUploadBox.addEventListener(eventName, handleDragEvent);
-    });
+    ["dragover", "dragleave", "drop"].forEach((eventName) =>
+        coverUploadBox.addEventListener(eventName, handleDragEvent)
+    );
 }
 
 function handleDragEvent(e) {
     const coverUploadBox = document.getElementById("uploadBox");
+    if (!coverUploadBox) return;
     e.preventDefault();
     if (e.type === "dragover") {
         coverUploadBox.classList.add("border-primary", "bg-gray-50");
@@ -42,10 +53,8 @@ function handleDragEvent(e) {
         coverUploadBox.classList.remove("border-primary", "bg-gray-50");
     } else if (e.type === "drop") {
         coverUploadBox.classList.remove("border-primary", "bg-gray-50");
-        const files = Array.from(e.dataTransfer.files);
-        if (files.length > 0) {
-            compressAndPreviewCoverImage(files[0]);
-        }
+        const files = Array.from(e.dataTransfer.files || []);
+        if (files.length > 0) compressAndPreviewCoverImage(files[0]);
     }
 }
 
@@ -55,18 +64,16 @@ async function compressAndPreviewCoverImage(file) {
     try {
         showTemporaryMessage("Compressing cover image...", "info");
         const originalSizeMB = (file.size / 1024 / 1024).toFixed(2);
-
         const compressedFile = await compressImageCanvas(file, 2000, 0.85);
         const compressedSizeMB = (compressedFile.size / 1024 / 1024).toFixed(2);
-
         compressedCoverFile = compressedFile;
 
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(compressedFile);
-        document.getElementById("image_path").files = dataTransfer.files;
+        const dt = new DataTransfer();
+        dt.items.add(compressedFile);
+        const input = document.getElementById("image_path");
+        if (input) input.files = dt.files;
 
         showCoverPreview(compressedFile);
-
         showTemporaryMessage(
             `Cover image compressed: ${originalSizeMB}MB → ${compressedSizeMB}MB`,
             "success"
@@ -86,11 +93,11 @@ function showCoverPreview(file) {
     const reader = new FileReader();
     const coverUploadBox = document.getElementById("uploadBox");
     const coverPreview = document.getElementById("previewImage");
+    if (!coverPreview) return;
 
     reader.onload = (e) => {
         coverPreview.src = e.target.result;
         coverPreview.classList.remove("hidden");
-
         const icon = coverUploadBox.querySelector("img:not(#previewImage)");
         const text = coverUploadBox.querySelector("span");
         if (icon) icon.style.display = "none";
