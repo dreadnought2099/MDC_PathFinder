@@ -115,7 +115,7 @@
 
                 <!-- Carousel Images (Full Width) -->
                 <div class="mb-8 conditional-field" id="carousel-images-section">
-                    <label class="block mb-2 dark:text-gray-300">Carousel Images (optional, max 50 images, 10MB
+                    <label class="block mb-2 dark:text-gray-300">Carousel Images (optional, max 15 images, 10MB
                         each)</label>
                     <div id="carouselUploadBox"
                         class="flex flex-col items-center justify-center w-full min-h-40 p-4

@@ -4,7 +4,7 @@ import {
     showTemporaryMessage,
 } from "./utils";
 
-const MAX_CAROUSEL_FILES = 50;
+const MAX_CAROUSEL_FILES = 15;
 const MAX_IMAGE_SIZE_MB = 10;
 
 let selectedFiles = [];
@@ -95,9 +95,10 @@ function handleCarouselFiles(newFiles) {
 }
 
 async function compressCarouselImages(newFiles) {
-    showTemporaryMessage(`Compressing ${newFiles.length} image(s)...`, "info");
-
     try {
+        // Create initial progress message and store reference
+        const progressElement = createProgressMessage(`Compressing 0%`, "info");
+
         const batchSize = 3;
         const compressedFiles = [];
         let totalOriginalSize = 0;
@@ -129,10 +130,22 @@ async function compressCarouselImages(newFiles) {
                 compressedCarouselFiles.set(originalFile.name, compressedFile);
             });
 
+            // Update the same message instead of creating new ones
             const progress = Math.round(
                 ((i + batch.length) / newFiles.length) * 100
             );
-            showTemporaryMessage(`Compressing: ${progress}%`, "info");
+            updateProgressMessage(progressElement, `Compressing ${progress}%`);
+        }
+
+        // Remove progress message with delay to prevent overlap
+        if (progressElement) {
+            progressElement.style.opacity = "0";
+            progressElement.style.transform = "translateX(100%)";
+            setTimeout(() => {
+                if (progressElement.parentElement) {
+                    progressElement.remove();
+                }
+            }, 300);
         }
 
         selectedFiles = selectedFiles.concat(compressedFiles);
@@ -142,13 +155,31 @@ async function compressCarouselImages(newFiles) {
         const originalMB = (totalOriginalSize / 1024 / 1024).toFixed(2);
         const compressedMB = (totalCompressedSize / 1024 / 1024).toFixed(2);
 
-        showTemporaryMessage(
-            `${newFiles.length} image(s) compressed: ${originalMB}MB → ${compressedMB}MB`,
-            "success"
-        );
+        // Show success message after progress message is gone
+        setTimeout(() => {
+            showTemporaryMessage(
+                `${newFiles.length} image(s) compressed: ${originalMB}MB → ${compressedMB}MB`,
+                "success"
+            );
+        }, 350);
     } catch (error) {
         console.error("Batch compression failed:", error);
         showTemporaryMessage("Some images could not be compressed", "error");
+    }
+}
+
+// Helper function to create and return progress message element
+function createProgressMessage(text, type = "info") {
+    if (typeof window.showTemporaryMessage === "function") {
+        window.showTemporaryMessage(text, type);
+    }
+    return document.getElementById("temp-message");
+}
+
+// Helper function to update the same progress message
+function updateProgressMessage(element, text) {
+    if (element && element.querySelector("p")) {
+        element.querySelector("p").textContent = text;
     }
 }
 

@@ -102,7 +102,7 @@ class RoomController extends Controller
             'room_type' => 'required|in:regular,entrance_point',
             'image_path' => 'nullable|image|max:10240',
             'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200',
-            'carousel_images' => 'nullable|array|max:50',
+            'carousel_images' => 'nullable|array|max:15',
             'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
             'office_hours' => 'nullable|array',
         ]);
@@ -284,7 +284,7 @@ class RoomController extends Controller
             'room_type' => 'required|in:regular,entrance_point',
             'image_path' => 'nullable|image|max:10240',
             'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200',
-            'carousel_images' => 'nullable|array|max:50',
+            'carousel_images' => 'nullable|array|max:15',
             'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
             'office_hours' => 'nullable|array',
         ]);
