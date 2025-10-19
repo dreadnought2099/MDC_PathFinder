@@ -66,7 +66,7 @@
                                     class="trigger-text text-2xl lg:text-3xl font-bold text-orange-600 mb-1 dark:text-orange-400">
                                     {{ $totalPaths }}
                                 </span>
-                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/dance.gif" alt="GIF" class="reveal-img">
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/girl-map.gif" alt="GIF" class="reveal-img">
                                 <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Paths</div>
                             </div>
                         </img-reveal>

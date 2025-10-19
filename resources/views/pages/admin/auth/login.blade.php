@@ -6,7 +6,7 @@
 @section('content')
     <div class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8">
         <div
-            class="w-full max-w-4xl flex flex-col md:flex-row rounded-xl shadow-lg overflow-hidden bg-white border border-primary">
+            class="w-full max-w-4xl flex flex-col md:flex-row rounded-xl shadow-lg overflow-hidden bg-white shadow-primary-hover">
 
             {{-- Left - Login --}}
             <div class="w-full md:w-1/2 p-6 sm:p-8 space-y-4 sm:space-y-6 flex flex-col justify-center">
