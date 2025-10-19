@@ -26,7 +26,7 @@
                             <span class="trigger-text text-2xl lg:text-3xl font-bold text-blue-600 mb-1 dark:text-blue-400">
                                 {{ $totalStaffs }}
                             </span>
-                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/staring.gif" alt="GIF" class="reveal-img">
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/bad-shark2.gif" alt="GIF" class="reveal-img">
                             <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Total Staffs</div>
                         </div>
                     </img-reveal>
