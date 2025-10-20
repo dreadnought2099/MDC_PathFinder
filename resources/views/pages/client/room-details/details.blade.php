@@ -1,5 +1,5 @@
 <div
-    class="min-h-screen w-full px-4 sm:px-8 md:px-12 lg:px-16 py-6 shadow-lg space-y-12 mx-auto">
+    class="min-h-screen w-full px-4 sm:px-8 md:px-12 lg:px-16 py-6 space-y-12 mx-auto">
 
     <!-- Cover Image -->
     @if ($room->image_path)
@@ -27,7 +27,7 @@
                     @if ($room->description)
                         <div class="relative max-w-3xl">
                             <p id="roomDescription"
-                                class="text-gray-200 text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl leading-relaxed drop-shadow transition-all duration-300 max-h-16 sm:max-h-20 md:max-h-24 lg:max-h-32 overflow-hidden pr-2 scrollbar-thin scrollbar-thumb-primary relative"
+                                class="font-sofia text-gray-200 text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl leading-relaxed drop-shadow transition-all duration-300 max-h-16 sm:max-h-20 md:max-h-24 lg:max-h-32 overflow-hidden pr-2 scrollbar-thin scrollbar-thumb-primary relative"
                                 data-full-text="{{ $room->description }}">
                                 {{ $room->description }}
                             </p>
@@ -101,7 +101,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6 md:gap-8">
                 @foreach ($room->staff as $member)
                     <div
-                        class="bg-gradient-to-br from-slate-50 to-white dark:from-gray-700 dark:to-gray-800 rounded-xl shadow-md hover:shadow-xl border-2 border-primary/70 dark:border-gray-600 overflow-hidden group transform hover:scale-[1.03] transition-all duration-300 ease-out">
+                        class="bg-gradient-to-br from-slate-50 to-white dark:from-gray-700 dark:to-gray-800 rounded-xl shadow-md hover:shadow-xl border-2 border-primary dark:border-gray-600 overflow-hidden group transform hover:scale-[1.03] transition-all duration-300 ease-out">
 
                         <!-- Staff Image -->
                         <div class="cursor-pointer overflow-hidden"

@@ -111,14 +111,14 @@ const initCursor = () => {
             gsap.to(cursorDot, {
                 scale: 2,
                 backgroundColor: "#16c47f",
-                duration: 0.1,
-                ease: "none",
+                duration: 0.05, // faster response
+                ease: "power1.out", // slight ease for smoothness
             });
             gsap.to(cursorOutline, {
                 scale: 1.5,
                 borderColor: "#16c47f",
-                duration: 0.1,
-                ease: "none",
+                duration: 0.05,
+                ease: "power1.out",
             });
         });
         el.addEventListener("mouseleave", () => {
@@ -126,14 +126,14 @@ const initCursor = () => {
             gsap.to(cursorDot, {
                 scale: 1,
                 backgroundColor: "#157ee1",
-                duration: 0.1,
-                ease: "none",
+                duration: 0.05,
+                ease: "power1.out",
             });
             gsap.to(cursorOutline, {
                 scale: 1,
                 borderColor: "#157ee1",
-                duration: 0.1,
-                ease: "none",
+                duration: 0.05,
+                ease: "power1.out",
             });
         });
     };

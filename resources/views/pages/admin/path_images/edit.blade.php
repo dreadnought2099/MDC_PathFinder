@@ -64,7 +64,7 @@
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     Replace Image
                                 </label>
-                                <input type="file" name="images[{{ $image->id }}][image_file]" accept="image/*"
+                                <input type="file" name="images[{{ $index }}][image_file]" accept="image/*"
                                     class="w-full text-sm border border-primary rounded px-3 py-2 
                                       file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 
                                       file:bg-[#157ee1] fle:hover:bg-white file:text-white file:text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
