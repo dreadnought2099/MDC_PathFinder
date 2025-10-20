@@ -3,7 +3,7 @@
         <div class="flex flex-wrap gap-1 sm:gap-2 items-center">
             {{-- Previous Page Link --}}
             @if ($paginator->onFirstPage())
-                <span class="px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm text-gray-400 bg-gray-200 rounded-lg cursor-not-allowed">
+                <span class="px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm text-gray-400 bg-gray-200 rounded-lg cursor-not-allowed dark:text-gray-600">
                     Prev
                 </span>
             @else
@@ -60,7 +60,7 @@
                     Next
                 </a>
             @else
-                <span class="px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm text-gray-400 bg-gray-200 rounded-lg cursor-not-allowed">
+                <span class="px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm text-gray-400 bg-gray-200 rounded-lg cursor-not-allowed dark:text-gray-600">
                     Next
                 </span>
             @endif
