@@ -21,57 +21,76 @@
             @method('PATCH')
             <input type="hidden" name="path_id" value="{{ $path->id }}">
 
-            <!-- Images Grid -->
-            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
-                @foreach ($pathImages as $index => $image)
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 border border-primary">
-                        <input type="hidden" name="images[{{ $index }}][id]" value="{{ $image->id }}">
-
-                        <!-- Image -->
-                        <div class="relative mb-4">
-                            <img src="{{ asset('storage/' . $image->image_file) }}" alt="Image {{ $image->image_order }}"
-                                class="w-full h-48 object-cover rounded">
-
-                            <!-- Order Badge -->
-                            <div class="absolute top-2 left-2 bg-primary text-white px-2 py-1 rounded text-sm font-medium">
-                                {{ $image->image_order }}
-                            </div>
-
-                            <!-- Delete Checkbox -->
-                            <div class="absolute top-2 right-2">
-                                <label class="flex items-center bg-white rounded px-2 py-1 text-sm cursor-pointer">
-                                    <input type="checkbox" name="images[{{ $index }}][delete]" value="1"
-                                        class="text-red-600 mr-1 custom-time-input">
-                                    Delete
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Controls -->
-                        <div class="space-y-3">
-                            <!-- Order -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    Order
-                                </label>
-                                <input type="number" name="images[{{ $index }}][image_order]"
-                                    value="{{ $image->image_order }}" min="1"
-                                    class="w-full px-3 py-2 border border-primary rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
-                            </div>
-
-                            <!-- Replace File -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    Replace Image
-                                </label>
-                                <input type="file" name="images[{{ $index }}][image_file]" accept="image/*"
-                                    class="w-full text-sm border border-primary rounded px-3 py-2 
-                                      file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 
-                                      file:bg-[#157ee1] fle:hover:bg-white file:text-white file:text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
-                            </div>
+            <!-- Images Grid with Add Button -->
+            <div class="relative mb-8">
+                <!-- Add Path Image Button - Positioned at top right corner -->
+                <div class="absolute -top-3 -right-3 z-10 group">
+                    <a href="{{ route('path-image.create', $path->id) }}"
+                        class="hover-underline inline-flex items-center justify-center p-2 rounded-md hover:scale-125 transition duration-200 bg-white dark:bg-gray-800 shadow-md border border-primary">
+                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
+                            alt="Add Icon" class="block w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 object-contain">
+                    </a>
+                    <div
+                        class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
+                        Add Path Image
+                        <div
+                            class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-l-gray-900 dark:border-l-gray-700 border-t-4 border-t-transparent border-b-4 border-b-transparent">
                         </div>
                     </div>
-                @endforeach
+                </div>
+
+                <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    @foreach ($pathImages as $index => $image)
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 border border-primary">
+                            <input type="hidden" name="images[{{ $index }}][id]" value="{{ $image->id }}">
+
+                            <!-- Image -->
+                            <div class="relative mb-4">
+                                <img src="{{ asset('storage/' . $image->image_file) }}"
+                                    alt="Image {{ $image->image_order }}" class="w-full h-48 object-cover rounded">
+
+                                <!-- Order Badge -->
+                                <div
+                                    class="absolute top-2 left-2 bg-primary text-white px-2 py-1 rounded text-sm font-medium">
+                                    {{ $image->image_order }}
+                                </div>
+
+                                <!-- Delete Checkbox -->
+                                <div class="absolute top-2 right-2">
+                                    <label class="flex items-center bg-white rounded px-2 py-1 text-sm cursor-pointer dark:text-red-600">
+                                        <input type="checkbox" name="images[{{ $index }}][delete]" value="1"
+                                            class="text-red-600 mr-1 custom-time-input">
+                                        Delete
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Controls -->
+                            <div class="space-y-3">
+                                <!-- Order -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Order
+                                    </label>
+                                    <input type="number" name="images[{{ $index }}][image_order]"
+                                        value="{{ $image->image_order }}" min="1"
+                                        class="w-full px-3 py-2 border border-primary rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                                </div>
+
+                                <!-- Replace File -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Replace Image
+                                    </label>
+                                    <input type="file" name="images[{{ $index }}][image_file]" accept="image/*"
+                                        class="w-full text-sm border border-primary rounded px-3 py-2 
+                                      file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 
+                                      file:bg-[#157ee1] fle:hover:bg-white file:text-white file:text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             </div>
 
             <!-- Actions -->
