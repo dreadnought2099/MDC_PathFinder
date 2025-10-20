@@ -41,7 +41,7 @@
                                 Entrance Point
                             </option>
                         </select>
-                        <label class="{{ $labelClasses }}">Room Type</label>
+                        <label class="{{ $labelClasses }}">Select Type</label>
                         @error('room_type')
                             <span class="text-red-500 text-sm">{{ $message }}</span>
                         @enderror
