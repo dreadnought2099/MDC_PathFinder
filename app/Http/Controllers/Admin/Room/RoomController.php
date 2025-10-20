@@ -299,11 +299,38 @@ class RoomController extends Controller
             // Remove old office hours
             $room->officeHours()->delete();
 
-            // Handle room type change
+            // Handle room type change safely
             if ($oldType !== $room->room_type) {
-                Path::where('from_room_id', $room->id)
-                    ->orWhere('to_room_id', $room->id)
-                    ->delete();
+                // Force delete ALL paths for this room first
+                Path::where('from_room_id', $room->id)->forceDelete();
+                Path::where('to_room_id', $room->id)->forceDelete();
+
+                // If changing TO entrance_point, remove media files
+                if ($room->room_type === 'entrance_point') {
+                    // Delete cover image
+                    if ($room->image_path && Storage::disk('public')->exists($room->image_path)) {
+                        Storage::disk('public')->delete($room->image_path);
+                        $room->image_path = null;
+                    }
+
+                    // Delete video
+                    if ($room->video_path && Storage::disk('public')->exists($room->video_path)) {
+                        Storage::disk('public')->delete($room->video_path);
+                        $room->video_path = null;
+                    }
+
+                    // Delete all carousel images
+                    $carouselImages = $room->images()->withTrashed()->get();
+                    foreach ($carouselImages as $img) {
+                        if ($img->image_path && Storage::disk('public')->exists($img->image_path)) {
+                            Storage::disk('public')->delete($img->image_path);
+                        }
+                        $img->forceDelete();
+                    }
+
+                    // Save the changes (null image_path and video_path)
+                    $room->save();
+                }
 
                 $entranceService = app(EntrancePointService::class);
 
@@ -354,7 +381,7 @@ class RoomController extends Controller
                         'room_id' => $room->id,
                         'error' => $e->getMessage()
                     ]);
-                    throw $e;
+                    throw $e; // Re-throw to trigger rollback
                 }
             }
 
@@ -376,7 +403,7 @@ class RoomController extends Controller
                 $room->video_path = $newVideoPath;
             }
 
-            // Save any changes to room
+            // Save room changes
             $room->save();
 
             // Delete selected carousel images
@@ -417,6 +444,14 @@ class RoomController extends Controller
                         ]);
                     }
                 }
+
+                // Optional: Add failed count to success message
+                $successMessage = "{$room->name} was updated successfully.";
+                if ($failedCount > 0) {
+                    $successMessage .= " However, {$failedCount} carousel image(s) failed to upload.";
+                }
+            } else {
+                $successMessage = "{$room->name} was updated successfully.";
             }
 
             DB::commit();
@@ -425,18 +460,13 @@ class RoomController extends Controller
                 $query->withTrashed();
             }]);
 
-            $successMessage = "{$room->name} was updated successfully.";
             session()->flash('success', $successMessage);
 
-            if ($request->expectsJson()) {
-                return response()->json(['redirect' => route('room.show', $room->id)], 200);
-            }
-
-            return redirect()->route('room.show', $room->id)
-                ->with('success', $successMessage);
+            return $request->expectsJson()
+                ? response()->json(['redirect' => route('room.show', $room->id)], 200)
+                : redirect()->route('room.show', $room->id)->with('success', $successMessage);
         } catch (\Exception $e) {
             DB::rollBack();
-
             Log::error('Office update error: ' . $e->getMessage(), [
                 'room_id' => $room->id,
                 'request' => $request->except(['image_path', 'video_path', 'carousel_images'])
@@ -445,6 +475,7 @@ class RoomController extends Controller
             return back()->withInput()->with('error', 'Failed to update office: ' . $e->getMessage());
         }
     }
+
 
     public function destroy(Room $room, EntrancePointService $entrancePointService)
     {
