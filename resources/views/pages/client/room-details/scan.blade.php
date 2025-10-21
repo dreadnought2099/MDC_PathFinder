@@ -3,8 +3,7 @@
 @section('content')
     <div class="min-h-screen dark:bg-gray-900 mb-8">
         <!-- Top navigation bar with back button and dark mode toggle -->
-        <div
-            class="bg-white flex justify-between items-center p-4 mb-2 sticky top-0 z-50
+        <div class="bg-white flex justify-between items-center p-4 mb-2 sticky top-0 z-50
            dark:bg-gray-900">
 
             <!-- Left: Back button -->
@@ -183,7 +182,8 @@
 
                 async checkRoomExists(roomToken) {
                     try {
-                        this.showMessage(`Checking if room ${roomToken} exists...`, 'info');
+                        console.log('Scanned room token:', roomToken);
+                        this.showMessage(`Verifying scanned office...`, 'info');
 
                         const url = `{{ route('rooms.exists', ['token' => 'TOKEN_PLACEHOLDER']) }}`
                             .replace('TOKEN_PLACEHOLDER', roomToken);
@@ -228,7 +228,7 @@
                 onScanSuccess(decodedText) {
                     if (!this.isScanning) return;
 
-                    this.stopScanner();
+                    this.stopScanner(false);
 
                     // Just trim and pass to backend — regex is handled by route constraint
                     const roomToken = decodedText.trim();
@@ -286,13 +286,15 @@
                     }
                 }
 
-                async stopScanner() {
+                async stopScanner(showMessage = true) {
                     if (this.html5QrCode && this.isScanning) {
                         try {
                             await this.html5QrCode.stop();
                             this.html5QrCode.clear();
                             this.isScanning = false;
-                            this.showMessage("Scanner stopped.", "warning");
+                            if (showMessage) {
+                                this.showMessage("Scanner stopped.", "warning");
+                            }
                         } catch (error) {
                             console.error("Error stopping scanner:", error);
                         }

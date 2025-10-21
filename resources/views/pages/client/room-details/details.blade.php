@@ -50,9 +50,7 @@
         <!-- Fallback if no cover image -->
         <div
             class="p-4 sm:p-6 md:p-8 rounded-xl shadow-lg container mx-auto max-w-4xl border-2 border-primary dark:bg-gray-800">
-             <img src="{{ asset('images/mdc.png') }}" alt="{{ $room->name }}"
-                class="absolute inset-0 w-full h-full object-cover brightness-75 transition-transform duration-700 ease-out group-hover:scale-105 cursor-pointer"
-                {{-- onclick="openModal('{{ asset('images/mdc.png')" /> --}}
+             
             <h1
                 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-primary text-center pb-2 sm:pb-3 md:pb-4 leading-tight">
                 {{ $room->name }}
