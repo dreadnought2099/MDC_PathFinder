@@ -4,7 +4,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
     <title>{{ config('app.name') }}</title>
+
+    <meta name="description" content="@yield('description', 'MDC Pathfinder helps students, staff, and visitors locate offices across the MDC campus through clear, accessible web-based navigation.')">
+    <link rel="canonical" href="{{ url()->current() }}">
+
+    <link rel="preload" href="{{ asset('images/pathfinder-bannerv2.png') }}" as="image">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <meta http-equiv="Content-Language" content="en">
+    <meta name="author" content="Raymart Magallanes">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="@yield('og_title', config('app.name'))">
+    <meta property="og:description" content="@yield('og_description', 'MDC Pathfinder helps students, staff, and visitors locate offices across the MDC campus through clear, accessible web-based navigation.')">
+    <meta property="og:image" content="@yield('og_image', asset('images/pathfinder-bannerv2.png'))">
+    <meta property="og:url" content="{{ url()->current() }}">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@yield('twitter_title', config('app.name'))">
+    <meta name="twitter:description" content="@yield('twitter_description', 'MDC Pathfinder helps students, staff, and visitors locate offices across the MDC campus through clear, accessible web-based navigation.')">
+    <meta name="twitter:image" content="@yield('twitter_image', asset('images/pathfinder-bannerv2.png'))">
+
+    <!-- Browser Theme -->
+    <meta name="theme-color" content="#157ee1">
+    <link rel="icon" href="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Organization",
+                "@id": "{{ url('/') }}#organization",
+                "name": "MDC PathFinder",
+                "url": "{{ url('/') }}",
+                "logo": "{{ url(asset('images/mdc.png')) }}",
+                "description": "MDC Pathfinder is a web-based platform that helps students, staff, and visitors easily locate offices across the MDC campus.",
+                "sameAs": [
+                    "https://www.facebook.com/mdctubigon",
+                    "https://www.tiktok.com/@theexemplarmdc"
+                ],
+                "contactPoint": {
+                    "@type": "ContactPoint",
+                    "email": "mdc1983tub@gmail.com",
+                    "contactType": "Customer Support",
+                    "areaServed": "PH"
+                }
+            },
+            {
+                "@type": "WebSite",
+                "url": "{{ url('/') }}",
+                "name": "MDC PathFinder",
+                "description": "An interactive web-based navigation system for the MDC campus, accessible from any device.",
+                "potentialAction": {
+                    "@type": "SearchAction",
+                    "target": "{{ url('/') }}?search={query}",
+                    "query-input": "required name=query"
+                }
+            },
+            {
+                "@type": "WebApplication",
+                "name": "MDC PathFinder",
+                "operatingSystem": "All",
+                "applicationCategory": "Navigation",
+                "url": "{{ url('/') }}",
+                "browserRequirements": "Requires JavaScript and a modern web browser",
+                "featureList": [
+                    "Office locator",
+                    "QR code scanning"
+                ]
+            },
+            {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    {
+                        "@type": "ListItem",
+                        "position": 1,
+                        "name": "Home",
+                        "item": "{{ url('/') }}"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 2,
+                        "name": "About",
+                        "item": "{{ url('/about') }}"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 3,
+                        "name": "Team",
+                        "item": "{{ url('/meet-the-team') }}"
+                    }
+                ]
+            },
+            {
+                "@type": "LocalBusiness",
+                "name": "MDC Campus",
+                "image": "{{ url(asset('images/mdc.png')) }}",
+                "url": "{{ url('/') }}",
+                "address": {
+                    "@type": "PostalAddress",
+                    "streetAddress": "Cabulijan",
+                    "addressLocality": "Tubigon",
+                    "addressRegion": "Bohol",
+                    "postalCode": "6329",
+                    "addressCountry": "PH"
+                },
+                "openingHours": "Mo-Fr 08:00-17:00",
+                "priceRange": "Free"
+            },
+            {
+                "@type": "FAQPage",
+                "mainEntity": [
+                    {
+                        "@type": "Question",
+                        "name": "What is MDC PathFinder?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "MDC PathFinder is a campus navigation system that helps students, staff, and visitors easily locate offices and departments across the MDC campus."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Do I need an account to use MDC PathFinder?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "No account is required to use MDC PathFinder."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Can I access MDC PathFinder on mobile?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Yes, MDC PathFinder is fully responsive and works on all modern mobile devices."
+                        }
+                    }
+                ]
+            },
+            {
+                "@type": "WebPage",
+                "name": "MDC PathFinder - Campus Navigation System",
+                "url": "{{ url()->current() }}",
+                "description": "Navigate the MDC campus easily using MDC PathFinder.",
+                "isPartOf": { "@id": "{{ url('/') }}#organization" },
+                "primaryImageOfPage": {
+                    "@type": "ImageObject",
+                    "url": "{{ asset('images/pathfinder-bannerv2.png') }}"
+                }
+            }
+        ]
+    }
+    </script>
 
     <!-- Dark mode initialization -->
     <script>
@@ -24,7 +180,6 @@
 
     <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8"></script>
-    <link rel="icon" href="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png">
 
     <!-- GLightbox CSS -->
     <link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet">
