@@ -297,10 +297,36 @@ class RoomController extends Controller
             $room->update($roomData);
 
             // -----------------------------
-            // Office Hours
+            // Handle Room Type Changes
             // -----------------------------
-            $room->officeHours()->delete();
+            if ($oldType !== $room->room_type) {
+
+                // Delete office hours ONLY if changing TO entrance_point
+                if ($room->room_type === 'entrance_point') {
+                    $room->officeHours()->delete();
+                }
+
+                // Delete paths, media, etc. as before
+                Path::where('from_room_id', $room->id)->forceDelete();
+                Path::where('to_room_id', $room->id)->forceDelete();
+
+                if ($room->room_type === 'entrance_point') {
+                    // Delete media...
+                }
+
+                $entranceService = app(EntrancePointService::class);
+                if ($room->room_type === 'entrance_point') {
+                    $entranceService->reconnectEntrancePoint($room);
+                } else {
+                    $entranceService->connectNewRoomToAllRooms($room);
+                }
+            }
+
+            // -----------------------------
+            // Handle Office Hours submission
+            // -----------------------------
             if ($request->has('office_hours')) {
+                $room->officeHours()->delete(); // delete previous ones
                 foreach ($request->office_hours as $day => $ranges) {
                     foreach ($ranges as $range) {
                         if (!empty($range['start']) && !empty($range['end'])) {
@@ -311,41 +337,6 @@ class RoomController extends Controller
                             ]);
                         }
                     }
-                }
-            }
-
-            // -----------------------------
-            // Handle Room Type Changes
-            // -----------------------------
-            if ($oldType !== $room->room_type) {
-                Path::where('from_room_id', $room->id)->forceDelete();
-                Path::where('to_room_id', $room->id)->forceDelete();
-
-                if ($room->room_type === 'entrance_point') {
-                    // Delete all media
-                    if ($room->image_path && Storage::disk('public')->exists($room->image_path)) {
-                        Storage::disk('public')->delete($room->image_path);
-                        $room->image_path = null;
-                    }
-                    if ($room->video_path && Storage::disk('public')->exists($room->video_path)) {
-                        Storage::disk('public')->delete($room->video_path);
-                        $room->video_path = null;
-                    }
-                    $carouselImages = $room->images()->withTrashed()->get();
-                    foreach ($carouselImages as $img) {
-                        if ($img->image_path && Storage::disk('public')->exists($img->image_path)) {
-                            Storage::disk('public')->delete($img->image_path);
-                        }
-                        $img->forceDelete();
-                    }
-                    $room->save();
-                }
-
-                $entranceService = app(EntrancePointService::class);
-                if ($room->room_type === 'entrance_point') {
-                    $entranceService->reconnectEntrancePoint($room);
-                } else {
-                    $entranceService->connectNewRoomToAllRooms($room);
                 }
             }
 
