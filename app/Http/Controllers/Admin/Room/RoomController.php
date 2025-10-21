@@ -296,52 +296,10 @@ class RoomController extends Controller
             $roomData = collect($validated)->except('office_hours')->toArray();
             $room->update($roomData);
 
-            // Remove old office hours
+            // -----------------------------
+            // Office Hours
+            // -----------------------------
             $room->officeHours()->delete();
-
-            // Handle room type change safely
-            if ($oldType !== $room->room_type) {
-                // Force delete ALL paths for this room first
-                Path::where('from_room_id', $room->id)->forceDelete();
-                Path::where('to_room_id', $room->id)->forceDelete();
-
-                // If changing TO entrance_point, remove media files
-                if ($room->room_type === 'entrance_point') {
-                    // Delete cover image
-                    if ($room->image_path && Storage::disk('public')->exists($room->image_path)) {
-                        Storage::disk('public')->delete($room->image_path);
-                        $room->image_path = null;
-                    }
-
-                    // Delete video
-                    if ($room->video_path && Storage::disk('public')->exists($room->video_path)) {
-                        Storage::disk('public')->delete($room->video_path);
-                        $room->video_path = null;
-                    }
-
-                    // Delete all carousel images
-                    $carouselImages = $room->images()->withTrashed()->get();
-                    foreach ($carouselImages as $img) {
-                        if ($img->image_path && Storage::disk('public')->exists($img->image_path)) {
-                            Storage::disk('public')->delete($img->image_path);
-                        }
-                        $img->forceDelete();
-                    }
-
-                    // Save the changes (null image_path and video_path)
-                    $room->save();
-                }
-
-                $entranceService = app(EntrancePointService::class);
-
-                if ($room->room_type === 'entrance_point') {
-                    $entranceService->reconnectEntrancePoint($room);
-                } else {
-                    $entranceService->connectNewRoomToAllRooms($room);
-                }
-            }
-
-            // Save new office hours
             if ($request->has('office_hours')) {
                 foreach ($request->office_hours as $day => $ranges) {
                     foreach ($ranges as $range) {
@@ -356,57 +314,95 @@ class RoomController extends Controller
                 }
             }
 
-            // Handle main image removal
-            if ($request->input('remove_image_path') && $room->image_path) {
-                if (Storage::disk('public')->exists($room->image_path)) {
-                    Storage::disk('public')->delete($room->image_path);
+            // -----------------------------
+            // Handle Room Type Changes
+            // -----------------------------
+            if ($oldType !== $room->room_type) {
+                Path::where('from_room_id', $room->id)->forceDelete();
+                Path::where('to_room_id', $room->id)->forceDelete();
+
+                if ($room->room_type === 'entrance_point') {
+                    // Delete all media
+                    if ($room->image_path && Storage::disk('public')->exists($room->image_path)) {
+                        Storage::disk('public')->delete($room->image_path);
+                        $room->image_path = null;
+                    }
+                    if ($room->video_path && Storage::disk('public')->exists($room->video_path)) {
+                        Storage::disk('public')->delete($room->video_path);
+                        $room->video_path = null;
+                    }
+                    $carouselImages = $room->images()->withTrashed()->get();
+                    foreach ($carouselImages as $img) {
+                        if ($img->image_path && Storage::disk('public')->exists($img->image_path)) {
+                            Storage::disk('public')->delete($img->image_path);
+                        }
+                        $img->forceDelete();
+                    }
+                    $room->save();
                 }
-                $room->image_path = null;
+
+                $entranceService = app(EntrancePointService::class);
+                if ($room->room_type === 'entrance_point') {
+                    $entranceService->reconnectEntrancePoint($room);
+                } else {
+                    $entranceService->connectNewRoomToAllRooms($room);
+                }
             }
 
-            // Update cover image - Convert to WebP
-            if ($request->hasFile('image_path')) {
+            // -----------------------------
+            // Handle Cover Image
+            // -----------------------------
+            if ($request->input('remove_image_path') || $request->hasFile('image_path')) {
                 if ($room->image_path && Storage::disk('public')->exists($room->image_path)) {
                     Storage::disk('public')->delete($room->image_path);
                 }
 
-                try {
-                    $webpPath = $this->convertToWebP(
-                        $request->file('image_path'),
-                        "offices/{$room->id}/cover_images"
-                    );
-                    $room->image_path = $webpPath;
-                } catch (\Exception $e) {
-                    Log::error('Cover image WebP conversion failed', [
-                        'room_id' => $room->id,
-                        'error' => $e->getMessage()
-                    ]);
-                    throw $e; // Re-throw to trigger rollback
+                if ($request->input('remove_image_path') && !$request->hasFile('image_path')) {
+                    $room->image_path = null;
                 }
+
+                if ($request->hasFile('image_path')) {
+                    try {
+                        $webpPath = $this->convertToWebP(
+                            $request->file('image_path'),
+                            "offices/{$room->id}/cover_images"
+                        );
+                        $room->image_path = $webpPath;
+                    } catch (\Exception $e) {
+                        Log::error('Cover image WebP conversion failed', [
+                            'room_id' => $room->id,
+                            'error' => $e->getMessage()
+                        ]);
+                        throw $e;
+                    }
+                }
+
+                $room->save();
             }
 
-            // Handle video removal
-            if ($request->input('remove_video_path') && $room->video_path) {
-                if (Storage::disk('public')->exists($room->video_path)) {
-                    Storage::disk('public')->delete($room->video_path);
-                }
-                $room->video_path = null;
-            }
-
-            // Update video
-            if ($request->hasFile('video_path')) {
+            // -----------------------------
+            // Handle Video
+            // -----------------------------
+            if ($request->input('remove_video_path') || $request->hasFile('video_path')) {
                 if ($room->video_path && Storage::disk('public')->exists($room->video_path)) {
                     Storage::disk('public')->delete($room->video_path);
                 }
 
-                $newVideoPath = $request->file('video_path')->store("offices/{$room->id}/videos", 'public');
-                $room->video_path = $newVideoPath;
+                if ($request->input('remove_video_path') && !$request->hasFile('video_path')) {
+                    $room->video_path = null;
+                }
+
+                if ($request->hasFile('video_path')) {
+                    $newVideoPath = $request->file('video_path')->store("offices/{$room->id}/videos", 'public');
+                    $room->video_path = $newVideoPath;
+                }
+
+                $room->save();
             }
 
-            // Save room changes
-            $room->save();
-
-            // Delete selected carousel images
+            // -----------------------------
+            // Handle Carousel Images
+            // -----------------------------
             if ($request->filled('remove_images')) {
                 $images = RoomImage::whereIn('id', $request->remove_images)->get();
                 foreach ($images as $img) {
@@ -417,7 +413,6 @@ class RoomController extends Controller
                 }
             }
 
-            // Add new carousel images - Convert to WebP
             if ($request->hasFile('carousel_images')) {
                 $uploadedCount = 0;
                 $failedCount = 0;
@@ -445,7 +440,6 @@ class RoomController extends Controller
                     }
                 }
 
-                // Optional: Add failed count to success message
                 $successMessage = "{$room->name} was updated successfully.";
                 if ($failedCount > 0) {
                     $successMessage .= " However, {$failedCount} carousel image(s) failed to upload.";
@@ -475,7 +469,6 @@ class RoomController extends Controller
             return back()->withInput()->with('error', 'Failed to update office: ' . $e->getMessage());
         }
     }
-
 
     public function destroy(Room $room, EntrancePointService $entrancePointService)
     {

@@ -57,7 +57,7 @@
 
                                 <!-- Delete Checkbox -->
                                 <div class="absolute top-2 right-2">
-                                    <label class="flex items-center bg-white rounded px-2 py-1 text-sm cursor-pointer dark:text-red-600">
+                                    <label class="flex items-center bg-white rounded px-2 py-1 text-sm cursor-pointer text-red-600">
                                         <input type="checkbox" name="images[{{ $index }}][delete]" value="1"
                                             class="text-red-600 mr-1 custom-time-input">
                                         Delete

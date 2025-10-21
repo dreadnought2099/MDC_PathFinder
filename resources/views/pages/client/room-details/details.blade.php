@@ -1,6 +1,6 @@
-<div
-    class="min-h-screen w-full px-4 sm:px-8 md:px-12 lg:px-16 py-6 space-y-12 mx-auto">
-
+<div class="min-h-screen w-full px-4 sm:px-8 md:px-12 lg:px-16 py-6 space-y-12 mx-auto">
+    <x-floating-qr />
+    
     <!-- Cover Image -->
     @if ($room->image_path)
         <section
@@ -50,12 +50,15 @@
         <!-- Fallback if no cover image -->
         <div
             class="p-4 sm:p-6 md:p-8 rounded-xl shadow-lg container mx-auto max-w-4xl border-2 border-primary dark:bg-gray-800">
+             <img src="{{ asset('images/mdc.png') }}" alt="{{ $room->name }}"
+                class="absolute inset-0 w-full h-full object-cover brightness-75 transition-transform duration-700 ease-out group-hover:scale-105 cursor-pointer"
+                {{-- onclick="openModal('{{ asset('images/mdc.png')" /> --}}
             <h1
                 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-primary text-center pb-2 sm:pb-3 md:pb-4 leading-tight">
                 {{ $room->name }}
             </h1>
             @if ($room->description)
-                <p class="text-xs sm:text-sm md:text-base lg:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+                <p class="font-sofia text-xs sm:text-sm md:text-base lg:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
                     {{ $room->description }}
                 </p>
             @endif
@@ -182,15 +185,6 @@
             <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 italic">{{ $fact }}</p>
         </div>
     @endif
-
-    <!-- Scan Another QR Code Button -->
-    <div class="text-center pt-8 border-t border-primary">
-        <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-300 mb-3">Want to explore another office?</p>
-        <a href="{{ route('scan.index') }}"
-            class="inline-block text-xs sm:text-sm md:text-base bg-primary hover:bg-white hover:text-primary text-white py-2 sm:py-3 px-4 sm:px-6 rounded-md border border-primary transition-all duration-300 dark:hover:bg-gray-800 shadow-primary-hover">
-            Scan Another QR Code
-        </a>
-    </div>
 </div>
 
 <!-- Reusable Image Modal Markup -->
