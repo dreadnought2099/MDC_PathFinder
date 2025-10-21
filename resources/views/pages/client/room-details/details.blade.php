@@ -7,9 +7,10 @@
             class="relative w-full h-[400px] sm:h-[500px] md:h-[600px] rounded-2xl shadow-xl border-2 border-primary mb-12 group transition-all duration-700 ease-out overflow-hidden">
 
             <!-- Background Image -->
-            <img src="{{ Storage::url($room->image_path) }}" alt="{{ $room->name }}"
+            <img src="{{ $room->image_path && Storage::exists($room->image_path) ? Storage::url($room->image_path) : asset('images/mdc.png') }}"
+                alt="{{ $room->name }}"
                 class="absolute inset-0 w-full h-full object-cover brightness-75 transition-transform duration-700 ease-out group-hover:scale-105 cursor-pointer"
-                onclick="openModal('{{ asset('storage/' . $room->image_path) }}')" />
+                onclick="openModal('{{ $room->image_path && Storage::exists($room->image_path) ? asset('storage/' . $room->image_path) : asset('images/mdc.png') }}')" />
 
             <!-- Gradient Overlay -->
             <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent pointer-events-none">
@@ -48,20 +49,50 @@
         </section>
     @else
         <!-- Fallback if no cover image -->
-        <div
-            class="p-4 sm:p-6 md:p-8 rounded-xl shadow-lg container mx-auto max-w-4xl border-2 border-primary dark:bg-gray-800">
+        <section
+            class="relative w-full h-[400px] sm:h-[500px] md:h-[600px] rounded-2xl shadow-xl border-2 border-primary mb-12 group transition-all duration-700 ease-out overflow-hidden">
 
-            <h1
-                class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-primary text-center pb-2 sm:pb-3 md:pb-4 leading-tight">
-                {{ $room->name }}
-            </h1>
-            @if ($room->description)
-                <p
-                    class="font-sofia text-xs sm:text-sm md:text-base lg:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-                    {{ $room->description }}
-                </p>
-            @endif
-        </div>
+            <!-- Fallback Background -->
+            <img src="{{ asset('images/mdc.png') }}" alt="{{ $room->name }}"
+                class="absolute inset-0 w-full h-full object-cover brightness-75 transition-transform duration-700 ease-out group-hover:scale-105 cursor-pointer"
+                onclick="openModal('{{ asset('images/mdc.png') }}')" />
+
+            <!-- Gradient Overlay -->
+            <div
+                class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent pointer-events-none">
+            </div>
+
+            <!-- Overlay Content -->
+            <div
+                class="absolute bottom-0 left-0 right-0 top-0 flex flex-col justify-end p-4 sm:p-8 md:p-12 text-white pointer-events-none">
+                <div class="space-y-3 sm:space-y-4 max-w-3xl pointer-events-auto">
+                    <h1
+                        class="text-transparent bg-clip-text bg-gradient-to-tr from-blue-300 to-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold drop-shadow-2xl leading-tight">
+                        {{ $room->name }}
+                    </h1>
+
+                    @if ($room->description)
+                        <div class="relative max-w-3xl">
+                            <p id="roomDescription"
+                                class="font-sofia text-gray-200 text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl leading-relaxed drop-shadow transition-all duration-300 max-h-16 sm:max-h-20 md:max-h-24 lg:max-h-32 overflow-hidden pr-2 scrollbar-thin scrollbar-thumb-primary relative"
+                                data-full-text="{{ $room->description }}">
+                                {{ $room->description }}
+                            </p>
+
+                            <!-- Fade overlay -->
+                            <div id="fadeOverlay"
+                                class="pointer-events-none absolute bottom-0 left-0 w-full h-8 sm:h-10 md:h-12 bg-gradient-to-t from-black/70 via-black/0 to-transparent transition-opacity duration-300">
+                            </div>
+
+                            <button id="toggleDescriptionBtn"
+                                class="mt-2 text-xs sm:text-sm md:text-base text-transparent bg-clip-text bg-gradient-to-tr from-blue-300 to-white font-semibold hover-underline focus:outline-none">
+                                See more
+                            </button>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </section>
     @endif
 
     <!-- Video -->
