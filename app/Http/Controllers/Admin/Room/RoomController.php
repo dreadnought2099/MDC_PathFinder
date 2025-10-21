@@ -300,18 +300,34 @@ class RoomController extends Controller
             // Handle Room Type Changes
             // -----------------------------
             if ($oldType !== $room->room_type) {
-
                 // Delete office hours ONLY if changing TO entrance_point
                 if ($room->room_type === 'entrance_point') {
                     $room->officeHours()->delete();
                 }
 
-                // Delete paths, media, etc. as before
+                // Delete paths
                 Path::where('from_room_id', $room->id)->forceDelete();
                 Path::where('to_room_id', $room->id)->forceDelete();
 
+                // Delete media if changing to entrance_point
                 if ($room->room_type === 'entrance_point') {
-                    // Delete media...
+                    if ($room->image_path && Storage::disk('public')->exists($room->image_path)) {
+                        Storage::disk('public')->delete($room->image_path);
+                        $room->image_path = null;
+                    }
+                    if ($room->video_path && Storage::disk('public')->exists($room->video_path)) {
+                        Storage::disk('public')->delete($room->video_path);
+                        $room->video_path = null;
+                    }
+
+                    $carouselImages = $room->images()->withTrashed()->get();
+                    foreach ($carouselImages as $img) {
+                        if ($img->image_path && Storage::disk('public')->exists($img->image_path)) {
+                            Storage::disk('public')->delete($img->image_path);
+                        }
+                        $img->forceDelete();
+                    }
+                    $room->save();
                 }
 
                 $entranceService = app(EntrancePointService::class);
@@ -323,18 +339,25 @@ class RoomController extends Controller
             }
 
             // -----------------------------
-            // Handle Office Hours submission
+            // Handle Office Hours
             // -----------------------------
-            if ($request->has('office_hours')) {
-                $room->officeHours()->delete(); // delete previous ones
-                foreach ($request->office_hours as $day => $ranges) {
-                    foreach ($ranges as $range) {
-                        if (!empty($range['start']) && !empty($range['end'])) {
-                            $room->officeHours()->create([
-                                'day' => $day,
-                                'start_time' => $range['start'],
-                                'end_time' => $range['end'],
-                            ]);
+            if ($oldType !== $room->room_type && $room->room_type === 'entrance_point') {
+                // Already deleted above
+            } else {
+                // Always clear old office hours first
+                $room->officeHours()->delete();
+
+                // Reinsert new ones only if provided
+                if ($request->filled('office_hours')) {
+                    foreach ($request->office_hours as $day => $ranges) {
+                        foreach ($ranges as $range) {
+                            if (!empty($range['start']) && !empty($range['end'])) {
+                                $room->officeHours()->create([
+                                    'day' => $day,
+                                    'start_time' => $range['start'],
+                                    'end_time' => $range['end'],
+                                ]);
+                            }
                         }
                     }
                 }
@@ -353,19 +376,11 @@ class RoomController extends Controller
                 }
 
                 if ($request->hasFile('image_path')) {
-                    try {
-                        $webpPath = $this->convertToWebP(
-                            $request->file('image_path'),
-                            "offices/{$room->id}/cover_images"
-                        );
-                        $room->image_path = $webpPath;
-                    } catch (\Exception $e) {
-                        Log::error('Cover image WebP conversion failed', [
-                            'room_id' => $room->id,
-                            'error' => $e->getMessage()
-                        ]);
-                        throw $e;
-                    }
+                    $webpPath = $this->convertToWebP(
+                        $request->file('image_path'),
+                        "offices/{$room->id}/cover_images"
+                    );
+                    $room->image_path = $webpPath;
                 }
 
                 $room->save();
@@ -405,51 +420,28 @@ class RoomController extends Controller
             }
 
             if ($request->hasFile('carousel_images')) {
-                $uploadedCount = 0;
-                $failedCount = 0;
-
                 foreach ($request->file('carousel_images') as $carouselImage) {
-                    try {
-                        $webpPath = $this->convertToWebP(
-                            $carouselImage,
-                            "offices/{$room->id}/carousel"
-                        );
+                    $webpPath = $this->convertToWebP(
+                        $carouselImage,
+                        "offices/{$room->id}/carousel"
+                    );
 
-                        RoomImage::create([
-                            'room_id' => $room->id,
-                            'image_path' => $webpPath
-                        ]);
-
-                        $uploadedCount++;
-                    } catch (\Exception $e) {
-                        $failedCount++;
-                        Log::error('Carousel image WebP conversion failed', [
-                            'room_id' => $room->id,
-                            'file' => $carouselImage->getClientOriginalName(),
-                            'error' => $e->getMessage()
-                        ]);
-                    }
+                    RoomImage::create([
+                        'room_id' => $room->id,
+                        'image_path' => $webpPath
+                    ]);
                 }
-
-                $successMessage = "{$room->name} was updated successfully.";
-                if ($failedCount > 0) {
-                    $successMessage .= " However, {$failedCount} carousel image(s) failed to upload.";
-                }
-            } else {
-                $successMessage = "{$room->name} was updated successfully.";
             }
 
             DB::commit();
 
-            $room->load(['images' => function ($query) {
-                $query->withTrashed();
-            }]);
+            $room->load(['images' => fn($q) => $q->withTrashed()]);
 
-            session()->flash('success', $successMessage);
+            session()->flash('success', "{$room->name} was updated successfully.");
 
             return $request->expectsJson()
                 ? response()->json(['redirect' => route('room.show', $room->id)], 200)
-                : redirect()->route('room.show', $room->id)->with('success', $successMessage);
+                : redirect()->route('room.show', $room->id)->with('success', "{$room->name} was updated successfully.");
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Office update error: ' . $e->getMessage(), [
