@@ -1,6 +1,6 @@
 <div class="min-h-screen w-full px-4 sm:px-8 md:px-12 lg:px-16 py-6 space-y-12 mx-auto">
     <x-floating-qr />
-    
+
     <!-- Cover Image -->
     @if ($room->image_path)
         <section
@@ -50,13 +50,14 @@
         <!-- Fallback if no cover image -->
         <div
             class="p-4 sm:p-6 md:p-8 rounded-xl shadow-lg container mx-auto max-w-4xl border-2 border-primary dark:bg-gray-800">
-             
+
             <h1
                 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-primary text-center pb-2 sm:pb-3 md:pb-4 leading-tight">
                 {{ $room->name }}
             </h1>
             @if ($room->description)
-                <p class="font-sofia text-xs sm:text-sm md:text-base lg:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+                <p
+                    class="font-sofia text-xs sm:text-sm md:text-base lg:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
                     {{ $room->description }}
                 </p>
             @endif
@@ -211,6 +212,54 @@
 </div>
 
 <script>
+    function openModal(src) {
+        const modal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        modalImage.src = src;
+        modal.classList.remove('hidden');
+
+        modalImage.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = modalImage.naturalWidth;
+            canvas.height = modalImage.naturalHeight;
+            ctx.drawImage(modalImage, 0, 0);
+
+            canvas.toBlob((blob) => {
+                const pngUrl = URL.createObjectURL(blob);
+                downloadBtn.href = pngUrl;
+                downloadBtn.download = 'image.png';
+            }, 'image/png');
+        };
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        modal.classList.add('hidden');
+        modalImage.src = '';
+    }
+
+    // Close modal when clicking outside the image
+    document.addEventListener('click', (e) => {
+        const modal = document.getElementById('imageModal');
+        if (!modal.classList.contains('hidden') && e.target === modal) {
+            closeModal();
+        }
+    });
+
+    // ✅ Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('imageModal');
+            if (!modal.classList.contains('hidden')) {
+                closeModal();
+            }
+        }
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
         const desc = document.getElementById('roomDescription');
         const btn = document.getElementById('toggleDescriptionBtn');
@@ -251,48 +300,6 @@
                 overlay.style.opacity = 1;
                 btn.textContent = 'See more';
             }
-        });
-
-        function openModal(src) {
-            const modal = document.getElementById('imageModal');
-            const modalImage = document.getElementById('modalImage');
-            const downloadBtn = document.getElementById('downloadBtn');
-
-            modalImage.src = src;
-            modal.classList.remove('hidden');
-
-            // When image finishes loading, prepare PNG download
-            modalImage.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = modalImage.naturalWidth;
-                canvas.height = modalImage.naturalHeight;
-                ctx.drawImage(modalImage, 0, 0);
-
-                // Convert to PNG blob and set as downloadable link
-                canvas.toBlob((blob) => {
-                    const pngUrl = URL.createObjectURL(blob);
-                    downloadBtn.href = pngUrl;
-                    downloadBtn.download = 'image.png';
-                }, 'image/png');
-            };
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('imageModal');
-            const modalImage = document.getElementById('modalImage');
-            modal.classList.add('hidden');
-            modalImage.src = '';
-        }
-
-        // Expose functions globally
-        window.openModal = openModal;
-        window.closeModal = closeModal;
-
-        // Click outside image to close
-        const modal = document.getElementById('imageModal');
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
         });
     });
 </script>
