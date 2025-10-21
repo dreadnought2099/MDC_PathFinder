@@ -2,98 +2,53 @@
     <x-floating-qr />
 
     <!-- Cover Image -->
-    @if ($room->image_path)
-        <section
-            class="relative w-full h-[400px] sm:h-[500px] md:h-[600px] rounded-2xl shadow-xl border-2 border-primary mb-12 group transition-all duration-700 ease-out overflow-hidden">
+    <section
+        class="relative w-full h-[400px] sm:h-[500px] md:h-[600px] rounded-2xl shadow-xl border-2 border-primary mb-12 group transition-all duration-700 ease-out overflow-hidden">
 
-            <!-- Background Image -->
-            <img src="{{ $room->image_path && Storage::exists($room->image_path) ? Storage::url($room->image_path) : asset('images/mdc.png') }}"
-                alt="{{ $room->name }}"
-                class="absolute inset-0 w-full h-full object-cover brightness-75 transition-transform duration-700 ease-out group-hover:scale-105 cursor-pointer"
-                onclick="openModal('{{ $room->image_path && Storage::exists($room->image_path) ? asset('storage/' . $room->image_path) : asset('images/mdc.png') }}')" />
+        @php
+            $hasImage = $room->image_path && Storage::exists('public/' . $room->image_path);
+            $imageSrc = $hasImage ? Storage::url($room->image_path) : asset('images/mdc.png');
+        @endphp
 
-            <!-- Gradient Overlay -->
-            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent pointer-events-none">
-            </div>
+        <img src="{{ $room->image_path ? Storage::url($room->image_path) : asset('images/mdc.png') }}"
+            alt="{{ $room->name }}"
+            class="absolute inset-0 w-full h-full object-cover brightness-75 transition-transform duration-700 ease-out group-hover:scale-105 cursor-pointer"
+            onclick="openModal('{{ $room->image_path ? Storage::url($room->image_path) : asset('images/mdc.png') }}')" />
 
-            <!-- Overlay Content -->
-            <div
-                class="absolute bottom-0 left-0 right-0 top-0 flex flex-col justify-end p-4 sm:p-8 md:p-12 text-white pointer-events-none">
-                <div class="space-y-3 sm:space-y-4 max-w-3xl pointer-events-auto">
-                    <h1
-                        class="text-transparent bg-clip-text bg-gradient-to-tr from-blue-300 to-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold drop-shadow-2xl leading-tight">
-                        {{ $room->name }}
-                    </h1>
+        <!-- Gradient Overlay -->
+        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent pointer-events-none">
+        </div>
 
-                    @if ($room->description)
-                        <div class="relative max-w-3xl">
-                            <p id="roomDescription"
-                                class="font-sofia text-gray-200 text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl leading-relaxed drop-shadow transition-all duration-300 max-h-16 sm:max-h-20 md:max-h-24 lg:max-h-32 overflow-hidden pr-2 scrollbar-thin scrollbar-thumb-primary relative"
-                                data-full-text="{{ $room->description }}">
-                                {{ $room->description }}
-                            </p>
+        <!-- Overlay Content -->
+        <div
+            class="absolute bottom-0 left-0 right-0 top-0 flex flex-col justify-end p-4 sm:p-8 md:p-12 text-white pointer-events-none">
+            <div class="space-y-3 sm:space-y-4 max-w-3xl pointer-events-auto">
+                <h1
+                    class="text-transparent bg-clip-text bg-gradient-to-tr from-blue-300 to-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold drop-shadow-2xl leading-tight">
+                    {{ $room->name }}
+                </h1>
 
-                            <!-- Fade overlay -->
-                            <div id="fadeOverlay"
-                                class="pointer-events-none absolute bottom-0 left-0 w-full h-8 sm:h-10 md:h-12 bg-gradient-to-t from-black/70 via-black/0 to-transparent transition-opacity duration-300">
-                            </div>
+                @if ($room->description)
+                    <div class="relative max-w-3xl">
+                        <p id="roomDescription"
+                            class="font-sofia text-gray-200 text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl leading-relaxed drop-shadow transition-all duration-300 max-h-16 sm:max-h-20 md:max-h-24 lg:max-h-32 overflow-hidden pr-2 scrollbar-thin scrollbar-thumb-primary relative"
+                            data-full-text="{{ $room->description }}">
+                            {{ $room->description }}
+                        </p>
 
-                            <button id="toggleDescriptionBtn"
-                                class="mt-2 text-xs sm:text-sm md:text-base text-transparent bg-clip-text bg-gradient-to-tr from-blue-300 to-white font-semibold hover-underline focus:outline-none">
-                                See more
-                            </button>
+                        <div id="fadeOverlay"
+                            class="pointer-events-none absolute bottom-0 left-0 w-full h-8 sm:h-10 md:h-12 bg-gradient-to-t from-black/70 via-black/0 to-transparent transition-opacity duration-300">
                         </div>
-                    @endif
-                </div>
+
+                        <button id="toggleDescriptionBtn"
+                            class="mt-2 text-xs sm:text-sm md:text-base text-transparent bg-clip-text bg-gradient-to-tr from-blue-300 to-white font-semibold hover-underline focus:outline-none">
+                            See more
+                        </button>
+                    </div>
+                @endif
             </div>
-        </section>
-    @else
-        <!-- Fallback if no cover image -->
-        <section
-            class="relative w-full h-[400px] sm:h-[500px] md:h-[600px] rounded-2xl shadow-xl border-2 border-primary mb-12 group transition-all duration-700 ease-out overflow-hidden">
-
-            <!-- Fallback Background -->
-            <img src="{{ asset('images/mdc.png') }}" alt="{{ $room->name }}"
-                class="absolute inset-0 w-full h-full object-cover brightness-75 transition-transform duration-700 ease-out group-hover:scale-105 cursor-pointer"
-                onclick="openModal('{{ asset('images/mdc.png') }}')" />
-
-            <!-- Gradient Overlay -->
-            <div
-                class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent pointer-events-none">
-            </div>
-
-            <!-- Overlay Content -->
-            <div
-                class="absolute bottom-0 left-0 right-0 top-0 flex flex-col justify-end p-4 sm:p-8 md:p-12 text-white pointer-events-none">
-                <div class="space-y-3 sm:space-y-4 max-w-3xl pointer-events-auto">
-                    <h1
-                        class="text-transparent bg-clip-text bg-gradient-to-tr from-blue-300 to-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold drop-shadow-2xl leading-tight">
-                        {{ $room->name }}
-                    </h1>
-
-                    @if ($room->description)
-                        <div class="relative max-w-3xl">
-                            <p id="roomDescription"
-                                class="font-sofia text-gray-200 text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl leading-relaxed drop-shadow transition-all duration-300 max-h-16 sm:max-h-20 md:max-h-24 lg:max-h-32 overflow-hidden pr-2 scrollbar-thin scrollbar-thumb-primary relative"
-                                data-full-text="{{ $room->description }}">
-                                {{ $room->description }}
-                            </p>
-
-                            <!-- Fade overlay -->
-                            <div id="fadeOverlay"
-                                class="pointer-events-none absolute bottom-0 left-0 w-full h-8 sm:h-10 md:h-12 bg-gradient-to-t from-black/70 via-black/0 to-transparent transition-opacity duration-300">
-                            </div>
-
-                            <button id="toggleDescriptionBtn"
-                                class="mt-2 text-xs sm:text-sm md:text-base text-transparent bg-clip-text bg-gradient-to-tr from-blue-300 to-white font-semibold hover-underline focus:outline-none">
-                                See more
-                            </button>
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </section>
-    @endif
+        </div>
+    </section>
 
     <!-- Video -->
     @if ($room->video_path)
@@ -242,95 +197,97 @@
     <img id="modalImage" src="" alt="Full Image" class="max-w-full max-h-full rounded-md shadow-lg" />
 </div>
 
-<script>
-    function openModal(src) {
-        const modal = document.getElementById('imageModal');
-        const modalImage = document.getElementById('modalImage');
-        const downloadBtn = document.getElementById('downloadBtn');
-
-        modalImage.src = src;
-        modal.classList.remove('hidden');
-
-        modalImage.onload = () => {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = modalImage.naturalWidth;
-            canvas.height = modalImage.naturalHeight;
-            ctx.drawImage(modalImage, 0, 0);
-
-            canvas.toBlob((blob) => {
-                const pngUrl = URL.createObjectURL(blob);
-                downloadBtn.href = pngUrl;
-                downloadBtn.download = 'image.png';
-            }, 'image/png');
-        };
-    }
-
-    function closeModal() {
-        const modal = document.getElementById('imageModal');
-        const modalImage = document.getElementById('modalImage');
-        modal.classList.add('hidden');
-        modalImage.src = '';
-    }
-
-    // Close modal when clicking outside the image
-    document.addEventListener('click', (e) => {
-        const modal = document.getElementById('imageModal');
-        if (!modal.classList.contains('hidden') && e.target === modal) {
-            closeModal();
-        }
-    });
-
-    // ✅ Close modal on Escape key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
+@push('scripts')
+    <script>
+        function openModal(src) {
             const modal = document.getElementById('imageModal');
-            if (!modal.classList.contains('hidden')) {
+            const modalImage = document.getElementById('modalImage');
+            const downloadBtn = document.getElementById('downloadBtn');
+
+            modalImage.src = src;
+            modal.classList.remove('hidden');
+
+            modalImage.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = modalImage.naturalWidth;
+                canvas.height = modalImage.naturalHeight;
+                ctx.drawImage(modalImage, 0, 0);
+
+                canvas.toBlob((blob) => {
+                    const pngUrl = URL.createObjectURL(blob);
+                    downloadBtn.href = pngUrl;
+                    downloadBtn.download = 'image.png';
+                }, 'image/png');
+            };
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            modal.classList.add('hidden');
+            modalImage.src = '';
+        }
+
+        // Close modal when clicking outside the image
+        document.addEventListener('click', (e) => {
+            const modal = document.getElementById('imageModal');
+            if (!modal.classList.contains('hidden') && e.target === modal) {
                 closeModal();
             }
-        }
-    });
+        });
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const desc = document.getElementById('roomDescription');
-        const btn = document.getElementById('toggleDescriptionBtn');
-        const overlay = document.getElementById('fadeOverlay');
-
-        if (!desc || !btn || !overlay) return;
-
-        const fullText = desc.dataset.fullText.trim();
-        desc.textContent = fullText;
-
-        function isOverflowing(el) {
-            return el.scrollHeight > el.clientHeight;
-        }
-
-        if (!isOverflowing(desc)) {
-            btn.style.display = 'none';
-            overlay.style.display = 'none';
-            return;
-        }
-
-        let expanded = false;
-
-        btn.addEventListener('click', () => {
-            expanded = !expanded;
-
-            if (expanded) {
-                desc.classList.remove('max-h-16', 'sm:max-h-20', 'md:max-h-24', 'lg:max-h-32',
-                    'overflow-hidden');
-                desc.classList.add('overflow-y-auto');
-                desc.style.maxHeight = '200px';
-                overlay.style.opacity = 0;
-                btn.textContent = 'See less';
-            } else {
-                desc.classList.remove('overflow-y-auto');
-                desc.classList.add('max-h-16', 'sm:max-h-20', 'md:max-h-24', 'lg:max-h-32',
-                    'overflow-hidden');
-                desc.style.maxHeight = null;
-                overlay.style.opacity = 1;
-                btn.textContent = 'See more';
+        // ✅ Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('imageModal');
+                if (!modal.classList.contains('hidden')) {
+                    closeModal();
+                }
             }
         });
-    });
-</script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const desc = document.getElementById('roomDescription');
+            const btn = document.getElementById('toggleDescriptionBtn');
+            const overlay = document.getElementById('fadeOverlay');
+
+            if (!desc || !btn || !overlay) return;
+
+            const fullText = desc.dataset.fullText.trim();
+            desc.textContent = fullText;
+
+            function isOverflowing(el) {
+                return el.scrollHeight > el.clientHeight;
+            }
+
+            if (!isOverflowing(desc)) {
+                btn.style.display = 'none';
+                overlay.style.display = 'none';
+                return;
+            }
+
+            let expanded = false;
+
+            btn.addEventListener('click', () => {
+                expanded = !expanded;
+
+                if (expanded) {
+                    desc.classList.remove('max-h-16', 'sm:max-h-20', 'md:max-h-24', 'lg:max-h-32',
+                        'overflow-hidden');
+                    desc.classList.add('overflow-y-auto');
+                    desc.style.maxHeight = '200px';
+                    overlay.style.opacity = 0;
+                    btn.textContent = 'See less';
+                } else {
+                    desc.classList.remove('overflow-y-auto');
+                    desc.classList.add('max-h-16', 'sm:max-h-20', 'md:max-h-24', 'lg:max-h-32',
+                        'overflow-hidden');
+                    desc.style.maxHeight = null;
+                    overlay.style.opacity = 1;
+                    btn.textContent = 'See more';
+                }
+            });
+        });
+    </script>
+@endpush
