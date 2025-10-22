@@ -148,10 +148,18 @@ class StaffController extends Controller
             ],
             'phone_num' => 'nullable|string|max:20',
             'photo_path' => 'nullable|image|max:5120',
+            'delete_photo' => 'nullable|string',
         ]);
 
-        unset($validated['photo_path']);
+        // Handle photo deletion
+        if ($request->delete_photo === "1" && $staff->photo_path) {
+            if (Storage::disk('public')->exists($staff->photo_path)) {
+                Storage::disk('public')->delete($staff->photo_path);
+            }
+            $staff->photo_path = null;
+        }
 
+        // Handle new photo upload
         if ($request->hasFile('photo_path')) {
             if ($staff->photo_path && Storage::disk('public')->exists($staff->photo_path)) {
                 Storage::disk('public')->delete($staff->photo_path);

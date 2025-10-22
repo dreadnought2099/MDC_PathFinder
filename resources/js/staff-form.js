@@ -1,9 +1,12 @@
 import { createPreview } from "./staff-modules/image-preview.js";
-import { compressImageCanvas, validateImageFile } from "./staff-modules/image-compression.js";
+import {
+    compressImageCanvas,
+    validateImageFile,
+} from "./staff-modules/image-compression.js";
 import { setupPhotoUpload } from "./staff-modules/photo-upload.js";
 import { setupEmailValidation } from "./staff-modules/email-validation.js";
 import { setupAutoResize } from "./staff-modules/auto-resize.js";
-import { showTemporaryMessage } from "./staff-modules/utils.js";
+import { showTemporaryMessage, formatFileSize } from "./staff-modules/utils.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     const photoInput = document.getElementById("photo_path");
@@ -13,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const bioTextarea = document.getElementById("bio");
     const emailInput = document.getElementById("email");
 
-    // Handle existing image for edit form
+    // Show existing image if editing
     const existingPhotoUrl = photoInput?.dataset.existingPhoto;
     if (existingPhotoUrl) {
         createPreview(
@@ -21,33 +24,33 @@ document.addEventListener("DOMContentLoaded", () => {
             previewContainer,
             placeholder,
             null,
-            0,
-            0,
             existingPhotoUrl
         );
     }
 
     // Handle new uploads
     photoInput.addEventListener("change", async () => {
-        if (photoInput.files.length > 0) {
-            const file = photoInput.files[0];
+        if (!photoInput.files.length) return;
 
-            if (!validateImageFile(file)) return;
+        const file = photoInput.files[0];
+        if (!validateImageFile(file)) return;
 
-            showTemporaryMessage("Compressing image...", "info");
+        showTemporaryMessage("Compressing image...", "info");
+
+        try {
             const compressed = await compressImageCanvas(file);
+
             createPreview(
                 photoInput,
                 previewContainer,
                 placeholder,
-                compressed,
-                file.size,
-                compressed.size
+                compressed
             );
+
             showTemporaryMessage(
-                `Image compressed: ${file.size / 1024 / 1024} → ${
-                    compressed.size / 1024 / 1024
-                } MB`,
+                `Image compressed: ${formatFileSize(
+                    file.size
+                )} → ${formatFileSize(compressed.size)}`,
                 "success"
             );
 
@@ -55,19 +58,22 @@ document.addEventListener("DOMContentLoaded", () => {
             const dt = new DataTransfer();
             dt.items.add(compressed);
             photoInput.files = dt.files;
+        } catch (err) {
+            showTemporaryMessage("Image compression failed.", "error");
+            console.error(err);
         }
     });
 
-    // Email validation setup
+    // Email validation
     if (emailInput) {
         const existingEmail = emailInput.dataset.existingEmail || null;
         setupEmailValidation(emailInput, existingEmail);
     }
 
-    // Auto-resize bio field
+    // Auto-resize bio
     if (bioTextarea) setupAutoResize(bioTextarea);
 
-    // Photo upload + compression
+    // Optional: Setup click-to-upload area
     if (uploadBox && photoInput && previewContainer && placeholder) {
         setupPhotoUpload({
             photoInput,
@@ -78,7 +84,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 showTemporaryMessage("Compressing image...", "info"),
             onCompressEnd: (originalSize, compressedSize) =>
                 showTemporaryMessage(
-                    `Image compressed: ${originalSize} → ${compressedSize}`,
+                    `Image compressed: ${formatFileSize(
+                        originalSize
+                    )} → ${formatFileSize(compressedSize)}`,
                     "success"
                 ),
             onError: (msg) => showTemporaryMessage(msg, "error"),

@@ -144,6 +144,8 @@
                 @error('photo_path')
                     <span class="text-red-500 text-sm">{{ $message }}</span>
                 @enderror
+
+                <input type="hidden" name="delete_photo" id="delete_photo" value="0">
             </div>
 
             <!-- Submit Button -->
