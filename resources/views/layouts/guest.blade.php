@@ -9,8 +9,10 @@
     <meta name="author" content="Raymart Magallanes">
     <meta name="keywords" content="MDC PathFinder, campus navigation, MDC Tubigon, Bohol, office locator">
     <meta name="application-name" content="MDC PathFinder">
+    <meta property="og:site_name" content="MDC PathFinder">
     <meta name="theme-color" content="#157ee1">
 
+    <link rel="preload" href="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png" as="image" type="image/png">
     <title>{{ config('app.name') }}</title>
     <meta name="description" content="@yield('description', 'MDC PathFinder helps students, staff, and visitors locate offices across the MDC campus through clear, accessible web-based navigation.')">
     <link rel="canonical" href="{{ url()->current() }}">
@@ -45,10 +47,16 @@
     <script defer src="https://unpkg.com/html5-qrcode@2.3.8"></script>
 
     <!-- Dark mode initialization -->
-    <script defer>
-        const theme = localStorage.getItem("theme");
-        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        document.documentElement.classList.toggle("dark", theme === "dark" || (!theme && prefersDark));
+    <script>
+        (function() {
+            const theme = localStorage.getItem("theme");
+            const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+            if (theme === "dark" || (!theme && prefersDark)) {
+                document.documentElement.classList.add("dark");
+            } else {
+                document.documentElement.classList.remove("dark");
+            }
+        })();
     </script>
 
     <!-- JSON-LD Schema -->
@@ -106,6 +114,7 @@
                     'name' => 'MDC Campus',
                     'image' => asset('images/mdc.png'),
                     'url' => url('/'),
+                    'telephone' => '+63 38 123 4567',
                     'address' => [
                         '@type' => 'PostalAddress',
                         'streetAddress' => 'Cabulijan',
@@ -168,6 +177,7 @@
 </head>
 
 {{-- If child page provides "body-class" section, use it; otherwise fallback --}}
+
 <body class="@yield('body-class', 'bg-white dark:bg-gray-900')">
     <div id="success-message-container" class="fixed top-4 right-4 z-[9999] max-w-md">
         @if (session('success') || session('error') || session('info') || session('warning') || $errors->any())
