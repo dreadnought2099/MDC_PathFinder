@@ -29,10 +29,10 @@
 
                     <!-- Photo -->
                     <div class="flex-shrink-0">
-                        <img src="{{ $staff->photo_path ? Storage::url($staff->photo_path) : asset('images/mdc.png') }}"
+                        <img src="{{ $staff->photo_path ? Storage::url($staff->photo_path) : asset('images/pathfinder-bannerv2.png') }}"
                             alt="Photo of {{ $staff->name }}" title="Click image to expand"
                             class="w-full lg:w-48 h-40 object-cover rounded-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
-                            onclick="openModal('{{ $staff->photo_path ? Storage::url($staff->photo_path) : asset('images/mdc.png') }}')">
+                            onclick="openModal('{{ $staff->photo_path ? Storage::url($staff->photo_path) : asset('images/pathfinder-bannerv2.png') }}')">
                     </div>
 
                     <!-- Info Section -->

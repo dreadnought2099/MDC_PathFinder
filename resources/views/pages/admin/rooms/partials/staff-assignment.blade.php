@@ -29,7 +29,7 @@
                         <div class="flex flex-col items-center text-center">
                             <!-- Avatar -->
                             <div class="w-16 h-16 mb-4">
-                                <img src="{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/mdc.png') }}"
+                                <img src="{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/pathfinder-bannerv2.png') }}"
                                     alt="{{ $member->first_name }} {{ $member->last_name }}"
                                     class="w-16 h-16 rounded-full object-cover">
                             </div>

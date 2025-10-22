@@ -7,13 +7,13 @@
 
         @php
             $hasImage = $room->image_path && Storage::exists('public/' . $room->image_path);
-            $imageSrc = $hasImage ? Storage::url($room->image_path) : asset('images/mdc.png');
+            $imageSrc = $hasImage ? Storage::url($room->image_path) : asset('images/pathfinder-bannerv2.png');
         @endphp
 
-        <img src="{{ $room->image_path ? Storage::url($room->image_path) : asset('images/mdc.png') }}"
+        <img src="{{ $room->image_path ? Storage::url($room->image_path) : asset('images/pathfinder-bannerv2.png') }}"
             alt="{{ $room->name }}"
             class="absolute inset-0 w-full h-full object-cover brightness-75 transition-transform duration-700 ease-out group-hover:scale-105 cursor-pointer"
-            onclick="openModal('{{ $room->image_path ? Storage::url($room->image_path) : asset('images/mdc.png') }}')" />
+            onclick="openModal('{{ $room->image_path ? Storage::url($room->image_path) : asset('images/pathfinder-bannerv2.png') }}')" />
 
         <!-- Gradient Overlay -->
         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent pointer-events-none">
@@ -81,37 +81,65 @@
 
     <!-- Assigned Staff -->
     @if ($room->staff->isNotEmpty())
-        <section class="mt-8 w-full">
-            <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-200 mb-6 text-center">
+        <section class="mt-8 w-full" x-data="{
+                expanded: false,
+                total: {{ $room->staff->count() }},
+                screenWidth: window.innerWidth,
+                get itemsToShow() {
+                    if (this.screenWidth >= 1024) return 5; // lg breakpoint - desktop
+                    return 2; // mobile
+                }
+            }" x-init="window.addEventListener('resize', () => { screenWidth = window.innerWidth })">
+            <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 text-center">
                 Assigned Staff
             </h2>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6 md:gap-8">
-                @foreach ($room->staff as $member)
-                    <div
-                        class="bg-gradient-to-br from-slate-50 to-white dark:from-gray-700 dark:to-gray-800 rounded-xl shadow-md hover:shadow-xl border-2 border-primary dark:border-gray-600 overflow-hidden group transform hover:scale-[1.03] transition-all duration-300 ease-out">
+            <!-- Grid container -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5">
+                @foreach ($room->staff as $index => $member)
+                    <div x-show="expanded || {{ $index }} < itemsToShow"
+                        x-transition:enter="transition ease-out duration-500"
+                        x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-400"
+                        x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                        class="bg-gradient-to-br from-slate-50 to-white dark:from-gray-700 dark:to-gray-800 
+                        rounded-lg shadow-sm hover:shadow-md border border-primary
+                        overflow-hidden group transform hover:scale-[1.02] transition-all duration-300 ease-out origin-top">
 
                         <!-- Staff Image -->
                         <div class="cursor-pointer overflow-hidden"
-                            onclick="openModal('{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/mdc.png') }}')">
-                            <img src="{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/mdc.png') }}"
+                            @click="openModal('{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/pathfinder-bannerv2.png') }}')">
+                            <img src="{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/pathfinder-bannerv2.png') }}"
                                 alt="{{ $member->full_name }}"
-                                class="w-full h-40 sm:h-48 md:h-56 object-cover group-hover:scale-110 transition-transform duration-500 ease-out">
+                                class="w-full h-28 sm:h-32 md:h-36 object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
+                                loading="lazy">
                         </div>
 
                         <!-- Staff Info -->
-                        <div class="p-4 sm:p-5 md:p-6 text-center space-y-1.5">
-                            <a href="{{ route('staff.client-show', $member->token) }}"
-                                class="block text-base sm:text-lg md:text-xl font-semibold text-slate-800 dark:text-gray-200 hover:text-primary transition-colors duration-200"
-                                target="_blank" rel="noopener noreferrer">
+                        <div class="p-2 sm:p-3 text-center space-y-0.5">
+                            <a href="{{ route('staff.client-show', $member->token) }}" target="_blank"
+                                rel="noopener noreferrer"
+                                class="block text-sm sm:text-base font-semibold text-slate-800 dark:text-gray-200 
+                                hover:text-primary transition-colors duration-200 truncate">
                                 {{ $member->full_name }}
                             </a>
-                            <p class="text-xs sm:text-sm md:text-base text-slate-600 dark:text-gray-300">
-                                {{ $member->position ?? 'No position assigned' }}
+                            <p class="text-xs sm:text-sm text-slate-600 dark:text-gray-300 truncate">
+                                {{ $member->position ?? 'No position' }}
                             </p>
                         </div>
                     </div>
                 @endforeach
+            </div>
+
+            <!-- Toggle Button -->
+            <div class="text-center mt-5"
+                x-show="(window.innerWidth >= 1024 && total > 5) || (window.innerWidth < 1024 && total > 2)"
+                x-transition x-cloak>
+                <button @click="expanded = !expanded"
+                    class="px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full border border-primary 
+                    text-primary hover:bg-primary hover:text-white transition-colors duration-200">
+                    <span x-text="expanded ? 'Show Less' : 'Show More'"></span>
+                </button>
             </div>
         </section>
     @else
@@ -122,9 +150,9 @@
 
     <!-- Office Hours -->
     <div class="mt-6 w-full">
-        <h3 class="text-xl sm:text-2xl md:text-3xl font-bold text-slate-800 mb-4 text-center dark:text-gray-300">
+        <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 text-center">
             Office Hours
-        </h3>
+        </h2>
 
         <div
             class="bg-gray-50 dark:bg-gray-800 border-2 border-primary rounded-lg sm:rounded-xl p-4 sm:p-6 md:p-8 shadow-sm">
@@ -237,7 +265,7 @@
             }
         });
 
-        // ✅ Close modal on Escape key
+        //  Close modal on Escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 const modal = document.getElementById('imageModal');
