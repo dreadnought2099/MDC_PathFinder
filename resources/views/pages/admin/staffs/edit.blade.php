@@ -281,7 +281,9 @@
             }
 
             function formatFileSize(bytes) {
-                return (bytes / (1024 * 1024)).toFixed(2) + 'MB';
+                const mb = bytes / (1024 * 1024);
+                const kb = bytes / 1024;
+                return mb >= 1 ? mb.toFixed(2) + ' MB' : kb.toFixed(2) + ' KB';
             }
 
             function createPreview(file, originalSize = 0, compressedSize = 0, url = null) {
@@ -289,36 +291,34 @@
                 previewContainer.classList.remove('hidden');
 
                 const reader = new FileReader();
-                const displayPreview = (src) => {
+                const displayPreview = (src, isCompressed = false) => {
                     previewContainer.innerHTML = `
-        <div class="relative w-full h-full">
-            <img src="${src}" class="w-full h-full object-cover rounded" alt="Staff photo preview">
-            ${file ? `<button type="button" id="removePhotoBtn" class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors font-bold">×</button>` : ''}
-            <div class="absolute bottom-0 left-0 right-0 bg-green-600 text-white text-xs p-2 font-medium">
-                ${file 
-                    ? `1 IMAGE(S) COMPRESSED: ${formatFileSize(originalSize)} → ${formatFileSize(compressedSize)}` 
-                    : '1 IMAGE LOADED'}
-            </div>
-        </div>
-        `;
+                        <div class="relative w-full h-full">
+                            <img src="${src}" class="w-full h-full object-cover rounded" alt="Staff photo preview">
+                            <button type="button" id="removePhotoBtn"
+                                class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors font-bold">×</button>
+                            <div class="absolute bottom-0 left-0 right-0 bg-green-600 text-white text-xs p-2 font-medium">
+                                ${isCompressed
+                                    ? `1 IMAGE(S) COMPRESSED: ${formatFileSize(originalSize)} → ${formatFileSize(compressedSize)}`
+                                    : '1 IMAGE LOADED'}
+                            </div>
+                        </div>`;
 
-                    if (file) {
-                        document.getElementById('removePhotoBtn').addEventListener('click', e => {
-                            e.stopPropagation();
-                            photoInput.value = '';
-                            compressedFile = null;
-                            previewContainer.classList.add('hidden');
-                            previewContainer.innerHTML = '';
-                            placeholder.classList.remove('hidden');
-                        });
-                    }
+                    document.getElementById('removePhotoBtn').addEventListener('click', e => {
+                        e.stopPropagation();
+                        photoInput.value = '';
+                        compressedFile = null;
+                        previewContainer.classList.add('hidden');
+                        previewContainer.innerHTML = '';
+                        placeholder.classList.remove('hidden');
+                    });
                 };
 
                 if (file) {
-                    reader.onload = e => displayPreview(e.target.result);
+                    reader.onload = e => displayPreview(e.target.result, true);
                     reader.readAsDataURL(file);
                 } else if (url) {
-                    displayPreview(url);
+                    displayPreview(url, false);
                 }
             }
 
