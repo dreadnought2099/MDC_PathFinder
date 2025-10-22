@@ -12,7 +12,6 @@
     <meta property="og:site_name" content="MDC PathFinder">
     <meta name="theme-color" content="#157ee1">
 
-    <link rel="preload" href="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png" as="image" type="image/png">
     <title>{{ config('app.name') }}</title>
     <meta name="description" content="@yield('description', 'MDC PathFinder helps students, staff, and visitors locate offices across the MDC campus through clear, accessible web-based navigation.')">
     <link rel="canonical" href="{{ url()->current() }}">
@@ -34,7 +33,6 @@
     <!-- Fonts & Preload -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="{{ asset('images/pathfinder-bannerv2.png') }}" as="image">
 
     <!-- GLightbox CSS -->
     <link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet">
