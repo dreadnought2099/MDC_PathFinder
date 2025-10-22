@@ -1,5 +1,12 @@
 @extends('layouts.guest')
 
+@section('title', 'Meet the Team - MDC PathFinder')
+@section('description', 'Meet the amazing team behind MDC PathFinder and learn about their roles and contributions.')
+@section('og_title', 'Meet the Team - MDC PathFinder')
+@section('og_description', 'Discover the talented team behind MDC PathFinder and their roles in building this campus navigation system.')
+@section('twitter_title', 'Meet the Team - MDC PathFinder')
+@section('twitter_description', 'Learn about the team members who developed MDC PathFinder.')
+
 @section('content')
     <div class="min-h-screen dark:bg-gray-900 flex flex-col">
         <!-- Top bar -->

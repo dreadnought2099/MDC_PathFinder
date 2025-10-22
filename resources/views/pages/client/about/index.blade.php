@@ -1,5 +1,12 @@
 @extends('layouts.guest')
 
+@section('title', 'About - ' . config('app.name'))
+@section('description', 'Learn about ' . config('app.name') . ', its purpose, overview, and what it offers to students, staff, and visitors.')
+@section('og_title', 'About - ' . config('app.name'))
+@section('og_description', 'Discover the features and mission of ' . config('app.name') . ', your campus navigation system.')
+@section('twitter_title', 'About - ' . config('app.name'))
+@section('twitter_description', 'Learn about ' . config('app.name') . ' and how it helps navigate the MDC campus.')
+
 @section('content')
     @php
         // Fetch and decode the JSON content from the file

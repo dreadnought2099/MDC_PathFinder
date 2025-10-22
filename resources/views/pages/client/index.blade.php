@@ -1,5 +1,12 @@
 @extends('layouts.guest')
 
+@section('title', 'MDC PathFinder')
+@section('description', 'Welcome to MDC PathFinder, the interactive web-based navigation system for the MDC campus.')
+@section('og_title', 'MDC PathFinder')
+@section('og_description', 'Easily locate offices, scan QR codes, and navigate the MDC campus with MDC PathFinder.')
+@section('twitter_title', 'MDC PathFinder')
+@section('twitter_description', 'Navigate the MDC campus easily with MDC PathFinder.')
+
 @section('content')
     <div class="min-h-screen dark:bg-gray-900 flex flex-col">
 
@@ -75,6 +82,5 @@
                 </div>
             </div>
         </div>
-
     </div>
 @endsection

@@ -12,7 +12,7 @@
     <meta property="og:site_name" content="MDC PathFinder">
     <meta name="theme-color" content="#157ee1">
 
-    <title>{{ config('app.name') }}</title>
+    <title>@yield('title', config('app.name'))</title>
     <meta name="description" content="@yield('description', 'MDC PathFinder helps students, staff, and visitors locate offices across the MDC campus through clear, accessible web-based navigation.')">
     <link rel="canonical" href="{{ url()->current() }}">
     <link rel="icon" href="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png">
@@ -175,7 +175,6 @@
 </head>
 
 {{-- If child page provides "body-class" section, use it; otherwise fallback --}}
-
 <body class="@yield('body-class', 'bg-white dark:bg-gray-900')">
     <div id="success-message-container" class="fixed top-4 right-4 z-[9999] max-w-md">
         @if (session('success') || session('error') || session('info') || session('warning') || $errors->any())
