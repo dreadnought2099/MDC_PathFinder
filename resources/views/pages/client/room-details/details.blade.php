@@ -35,7 +35,7 @@
                             data-full-text="{{ $room->description }}">
                             {{ $room->description }}
                         </p>
-                        
+
                         <button id="toggleDescriptionBtn"
                             class="mt-2 text-xs sm:text-sm md:text-base text-transparent bg-clip-text bg-gradient-to-tr from-blue-300 to-white font-semibold hover-underline focus:outline-none">
                             See more
@@ -155,17 +155,16 @@
             @if ($room->grouped_office_hours && count($room->grouped_office_hours) > 0)
                 <div class="space-y-3 sm:space-y-4 md:space-y-5">
                     @foreach ($room->grouped_office_hours as $timeRange => $days)
-                        <div
-                            class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-4 md:gap-6 text-center sm:text-left">
+                        <div class="flex flex-row justify-between items-center gap-2 sm:gap-4 md:gap-6">
 
                             <!-- Days -->
                             <div
-                                class="font-medium text-xs sm:text-sm md:text-base text-gray-800 dark:text-gray-300 flex-1">
+                                class="font-medium text-xs sm:text-sm md:text-base text-gray-800 dark:text-gray-300 flex-1 text-left">
                                 {{ $room->formatDaysGroup($days) }}
                             </div>
 
                             <!-- Time Range -->
-                            <div class="text-xs sm:text-sm md:text-base sm:text-right">
+                            <div class="text-xs sm:text-sm md:text-base text-right">
                                 @if (strtolower($timeRange) === 'closed')
                                     <span class="text-red-600 font-semibold">Closed</span>
                                 @else
@@ -182,7 +181,6 @@
                     No office hours specified
                 </div>
             @endif
-
         </div>
     </div>
 
