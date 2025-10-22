@@ -3,7 +3,7 @@
 
     <!-- Cover Image -->
     <section
-        class="relative w-full h-[400px] sm:h-[500px] md:h-[600px] rounded-2xl shadow-xl border-2 border-primary mb-12 group transition-all duration-700 ease-out overflow-hidden">
+        class="relative w-full h-[400px] sm:h-[500px] md:h-[600px] rounded-2xl  border-2 border-primary mb-12 group transition-all duration-700 ease-out overflow-hidden">
 
         @php
             $hasImage = $room->image_path && Storage::exists('public/' . $room->image_path);
@@ -35,11 +35,7 @@
                             data-full-text="{{ $room->description }}">
                             {{ $room->description }}
                         </p>
-
-                        <div id="fadeOverlay"
-                            class="pointer-events-none absolute bottom-0 left-0 w-full h-8 sm:h-10 md:h-12 bg-gradient-to-t from-black/70 via-black/0 to-transparent transition-opacity duration-300">
-                        </div>
-
+                        
                         <button id="toggleDescriptionBtn"
                             class="mt-2 text-xs sm:text-sm md:text-base text-transparent bg-clip-text bg-gradient-to-tr from-blue-300 to-white font-semibold hover-underline focus:outline-none">
                             See more
@@ -82,14 +78,14 @@
     <!-- Assigned Staff -->
     @if ($room->staff->isNotEmpty())
         <section class="mt-8 w-full" x-data="{
-                expanded: false,
-                total: {{ $room->staff->count() }},
-                screenWidth: window.innerWidth,
-                get itemsToShow() {
-                    if (this.screenWidth >= 1024) return 5; // lg breakpoint - desktop
-                    return 2; // mobile
-                }
-            }" x-init="window.addEventListener('resize', () => { screenWidth = window.innerWidth })">
+            expanded: false,
+            total: {{ $room->staff->count() }},
+            screenWidth: window.innerWidth,
+            get itemsToShow() {
+                if (this.screenWidth >= 1024) return 5; // lg breakpoint - desktop
+                return 2; // mobile
+            }
+        }" x-init="window.addEventListener('resize', () => { screenWidth = window.innerWidth })">
             <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 text-center">
                 Assigned Staff
             </h2>
@@ -133,8 +129,7 @@
 
             <!-- Toggle Button -->
             <div class="text-center mt-5"
-                x-show="(screenWidth >= 1024 && total > 5) || (screenWidth < 1024 && total > 2)"
-                x-transition x-cloak>
+                x-show="(screenWidth >= 1024 && total > 5) || (screenWidth < 1024 && total > 2)" x-transition x-cloak>
                 <button @click="expanded = !expanded"
                     class="px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full border border-primary 
                     text-primary hover:bg-primary hover:text-white transition-colors duration-200">
@@ -278,9 +273,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             const desc = document.getElementById('roomDescription');
             const btn = document.getElementById('toggleDescriptionBtn');
-            const overlay = document.getElementById('fadeOverlay');
 
-            if (!desc || !btn || !overlay) return;
+            if (!desc || !btn) return;
 
             const fullText = desc.dataset.fullText.trim();
             desc.textContent = fullText;
@@ -291,7 +285,6 @@
 
             if (!isOverflowing(desc)) {
                 btn.style.display = 'none';
-                overlay.style.display = 'none';
                 return;
             }
 
@@ -305,14 +298,12 @@
                         'overflow-hidden');
                     desc.classList.add('overflow-y-auto');
                     desc.style.maxHeight = '200px';
-                    overlay.style.opacity = 0;
                     btn.textContent = 'See less';
                 } else {
                     desc.classList.remove('overflow-y-auto');
                     desc.classList.add('max-h-16', 'sm:max-h-20', 'md:max-h-24', 'lg:max-h-32',
                         'overflow-hidden');
                     desc.style.maxHeight = null;
-                    overlay.style.opacity = 1;
                     btn.textContent = 'See more';
                 }
             });
