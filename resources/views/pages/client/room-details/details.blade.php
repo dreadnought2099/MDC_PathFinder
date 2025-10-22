@@ -133,7 +133,7 @@
 
             <!-- Toggle Button -->
             <div class="text-center mt-5"
-                x-show="(window.innerWidth >= 1024 && total > 5) || (window.innerWidth < 1024 && total > 2)"
+                x-show="(screenWidth >= 1024 && total > 5) || (screenWidth < 1024 && total > 2)"
                 x-transition x-cloak>
                 <button @click="expanded = !expanded"
                     class="px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full border border-primary 
