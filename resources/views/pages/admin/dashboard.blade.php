@@ -158,7 +158,7 @@
                                     class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
                                     Manage Office User
                                 </h3>
-                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Organize office users</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Configure office users</p>
                             </div>
                         </div>
                     </a>
@@ -200,7 +200,7 @@
                                     class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
                                     Recycle Bin
                                 </h3>
-                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Restore or Permanently delete items
+                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Restore or Permanently delete
                                 </p>
                             </div>
                         </div>
