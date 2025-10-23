@@ -1,5 +1,3 @@
-// image-compression.js
-
 /**
  * Validate selected image file before compression
  * - Ensures correct file type and size limit

@@ -1,17 +1,7 @@
-// photo-upload.js
 import { compressImageCanvas, validateImageFile } from "./image-compression.js";
 import { createPreview } from "./image-preview.js";
 import { formatFileSize } from "./utils.js";
 
-/**
- * setupPhotoUpload(options)
- * Handles image selection, validation, compression, and preview display.
- *
- * options: {
- *   photoInput, uploadBox, placeholder, previewContainer,
- *   onCompressStart?, onCompressEnd?, onError?
- * }
- */
 export function setupPhotoUpload(options = {}) {
     const {
         photoInput,

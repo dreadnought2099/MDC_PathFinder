@@ -1,8 +1,3 @@
-// utils.js
-
-/**
- * formatFileSize(bytes) -> "1.23 MB" or "456.7 KB"
- */
 export function formatFileSize(bytes) {
     if (!Number.isFinite(bytes)) return "";
     const mb = bytes / (1024 * 1024);

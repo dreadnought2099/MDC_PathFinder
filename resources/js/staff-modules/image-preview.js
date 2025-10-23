@@ -1,4 +1,3 @@
-// image-preview.js
 import { formatFileSize } from "./utils.js";
 
 /**
