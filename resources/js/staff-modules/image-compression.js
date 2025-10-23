@@ -41,7 +41,7 @@ export function validateImageFile(file, inputEl = null) {
  */
 export async function compressImageCanvas(
     file,
-    quality = 0.7,
+    quality = 0.85,
     maxWidth = 1200,
     maxHeight = 1200
 ) {
