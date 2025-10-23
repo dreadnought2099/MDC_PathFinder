@@ -87,9 +87,13 @@
             <!-- Email Info -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                 <div class="relative">
-                    <input type="email" placeholder="Email" name="email" id="email" class="{{ $inputClasses }}">
-                    <label class="{{ $labelClasses }}">Email</label>
-                    <p id="email_error" class="text-red-500 text-sm mt-1 invisible">The email has already been taken.</p>
+                    <input type="email" name="email" id="email" placeholder="Email" class="{{ $inputClasses }}"
+                        value="{{ old('email') }}" data-check-email-url="{{ route('staff.checkEmail') }}">
+                    <label for="email" class="{{ $labelClasses }}">Email</label>
+                    {{-- Error container, initially hidden --}}
+                    <p id="email_error" class="text-red-500 text-sm mt-1 invisible">
+                        The email has already been taken.
+                    </p>
                 </div>
                 <div class="relative">
                     <input type="tel" name="phone_num" placeholder="Phone Number" class="{{ $inputClasses }}"
@@ -111,7 +115,7 @@
                     <div id="staffPreviewContainer" class="w-full h-full hidden"></div>
                 </div>
                 <input type="file" name="photo_path" id="photo_path" class="hidden"
-                    accept="image/jpeg,image/jpg,image/png" />
+                    accept="image/jpeg,image/jpg,image/png" data-max-size="5120" />
                 @error('photo_path')
                     <span class="text-red-500 text-sm">{{ $message }}</span>
                 @enderror

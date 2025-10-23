@@ -1,21 +1,46 @@
-export function validateImageFile(file) {
-    const validTypes = ["image/jpeg", "image/png", "image/webp"];
-    const maxSizeMB = 10;
+// image-compression.js
 
+/**
+ * Validate selected image file before compression
+ * - Ensures correct file type and size limit
+ */
+export function validateImageFile(file, inputEl = null) {
+    const validTypes = ["image/jpeg", "image/png", "image/webp"];
+
+    // Default: 5 MB, can be overridden by <input data-max-size="5120">
+    let maxSizeMB = 5;
+    if (inputEl && inputEl.dataset.maxSize) {
+        const kb = parseFloat(inputEl.dataset.maxSize);
+        if (!isNaN(kb)) maxSizeMB = kb / 1024; // convert KB to MB
+    }
+
+    if (!file) return false;
+
+    // Type validation
     if (!validTypes.includes(file.type)) {
-        alert("Only JPG, PNG, or WEBP images are allowed.");
+        window.showTemporaryMessage?.(
+            "Only JPG, PNG, or WEBP images are allowed.",
+            "error"
+        );
         return false;
     }
 
-    if (file.size / (1024 * 1024) > maxSizeMB) {
-        alert("Image exceeds 10MB limit.");
+    // Size validation
+    const sizeMB = file.size / (1024 * 1024);
+    if (sizeMB > maxSizeMB) {
+        window.showTemporaryMessage?.(
+            `Image exceeds ${maxSizeMB} MB limit. Please choose a smaller file.`,
+            "error"
+        );
         return false;
     }
 
     return true;
 }
 
-// Compress image using Canvas API
+/**
+ * Compress image using Canvas API
+ */
 export async function compressImageCanvas(
     file,
     quality = 0.7,
@@ -29,8 +54,8 @@ export async function compressImageCanvas(
     // Resize if too large
     if (width > maxWidth || height > maxHeight) {
         const ratio = Math.min(maxWidth / width, maxHeight / height);
-        width *= ratio;
-        height *= ratio;
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
     }
 
     canvas.width = width;
