@@ -398,9 +398,9 @@ class PathImageController extends Controller
         }
 
         // Adjust quality based on file size
-        $quality = 70;
+        $quality = 75;
         if ($file->getSize() > 5 * 1024 * 1024) {
-            $quality = 60;
+            $quality = 70;
         }
 
         $encodedImage = $image->encode(new WebpEncoder($quality));

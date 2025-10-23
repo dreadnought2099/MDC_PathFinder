@@ -266,7 +266,7 @@ class StaffController extends Controller
         $image = $this->manager->read($file);
 
         // NO resizing, no additional compression
-        $encodedImage = $image->encode(new WebpEncoder(quality: 90));
+        $encodedImage = $image->encode(new WebpEncoder(quality: 80));
         unset($image);
 
         Storage::disk('public')->put($webpPath, (string) $encodedImage);

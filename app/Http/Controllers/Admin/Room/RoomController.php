@@ -563,7 +563,7 @@ class RoomController extends Controller
 
         // NO resizing - image is already properly sized by frontend
         // Just convert to WebP with high quality since it's pre-compressed
-        $encodedImage = $image->encode(new WebpEncoder(quality: 90));
+        $encodedImage = $image->encode(new WebpEncoder(quality: 85));
 
         // Clean up
         unset($image);
