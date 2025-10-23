@@ -15,14 +15,34 @@ export function setupPhotoUpload(options = {}) {
 
     if (!photoInput || !uploadBox || !previewContainer) return;
 
-    // Open file selector when user clicks upload box
+    // --- CLICK UPLOAD ---
     uploadBox.addEventListener("click", () => photoInput.click());
 
-    // Handle file selection
+    // --- DRAG AND DROP EVENTS ---
+    uploadBox.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        uploadBox.classList.add("border-blue-500", "bg-blue-50");
+    });
+
+    uploadBox.addEventListener("dragleave", () => {
+        uploadBox.classList.remove("border-blue-500", "bg-blue-50");
+    });
+
+    uploadBox.addEventListener("drop", async (e) => {
+        e.preventDefault();
+        uploadBox.classList.remove("border-blue-500", "bg-blue-50");
+        const file = e.dataTransfer.files?.[0];
+        if (file) await handleFile(file);
+    });
+
+    // --- NORMAL FILE INPUT CHANGE ---
     photoInput.addEventListener("change", async () => {
         const file = photoInput.files?.[0];
+        if (file) await handleFile(file);
+    });
 
-        // If user canceled file selection
+    // --- CORE FILE HANDLER ---
+    async function handleFile(file) {
         if (!file) {
             window.showTemporaryMessage?.("No image selected.", "warning");
             return;
@@ -30,7 +50,9 @@ export function setupPhotoUpload(options = {}) {
 
         // Validate before compression
         if (!validateImageFile(file, photoInput)) {
-            onError?.("Invalid or oversized image file.");
+            const msg = "Invalid or oversized image file.";
+            onError?.(msg);
+            window.showTemporaryMessage?.(msg, "error");
             return;
         }
 
@@ -38,14 +60,15 @@ export function setupPhotoUpload(options = {}) {
             onCompressStart?.(file.size);
             window.showTemporaryMessage?.("Compressing image...", "info");
 
+            // Compress
             const compressedFile = await compressImageCanvas(file);
 
-            // Replace the input's FileList with the compressed file
+            // Replace original FileList
             const dt = new DataTransfer();
             dt.items.add(compressedFile);
             photoInput.files = dt.files;
 
-            // Create live preview
+            // Preview
             createPreview({
                 input: photoInput,
                 container: previewContainer,
@@ -55,7 +78,6 @@ export function setupPhotoUpload(options = {}) {
 
             onCompressEnd?.(file.size, compressedFile.size);
 
-            // Show success message
             window.showTemporaryMessage?.(
                 `Image compressed: ${formatFileSize(
                     file.size
@@ -67,6 +89,9 @@ export function setupPhotoUpload(options = {}) {
             const msg = "Image compression failed. Try another file.";
             onError?.(msg);
             window.showTemporaryMessage?.(msg, "error");
+        } finally {
+            // Always reset drag styles
+            uploadBox.classList.remove("border-blue-500", "bg-blue-50");
         }
-    });
+    }
 }
