@@ -70,8 +70,8 @@
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                                     fill="currentColor">
                                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586
-                                                                    6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
-                                                                    0 001.414 0l7-7a1 1 0 000-1.414z"
+                                                                        6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
+                                                                        0 001.414 0l7-7a1 1 0 000-1.414z"
                                                         clip-rule="evenodd" />
                                                 </svg>
                                             </span>
@@ -90,7 +90,7 @@
                         class="flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary dark:hover:bg-gray-800 transition-colors p-4 overflow-auto relative">
                         <span class="text-gray-600 dark:text-gray-300 mb-2">Drop images here or click to browse</span>
                         <span class="text-xs text-gray-400">
-                            JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 10 MB each | multiple allowed
+                            JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 5 MB each | multiple allowed
                         </span>
 
                         <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
@@ -187,7 +187,7 @@
 
             // ===== CONFIGURATION =====
             const MAX_FILES = 20;
-            const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+            const MAX_FILE_SIZE = 5 * 1024 * 1024; // 10 MB
             const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // 100 MB
             const ALLOWED_TYPES = [
                 'image/jpeg', 'image/jpg', 'image/png', 'image/gif',
@@ -349,7 +349,7 @@
                 const fileError = document.getElementById('fileError');
                 let compressionInfo = [];
 
-                fileError.innerHTML = '<div class="text-blue-600">⏳ Compressing images...</div>';
+                fileError.innerHTML = '<div class="text-blue-600">Compressing images...</div>';
                 fileError.classList.remove('hidden');
 
                 for (const file of filesToProcess) {

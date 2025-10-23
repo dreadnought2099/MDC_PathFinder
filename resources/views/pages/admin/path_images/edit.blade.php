@@ -57,7 +57,8 @@
 
                                 <!-- Delete Checkbox -->
                                 <div class="absolute top-2 right-2">
-                                    <label class="flex items-center bg-white rounded px-2 py-1 text-sm cursor-pointer text-red-600">
+                                    <label
+                                        class="flex items-center bg-white rounded px-2 py-1 text-sm cursor-pointer text-red-600">
                                         <input type="checkbox" name="images[{{ $index }}][delete]" value="1"
                                             class="text-red-600 mr-1 custom-time-input">
                                         Delete
@@ -115,27 +116,246 @@
             </div>
         </form>
     </div>
+@endsection
 
+@push('scripts')
     <script>
-        // Toggle all delete checkboxes
-        function toggleAllDeletes() {
-            const checkboxes = document.querySelectorAll('input[type="checkbox"][name*="[delete]"]');
-            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.querySelector('form[action*="path-image.update-multiple"]');
+            if (!form) return;
 
-            checkboxes.forEach(cb => {
-                cb.checked = !allChecked;
-            });
-        }
+            const fileInputs = form.querySelectorAll('input[type="file"][name*="[image_file]"]');
+            const submitButton = form.querySelector('button[type="submit"]');
+            const deleteCheckboxes = form.querySelectorAll('input[type="checkbox"][name*="[delete]"]');
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+            const maxSize = 5 * 1024 * 1024; // 5MB
 
-        // Confirm before submitting if deletions are selected
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const deleteCheckboxes = document.querySelectorAll('input[type="checkbox"][name*="[delete]"]:checked');
+            // Track invalid files
+            const invalidFiles = new Set();
+            let formSubmitting = false;
 
-            if (deleteCheckboxes.length > 0) {
-                if (!confirm(`Delete ${deleteCheckboxes.length} image(s)? This cannot be undone.`)) {
-                    e.preventDefault();
+            // Helper: Format file size
+            function formatSize(bytes) {
+                if (bytes < 1024) return bytes + ' B';
+                if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+                return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+            }
+
+            // Validate one file input
+            function validateFile(input) {
+                // Remove previous error messages
+                input.parentElement.querySelectorAll('.file-error, .file-size').forEach(el => el.remove());
+
+                const file = input.files[0];
+
+                // No file selected - valid
+                if (!file) {
+                    invalidFiles.delete(input);
+                    input.classList.remove('border-red-500', 'focus:ring-red-500');
+                    return true;
+                }
+
+                let valid = true;
+                let message = '';
+
+                // Check file type
+                if (!allowedTypes.includes(file.type)) {
+                    valid = false;
+                    message = 'Invalid file type. Only JPEG, PNG, JPG, and WEBP are allowed.';
+                }
+                // Check file size
+                else if (file.size > maxSize) {
+                    valid = false;
+                    message = `File too large (${formatSize(file.size)}). Max size is 5MB.`;
+                }
+
+                // Show file size
+                const sizeEl = document.createElement('p');
+                sizeEl.textContent = `Size: ${formatSize(file.size)}`;
+                sizeEl.className =
+                    `mt-1 text-sm ${valid ? 'text-gray-500 dark:text-gray-400' : 'text-red-500'} file-size`;
+                input.insertAdjacentElement('afterend', sizeEl);
+
+                // Show error if invalid
+                if (!valid) {
+                    invalidFiles.add(input);
+
+                    const errEl = document.createElement('p');
+                    errEl.textContent = message;
+                    errEl.className = 'mt-1 text-sm text-red-500 font-semibold file-error';
+                    input.insertAdjacentElement('afterend', errEl);
+                    input.classList.add('border-red-500', 'focus:ring-red-500');
+                } else {
+                    invalidFiles.delete(input);
+                    input.classList.remove('border-red-500', 'focus:ring-red-500');
+                }
+
+                return valid;
+            }
+
+            // Update submit button state
+            function refreshSubmitState() {
+                const hasInvalidFiles = invalidFiles.size > 0;
+
+                if (hasInvalidFiles) {
+                    submitButton.disabled = true;
+                    submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+                    submitButton.title = 'Fix invalid or oversized images before submitting';
+                } else {
+                    submitButton.disabled = false;
+                    submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                    submitButton.title = '';
                 }
             }
+
+            // Clear file input and validation
+            function clearFileInput(input) {
+                input.value = '';
+                input.parentElement.querySelectorAll('.file-error, .file-size').forEach(el => el.remove());
+                input.classList.remove('border-red-500', 'focus:ring-red-500');
+                invalidFiles.delete(input);
+            }
+
+            // Validate when file changes
+            fileInputs.forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+
+                    // --- if user cleared input ---
+                    if (!file) {
+                        clearFileInput(input);
+                        refreshSubmitState();
+                        return;
+                    }
+
+                    // --- validate immediately ---
+                    const isValid = validateFile(input);
+
+                    // --- always refresh button state after validation ---
+                    refreshSubmitState();
+
+                    // --- if invalid (too large or wrong type) ---
+                    if (!isValid) {
+                        // instantly disable submit before alert
+                        submitButton.disabled = true;
+                        submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+
+                        const reason = file.size > maxSize ?
+                            `The file size (${formatSize(file.size)}) exceeds the 5MB limit.` :
+                            'The file type is not allowed.';
+
+                        showTemporaryMessage(
+                            `❌ Cannot use this file: <strong>${file.name}</strong><br>${reason}<br>Please choose a JPEG, PNG, JPG, or WEBP image under 5MB.`,
+                            'error'
+                        );
+
+                        // clear invalid input so user must pick again
+                        clearFileInput(input);
+                        refreshSubmitState(); // keep disabled until fixed
+                        return;
+                    }
+
+                    // --- valid file ---
+                    invalidFiles.delete(input);
+                    refreshSubmitState();
+                });
+            });
+
+            // Intercept form submission - CRITICAL
+            form.addEventListener('submit', (e) => {
+                // Prevent double submission
+                if (formSubmitting) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    return false;
+                }
+
+                let allValid = true;
+                let invalidFileList = [];
+
+                // Validate each file input
+                fileInputs.forEach(input => {
+                    const file = input.files[0];
+                    if (file) {
+                        if (!validateFile(input)) {
+                            allValid = false;
+                            const reason = file.size > maxSize ?
+                                `(${formatSize(file.size)} - exceeds 5MB)` :
+                                '(invalid type)';
+                            invalidFileList.push(`• ${file.name} ${reason}`);
+                        }
+                    }
+                });
+
+                // BLOCK submission if any files are invalid
+                if (!allValid || invalidFiles.size > 0) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+
+                    submitButton.disabled = true;
+                    submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+
+                    showTemporaryMessage(
+                        `❌ Cannot submit form!<br><br>The following files are invalid:<br>${invalidFileList.join('<br>')}<br><br>⚠️ Please remove or replace these files before submitting.`,
+                        'error'
+                    );
+
+                    // Scroll to first invalid file
+                    const firstInvalidInput = Array.from(invalidFiles)[0];
+                    if (firstInvalidInput) {
+                        firstInvalidInput.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                        firstInvalidInput.focus();
+                    }
+
+                    return false;
+                }
+
+                // Check for delete confirmation
+                const checkedDeletes = Array.from(deleteCheckboxes).filter(cb => cb.checked);
+                if (checkedDeletes.length > 0) {
+                    if (!confirm(
+                            `⚠️ Delete ${checkedDeletes.length} image(s)?\n\nThis action cannot be undone.`
+                        )) {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        return false;
+                    }
+                }
+
+                // All validation passed - allow submission
+                formSubmitting = true;
+                submitButton.disabled = true;
+                submitButton.textContent = 'Saving...';
+                submitButton.classList.add('opacity-75');
+
+                return true;
+            });
+
+            // Prevent form submission via Enter key if invalid
+            form.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && invalidFiles.size > 0) {
+                    e.preventDefault();
+                    showTemporaryMessage('⚠️ Please fix invalid files before submitting.', 'warning');
+                    return false;
+                }
+            });
+
+            // Toggle all deletes function
+            window.toggleAllDeletes = function() {
+                const allChecked = Array.from(deleteCheckboxes).every(cb => cb.checked);
+                deleteCheckboxes.forEach(cb => cb.checked = !allChecked);
+            };
+
+            // Initial validation check on page load
+            fileInputs.forEach(input => {
+                if (input.files[0]) {
+                    validateFile(input);
+                }
+            });
+            refreshSubmitState();
         });
     </script>
-@endsection
+@endpush
