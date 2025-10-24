@@ -205,7 +205,6 @@ class PathImageController extends Controller
         $pathId = $pathId ?? $request->input('path_id');
         $path = Path::findOrFail($pathId);
 
-        // First validate basic structure
         $request->validate([
             'path_id' => 'required|exists:paths,id',
             'images' => 'required|array|min:1',
@@ -214,21 +213,16 @@ class PathImageController extends Controller
             'images.*.delete' => 'nullable|boolean',
         ]);
 
-        // Build dynamic validation rules for file uploads
-        $fileRules = [];
-        foreach ($request->file('images', []) as $index => $imageData) {
-            if (isset($imageData['image_file']) && $imageData['image_file'] !== null) {
-                $fileRules["images.{$index}.image_file"] = 'image|mimes:jpeg,png,jpg,webp|max:5120';
+        // Validate file uploads separately by checking request files
+        $filesValidation = [];
+        foreach ($request->file('images', []) as $index => $imageFiles) {
+            if (isset($imageFiles['image_file'])) {
+                $filesValidation["images.{$index}.image_file"] = 'image|max:10240';
             }
         }
 
-        // Validate files if any exist
-        if (!empty($fileRules)) {
-            $request->validate($fileRules, [
-                'images.*.image_file.max' => 'The image file must not exceed 5MB.',
-                'images.*.image_file.image' => 'The file must be an image.',
-                'images.*.image_file.mimes' => 'Only JPEG, PNG, JPG, and WEBP images are allowed.',
-            ]);
+        if (!empty($filesValidation)) {
+            $request->validate($filesValidation);
         }
 
         $updatedCount = 0;

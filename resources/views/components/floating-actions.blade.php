@@ -33,7 +33,7 @@
                             Add Path Images
                         </span>
                     </a>
-
+                    
                     <a href="{{ route('staff.create') }}" class="group flex items-center space-x-2">
                         <div
                             class="flex items-center justify-center w-12 h-12 hover:scale-120 transition-all duration-300">
