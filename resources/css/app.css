@@ -306,28 +306,18 @@
     }
 
     img-reveal .reveal-img {
-        position: absolute;
-        bottom: 100%; /* show above text */
-        left: 50%;
-        transform: translateX(-50%) translateY(-10px);
+        position: fixed; /* change to fixed so it always appears relative to viewport */
         opacity: 0;
         pointer-events: none;
-        transition: opacity 0.3s ease, transform 0.3s ease;
-        width: 180px;
+        width: 180px; /* adjust to match GIF */
+        max-width: 90vw; /* prevent overflow on small screens */
         border-radius: 10px;
-        z-index: 10;
+        z-index: 9999;
     }
 
     img-reveal .trigger-text {
         cursor: pointer;
-        color: #007bff;
         font-weight: 600;
-    }
-
-    /* Show image only when text is hovered */
-    img-reveal .trigger-text:hover + .reveal-img {
-        opacity: 1;
-        transform: translateX(-50%) translateY(-20px);
     }
 
     .custom-time-input {

@@ -3,8 +3,46 @@ import gsap from "gsap";
 
 // Make GSAP available globally
 window.gsap = gsap;
+class ImgReveal extends HTMLElement {
+    constructor() {
+        super();
+        this.text = this.querySelector(".trigger-text");
+        this.img = this.querySelector(".reveal-img");
+        if (!this.text || !this.img) return;
 
-class ImgReveal extends HTMLElement {}
+        this.text.addEventListener("mouseenter", () => this.show());
+        this.text.addEventListener("mouseleave", () => this.hide());
+    }
+
+    show() {
+        const rect = this.text.getBoundingClientRect();
+        const imgWidth = this.img.offsetWidth;
+        const imgHeight = this.img.offsetHeight;
+
+        const spaceAbove = rect.top;
+        const spaceBelow = window.innerHeight - rect.bottom;
+
+        // Default: show above
+        let top = rect.top - imgHeight - 10;
+        if (spaceAbove < imgHeight + 20 && spaceBelow > spaceAbove) {
+            // Flip below if not enough space above
+            top = rect.bottom + 10;
+        }
+
+        // Clamp horizontal so it doesn't overflow viewport
+        let left = rect.left + rect.width / 2 - imgWidth / 2;
+        left = Math.max(10, Math.min(left, window.innerWidth - imgWidth - 10));
+
+        this.img.style.top = `${top}px`;
+        this.img.style.left = `${left}px`;
+        this.img.style.opacity = 1;
+    }
+
+    hide() {
+        this.img.style.opacity = 0;
+    }
+}
+
 customElements.define("img-reveal", ImgReveal);
 
 const initCursor = () => {

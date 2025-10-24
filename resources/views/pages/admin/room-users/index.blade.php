@@ -6,8 +6,13 @@
     <div class="max-w-7xl mx-auto mt-8 px-4 sm:px-6 lg:px-8">
         <!-- Page Title -->
         <div class="text-center mb-6 sm:mb-8">
-            <h1 class="text-2xl sm:text-3xl lg:text-3xl font-bold text-gray-800 dark:text-white">
-                <span class="text-primary">Office User</span> Management
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-1 dark:text-gray-100">
+                <img-reveal>
+                    <span class="trigger-text text-primary">Office User</span>
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/spider-hacker.gif"
+                        alt="GIF" class="reveal-img">
+                </img-reveal>
+                Management
             </h1>
             <p class="text-sm sm:text-base lg:text-base text-gray-600 dark:text-gray-300 mt-1 sm:mt-2">
                 Manage users across different offices and rooms.

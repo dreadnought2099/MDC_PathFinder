@@ -10,9 +10,9 @@
             // Dispatch custom event to notify navbar
             window.dispatchEvent(new CustomEvent('tab-changed', { detail: { tab: newTab } }));
         }
-    }" x-init="sessionStorage.setItem('activeTab', tab);
-    // Initial dispatch
-    window.dispatchEvent(new CustomEvent('tab-changed', { detail: { tab: tab } }));" class="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        }" x-init="sessionStorage.setItem('activeTab', tab);
+        // Initial dispatch
+        window.dispatchEvent(new CustomEvent('tab-changed', { detail: { tab: tab } }));" class="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
         <!-- Navigation -->
         <nav class="mb-6 flex justify-center space-x-6">
