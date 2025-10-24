@@ -84,15 +84,33 @@
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                         Replace Image
                                     </label>
-                                    <input type="file" name="images[{{ $index }}][image_file]" accept="image/*"
-                                        class="image-file-input w-full text-sm border border-primary rounded px-3 py-2 
-                                      file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 
-                                      file:bg-[#157ee1] file:hover:bg-white file:text-white file:text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                                        data-index="{{ $index }}">
+                                    <div class="relative">
+                                        <input type="file" name="images[{{ $index }}][image_file]"
+                                            accept="image/*"
+                                            class="image-file-input w-full text-sm border border-primary rounded px-3 py-2 
+                                          file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 
+                                          file:bg-[#157ee1] file:hover:bg-white file:text-white file:text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                                            data-index="{{ $index }}">
+                                        <!-- Clear button (hidden by default) -->
+                                        <button type="button"
+                                            class="clear-file-btn hidden absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-colors duration-200"
+                                            data-index="{{ $index }}" title="Clear selected file">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
+                                                fill="currentColor">
+                                                <path fill-rule="evenodd"
+                                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                                    clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                     <!-- Error message for file size -->
                                     <p class="file-size-error hidden text-red-600 text-xs mt-1"
                                         data-index="{{ $index }}">
                                         File size must be less than 5MB
+                                    </p>
+                                    <!-- File name display -->
+                                    <p class="file-name-display hidden text-gray-600 dark:text-gray-400 text-xs mt-1"
+                                        data-index="{{ $index }}">
                                     </p>
                                 </div>
                             </div>
@@ -111,10 +129,6 @@
                 </button>
 
                 <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                    <a href="{{ route('path.show', $path) }}"
-                        class="px-4 py-2 text-sm border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover w-full sm:w-auto text-center">
-                        Cancel
-                    </a>
                     <button type="submit" id="submitButton"
                         class="px-4 py-2 text-sm border-2 border-primary text-white bg-primary hover:text-primary hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-primary shadow-primary-hover w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary disabled:hover:text-white">
                         Save Changes
@@ -123,7 +137,9 @@
             </div>
         </form>
     </div>
+@endsection
 
+@push('scripts')
     <script>
         const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
         const submitButton = document.getElementById('submitButton');
@@ -137,9 +153,17 @@
             fileInputs.forEach(input => {
                 const index = input.dataset.index;
                 const errorMsg = document.querySelector(`.file-size-error[data-index="${index}"]`);
+                const clearBtn = document.querySelector(`.clear-file-btn[data-index="${index}"]`);
+                const fileNameDisplay = document.querySelector(`.file-name-display[data-index="${index}"]`);
 
                 if (input.files && input.files[0]) {
-                    const fileSize = input.files[0].size;
+                    const file = input.files[0];
+                    const fileSize = file.size;
+
+                    // Show clear button and file name
+                    clearBtn.classList.remove('hidden');
+                    fileNameDisplay.classList.remove('hidden');
+                    fileNameDisplay.textContent = `Selected: ${file.name}`;
 
                     if (fileSize > MAX_FILE_SIZE) {
                         errorMsg.classList.remove('hidden');
@@ -152,7 +176,10 @@
                         input.classList.add('border-primary');
                     }
                 } else {
+                    // Hide clear button, error message, and file name when no file selected
+                    clearBtn.classList.add('hidden');
                     errorMsg.classList.add('hidden');
+                    fileNameDisplay.classList.add('hidden');
                     input.classList.remove('border-red-500');
                     input.classList.add('border-primary');
                 }
@@ -167,6 +194,20 @@
         // Add event listeners to all file inputs
         document.querySelectorAll('.image-file-input').forEach(input => {
             input.addEventListener('change', function() {
+                validateAllFileSizes();
+            });
+        });
+
+        // Add event listeners to all clear buttons
+        document.querySelectorAll('.clear-file-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const index = this.dataset.index;
+                const fileInput = document.querySelector(`.image-file-input[data-index="${index}"]`);
+
+                // Clear the file input
+                fileInput.value = '';
+
+                // Trigger validation to update UI
                 validateAllFileSizes();
             });
         });
@@ -199,4 +240,4 @@
             }
         });
     </script>
-@endsection
+@endpush
