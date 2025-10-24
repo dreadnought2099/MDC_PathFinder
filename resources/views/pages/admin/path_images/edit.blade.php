@@ -16,7 +16,8 @@
         </div>
 
         <!-- Form -->
-        <form action="{{ route('path-image.update-multiple', $path) }}" method="POST" enctype="multipart/form-data">
+        <form id="pathImagesForm" action="{{ route('path-image.update-multiple', $path) }}" method="POST"
+            enctype="multipart/form-data">
             @csrf
             @method('PATCH')
             <input type="hidden" name="path_id" value="{{ $path->id }}">
@@ -84,9 +85,15 @@
                                         Replace Image
                                     </label>
                                     <input type="file" name="images[{{ $index }}][image_file]" accept="image/*"
-                                        class="w-full text-sm border border-primary rounded px-3 py-2 
+                                        class="image-file-input w-full text-sm border border-primary rounded px-3 py-2 
                                       file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 
-                                      file:bg-[#157ee1] fle:hover:bg-white file:text-white file:text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                                      file:bg-[#157ee1] file:hover:bg-white file:text-white file:text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                                        data-index="{{ $index }}">
+                                    <!-- Error message for file size -->
+                                    <p class="file-size-error hidden text-red-600 text-xs mt-1"
+                                        data-index="{{ $index }}">
+                                        File size must be less than 5MB
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -108,8 +115,8 @@
                         class="px-4 py-2 text-sm border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover w-full sm:w-auto text-center">
                         Cancel
                     </a>
-                    <button type="submit"
-                        class="px-4 py-2 text-sm border-2 border-primary text-white bg-primary hover:text-primary hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-primary shadow-primary-hover w-full sm:w-auto">
+                    <button type="submit" id="submitButton"
+                        class="px-4 py-2 text-sm border-2 border-primary text-white bg-primary hover:text-primary hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-primary shadow-primary-hover w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary disabled:hover:text-white">
                         Save Changes
                     </button>
                 </div>
@@ -118,6 +125,52 @@
     </div>
 
     <script>
+        const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+        const submitButton = document.getElementById('submitButton');
+        const form = document.getElementById('pathImagesForm');
+
+        // Validate file size for all file inputs
+        function validateAllFileSizes() {
+            const fileInputs = document.querySelectorAll('.image-file-input');
+            let allValid = true;
+
+            fileInputs.forEach(input => {
+                const index = input.dataset.index;
+                const errorMsg = document.querySelector(`.file-size-error[data-index="${index}"]`);
+
+                if (input.files && input.files[0]) {
+                    const fileSize = input.files[0].size;
+
+                    if (fileSize > MAX_FILE_SIZE) {
+                        errorMsg.classList.remove('hidden');
+                        input.classList.add('border-red-500');
+                        input.classList.remove('border-primary');
+                        allValid = false;
+                    } else {
+                        errorMsg.classList.add('hidden');
+                        input.classList.remove('border-red-500');
+                        input.classList.add('border-primary');
+                    }
+                } else {
+                    errorMsg.classList.add('hidden');
+                    input.classList.remove('border-red-500');
+                    input.classList.add('border-primary');
+                }
+            });
+
+            // Enable/disable submit button based on validation
+            submitButton.disabled = !allValid;
+
+            return allValid;
+        }
+
+        // Add event listeners to all file inputs
+        document.querySelectorAll('.image-file-input').forEach(input => {
+            input.addEventListener('change', function() {
+                validateAllFileSizes();
+            });
+        });
+
         // Toggle all delete checkboxes
         function toggleAllDeletes() {
             const checkboxes = document.querySelectorAll('input[type="checkbox"][name*="[delete]"]');
@@ -129,7 +182,14 @@
         }
 
         // Confirm before submitting if deletions are selected
-        document.querySelector('form').addEventListener('submit', function(e) {
+        form.addEventListener('submit', function(e) {
+            // Validate file sizes one more time before submission
+            if (!validateAllFileSizes()) {
+                e.preventDefault();
+                alert('Please fix the file size errors before submitting.');
+                return;
+            }
+
             const deleteCheckboxes = document.querySelectorAll('input[type="checkbox"][name*="[delete]"]:checked');
 
             if (deleteCheckboxes.length > 0) {
