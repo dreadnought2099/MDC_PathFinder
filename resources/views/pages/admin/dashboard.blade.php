@@ -7,7 +7,12 @@
             <!-- Header Section -->
             <div class="text-center mb-8">
                 <h1 class="text-4xl lg:text-5xl font-bold text-gray-800 dark:text-white mb-3">
-                    <span class="text-primary">{{ Auth::user()->room->name ?? Auth::user()->username }}</span> Dashboard
+                    <img-reveal>
+                        <span class="trigger-text text-primary">{{ Auth::user()->room->name ?? Auth::user()->username }}</span>
+                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/pengu-admin.gif"
+                            alt="GIF" class="reveal-img">
+                    </img-reveal>
+                    Dashboard
                 </h1>
                 <p class="text-base lg:text-lg text-gray-600 dark:text-gray-300">Manage your organization's staff and office
                     spaces</p>
@@ -26,7 +31,8 @@
                             <span class="trigger-text text-2xl lg:text-3xl font-bold text-blue-600 mb-1 dark:text-blue-400">
                                 {{ $totalStaffs }}
                             </span>
-                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/bad-shark2.gif" alt="GIF" class="reveal-img">
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/three-minions.gif"
+                                alt="GIF" class="reveal-img">
                             <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Total Staffs</div>
                         </div>
                     </img-reveal>
@@ -39,7 +45,8 @@
                                 class="trigger-text text-2xl lg:text-3xl font-bold text-green-600 mb-1 dark:text-green-400">
                                 {{ $totalRooms }}
                             </span>
-                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/mr-incredible.gif" alt="GIF" class="reveal-img">
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/mr-incredible.gif"
+                                alt="GIF" class="reveal-img">
                             <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Total Offices</div>
                         </div>
                     </img-reveal>
@@ -52,7 +59,8 @@
                                 class="trigger-text text-2xl lg:text-3xl font-bold text-purple-600 mb-1 dark:text-purple-400">
                                 {{ $totalAssignments }}
                             </span>
-                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/pages.gif" alt="GIF" class="reveal-img">
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/pages.gif"
+                                alt="GIF" class="reveal-img">
                             <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Assignments</div>
                         </div>
                     </img-reveal>
@@ -66,7 +74,8 @@
                                     class="trigger-text text-2xl lg:text-3xl font-bold text-orange-600 mb-1 dark:text-orange-400">
                                     {{ $totalPaths }}
                                 </span>
-                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/kermit-map.gif" alt="GIF" class="reveal-img">
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/kermit-map.gif"
+                                    alt="GIF" class="reveal-img">
                                 <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Paths</div>
                             </div>
                         </img-reveal>
