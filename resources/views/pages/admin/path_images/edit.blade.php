@@ -119,22 +119,28 @@
                 </div>
             </div>
 
-            <!-- Actions -->
-            <div
-                class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sticky bottom-0 p-4 bg-white dark:bg-gray-800 rounded-md border border-primary">
+            <!-- Spacer to prevent content from being hidden behind fixed buttons -->
+            <div class="h-20"></div>
+        </form>
 
+        <!-- Actions - Fixed at bottom -->
+        <div
+            class="fixed bottom-0 left-0 right-0 z-50 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 p-4 bg-white dark:bg-gray-800 border-t-2 border-primary shadow-lg">
+            <div
+                class="container mx-auto px-4 max-w-6xl flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                 <button type="button" onclick="toggleAllDeletes()"
                     class="px-4 py-2 text-sm border-2 border-secondary text-white bg-secondary hover:text-secondary hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-secondary shadow-secondary-hover w-full sm:w-auto">
                     Toggle All Deletes
                 </button>
 
                 <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                    <button type="submit" id="submitButton"
+                    <button type="submit" id="submitButton" form="pathImagesForm"
                         class="px-4 py-2 text-sm border-2 border-primary text-white bg-primary hover:text-primary hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-primary shadow-primary-hover w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary disabled:hover:text-white">
                         Save Changes
                     </button>
                 </div>
             </div>
+        </div>
         </form>
     </div>
 @endsection
@@ -144,6 +150,9 @@
         const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
         const submitButton = document.getElementById('submitButton');
         const form = document.getElementById('pathImagesForm');
+
+        // Save the current path ID to sessionStorage for the floating action button
+        sessionStorage.setItem('selectedPathId', '{{ $path->id }}');
 
         // Validate file size for all file inputs
         function validateAllFileSizes() {
