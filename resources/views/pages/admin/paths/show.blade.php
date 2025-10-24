@@ -103,11 +103,17 @@
                 @endif
             </div>
         </div>
-    @endsection
+    </div>
+@endsection
 
-    @push('scripts')
-        <script>
-            window.glightboxInstance = window.glightboxInstance || GLightbox({
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.glightboxInstance) {
+                window.glightboxInstance.destroy();
+            }
+
+            window.glightboxInstance = GLightbox({
                 selector: '.glightbox',
                 touchNavigation: true,
                 loop: true,
@@ -115,10 +121,11 @@
                 autoplayVideos: false,
                 moreText: 'View Image',
                 svg: {
-                    close: '<img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png"/>',
-                    next: '<img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/next.png"/>',
-                    prev: '<img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/prev.png"/>'
+                    close: '<img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png" alt="Close"/>',
+                    next: '<svg width="25" height="40" viewBox="0 0 25 40" xmlns="http://www.w3.org/2000/svg"><path d="M5 0 L25 20 L5 40" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+                    prev: '<svg width="25" height="40" viewBox="0 0 25 40" xmlns="http://www.w3.org/2000/svg"><path d="M20 0 L0 20 L20 40" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>'
                 }
             });
-        </script>
-    @endpush
+        });
+    </script>
+@endpush

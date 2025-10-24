@@ -140,6 +140,26 @@
         -moz-appearance: textfield; /* Firefox fallback */
         -webkit-appearance: textfield; /* Older WebKit browsers */
     }
+
+    /* Ensure custom cursor is always visible even over GLightbox */
+    .cursor-dot,
+    .cursor-outline,
+    .cursor-particles {
+        position: fixed !important;
+        pointer-events: none !important;
+        z-index: 2147483647 !important; /* absolute top */
+    }
+
+    /* Keep default cursor hidden inside GLightbox */
+    .custom-cursor-enabled .glightbox-container,
+    .custom-cursor-enabled .glightbox-container * {
+        cursor: none !important;
+    }
+
+    /* Fix pointer events blocking issue if any */
+    body.glightbox-open {
+        pointer-events: auto !important;
+    }
 }
 
 @layer components {
@@ -604,7 +624,7 @@
     .shadow-primary {
         box-shadow: 0 4px 15px rgba(21, 126, 225, 0.4);
     }
-    
+
     .shadow-primary-hover {
         transition: all 0.3s ease;
     }

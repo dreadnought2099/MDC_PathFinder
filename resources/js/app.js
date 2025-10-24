@@ -1,6 +1,9 @@
 import "./bootstrap";
 import gsap from "gsap";
 
+// Make GSAP available globally
+window.gsap = gsap;
+
 class ImgReveal extends HTMLElement {}
 customElements.define("img-reveal", ImgReveal);
 
@@ -107,12 +110,11 @@ const initCursor = () => {
         if (el.dataset.cursorHover) return;
         el.dataset.cursorHover = "true";
         el.addEventListener("mouseenter", () => {
-            // Instant hover grow (no easing)
             gsap.to(cursorDot, {
                 scale: 2,
                 backgroundColor: "#16c47f",
-                duration: 0.05, // faster response
-                ease: "power1.out", // slight ease for smoothness
+                duration: 0.05,
+                ease: "power1.out",
             });
             gsap.to(cursorOutline, {
                 scale: 1.5,
@@ -122,7 +124,6 @@ const initCursor = () => {
             });
         });
         el.addEventListener("mouseleave", () => {
-            // Instant revert (no easing)
             gsap.to(cursorDot, {
                 scale: 1,
                 backgroundColor: "#157ee1",
@@ -143,32 +144,62 @@ const initCursor = () => {
             'a, button, input:not([type="file"]), textarea, select, [role="button"], [onclick], .clickable, label[for]';
         document.querySelectorAll(selector).forEach(createHoverEffect);
     };
+
+    const applyGlightboxEffects = () => {
+        // Specific selectors for GLightbox elements
+        const glightboxSelectors =
+            ".gclose, .gnext, .gprev, .gslide-image, .gslide-description";
+        document
+            .querySelectorAll(glightboxSelectors)
+            .forEach(createHoverEffect);
+    };
+
     applyHoverEffects();
 
-    const observer = new MutationObserver(() => applyHoverEffects());
+    // Update observer to watch for GLightbox container specifically
+    const observer = new MutationObserver((mutations) => {
+        const hasGlightbox = mutations.some((mutation) =>
+            Array.from(mutation.addedNodes).some(
+                (node) =>
+                    node.classList &&
+                    node.classList.contains("glightbox-container")
+            )
+        );
+
+        if (hasGlightbox) {
+            // Apply both general and GLightbox-specific effects
+            setTimeout(() => {
+                applyHoverEffects();
+                applyGlightboxEffects();
+            }, 150);
+        } else {
+            applyHoverEffects();
+        }
+    });
+
     observer.observe(document.body, { childList: true, subtree: true });
 
     document.addEventListener("click", (e) => {
+        // Purple pulse effect on click
         gsap.to(cursorDot, {
-            scale: 0.5,
+            scale: 0.6,
             backgroundColor: "#FF2DD1",
-            duration: 0.1,
+            duration: 0.12,
+            ease: "power2.inOut",
             yoyo: true,
             repeat: 1,
-            ease: "power2.inOut",
-            onComplete: () =>
-                gsap.set(cursorDot, { backgroundColor: "#157ee1" }),
         });
+
         gsap.to(cursorOutline, {
-            scale: 0.7,
+            scale: 0.8,
             borderColor: "#FF2DD1",
-            duration: 0.1,
+            duration: 0.12,
+            ease: "power2.inOut",
             yoyo: true,
             repeat: 1,
-            ease: "power2.inOut",
-            onComplete: () =>
-                gsap.set(cursorOutline, { borderColor: "#157ee1" }),
         });
+
+        // Particle burst
         createParticles(e.clientX, e.clientY);
     });
 
@@ -189,7 +220,6 @@ const initCursor = () => {
 
     // Particle creation with slight delay to sync with trailing outline
     function createParticles(x, y) {
-        // Delay particles slightly (matches cursorOutline motion)
         gsap.delayedCall(0.08, () => {
             const fragment = document.createDocumentFragment();
             for (let i = 0; i < 8; i++) {
@@ -215,6 +245,61 @@ const initCursor = () => {
         });
     }
 };
+
+// --- Ensure cursor stays above GLightbox ---
+const bringCursorToFront = () => {
+    const cursorEls = document.querySelectorAll(
+        ".cursor-dot, .cursor-outline, .cursor-particles"
+    );
+    cursorEls.forEach((el) => document.body.appendChild(el));
+};
+
+// When GLightbox opens, re-append cursor elements to the top and reapply hover effects
+document.addEventListener("glightbox_open", () => {
+    setTimeout(() => {
+        bringCursorToFront();
+
+        // Reapply cursor hover effects for GLightbox buttons
+        const cursorDot = document.querySelector(".cursor-dot");
+        const cursorOutline = document.querySelector(".cursor-outline");
+
+        const glightboxSelectors =
+            ".gclose, .gnext, .gprev, .gslide-image, .gslide-description";
+        document.querySelectorAll(glightboxSelectors).forEach((el) => {
+            el.addEventListener("mouseenter", () => {
+                gsap.to(cursorDot, {
+                    scale: 2,
+                    backgroundColor: "#16c47f",
+                    duration: 0.05,
+                    ease: "power1.out",
+                });
+                gsap.to(cursorOutline, {
+                    scale: 1.5,
+                    borderColor: "#16c47f",
+                    duration: 0.05,
+                    ease: "power1.out",
+                });
+            });
+            el.addEventListener("mouseleave", () => {
+                gsap.to(cursorDot, {
+                    scale: 1,
+                    backgroundColor: "#157ee1",
+                    duration: 0.05,
+                    ease: "power1.out",
+                });
+                gsap.to(cursorOutline, {
+                    scale: 1,
+                    borderColor: "#157ee1",
+                    duration: 0.05,
+                    ease: "power1.out",
+                });
+            });
+        });
+
+        // Smooth fade-in if needed
+        gsap.to([cursorDot, cursorOutline], { opacity: 1, duration: 0.3 });
+    }, 150);
+});
 
 // --- Fallback-safe initialization ---
 const init = () => {
