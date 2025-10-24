@@ -77,8 +77,10 @@
 
                                     {{-- Add Path Images --}}
                                     <div class="relative inline-block group">
-                                        <a href="{{ route('path-image.create', $path->id) }}"
-                                            class="hover-underline inline-flex items-center justify-center p-2 rounded-lg hover:scale-125 transition duration-200">
+                                        <a id="pathRowImageLink_{{ $path->id }}"
+                                            href="{{ route('path-image.create', $path->id) }}"
+                                            class="hover-underline inline-flex items-center justify-center p-2 rounded-lg hover:scale-125 transition duration-200"
+                                            onclick="savePathSelection({{ $path->id }})">
                                             <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
                                                 alt="Add Image"
                                                 class="block w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 object-contain">

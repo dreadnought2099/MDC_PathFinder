@@ -69,9 +69,10 @@
                                             <span x-show="selectedId == path.id" class="float-right text-primary">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                                     fill="currentColor">
-                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586
-                                                                        6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
-                                                                        0 001.414 0l7-7a1 1 0 000-1.414z"
+                                                    <path fill-rule="evenodd"
+                                                        d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586
+                                                            6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
+                                                            0 001.414 0l7-7a1 1 0 000-1.414z"
                                                         clip-rule="evenodd" />
                                                 </svg>
                                             </span>
@@ -90,7 +91,7 @@
                         class="flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary dark:hover:bg-gray-800 transition-colors p-4 overflow-auto relative">
                         <span class="text-gray-600 dark:text-gray-300 mb-2">Drop images here or click to browse</span>
                         <span class="text-xs text-gray-400">
-                            JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 5 MB each | multiple allowed
+                            JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 10 MB each | multiple allowed
                         </span>
 
                         <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
@@ -126,14 +127,31 @@
                 selectedName: '',
 
                 init() {
-                    // Load from sessionStorage
+                    // Priority: sessionStorage > defaultPathId (from URL)
                     const storedId = sessionStorage.getItem('selectedPathId');
-                    const selectedId = storedId ? parseInt(storedId, 10) : this.selectedId;
 
-                    const selected = this.paths.find(p => p.id === selectedId);
+                    // If there's a stored ID, use it; otherwise use the URL parameter
+                    const targetId = storedId ? parseInt(storedId, 10) : this.selectedId;
 
-                    this.selectedId = selected ? selected.id : defaultPathId;
-                    this.selectedName = selected ? selected.display_name : '';
+                    const selected = this.paths.find(p => p.id === targetId);
+
+                    if (selected) {
+                        this.selectedId = selected.id;
+                        this.selectedName = selected.display_name;
+
+                        // Save back to sessionStorage
+                        sessionStorage.setItem('selectedPathId', this.selectedId);
+
+                        // Update the URL if different from what was passed
+                        if (this.selectedId !== defaultPathId) {
+                            this.updateBrowserUrl();
+                        }
+                    } else {
+                        // Fallback to default
+                        this.selectedId = defaultPathId;
+                        const defaultPath = this.paths.find(p => p.id === defaultPathId);
+                        this.selectedName = defaultPath ? defaultPath.display_name : '';
+                    }
 
                     this.filteredPaths = this.paths;
                 },
@@ -165,7 +183,17 @@
 
                     // Save selection to sessionStorage
                     sessionStorage.setItem('selectedPathId', path.id);
+
+                    // Update the browser URL
+                    this.updateBrowserUrl();
                 },
+
+                updateBrowserUrl() {
+                    // Update URL without page reload
+                    const baseUrl = "{{ route('path-image.create', ':pathId') }}";
+                    const newUrl = baseUrl.replace(':pathId', this.selectedId);
+                    window.history.replaceState({}, '', newUrl);
+                }
             };
         }
 
@@ -187,7 +215,7 @@
 
             // ===== CONFIGURATION =====
             const MAX_FILES = 20;
-            const MAX_FILE_SIZE = 5 * 1024 * 1024; // 10 MB
+            const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
             const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // 100 MB
             const ALLOWED_TYPES = [
                 'image/jpeg', 'image/jpg', 'image/png', 'image/gif',
@@ -349,7 +377,7 @@
                 const fileError = document.getElementById('fileError');
                 let compressionInfo = [];
 
-                fileError.innerHTML = '<div class="text-blue-600">Compressing images...</div>';
+                fileError.innerHTML = '<div class="text-blue-600">⏳ Compressing images...</div>';
                 fileError.classList.remove('hidden');
 
                 for (const file of filesToProcess) {

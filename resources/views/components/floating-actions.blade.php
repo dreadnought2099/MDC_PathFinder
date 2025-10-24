@@ -5,11 +5,13 @@
         <!-- Buttons -->
         @if (auth()->user()->hasRole('Admin'))
             <template x-if="open">
-                <div class="bg-slate-300 rounded-md p-4 border border-primary dark:bg-gray-800 flex flex-col space-y-2 mb-2">
+                <div
+                    class="bg-slate-300 rounded-md p-4 border border-primary dark:bg-gray-800 flex flex-col space-y-2 mb-2">
                     <a href="{{ route('room.create') }}" class="group flex items-center space-x-2">
                         <div
                             class="flex items-center justify-center w-12 h-12 hover:scale-120 transition-all duration-300">
-                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/offices.png" alt="Add Room/Office" />
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/offices.png"
+                                alt="Add Room/Office" />
                         </div>
                         <span class="text-sm text-gray-700 hover-underline dark:text-gray-300">Add Office</span>
                     </a>
@@ -18,11 +20,14 @@
                         $firstPath = \App\Models\Path::first();
                     @endphp
 
-                    <a href="{{ $firstPath ? route('path-image.create', $firstPath) : '#' }}"
-                        class="group flex items-center space-x-2 @if (!$firstPath) opacity-50 cursor-not-allowed @endif">
+                    <a id="floatingPathImageLink"
+                        href="{{ $firstPath ? route('path-image.create', $firstPath->id) : '#' }}"
+                        class="group flex items-center space-x-2 @if (!$firstPath) opacity-50 cursor-not-allowed @endif"
+                        @if ($firstPath) onclick="return updatePathLinkBeforeNavigate(event, 'floatingPathImageLink')" @endif>
                         <div
                             class="flex items-center justify-center w-12 h-12 hover:scale-120 transition-all duration-300">
-                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png" alt="Add Path Images" />
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
+                                alt="Add Path Images" />
                         </div>
                         <span class="text-sm text-gray-700 hover-underline dark:text-gray-300">
                             Add Path Images
@@ -32,7 +37,8 @@
                     <a href="{{ route('staff.create') }}" class="group flex items-center space-x-2">
                         <div
                             class="flex items-center justify-center w-12 h-12 hover:scale-120 transition-all duration-300">
-                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder@cac2411/public/icons/staff.png" alt="Add Staff Member" />
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder@cac2411/public/icons/staff.png"
+                                alt="Add Staff Member" />
                         </div>
                         <span class="text-sm text-gray-700 hover-underline dark:text-gray-300">Add Staff Member</span>
                     </a>
@@ -41,7 +47,8 @@
                     <a href="{{ route('room-user.create') }}" class="group flex items-center space-x-2">
                         <div
                             class="flex items-center justify-center w-12 h-12 hover:scale-120 transition-all duration-300">
-                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder@cac2411/public/icons/user.png" alt="Add Staff Member" />
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder@cac2411/public/icons/user.png"
+                                alt="Add Staff Member" />
                         </div>
                         <span class="text-sm text-gray-700 hover-underline dark:text-gray-300">Add Office User</span>
                     </a>
