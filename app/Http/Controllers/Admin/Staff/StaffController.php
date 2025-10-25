@@ -6,11 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Staff;
 use App\Models\Room;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
-use Intervention\Image\Drivers\Gd\Driver;
-use Intervention\Image\Encoders\WebpEncoder;
 use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
+use Intervention\Image\Drivers\Gd\Driver as GdDriver;
 
 class StaffController extends Controller
 {
@@ -18,45 +19,43 @@ class StaffController extends Controller
 
     public function __construct()
     {
-        $this->manager = new ImageManager(new Driver());
+        // Use Imagick if available, fallback to GD
+        if (extension_loaded('imagick')) {
+            $this->manager = new ImageManager(new ImagickDriver());
+        } else {
+            Log::warning('Imagick not available, using GD driver. Install Imagick for better performance.');
+            $this->manager = new ImageManager(new GdDriver());
+        }
     }
 
     public function index(Request $request)
     {
-        // Get parameters (from request or session)
         $sort = $request->input('sort', session('staff.sort', 'full_name'));
         $direction = $request->input('direction', session('staff.direction', 'asc'));
         $search = $request->input('search', session('staff.search', ''));
 
-        // Always save to session
         session([
             'staff.sort' => $sort,
             'staff.direction' => $direction,
             'staff.search' => $search,
         ]);
 
-        // Get current user
         $user = auth()->user();
 
-        // Build query using model scopes
         $query = Staff::with('room')
             ->when(
                 $user->hasRole('Office Manager') && $user->room_id,
-                fn($q) =>
-                $q->where('room_id', $user->room_id)
+                fn($q) => $q->where('room_id', $user->room_id)
             )
             ->when(
                 $user->hasRole('Office Manager') && !$user->room_id,
-                fn($q) =>
-                $q->whereRaw('1 = 0') // no assigned room → show nothing
+                fn($q) => $q->whereRaw('1 = 0')
             )
             ->search($search)
             ->sortBy($sort, $direction);
 
-        // Paginate results
         $staffs = $query->paginate(10)->withQueryString();
 
-        // Handle AJAX requests
         if ($request->ajax()) {
             return response()->json([
                 'html' => view('pages.admin.staffs.partials.staff-table', compact('staffs'))->render(),
@@ -65,7 +64,6 @@ class StaffController extends Controller
 
         return view('pages.admin.staffs.index', compact('staffs', 'sort', 'direction', 'search'));
     }
-
 
     public function create()
     {
@@ -91,10 +89,7 @@ class StaffController extends Controller
         $staff = Staff::create($validated);
 
         if ($request->hasFile('photo_path')) {
-            $webpPath = $this->convertToWebP(
-                $request->file('photo_path'),
-                "staffs/{$staff->id}"
-            );
+            $webpPath = $this->convertToWebP($request->file('photo_path'), "staffs/{$staff->id}");
             $staff->update(['photo_path' => $webpPath]);
         }
 
@@ -104,19 +99,18 @@ class StaffController extends Controller
             return response()->json(['redirect' => route('staff.show', $staff->id)], 200);
         }
 
-        return redirect()->route('staff.index')
-            ->with('success', "{$staff->full_name} was added successfully.");
+        return redirect()->route('staff.index')->with('success', "{$staff->full_name} was added successfully.");
     }
 
     public function show(Staff $staff)
     {
         return view('pages.admin.staffs.show', compact('staff'));
     }
+
     public function clientShow(Staff $staff)
     {
         return view('pages.client.room-details.client-show', compact('staff'));
     }
-
 
     public function edit($id)
     {
@@ -151,7 +145,6 @@ class StaffController extends Controller
             'delete_photo' => 'nullable|string',
         ]);
 
-        // Handle photo deletion
         if ($request->delete_photo === "1" && $staff->photo_path) {
             if (Storage::disk('public')->exists($staff->photo_path)) {
                 Storage::disk('public')->delete($staff->photo_path);
@@ -159,16 +152,12 @@ class StaffController extends Controller
             $staff->photo_path = null;
         }
 
-        // Handle new photo upload
         if ($request->hasFile('photo_path')) {
             if ($staff->photo_path && Storage::disk('public')->exists($staff->photo_path)) {
                 Storage::disk('public')->delete($staff->photo_path);
             }
 
-            $webpPath = $this->convertToWebP(
-                $request->file('photo_path'),
-                "staffs/{$staff->id}"
-            );
+            $webpPath = $this->convertToWebP($request->file('photo_path'), "staffs/{$staff->id}");
             $validated['photo_path'] = $webpPath;
         }
 
@@ -227,7 +216,6 @@ class StaffController extends Controller
         $staffs = Staff::with('room')
             ->select('id', 'first_name', 'middle_name', 'last_name', 'suffix', 'room_id', 'full_name')
             ->when(strlen($query) >= 3, function ($q) use ($query) {
-                // Use FULLTEXT for longer queries
                 $q->whereRaw("MATCH(first_name, middle_name, last_name, suffix, full_name) AGAINST(? IN BOOLEAN MODE)", [$query])
                     ->orWhere('first_name', 'like', "%{$query}%")
                     ->orWhere('middle_name', 'like', "%{$query}%")
@@ -235,7 +223,6 @@ class StaffController extends Controller
                     ->orWhere('suffix', 'like', "%{$query}%")
                     ->orWhere('full_name', 'like', "%{$query}%");
             }, function ($q) use ($query) {
-                // Use only LIKE for short queries
                 $q->where('first_name', 'like', "%{$query}%")
                     ->orWhere('middle_name', 'like', "%{$query}%")
                     ->orWhere('last_name', 'like', "%{$query}%")
@@ -255,22 +242,30 @@ class StaffController extends Controller
     }
 
     /**
-     * Convert pre-compressed frontend image to WebP
-     * Backend responsibility only: format conversion, high quality (90), no resizing
+     * Convert uploaded image to WebP format
+     * Uses Imagick if available, falls back to GD
+     * Intervention Image v3 syntax
      */
     private function convertToWebP($file, $folder)
     {
         $baseName = uniqid('', true);
         $webpPath = "{$folder}/{$baseName}.webp";
 
+        // Read image using Intervention Image v3
         $image = $this->manager->read($file);
 
-        // NO resizing, no additional compression
-        $encodedImage = $image->encode(new WebpEncoder(quality: 80));
-        unset($image);
+        // Resize to max 1200px width to prevent memory issues
+        // Works with both Imagick and GD drivers
+        $image->scaleDown(width: 1200);
 
+        // Convert to WebP with 80% quality
+        $encodedImage = $image->toWebp(80);
+
+        // Save to storage
         Storage::disk('public')->put($webpPath, (string) $encodedImage);
-        unset($encodedImage);
+
+        // Memory is automatically managed in v3
+        unset($image, $encodedImage);
 
         return $webpPath;
     }
