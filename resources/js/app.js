@@ -1,27 +1,15 @@
 import "./bootstrap";
 import gsap from "gsap";
-import {
-    savePathSelection,
-    updatePathLinkBeforeNavigate,
-    initializePathLinks,
-} from "./path-selection";
+import { initializeFloatingLink, savePathSelection } from "./path-selection";
 
 // Make GSAP available globally
 window.gsap = gsap;
 
-// Make functions globally available
+// Make savePathSelection globally available for use in blade templates
 window.savePathSelection = savePathSelection;
-window.updatePathLinkBeforeNavigate = updatePathLinkBeforeNavigate;
 
-// Initialize path links on DOM load
 document.addEventListener("DOMContentLoaded", () => {
-    const floatingLink = document.getElementById("floatingPathImageLink");
-    if (floatingLink) {
-        const routeBase = floatingLink.getAttribute("data-route-base");
-        if (routeBase) {
-            initializePathLinks(routeBase);
-        }
-    }
+    initializeFloatingLink();
 });
 
 class ImgReveal extends HTMLElement {

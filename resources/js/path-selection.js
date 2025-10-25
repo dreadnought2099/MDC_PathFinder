@@ -2,29 +2,36 @@ export function savePathSelection(pathId) {
     sessionStorage.setItem("selectedPathId", pathId);
 }
 
-// Navigate with remembered path
-export function updatePathLinkBeforeNavigate(event, createRouteBase) {
+export function updatePathLinkBeforeNavigate(createRouteBase) {
     const storedPathId = sessionStorage.getItem("selectedPathId");
     if (storedPathId) {
-        event.preventDefault();
         const newUrl = createRouteBase.replace(":pathId", storedPathId);
         window.location.href = newUrl;
-        return false;
+        return true;
     }
-    return true;
+    return false;
 }
 
-// Update links on page load
-export function initializePathLinks(createRouteBase) {
-    const storedPathId = sessionStorage.getItem("selectedPathId");
+export function initializeFloatingLink() {
+    const link = document.getElementById("floatingPathImageLink");
+    if (!link) return;
 
+    const routeBase = link.dataset.routeBase;
+    if (!routeBase) return;
+
+    // Update href if sessionStorage already has path
+    const storedPathId = sessionStorage.getItem("selectedPathId");
     if (storedPathId) {
-        const floatingLink = document.getElementById("floatingPathImageLink");
-        if (floatingLink) {
-            floatingLink.href = createRouteBase.replace(
-                ":pathId",
-                storedPathId
-            );
-        }
+        link.href = routeBase.replace(":pathId", storedPathId);
     }
+
+    // Attach click handler
+    link.addEventListener("click", (event) => {
+        const storedPathId = sessionStorage.getItem("selectedPathId");
+        if (storedPathId) {
+            event.preventDefault();
+            link.href = routeBase.replace(":pathId", storedPathId);
+            window.location.href = link.href;
+        }
+    });
 }

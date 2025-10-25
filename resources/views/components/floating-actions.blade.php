@@ -23,8 +23,7 @@
                     <a id="floatingPathImageLink"
                         href="{{ $firstPath ? route('path-image.create', $firstPath->id) : '#' }}"
                         data-route-base="{{ route('path-image.create', ':pathId') }}"
-                        class="group flex items-center space-x-2 @if (!$firstPath) opacity-50 cursor-not-allowed @endif"
-                        @if ($firstPath) onclick="return updatePathLinkBeforeNavigate(event, 'floatingPathImageLink', '{{ route('path-image.create', ':pathId') }}')" @endif>
+                        class="group flex items-center space-x-2 {{ !$firstPath ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}">
                         <div
                             class="flex items-center justify-center w-12 h-12 hover:scale-120 transition-all duration-300">
                             <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
