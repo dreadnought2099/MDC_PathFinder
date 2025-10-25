@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Encoders\WebpEncoder;
-use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
+use Intervention\Image\Drivers\Gd\Driver as GdDriver;
 
 class PathImageController extends Controller
 {
@@ -31,10 +32,14 @@ class PathImageController extends Controller
         ]);
 
         $this->middleware('auth');
-        ini_set('memory_limit', '512M');
-        ini_set('max_execution_time', '300');
 
-        $this->manager = new ImageManager(new Driver());
+        // Use Imagick if available, fallback to GD
+        if (extension_loaded('imagick')) {
+            $this->manager = new ImageManager(new ImagickDriver());
+        } else {
+            Log::warning('Imagick not available in PathImageController, using GD driver. Install Imagick for better performance.');
+            $this->manager = new ImageManager(new GdDriver());
+        }
     }
 
     public function create(Path $path = null)
@@ -375,6 +380,7 @@ class PathImageController extends Controller
 
     /**
      * Process and save an uploaded image
+     * Uses Imagick if available, falls back to GD
      */
     private function processAndSaveImage($file, $pathId)
     {
