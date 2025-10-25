@@ -27,3 +27,30 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     initializeConditionalFields();
 });
+
+// Make removeFile globally available for inline Blade onclick handlers
+window.removeFile = function (type) {
+    if (type === "image") {
+        const removeImageFlag = document.getElementById("remove_image_path");
+        const imagePreview = document.querySelector(
+            '#cover-image-section img[src*="storage/"]'
+        );
+        if (removeImageFlag) removeImageFlag.value = "1";
+        if (imagePreview) {
+            imagePreview.classList.add("opacity-50", "grayscale");
+            imagePreview.style.pointerEvents = "none";
+        }
+    }
+
+    if (type === "video") {
+        const removeVideoFlag = document.getElementById("remove_video_path");
+        const videoPreview = document.querySelector(
+            '#video-section video[src*="storage/"]'
+        );
+        if (removeVideoFlag) removeVideoFlag.value = "1";
+        if (videoPreview) {
+            videoPreview.classList.add("opacity-50", "grayscale");
+            videoPreview.style.pointerEvents = "none";
+        }
+    }
+};

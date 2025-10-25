@@ -12,6 +12,18 @@ export function initializeCoverImage() {
     const coverUploadBox = document.getElementById("uploadBox");
     if (!coverInput || !coverUploadBox) return;
 
+    document
+        .querySelectorAll('.group label input[type="checkbox"]')
+        .forEach((cb) => {
+            cb.addEventListener("change", function () {
+                const parent = this.closest(".group");
+                if (parent) {
+                    parent.classList.toggle("opacity-50", this.checked);
+                    parent.classList.toggle("grayscale", this.checked);
+                }
+            });
+        });
+
     // Create preview image if not exists
     let coverPreview = document.getElementById("previewImage");
     if (!coverPreview) {
@@ -47,6 +59,8 @@ export function initializeCoverImage() {
             );
             if (removeCheckbox) removeCheckbox.checked = false;
         }
+        const removeImageFlag = document.getElementById("remove_image_path");
+        if (removeImageFlag) removeImageFlag.value = "0"; //  ensure not marked for deletion
     });
 
     // Drag & Drop
@@ -60,15 +74,17 @@ export function initializeCoverImage() {
     );
     if (removeCheckbox) {
         removeCheckbox.addEventListener("change", (e) => {
+            const removeImageFlag =
+                document.getElementById("remove_image_path");
             if (e.target.checked) {
-                // Hide preview
                 coverPreview.classList.add("hidden");
-                // Show placeholder icon/text
                 if (placeholderIcon) placeholderIcon.style.display = "";
                 if (placeholderText) placeholderText.style.display = "";
-                // Clear file input and compressed file
                 coverInput.value = "";
                 compressedCoverFile = null;
+                if (removeImageFlag) removeImageFlag.value = "1"; // mark for deletion
+            } else {
+                if (removeImageFlag) removeImageFlag.value = "0"; // reset if unchecked
             }
         });
     }
@@ -86,7 +102,16 @@ function handleDragEvent(e) {
     }
     if (e.type === "drop") {
         const files = Array.from(e.dataTransfer.files || []);
-        if (files.length > 0) compressAndPreviewCoverImage(files[0]);
+        if (files.length > 0) {
+            compressAndPreviewCoverImage(files[0]);
+            showTemporaryMessage(
+                "Cover image added from drag & drop",
+                "success"
+            );
+            const removeImageFlag =
+                document.getElementById("remove_image_path");
+            if (removeImageFlag) removeImageFlag.value = "0"; // reset flag
+        }
     }
 }
 

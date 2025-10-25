@@ -11,6 +11,18 @@ export function initializeVideoUpload() {
     );
     if (!videoDropZone || !videoInput) return;
 
+    document
+        .querySelectorAll('.group label input[type="checkbox"]')
+        .forEach((cb) => {
+            cb.addEventListener("change", function () {
+                const parent = this.closest(".group");
+                if (parent) {
+                    parent.classList.toggle("opacity-50", this.checked);
+                    parent.classList.toggle("grayscale", this.checked);
+                }
+            });
+        });
+
     // If there's already a server-rendered video above the upload box (edit), keep it visible.
     // Your Blade already prints a <video src="..."> above the drop zone if room->video_path exists,
     // so no work is required here; our preview area (#videoThumbnailPreview) will be used when user selects a new file.
@@ -24,9 +36,15 @@ export function initializeVideoUpload() {
         videoInput.click();
     });
 
+    // When a user selects a new video file
     videoInput.addEventListener("change", () => {
-        if (videoInput.files && videoInput.files[0])
+        if (videoInput.files && videoInput.files[0]) {
             showVideoThumbnailPreview(videoInput.files[0]);
+        }
+
+        // Reset deletion flag — user uploaded new video
+        const removeVideoFlag = document.getElementById("remove_video_path");
+        if (removeVideoFlag) removeVideoFlag.value = "0";
     });
 
     ["dragover", "dragleave", "drop"].forEach((eventName) => {
@@ -40,6 +58,9 @@ export function initializeVideoUpload() {
             clearVideoThumbnail();
             const vi = document.getElementById("video_path");
             if (vi) vi.value = "";
+            const removeVideoFlag =
+                document.getElementById("remove_video_path");
+            if (removeVideoFlag) removeVideoFlag.value = "1"; // mark for deletion
         });
     }
 }
@@ -58,6 +79,11 @@ function handleVideoDrag(e) {
             const videoInput = document.getElementById("video_path");
             if (videoInput) videoInput.files = e.dataTransfer.files;
             showVideoThumbnailPreview(e.dataTransfer.files[0]);
+
+            // Reset deletion flag when dropping a new file
+            const removeVideoFlag =
+                document.getElementById("remove_video_path");
+            if (removeVideoFlag) removeVideoFlag.value = "0";
         }
     }
 }

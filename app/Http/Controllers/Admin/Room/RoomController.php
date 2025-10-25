@@ -293,7 +293,15 @@ class RoomController extends Controller
             DB::beginTransaction();
 
             $oldType = $room->room_type;
-            $roomData = collect($validated)->except('office_hours')->toArray();
+
+            // Store old paths BEFORE updating with validated data
+            $oldImagePath = $room->image_path;
+            $oldVideoPath = $room->video_path;
+
+            // Update room with data EXCLUDING files (we'll handle them separately)
+            $roomData = collect($validated)
+                ->except(['office_hours', 'image_path', 'video_path', 'carousel_images'])
+                ->toArray();
             $room->update($roomData);
 
             // -----------------------------
@@ -311,12 +319,12 @@ class RoomController extends Controller
 
                 // Delete media if changing to entrance_point
                 if ($room->room_type === 'entrance_point') {
-                    if ($room->image_path && Storage::disk('public')->exists($room->image_path)) {
-                        Storage::disk('public')->delete($room->image_path);
+                    if ($oldImagePath && Storage::disk('public')->exists($oldImagePath)) {
+                        Storage::disk('public')->delete($oldImagePath);
                         $room->image_path = null;
                     }
-                    if ($room->video_path && Storage::disk('public')->exists($room->video_path)) {
-                        Storage::disk('public')->delete($room->video_path);
+                    if ($oldVideoPath && Storage::disk('public')->exists($oldVideoPath)) {
+                        Storage::disk('public')->delete($oldVideoPath);
                         $room->video_path = null;
                     }
 
@@ -364,47 +372,59 @@ class RoomController extends Controller
             }
 
             // -----------------------------
-            // Handle Cover Image
+            // Handle Cover Image removal
             // -----------------------------
-            if ($request->input('remove_image_path') || $request->hasFile('image_path')) {
-                if ($room->image_path && Storage::disk('public')->exists($room->image_path)) {
-                    Storage::disk('public')->delete($room->image_path);
+            if ($request->input('remove_image_path') && $oldImagePath) {
+                if (Storage::disk('public')->exists($oldImagePath)) {
+                    Storage::disk('public')->delete($oldImagePath);
                 }
-
-                if ($request->input('remove_image_path') && !$request->hasFile('image_path')) {
-                    $room->image_path = null;
-                }
-
-                if ($request->hasFile('image_path')) {
-                    $webpPath = $this->convertToWebP(
-                        $request->file('image_path'),
-                        "offices/{$room->id}/cover_images"
-                    );
-                    $room->image_path = $webpPath;
-                }
-
-                $room->save();
+                $room->image_path = null;
             }
 
             // -----------------------------
-            // Handle Video
+            // Handle Video removal
             // -----------------------------
-            if ($request->input('remove_video_path') || $request->hasFile('video_path')) {
-                if ($room->video_path && Storage::disk('public')->exists($room->video_path)) {
-                    Storage::disk('public')->delete($room->video_path);
+            if ($request->input('remove_video_path') && $oldVideoPath) {
+                if (Storage::disk('public')->exists($oldVideoPath)) {
+                    Storage::disk('public')->delete($oldVideoPath);
                 }
-
-                if ($request->input('remove_video_path') && !$request->hasFile('video_path')) {
-                    $room->video_path = null;
-                }
-
-                if ($request->hasFile('video_path')) {
-                    $newVideoPath = $request->file('video_path')->store("offices/{$room->id}/videos", 'public');
-                    $room->video_path = $newVideoPath;
-                }
-
-                $room->save();
+                $room->video_path = null;
             }
+
+            // -----------------------------
+            // Handle Cover Image upload
+            // -----------------------------
+            if ($request->hasFile('image_path')) {
+                // Delete old image using the stored path
+                if ($oldImagePath && Storage::disk('public')->exists($oldImagePath)) {
+                    Storage::disk('public')->delete($oldImagePath);
+                }
+
+                $room->image_path = $this->convertToWebP(
+                    $request->file('image_path'),
+                    "offices/{$room->id}/cover_images"
+                );
+            }
+
+            // -----------------------------
+            // Handle Video upload
+            // -----------------------------
+            if ($request->hasFile('video_path')) {
+                // Delete old video using the stored path
+                if ($oldVideoPath && Storage::disk('public')->exists($oldVideoPath)) {
+                    Storage::disk('public')->delete($oldVideoPath);
+                }
+
+                $room->video_path = $request->file('video_path')->store(
+                    "offices/{$room->id}/videos",
+                    'public'
+                );
+            }
+
+            // -----------------------------
+            // Save once after all updates
+            // -----------------------------
+            $room->save();
 
             // -----------------------------
             // Handle Carousel Images

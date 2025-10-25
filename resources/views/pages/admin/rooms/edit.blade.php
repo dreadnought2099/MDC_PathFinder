@@ -65,39 +65,32 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                     <!-- Cover Image -->
                     <div class="conditional-field" id="cover-image-section">
-                        <label class="block mb-2 dark:text-gray-300">
-                            Cover Image (optional, max 10MB)
-                        </label>
+                        <label class="block mb-2 dark:text-gray-300">Cover Image (optional, max 10MB)</label>
 
-                        <!-- Existing Image Preview & Remove Checkbox -->
                         @if ($room->image_path)
-                            <div class="mb-2 relative">
-                                <img src="{{ asset('storage/' . $room->image_path) }}" alt="Current cover"
-                                    id="existingCoverPreview" class="w-full h-32 object-cover rounded">
-                                <label class="flex items-center mt-2 text-sm text-gray-600 dark:text-gray-300">
-                                    <input type="checkbox" name="remove_image_path" value="1" class="mr-2">
-                                    Remove current image
-                                </label>
+                            <div class="relative group mb-3">
+                                <img src="{{ asset('storage/' . $room->image_path) }}"
+                                    class="w-full h-32 object-cover rounded border shadow-sm">
+
+                                <button type="button"
+                                    class="absolute top-1 right-1 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center cursor-pointer hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    onclick="removeFile('image')">
+                                    ×
+                                </button>
+
+                                <input type="hidden" name="remove_image_path" id="remove_image_path" value="0">
                             </div>
                         @endif
 
-                        <!-- Upload Box -->
                         <div id="uploadBox"
-                            class="flex flex-col items-center justify-center w-full h-40
-                                    border-2 border-dashed border-gray-300 dark:border-gray-600
-                                    rounded cursor-pointer hover:border-primary hover:bg-gray-50
-                                    dark:hover:border-primary dark:hover:bg-gray-800
-                                    transition-colors overflow-hidden relative">
-                            <!-- Placeholder Icon & Text -->
+                            class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded cursor-pointer hover:border-primary hover:bg-gray-50 dark:hover:border-primary dark:hover:bg-gray-800 transition-colors overflow-hidden relative">
                             <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
-                                alt="Image Icon" class="w-8 h-8" onerror="this.style.display='none'">
-                            <span id="uploadText" class="text-gray-500 dark:text-gray-300 text-sm text-center px-2">
-                                Click to upload new cover image
+                                alt="Image Icon" class="w-8 h-8">
+                            <span class="text-gray-500 dark:text-gray-300 text-sm text-center px-2">
+                                Click or drag to upload new cover image
                             </span>
-
-                            <!-- Preview Image (hidden by default, shown by JS) -->
-                            <img id="previewImage" class="absolute inset-0 object-cover w-full h-full hidden"
-                                alt="Image preview" />
+                            <img id="previewImage" class="absolute inset-0 object-cover w-full h-full hidden rounded"
+                                alt="Preview">
                         </div>
 
                         <input type="file" name="image_path" id="image_path" class="hidden" accept="image/*" />
@@ -111,23 +104,24 @@
                         <label class="block mb-2 dark:text-gray-300">Short Video (optional, max 50MB)</label>
 
                         @if ($room->video_path)
-                            <div class="mb-2">
+                            <div class="relative group mb-3">
                                 <video src="{{ asset('storage/' . $room->video_path) }}"
-                                    class="w-full h-32 object-cover rounded" controls></video>
-                                <label class="flex items-center mt-2 text-sm text-gray-600 dark:text-gray-300">
-                                    <input type="checkbox" name="remove_video_path" value="1" class="mr-2">
-                                    Remove current video
-                                </label>
+                                    class="w-full h-32 object-cover rounded border shadow-sm" controls></video>
+
+                                <button type="button"
+                                    class="absolute top-1 right-1 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center cursor-pointer hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    onclick="removeFile('video')">
+                                    ×
+                                </button>
+
+                                <input type="hidden" name="remove_video_path" id="remove_video_path" value="0">
                             </div>
                         @endif
 
                         <div id="videoDropZone"
-                            class="flex flex-col items-center justify-center w-full h-40 
-                                    border-2 border-dashed border-gray-300 dark:border-gray-600 
-                                    rounded cursor-pointer hover:border-primary hover:bg-gray-50 
-                                    dark:hover:border-primary dark:hover:bg-gray-800 transition-colors overflow-hidden relative">
+                            class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded cursor-pointer hover:border-primary hover:bg-gray-50 dark:hover:border-primary dark:hover:bg-gray-800 transition-colors overflow-hidden relative">
                             <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/video.png"
-                                alt="Video Icon" id="videoIcon" class="w-9 h-9" onerror="this.style.display='none'">
+                                alt="Video Icon" class="w-9 h-9" id="videoIcon">
                             <span id="videoUploadText" class="text-gray-500 dark:text-gray-300 text-sm text-center px-2">
                                 Drag & drop or click to select new video
                             </span>
@@ -136,8 +130,8 @@
                             <div id="videoThumbnailPreview" class="absolute inset-0 hidden bg-black">
                                 <video id="videoThumbnail" class="w-full h-full object-cover"></video>
                                 <button type="button" id="removeVideoThumbnailBtn"
-                                    class="absolute top-2 right-2 bg-secondary text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-700 transition-colors text-lg z-10"
-                                    title="Remove video">&times;</button>
+                                    class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors text-lg z-10"
+                                    title="Remove video">×</button>
                             </div>
                         </div>
                         <input type="file" id="video_path" name="video_path" accept="video/mp4,video/avi,video/mpeg"
