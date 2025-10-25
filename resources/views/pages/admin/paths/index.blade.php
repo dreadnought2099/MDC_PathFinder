@@ -38,39 +38,3 @@
         </div>
     </div>
 @endsection
-
-@push('scripts')
-    <script>
-        // Function to save path selection when clicking specific path link
-        function savePathSelection(pathId) {
-            sessionStorage.setItem('selectedPathId', pathId);
-        }
-
-        // Function to navigate with remembered path
-        function updatePathLinkBeforeNavigate(event, linkId) {
-            const storedPathId = sessionStorage.getItem('selectedPathId');
-            if (storedPathId) {
-                event.preventDefault();
-                const baseUrl = "{{ route('path-image.create', ':pathId') }}";
-                const newUrl = baseUrl.replace(':pathId', storedPathId);
-                window.location.href = newUrl;
-                return false;
-            }
-            return true;
-        }
-
-        // Update all links on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            const storedPathId = sessionStorage.getItem('selectedPathId');
-
-            if (storedPathId) {
-                // Update floating action link
-                const floatingLink = document.getElementById('floatingPathImageLink');
-                if (floatingLink) {
-                    const baseUrl = "{{ route('path-image.create', ':pathId') }}";
-                    floatingLink.href = baseUrl.replace(':pathId', storedPathId);
-                }
-            }
-        });
-    </script>
-@endpush

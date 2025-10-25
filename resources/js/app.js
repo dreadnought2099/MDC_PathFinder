@@ -1,8 +1,29 @@
 import "./bootstrap";
 import gsap from "gsap";
+import {
+    savePathSelection,
+    updatePathLinkBeforeNavigate,
+    initializePathLinks,
+} from "./path-selection";
 
 // Make GSAP available globally
 window.gsap = gsap;
+
+// Make functions globally available
+window.savePathSelection = savePathSelection;
+window.updatePathLinkBeforeNavigate = updatePathLinkBeforeNavigate;
+
+// Initialize path links on DOM load
+document.addEventListener("DOMContentLoaded", () => {
+    const floatingLink = document.getElementById("floatingPathImageLink");
+    if (floatingLink) {
+        const routeBase = floatingLink.getAttribute("data-route-base");
+        if (routeBase) {
+            initializePathLinks(routeBase);
+        }
+    }
+});
+
 class ImgReveal extends HTMLElement {
     constructor() {
         super();
