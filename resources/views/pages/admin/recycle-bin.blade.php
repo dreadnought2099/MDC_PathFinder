@@ -10,9 +10,9 @@
             // Dispatch custom event to notify navbar
             window.dispatchEvent(new CustomEvent('tab-changed', { detail: { tab: newTab } }));
         }
-        }" x-init="sessionStorage.setItem('activeTab', tab);
-        // Initial dispatch
-        window.dispatchEvent(new CustomEvent('tab-changed', { detail: { tab: tab } }));" class="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    }" x-init="sessionStorage.setItem('activeTab', tab);
+    // Initial dispatch
+    window.dispatchEvent(new CustomEvent('tab-changed', { detail: { tab: tab } }));" class="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
         <!-- Navigation -->
         <nav class="mb-6 flex justify-center space-x-6">
@@ -60,18 +60,70 @@
 
 @push('scripts')
     <script>
-        function showModal(id) {
-            document.getElementById(id).classList.remove('hidden');
-        }
+        document.addEventListener('DOMContentLoaded', () => {
 
-        function hideModal(id) {
-            document.getElementById(id).classList.add('hidden');
-        }
+            // Show modal with transition
+            function showModal(modalId) {
+                const modal = document.getElementById(modalId);
+                if (!modal) {
+                    console.warn(`Modal with ID "${modalId}" not found`);
+                    return;
+                }
 
-        function closeModal(event, modal) {
-            if (event.target === modal) {
-                modal.classList.add('hidden');
+                const transformElement = modal.querySelector('.transform');
+                if (!transformElement) {
+                    console.warn(`Transform element not found in modal "${modalId}"`);
+                    return;
+                }
+
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    transformElement.classList.remove('scale-95');
+                }, 10);
             }
-        }
+
+            // Hide modal with transition
+            function hideModal(modalId) {
+                const modal = document.getElementById(modalId);
+                if (!modal) {
+                    console.warn(`Modal with ID "${modalId}" not found`);
+                    return;
+                }
+
+                const transformElement = modal.querySelector('.transform');
+                if (!transformElement) {
+                    console.warn(`Transform element not found in modal "${modalId}"`);
+                    return;
+                }
+
+                modal.classList.add('opacity-0');
+                transformElement.classList.add('scale-95');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+            }
+
+            // Close modal when clicking outside content
+            function closeModal(event, element) {
+                if (event.target === element) {
+                    hideModal(element.id);
+                }
+            }
+
+            // Close any open modal when pressing Escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('.fixed.inset-0:not(.hidden)').forEach(modal => {
+                        if (modal.id) hideModal(modal.id);
+                    });
+                }
+            });
+
+            // Expose functions globally for onclick bindings
+            window.showModal = showModal;
+            window.hideModal = hideModal;
+            window.closeModal = closeModal;
+        });
     </script>
 @endpush
