@@ -218,5 +218,19 @@
                 closeToggleModal();
             }
         });
+
+        // Close modal when clicking outside
+        document.addEventListener('click', function(e) {
+            // Select all elements that act as modals
+            const modals = document.querySelectorAll('.modal-overlay');
+
+            modals.forEach(modal => {
+                // Close when clicking the semi-transparent background
+                if (e.target === modal) {
+                    if (modal.id === 'userDeleteModal') closeUserModal();
+                    if (modal.id === 'userToggleModal') closeToggleModal();
+                }
+            });
+        });
     </script>
 @endpush

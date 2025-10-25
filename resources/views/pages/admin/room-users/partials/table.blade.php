@@ -157,7 +157,7 @@
 
 <!-- Modals -->
 <div id="userToggleModal"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden transition-all duration-300 opacity-0">
+    class="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden transition-all duration-300 opacity-0">
     <div
         class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-xs sm:max-w-md mx-4 transform transition-all duration-300 scale-95 border border-secondary">
         <!-- Header -->
@@ -207,7 +207,7 @@
 </div>
 
 <div id="userDeleteModal"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden transition-all duration-300 opacity-0">
+    class="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden transition-all duration-300 opacity-0">
     <div
         class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-xs sm:max-w-md mx-4 transform transition-all duration-300 scale-95 border border-secondary">
         <!-- Header -->
