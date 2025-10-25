@@ -15,8 +15,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Intervention\Image\ImageManager;
-use Intervention\Image\Encoders\WebpEncoder;
-use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
+use Intervention\Image\Drivers\Gd\Driver as GdDriver;
 
 class RoomController extends Controller
 {
@@ -33,11 +33,13 @@ class RoomController extends Controller
             'recycleBin'
         ]);
 
-        // Reduced memory since images are pre-compressed by frontend
-        ini_set('memory_limit', '256M');
-        ini_set('max_execution_time', '180');
-
-        $this->manager = new ImageManager(new Driver());
+        // Use Imagick if available, fallback to GD
+        if (extension_loaded('imagick')) {
+            $this->manager = new ImageManager(new ImagickDriver());
+        } else {
+            \Log::warning('Imagick not available in RoomController, using GD driver. Install Imagick for better performance.');
+            $this->manager = new ImageManager(new GdDriver());
+        }
     }
 
     public function index(Request $request)
@@ -572,6 +574,7 @@ class RoomController extends Controller
     /**
      * Convert already-compressed image to WebP format
      * Frontend handles compression, backend handles format optimization
+     * Uses Imagick if available, falls back to GD
      */
     private function convertToWebP($file, $folder)
     {
@@ -583,14 +586,13 @@ class RoomController extends Controller
 
         // NO resizing - image is already properly sized by frontend
         // Just convert to WebP with high quality since it's pre-compressed
-        $encodedImage = $image->encode(new WebpEncoder(quality: 85));
-
-        // Clean up
-        unset($image);
+        $encodedImage = $image->toWebp(85);
 
         // Store the WebP image
         Storage::disk('public')->put($webpPath, (string) $encodedImage);
-        unset($encodedImage);
+
+        // Clean up
+        unset($image, $encodedImage);
 
         return $webpPath;
     }
