@@ -5,11 +5,11 @@
         <div class="mb-8 relative">
             <!-- Centered Header -->
             <div class="text-center">
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-300">
+                <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-1 dark:text-gray-100">
                     {{-- Auth::user() is only used for permission checks, not for displaying the target user's info. --}}
                     <span class="text-primary">{{ $user->name ?? $user->username }}</span> User
                 </h1>
-                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300">
                     View office user information and details
                 </p>
             </div>

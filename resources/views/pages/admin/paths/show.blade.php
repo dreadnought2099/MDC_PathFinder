@@ -8,7 +8,7 @@
     <div class="container mx-auto max-w-6xl px-4 py-6">
         <!-- Header -->
         <div class="mb-12 text-center">
-            <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-1 dark:text-gray-100">
                 <span class="text-primary">Path</span> Details
             </h1>
             <p class="text-sm sm:text-base lg:text-base text-gray-600 dark:text-gray-300 mt-1 sm:mt-2">
