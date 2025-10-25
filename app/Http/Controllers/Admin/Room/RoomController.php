@@ -37,7 +37,7 @@ class RoomController extends Controller
         if (extension_loaded('imagick')) {
             $this->manager = new ImageManager(new ImagickDriver());
         } else {
-            \Log::warning('Imagick not available in RoomController, using GD driver. Install Imagick for better performance.');
+            Log::warning('Imagick not available in RoomController, using GD driver. Install Imagick for better performance.');
             $this->manager = new ImageManager(new GdDriver());
         }
     }
