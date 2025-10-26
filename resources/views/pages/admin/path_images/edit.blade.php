@@ -153,21 +153,6 @@
 
 @push('scripts')
     <script>
-        {{-- 
-        ═══════════════════════════════════════════════════════════════
-        IMAGE UPLOAD CONFIGURATION
-        ═══════════════════════════════════════════════════════════════
-        Frontend Compression: 2000px (MAX_DIMENSION)
-        Backend Validation:   3000px (safety net for direct uploads/API)
-        Final Processing:     2000px WebP @ 75% quality
-        
-        This layered approach ensures:
-        1. Fast uploads (compressed before sending)
-        2. Safety net (rejects oversized direct uploads)
-        3. Consistent output (all images → 2000px WebP)
-        ═══════════════════════════════════════════════════════════════
-     --}}
-
         const MAX_FILE_SIZE_ORIGINAL = 10 * 1024 * 1024; // 10MB - what user can SELECT
         const MAX_FILE_SIZE_COMPRESSED = 5 * 1024 * 1024; // 5MB - after compression
         const MAX_DIMENSION = 2000;
