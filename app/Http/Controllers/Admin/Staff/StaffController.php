@@ -13,13 +13,30 @@ use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
 use Intervention\Image\Drivers\Gd\Driver as GdDriver;
 
+/**
+ * Staff Management Controller
+ * 
+ * Handles CRUD operations for staff members with advanced image processing.
+ * 
+ * IMAGE PROCESSING PIPELINE:
+ * 1. Frontend: Compresses to 1200px before upload
+ * 2. Laravel: Validates 5MB + 4000px dimension limit
+ * 3. GD Check: Additional 4000px safety check (non-Imagick only)
+ * 4. Backend: Final resize to 1200px + WebP conversion
+ * 5. Error Handling: Graceful failures with logging
+ */
 class StaffController extends Controller
 {
     private ImageManager $manager;
 
+    /**
+     * Initialize image processing driver
+     * 
+     * Automatically selects Imagick (preferred) or GD (fallback).
+     * Check logs for "Imagick not available" warning if using GD.
+     */
     public function __construct()
     {
-        // Use Imagick if available, fallback to GD
         if (extension_loaded('imagick')) {
             $this->manager = new ImageManager(new ImagickDriver());
         } else {
@@ -70,6 +87,18 @@ class StaffController extends Controller
         return view('pages.admin.staffs.create');
     }
 
+    /**
+     * Store new staff member with photo processing
+     * 
+     * VALIDATION:
+     * - Max 5MB file size
+     * - Max 4000x4000px dimensions (safety for direct uploads/API calls)
+     * - Frontend typically compresses to 1200px before reaching here
+     * 
+     * ERROR HANDLING:
+     * - Image processing failures are logged and return user-friendly errors
+     * - Staff record created even if photo fails (photo_path remains null)
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -86,8 +115,8 @@ class StaffController extends Controller
             'photo_path' => [
                 'nullable',
                 'image',
-                'max:5120',
-                'dimensions:max_width=4000,max_height=4000' // Image Dimension validation
+                'max:5120', // 5MB in kilobytes
+                'dimensions:max_width=4000,max_height=4000'
             ],
         ]);
 
@@ -98,8 +127,13 @@ class StaffController extends Controller
                 $webpPath = $this->convertToWebP($request->file('photo_path'), "staffs/{$staff->id}");
                 $staff->update(['photo_path' => $webpPath]);
             } catch (\Exception $e) {
-                Log::error('Image conversion failed', ['error' => $e->getMessage(), 'staff_id' => $staff->id]);
-                return back()->withErrors(['photo_path' => 'Image processing failed. Please try a smaller image.']);
+                Log::error('Image conversion failed', [
+                    'error' => $e->getMessage(),
+                    'staff_id' => $staff->id
+                ]);
+                return back()->withErrors([
+                    'photo_path' => 'Image processing failed. Please try a smaller image.'
+                ]);
             }
         }
 
@@ -109,7 +143,8 @@ class StaffController extends Controller
             return response()->json(['redirect' => route('staff.show', $staff->id)], 200);
         }
 
-        return redirect()->route('staff.index')->with('success', "{$staff->full_name} was added successfully.");
+        return redirect()->route('staff.index')
+            ->with('success', "{$staff->full_name} was added successfully.");
     }
 
     public function show(Staff $staff)
@@ -130,6 +165,14 @@ class StaffController extends Controller
         return view('pages.admin.staffs.edit', compact('staff', 'rooms'));
     }
 
+    /**
+     * Update staff member with photo management
+     * 
+     * PHOTO HANDLING:
+     * - Old photo automatically deleted when uploading new one
+     * - Explicit deletion via 'delete_photo' flag
+     * - All images converted to WebP for consistency
+     */
     public function update(Request $request, $id)
     {
         $staff = Staff::findOrFail($id);
@@ -155,7 +198,7 @@ class StaffController extends Controller
                 'nullable',
                 'image',
                 'max:5120',
-                'dimensions:max_width=4000,max_height=4000' // Image Dimension validation
+                'dimensions:max_width=4000,max_height=4000'
             ],
             'delete_photo' => 'nullable|string',
         ]);
@@ -176,11 +219,16 @@ class StaffController extends Controller
                 $webpPath = $this->convertToWebP($request->file('photo_path'), "staffs/{$staff->id}");
                 $validated['photo_path'] = $webpPath;
             } catch (\Exception $e) {
-                Log::error('Image conversion failed', ['error' => $e->getMessage(), 'staff_id' => $staff->id]);
-                return back()->withErrors(['photo_path' => 'Image processing failed. Please try a smaller image.']);
+                Log::error('Image conversion failed', [
+                    'error' => $e->getMessage(),
+                    'staff_id' => $staff->id
+                ]);
+                return back()->withErrors([
+                    'photo_path' => 'Image processing failed. Please try a smaller image.'
+                ]);
             }
         }
-        
+
         $staff->update($validated);
 
         session()->flash('success', "{$staff->full_name} updated successfully.");
@@ -189,21 +237,24 @@ class StaffController extends Controller
             return response()->json(['redirect' => route('staff.show', $staff->id)], 200);
         }
 
-        return redirect()->route('staff.index')->with('success', "{$staff->full_name} updated successfully.");
+        return redirect()->route('staff.index')
+            ->with('success', "{$staff->full_name} updated successfully.");
     }
 
     public function destroy($id)
     {
         $staff = Staff::findOrFail($id);
         $staff->delete();
-        return redirect()->route('staff.index')->with('success', "{$staff->full_name} moved to recycle bin");
+        return redirect()->route('staff.index')
+            ->with('success', "{$staff->full_name} moved to recycle bin");
     }
 
     public function restore($id)
     {
         $staff = Staff::onlyTrashed()->findOrFail($id);
         $staff->restore();
-        return redirect()->route('recycle-bin')->with('success', "{$staff->full_name} restored successfully.");
+        return redirect()->route('recycle-bin')
+            ->with('success', "{$staff->full_name} restored successfully.");
     }
 
     public function forceDelete($id)
@@ -216,7 +267,8 @@ class StaffController extends Controller
 
         $staff->forceDelete();
 
-        return redirect()->route('recycle-bin')->with('success', "{$staff->full_name} permanently deleted.");
+        return redirect()->route('recycle-bin')
+            ->with('success', "{$staff->full_name} permanently deleted.");
     }
 
     public function checkEmail(Request $request)
@@ -262,21 +314,62 @@ class StaffController extends Controller
     }
 
     /**
-     * Convert uploaded image to WebP format
-     * Uses Imagick if available, falls back to GD
-     * Intervention Image v3 syntax
+     * Convert uploaded image to WebP format with optimization
+     * 
+     * PROCESSING FLOW:
+     * ┌─────────────────────────────────────────────────────────────────┐
+     * │ Example: User uploads 3500x2800px, 4.5MB image                  │
+     * ├─────────────────────────────────────────────────────────────────┤
+     * │ 1. Frontend Validation ✓                                        │
+     * │    - Type: image/jpeg ✓                                         │
+     * │    - Size: 4.5MB < 5MB ✓                                        │
+     * ├─────────────────────────────────────────────────────────────────┤
+     * │ 2. Frontend Compression (compressImageCanvas)                   │
+     * │    - Input: 3500x2800px                                         │
+     * │    - Output: 1200x960px, ~800KB JPEG                            │
+     * ├─────────────────────────────────────────────────────────────────┤
+     * │ 3. Laravel Validation ✓                                         │
+     * │    - Type: image ✓                                              │
+     * │    - Size: 800KB < 5MB ✓                                        │
+     * │    - Dimensions: 1200x960 < 4000x4000 ✓                         │
+     * ├─────────────────────────────────────────────────────────────────┤
+     * │ 4. GD Dimension Check (skipped)                                 │
+     * │    - 1200x960 < 4000px → No exception                           │
+     * ├─────────────────────────────────────────────────────────────────┤
+     * │ 5. Backend Processing (this method)                             │
+     * │    - scaleDown(1200) → Already 1200px, no resize                │
+     * │    - Convert to WebP @ 80% quality                              │
+     * │    - Output: ~400KB WebP                                        │
+     * │    - Saved to storage/app/public/staffs/{id}/xxx.webp           │
+     * └─────────────────────────────────────────────────────────────────┘
+     * 
+     * EDGE CASES:
+     * - Direct API upload (5000x4000px): Rejected by Laravel validation
+     * - Corrupted image: Caught by try-catch, logged, returns error
+     * - GD without Imagick (3500px image): Pre-checked at line 283-291
+     * 
+     * DRIVER BEHAVIOR:
+     * - Imagick: Handles any dimension efficiently, no pre-check needed
+     * - GD: Requires 4000px pre-check to prevent memory exhaustion
+     * 
+     * @param \Illuminate\Http\UploadedFile $file Image file to process
+     * @param string $folder Storage path (e.g., "staffs/123")
+     * @return string Relative path to saved WebP file
+     * @throws \Exception If GD encounters >4000px image or processing fails
      */
     private function convertToWebP($file, $folder)
     {
-        // Check dimensions BEFORE processing if using GD
+        // GD driver safety check (Imagick handles large images efficiently)
         if (!extension_loaded('imagick')) {
             $imageInfo = getimagesize($file->getRealPath());
             if ($imageInfo) {
                 [$width, $height] = $imageInfo;
-                $maxDimension = 4000; // Adjust based on your server's memory_limit
+                $maxDimension = 4000;
 
                 if ($width > $maxDimension || $height > $maxDimension) {
-                    throw new \Exception("Image dimensions too large. Maximum {$maxDimension}px on either side when using GD driver.");
+                    throw new \Exception(
+                        "Image dimensions too large. Maximum {$maxDimension}px on either side when using GD driver."
+                    );
                 }
             }
         }
@@ -284,20 +377,13 @@ class StaffController extends Controller
         $baseName = uniqid('', true);
         $webpPath = "{$folder}/{$baseName}.webp";
 
-        // Read image using Intervention Image v3
+        // Process: Load → Resize → Convert → Save
         $image = $this->manager->read($file);
-
-        // Resize to max 1200px width to prevent memory issues
-        // Works with both Imagick and GD drivers
         $image->scaleDown(width: 1200);
-
-        // Convert to WebP with 80% quality
         $encodedImage = $image->toWebp(80);
 
-        // Save to storage
         Storage::disk('public')->put($webpPath, (string) $encodedImage);
 
-        // Memory is automatically managed in v3
         unset($image, $encodedImage);
 
         return $webpPath;
