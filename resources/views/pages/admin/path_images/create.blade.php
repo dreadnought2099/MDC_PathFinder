@@ -626,13 +626,6 @@
                 updateSubmitButton();
             }
 
-            // Listen for path changes
-            document.addEventListener('path-changed', function(e) {
-                if (e.detail && e.detail.pathId) {
-                    fetchPathImageCount(e.detail.pathId);
-                }
-            });
-
             function renderPreviews() {
                 selectedFilesContainer.innerHTML = '';
                 if (!files.length) return;
