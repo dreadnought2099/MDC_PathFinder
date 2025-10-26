@@ -149,6 +149,8 @@ Route::middleware(['auth', 'role:Admin|Office Manager', '2fa'])->prefix('admin')
     });
 
     Route::prefix('path-images')->name('path-image.')->group(function () {
+        Route::get('/count', [PathImageController::class, 'getPathImageCount'])->name('count')->middleware(['auth', 'role:Admin']);
+
         Route::get('/create/{path?}', [PathImageController::class, 'create'])->name('create');
         Route::post('/', [PathImageController::class, 'store'])->name('store');
 

@@ -8,6 +8,8 @@ use App\Models\Path;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
 use Intervention\Image\Drivers\Gd\Driver as GdDriver;
@@ -32,6 +34,9 @@ use Intervention\Image\Encoders\WebpEncoder;
 class PathImageController extends Controller
 {
     private ImageManager $manager;
+
+    // Configuration constant for per-path limit
+    private const MAX_IMAGES_PER_PATH = 25;
 
     public function __construct()
     {
@@ -69,7 +74,18 @@ class PathImageController extends Controller
 
         $defaultPath = $path ?? $paths->first();
 
-        return view('pages.admin.path_images.create', compact('paths', 'defaultPath'));
+        // Get current image count for the default path
+        $currentImageCount = PathImage::where('path_id', $defaultPath->id)->count();
+        $maxImagesPerPath = self::MAX_IMAGES_PER_PATH;
+        $remainingSlots = max(0, $maxImagesPerPath - $currentImageCount);
+
+        return view('pages.admin.path_images.create', compact(
+            'paths',
+            'defaultPath',
+            'currentImageCount',
+            'maxImagesPerPath',
+            'remainingSlots'
+        ));
     }
 
     /**
@@ -103,71 +119,138 @@ class PathImageController extends Controller
             ],
         ]);
 
-        $path = Path::findOrFail($request->path_id);
         $files = $request->file('files');
-        $nextOrder = PathImage::where('path_id', $path->id)->max('image_order') ?? 0;
 
-        $uploadedCount = 0;
-        $errors = [];
+        try {
+            // Use transaction with lock to prevent race conditions
+            return DB::transaction(function () use ($request, $files) {
+                // Lock the path row to prevent concurrent uploads
+                $path = Path::lockForUpdate()->findOrFail($request->path_id);
 
-        foreach ($files as $file) {
-            try {
-                $webpPath = $this->processAndSaveImage($file, $path->id);
+                // Re-check count INSIDE transaction (critical!)
+                $currentImageCount = PathImage::where('path_id', $path->id)->count();
+                $newFileCount = count($files);
+                $totalAfterUpload = $currentImageCount + $newFileCount;
 
-                PathImage::create([
-                    'path_id'     => $path->id,
-                    'image_file'  => $webpPath,
-                    'image_order' => ++$nextOrder,
-                ]);
+                if ($totalAfterUpload > self::MAX_IMAGES_PER_PATH) {
+                    $remaining = self::MAX_IMAGES_PER_PATH - $currentImageCount;
+                    $errorMessage = $remaining > 0
+                        ? "This path already has {$currentImageCount} images. Maximum allowed is " . self::MAX_IMAGES_PER_PATH . ". You can only upload {$remaining} more image(s)."
+                        : "This path has reached the maximum limit of " . self::MAX_IMAGES_PER_PATH . " images.";
 
-                $uploadedCount++;
-                gc_collect_cycles();
-            } catch (\Exception $e) {
-                $errors[] = "Failed to upload {$file->getClientOriginalName()}: " . $e->getMessage();
+                    if ($request->ajax()) {
+                        // Need to throw exception to rollback transaction
+                        throw ValidationException::withMessages(['files' => $errorMessage]);
+                    }
 
-                Log::error("PathImage upload failed", [
-                    'path_id' => $path->id,
-                    'file'    => $file->getClientOriginalName(),
-                    'size'    => $file->getSize(),
-                    'error'   => $e->getMessage(),
-                ]);
-            }
-        }
+                    // For non-ajax, we'll handle this outside transaction
+                    throw new \Exception($errorMessage);
+                }
 
-        $message = "{$uploadedCount} image(s) uploaded successfully.";
+                $nextOrder = PathImage::where('path_id', $path->id)->max('image_order') ?? 0;
 
-        if (count($errors) > 0) {
-            $warningMessage = $message . ' However, ' . count($errors) . ' file(s) failed.';
-            session()->flash('warning', $warningMessage);
+                $uploadedCount = 0;
+                $errors = [];
 
+                foreach ($files as $file) {
+                    try {
+                        $webpPath = $this->processAndSaveImage($file, $path->id);
+
+                        PathImage::create([
+                            'path_id'     => $path->id,
+                            'image_file'  => $webpPath,
+                            'image_order' => ++$nextOrder,
+                        ]);
+
+                        $uploadedCount++;
+                        gc_collect_cycles();
+                    } catch (\Exception $e) {
+                        $errors[] = "Failed to upload {$file->getClientOriginalName()}: " . $e->getMessage();
+
+                        Log::error("PathImage upload failed", [
+                            'path_id' => $path->id,
+                            'file'    => $file->getClientOriginalName(),
+                            'size'    => $file->getSize(),
+                            'error'   => $e->getMessage(),
+                        ]);
+                    }
+                }
+
+                $message = "{$uploadedCount} image(s) uploaded successfully.";
+
+                if (count($errors) > 0) {
+                    $warningMessage = $message . ' However, ' . count($errors) . ' file(s) failed.';
+                    session()->flash('warning', $warningMessage);
+
+                    if ($request->ajax()) {
+                        return response()->json([
+                            'redirect' => route('path.show', $path),
+                            'status'   => 'warning',
+                            'message'  => $warningMessage,
+                            'errors'   => $errors,
+                        ]);
+                    }
+
+                    return redirect()
+                        ->route('path.show', $path)
+                        ->with('warning', $warningMessage)
+                        ->withErrors($errors);
+                }
+
+                session()->flash('success', $message);
+
+                if ($request->ajax()) {
+                    return response()->json([
+                        'redirect' => route('path.show', $path),
+                        'status'   => 'success',
+                        'message'  => $message,
+                    ]);
+                }
+
+                return redirect()
+                    ->route('path.show', $path)
+                    ->with('success', $message);
+            });
+        } catch (ValidationException $e) {
+            // Handle validation errors from inside transaction
             if ($request->ajax()) {
                 return response()->json([
-                    'redirect' => route('path.show', $path),
-                    'status'   => 'warning',
-                    'message'  => $warningMessage,
-                    'errors'   => $errors,
-                ]);
+                    'status' => 'error',
+                    'message' => $e->getMessage(),
+                ], 422);
             }
+            return back()->withErrors($e->errors());
+        } catch (\Exception $e) {
+            // Handle limit exceeded error
+            if ($request->ajax()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $e->getMessage(),
+                ], 422);
+            }
+            return back()->withErrors(['files' => $e->getMessage()]);
+        }
+    }
 
-            return redirect()
-                ->route('path.show', $path)
-                ->with('warning', $warningMessage)
-                ->withErrors($errors);
+    public function edit(Request $request, Path $path, PathImage $pathImage = null)
+    {
+        $path->load(['fromRoom', 'toRoom']);
+
+        if ($pathImage && $pathImage->path_id !== $path->id) {
+            return redirect()->route('path.show', $path)
+                ->with('error', 'Image does not belong to this path.');
         }
 
-        session()->flash('success', $message);
+        $pathImages = $pathImage
+            ? collect([$pathImage])
+            : PathImage::where('path_id', $path->id)->orderBy('image_order')->get();
 
-        if ($request->ajax()) {
-            return response()->json([
-                'redirect' => route('path.show', $path),
-                'status'   => 'success',
-                'message'  => $message,
-            ]);
+        if ($pathImages->isEmpty()) {
+            return redirect()->route('path.show', $path)
+                ->with('warning', 'No images found for this path.');
         }
 
-        return redirect()
-            ->route('path.show', $path)
-            ->with('success', $message);
+        return view('pages.admin.path_images.edit', compact('path', 'pathImages'));
     }
 
     public function update(Request $request, $pathOrPathImage = null)
@@ -346,6 +429,130 @@ class PathImageController extends Controller
     }
 
     /**
+     * Delete a single path image
+     * 
+     * @param PathImage $pathImage Image to delete
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     */
+    public function destroySingle(PathImage $pathImage)
+    {
+        $path = $pathImage->path;
+
+        // Delete file from storage
+        if (Storage::disk('public')->exists($pathImage->image_file)) {
+            Storage::disk('public')->delete($pathImage->image_file);
+        }
+
+        $pathImage->delete();
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'message' => 'Image deleted successfully.',
+                'status' => 'success'
+            ], 200);
+        }
+
+        return redirect()
+            ->route('path.show', $path)
+            ->with('success', 'Image deleted successfully.');
+    }
+
+    /**
+     * Delete multiple path images (bulk delete)
+     * 
+     * @param Request $request Must contain path_id and array of image_ids
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     */
+    public function destroyMultiple(Request $request)
+    {
+        $request->validate([
+            'path_id' => 'required|exists:paths,id',
+            'image_ids' => 'required|array|min:1',
+            'image_ids.*' => 'required|exists:path_images,id',
+        ]);
+
+        $path = Path::findOrFail($request->path_id);
+        $deletedCount = 0;
+
+        foreach ($request->image_ids as $imageId) {
+            $pathImage = PathImage::where('id', $imageId)
+                ->where('path_id', $path->id)
+                ->first();
+
+            if ($pathImage) {
+                // Delete file from storage
+                if (Storage::disk('public')->exists($pathImage->image_file)) {
+                    Storage::disk('public')->delete($pathImage->image_file);
+                }
+
+                $pathImage->delete();
+                $deletedCount++;
+            }
+        }
+
+        $successMessage = "{$deletedCount} image(s) deleted successfully.";
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'redirect' => route('path.show', $path),
+                'message' => $successMessage,
+                'deleted_count' => $deletedCount,
+                'status' => 'success'
+            ], 200);
+        }
+
+        return redirect()
+            ->route('path.show', $path)
+            ->with('success', $successMessage);
+    }
+    
+    /**
+     * Update the display order of path images
+     * 
+     * Used for drag-and-drop reordering functionality
+     * 
+     * @param Request $request Must contain array of image_orders with id and order
+     * @param Path $path The path whose images are being reordered
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     */
+    public function updateOrder(Request $request, Path $path)
+    {
+        $request->validate([
+            'image_orders' => 'required|array',
+            'image_orders.*.id' => 'required|exists:path_images,id',
+            'image_orders.*.order' => 'required|integer|min:1',
+        ]);
+
+        $updatedCount = 0;
+
+        foreach ($request->image_orders as $imageData) {
+            $updated = PathImage::where('id', $imageData['id'])
+                ->where('path_id', $path->id)
+                ->update(['image_order' => $imageData['order']]);
+
+            if ($updated) {
+                $updatedCount++;
+            }
+        }
+
+        $message = $updatedCount > 0
+            ? "Image order updated successfully. ({$updatedCount} images reordered)"
+            : "No changes made to image order.";
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => $message,
+                'updated_count' => $updatedCount,
+                'status' => 'success'
+            ], 200);
+        }
+
+        return redirect()
+            ->route('path.show', $path)
+            ->with('success', $message);
+    }
+
+    /**
      * Process and save an uploaded image to WebP format
      * 
      * PROCESSING FLOW:
@@ -436,5 +643,28 @@ class PathImageController extends Controller
         unset($encodedImage);
 
         return $webpPath;
+    }
+
+
+    /**
+     * API endpoint to get current image count for a path
+     */
+    public function getPathImageCount(Request $request)
+    {
+        $request->validate([
+            'path_id' => 'required|exists:paths,id',
+        ]);
+
+        $pathId = $request->input('path_id');
+        $currentCount = PathImage::where('path_id', $pathId)->count();
+        $maxImages = self::MAX_IMAGES_PER_PATH;
+        $remaining = max(0, $maxImages - $currentCount);
+
+        return response()->json([
+            'current_count' => $currentCount,
+            'max_images' => $maxImages,
+            'remaining_slots' => $remaining,
+            'is_full' => $remaining === 0,
+        ]);
     }
 }

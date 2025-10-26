@@ -69,9 +69,10 @@
                                             <span x-show="selectedId == path.id" class="float-right text-primary">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                                     fill="currentColor">
-                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586
-                                                                            6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
-                                                                            0 001.414 0l7-7a1 1 0 000-1.414z"
+                                                    <path fill-rule="evenodd"
+                                                        d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586
+                                                                                                                        6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
+                                                                                                                        0 001.414 0l7-7a1 1 0 000-1.414z"
                                                         clip-rule="evenodd" />
                                                 </svg>
                                             </span>
@@ -85,15 +86,81 @@
                         </div>
                     </div>
 
-                    {{-- Dropzone --}}
-                    <label for="fileInput"
-                        class="flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary dark:hover:bg-gray-800 transition-colors p-4 overflow-auto relative">
-                        <span class="text-gray-600 dark:text-gray-300 mb-2">Drop images here or click to browse</span>
-                        <span class="text-xs text-gray-400">
-                            JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 10 MB each | multiple allowed
-                        </span>
+                    {{-- Path Image Limit Display --}}
+                    <div id="pathLimitDisplay"
+                        class="mb-4 p-3 rounded-lg border-2 border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
+                        @php
+                            $percentage = $maxImagesPerPath > 0 ? ($currentImageCount / $maxImagesPerPath) * 25 : 0;
+                            $colorClass = 'text-green-600 dark:text-green-400';
+                            if ($percentage >= 90) {
+                                $colorClass = 'text-red-600 dark:text-red-400';
+                            } elseif ($percentage >= 70) {
+                                $colorClass = 'text-yellow-600 dark:text-yellow-400';
+                            }
+                        @endphp
 
-                        <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-sm text-gray-600 dark:text-gray-400">Path Images:</span>
+                                <span class="{{ $colorClass }} text-lg font-bold ml-2">
+                                    {{ $currentImageCount }} / {{ $maxImagesPerPath }}
+                                </span>
+                            </div>
+
+                            @if ($remainingSlots > 0)
+                                <span class="text-sm {{ $colorClass }} font-medium">
+                                    {{ $remainingSlots }} slot{{ $remainingSlots !== 1 ? 's' : '' }} remaining
+                                </span>
+                            @else
+                                <span class="text-sm text-red-600 dark:text-red-400 font-bold">
+                                    ⚠️ PATH FULL
+                                </span>
+                            @endif
+                        </div>
+
+                        {{-- Progress bar --}}
+                        <div class="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                            <div class="h-full rounded-full transition-all duration-300 
+                                @if ($percentage >= 90) bg-secondary
+                                @elseif($percentage >= 70) bg-orange
+                                @else bg-tertiary @endif"
+                                style="width: {{ min($percentage, 100) }}%">
+                            </div>
+                        </div>
+
+                        @if ($remainingSlots === 0)
+                            <p class="text-xs text-red-600 dark:text-red-400 mt-2">
+                                This path has reached the maximum limit. Please delete some images or select a different
+                                path.
+                            </p>
+                        @endif
+                    </div>
+
+                    {{-- Dropzone --}}
+                    {{-- Update the dropzone label text to show the limit --}}
+                    <label for="fileInput"
+                        class="flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary dark:hover:bg-gray-800 transition-colors p-4 overflow-auto relative
+                            {{ $remainingSlots === 0 ? 'opacity-50 cursor-not-allowed' : '' }}">
+
+                        @if ($remainingSlots > 0)
+                            <span class="text-gray-600 dark:text-gray-300 mb-2">Drop images here or click to browse</span>
+                            <span class="text-xs text-gray-400">
+                                JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 10 MB each | max 20 per upload
+                            </span>
+                            <span class="text-xs text-primary font-medium mt-1">
+                                Path can accept {{ $remainingSlots }} more image(s)
+                            </span>
+                        @else
+                            <span class="text-red-600 dark:text-red-400 font-bold mb-2">
+                                ⚠️ This path has reached the maximum limit ({{ $maxImagesPerPath }} images)
+                            </span>
+                            <span class="text-xs text-gray-500">
+                                Please delete some images or select a different path to upload
+                            </span>
+                        @endif
+
+                        <input type="file" id="fileInput" multiple accept="image/*" class="hidden"
+                            {{ $remainingSlots === 0 ? 'disabled' : '' }}>
                     </label>
 
                     <div id="fileError" class="text-red-500 text-sm mt-2 hidden"></div>
@@ -126,27 +193,19 @@
                 selectedName: '',
 
                 init() {
-                    // Priority: sessionStorage > defaultPathId (from URL)
                     const storedId = sessionStorage.getItem('selectedPathId');
-
-                    // If there's a stored ID, use it; otherwise use the URL parameter
                     const targetId = storedId ? parseInt(storedId, 10) : this.selectedId;
-
                     const selected = this.paths.find(p => p.id === targetId);
 
                     if (selected) {
                         this.selectedId = selected.id;
                         this.selectedName = selected.display_name;
-
-                        // Save back to sessionStorage
                         sessionStorage.setItem('selectedPathId', this.selectedId);
 
-                        // Update the URL if different from what was passed
                         if (this.selectedId !== defaultPathId) {
                             this.updateBrowserUrl();
                         }
                     } else {
-                        // Fallback to default
                         this.selectedId = defaultPathId;
                         const defaultPath = this.paths.find(p => p.id === defaultPathId);
                         this.selectedName = defaultPath ? defaultPath.display_name : '';
@@ -180,15 +239,18 @@
                     this.search = '';
                     this.filterPaths();
 
-                    // Save selection to sessionStorage
                     sessionStorage.setItem('selectedPathId', path.id);
-
-                    // Update the browser URL
                     this.updateBrowserUrl();
+
+                    // Dispatch event to trigger image count fetch
+                    window.dispatchEvent(new CustomEvent('path-changed', {
+                        detail: {
+                            pathId: path.id
+                        }
+                    }));
                 },
 
                 updateBrowserUrl() {
-                    // Update URL without page reload
                     const baseUrl = "{{ route('path-image.create', ':pathId') }}";
                     const newUrl = baseUrl.replace(':pathId', this.selectedId);
                     window.history.replaceState({}, '', newUrl);
@@ -210,7 +272,7 @@
         3. Consistent output (all images → 2000px WebP)
         ═══════════════════════════════════════════════════════════════
         --}}
-        
+
         document.addEventListener('DOMContentLoaded', function() {
             const fileInput = document.getElementById('fileInput');
             const selectedFilesContainer = document.getElementById('selectedFiles');
@@ -245,10 +307,89 @@
 
             const COMPRESSION_QUALITY = 0.85;
 
-            function updateSubmitButton() {
-                submitBtn.disabled = files.length === 0 || isSubmitting;
+            // Add these variables at the top with other configuration
+            const MAX_IMAGES_PER_PATH = {{ $maxImagesPerPath ?? 25 }};
+            let currentPathImageCount = {{ $currentImageCount ?? 0 }};
+            let remainingSlots = {{ $remainingSlots ?? 25 }};
 
-                if (files.length > 0) {
+            // Add this function to fetch path image count
+            async function fetchPathImageCount(pathId) {
+                try {
+                    const response = await fetch(`{{ route('path-image.count') }}?path_id=${pathId}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        currentPathImageCount = data.current_count;
+                        remainingSlots = data.remaining_slots;
+
+                        updatePathLimitDisplay();
+
+                        if (data.is_full) {
+                            files = [];
+                            renderPreviews();
+                            updateSubmitButton();
+                            showError([
+                                `This path has reached the maximum limit of ${MAX_IMAGES_PER_PATH} images.`
+                            ]);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch path image count:', error);
+                }
+            }
+
+            // Add this function to update the UI
+            function updatePathLimitDisplay() {
+                const limitDisplay = document.getElementById('pathLimitDisplay');
+                if (!limitDisplay) return;
+
+                const percentage = (currentPathImageCount / MAX_IMAGES_PER_PATH) * 100;
+                let colorClass = 'text-green-600 dark:text-green-400';
+                let bgClass = 'bg-tertiary';
+
+                if (percentage >= 90) {
+                    colorClass = 'text-red-600 dark:text-red-400';
+                    bgClass = 'bg-secondary';
+                } else if (percentage >= 70) {
+                    colorClass = 'text-yellow-600 dark:text-yellow-400';
+                    bgClass = 'bg-orange';
+                }
+
+                limitDisplay.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-sm text-gray-600 dark:text-gray-400">Path Images:</span>
+                            <span class="${colorClass} text-lg font-bold ml-2">
+                                ${currentPathImageCount} / ${MAX_IMAGES_PER_PATH}
+                            </span>
+                        </div>
+                        ${remainingSlots > 0 
+                            ? `<span class="text-sm ${colorClass} font-medium">${remainingSlots} slot${remainingSlots !== 1 ? 's' : ''} remaining</span>`
+                            : `<span class="text-sm text-red-600 dark:text-red-400 font-bold">⚠️ PATH FULL</span>`
+                        }
+                    </div>
+                    <div class="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                        <div class="h-full rounded-full transition-all duration-300 ${bgClass}" style="width: ${Math.min(percentage, 100)}%"></div>
+                    </div>
+                    ${remainingSlots === 0 
+                        ? `<p class="text-xs text-red-600 dark:text-red-400 mt-2">This path has reached the maximum limit. Please delete some images or select a different path.</p>`
+                        : ''
+                    }
+                `;
+            }
+
+            function updateSubmitButton() {
+                const isDisabled = files.length === 0 || isSubmitting || remainingSlots === 0;
+                submitBtn.disabled = isDisabled;
+
+                if (remainingSlots === 0) {
+                    submitBtn.textContent = 'Path Full - Cannot Upload';
+                } else if (files.length > 0) {
                     submitBtn.textContent = `Upload ${files.length} Image${files.length > 1 ? 's' : ''}`;
                 } else {
                     submitBtn.textContent = 'Upload Images';
@@ -272,10 +413,31 @@
                 const currentCount = files.length;
                 const potentialTotal = currentCount + newFiles.length;
 
+                // Check per-upload limit (20 files)
                 if (potentialTotal > MAX_FILES) {
                     errors.push(
-                        `Maximum ${MAX_FILES} files allowed. Currently selected: ${currentCount}, trying to add: ${newFiles.length}`
+                        `Maximum ${MAX_FILES} files per upload. Currently selected: ${currentCount}, trying to add: ${newFiles.length}`
                     );
+                    return {
+                        valid: false,
+                        errors,
+                        validFiles: []
+                    };
+                }
+
+                // CHECK PER-PATH LIMIT ← ADD THIS
+                const totalImagesAfterUpload = currentPathImageCount + potentialTotal;
+                if (totalImagesAfterUpload > MAX_IMAGES_PER_PATH) {
+                    const allowedToAdd = Math.max(0, remainingSlots - currentCount);
+                    if (allowedToAdd === 0) {
+                        errors.push(
+                            `This path has reached the maximum limit of ${MAX_IMAGES_PER_PATH} images. Please delete some images first.`
+                        );
+                    } else {
+                        errors.push(
+                            `This path can only accept ${allowedToAdd} more image(s). Currently has ${currentPathImageCount} images (max: ${MAX_IMAGES_PER_PATH}).`
+                        );
+                    }
                     return {
                         valid: false,
                         errors,
@@ -464,20 +626,33 @@
                 updateSubmitButton();
             }
 
+            // Listen for path changes
+            document.addEventListener('path-changed', function(e) {
+                if (e.detail && e.detail.pathId) {
+                    fetchPathImageCount(e.detail.pathId);
+                }
+            });
+
             function renderPreviews() {
                 selectedFilesContainer.innerHTML = '';
                 if (!files.length) return;
 
                 const totalSize = getTotalSize();
+                const afterUploadTotal = currentPathImageCount + files.length;
+                const limitColor = afterUploadTotal > MAX_IMAGES_PER_PATH * 0.9 ? 'text-red-600' : 'text-blue-800';
+
                 const infoBanner = document.createElement('div');
                 infoBanner.className =
                     'col-span-full bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded p-3 text-sm';
                 infoBanner.innerHTML = `
-            <div class="flex justify-between items-center text-blue-800 dark:text-blue-200">
-                <span><strong>${files.length}</strong> of ${MAX_FILES} files</span>
-                <span><strong>${formatFileSize(totalSize)}</strong> of ${formatFileSize(MAX_TOTAL_SIZE)}</span>
-            </div>
-            `;
+                    <div class="flex justify-between items-center text-blue-800 dark:text-blue-200">
+                        <span><strong>${files.length}</strong> of ${MAX_FILES} files selected</span>
+                        <span><strong>${formatFileSize(totalSize)}</strong> of ${formatFileSize(MAX_TOTAL_SIZE)}</span>
+                    </div>
+                    <div class="mt-2 ${limitColor} dark:${limitColor} font-medium">
+                        Path will have <strong>${afterUploadTotal} / ${MAX_IMAGES_PER_PATH}</strong> images after upload
+                    </div>
+                `;
                 selectedFilesContainer.appendChild(infoBanner);
 
                 files.forEach((file, index) => {
@@ -637,6 +812,7 @@
             });
 
             updateSubmitButton();
+            updatePathLimitDisplay();
         });
     </script>
 @endpush

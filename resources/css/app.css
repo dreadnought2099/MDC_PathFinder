@@ -489,6 +489,10 @@
         background-color: var(--color-tertiary);
     }
 
+    .bg-orange {
+        background-color: var(--color-orange);
+    }
+
     /* ========================
         TEXT UTILITIES
         ======================== */
@@ -503,6 +507,9 @@
     }
     .text-tertiary {
         color: var(--color-tertiary);
+    }
+    .text-orange {
+        color: var(--color-orange);
     }
 
     /* ========================

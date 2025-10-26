@@ -25,6 +25,13 @@ return new class extends Migration
             // File path (can store relative path or full URL)
             $table->string('image_file');
             $table->timestamps();
+            
+            // Composite index for path_id + image_order
+            // This speeds up queries like:
+            // - WHERE path_id = ? ORDER BY image_order
+            // - WHERE path_id = ? AND image_order = ?
+            // - MAX(image_order) WHERE path_id = ?
+            $table->index(['path_id', 'image_order'], 'path_images_path_order_index');
         });
     }
 
