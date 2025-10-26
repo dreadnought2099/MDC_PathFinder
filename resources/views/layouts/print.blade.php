@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="robots" content="noindex, nofollow">
     
-    <title>@yield('title')</title>
+    <title>@yield('title', config('app.name'))</title>
     <!-- Theme script runs before CSS -->
     <script>
         (function() {
