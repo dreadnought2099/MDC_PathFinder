@@ -72,7 +72,7 @@
 
 @push('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        function initGlightbox() {
             if (window.glightboxInstance) {
                 window.glightboxInstance.destroy();
             }
@@ -90,6 +90,9 @@
                     prev: '<svg width="25" height="40" viewBox="0 0 25 40" xmlns="http://www.w3.org/2000/svg"><path d="M20 0 L0 20 L20 40" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>'
                 }
             });
-        });
+        }
+
+        // Init on first load
+        document.addEventListener('DOMContentLoaded', initGlightbox);
     </script>
 @endpush

@@ -72,6 +72,7 @@
                 },
 
                 async loadPage(page = 1) {
+                    showSpinner(); // show spinner
                     const params = new URLSearchParams({
                         search: this.search || '',
                         sort: this.sort,
@@ -99,6 +100,10 @@
                             const tableElement = document.querySelector('#records-table');
                             if (tableElement) {
                                 tableElement.innerHTML = data.html;
+
+                                // Re-initialize GLightbox
+                                initGlightbox();
+
                                 // Re-setup pagination listener for new links
                                 this.$nextTick(() => {
                                     window.scrollTo({
@@ -115,6 +120,8 @@
                         console.error('Error fetching data:', err);
                         // Fallback to full page reload if AJAX fails
                         window.location.href = url;
+                    } finally {
+                        hideSpinner();
                     }
                 },
 
