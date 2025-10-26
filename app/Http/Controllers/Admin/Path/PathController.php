@@ -53,13 +53,33 @@ class PathController extends Controller
     }
 
     // Show images for a specific path
-    public function show(Path $path)
+    public function show(Path $path, Request $request)
     {
-        $path->load(['fromRoom', 'toRoom', 'images' => function ($query) {
-            $query->orderBy('image_order');
-        }]);
+        $path->load(['fromRoom', 'toRoom']);
 
-        return view('pages.admin.paths.show', compact('path'));
+        $imagesQuery = $path->images();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            // Only search by numeric image_order
+            if (is_numeric($search)) {
+                $imagesQuery->where('image_order', $search);
+            }
+        }
+
+        $images = $imagesQuery
+            ->orderBy($request->get('sort', 'image_order'), $request->get('direction', 'asc'))
+            ->paginate(8)
+            ->withQueryString();
+
+        // AJAX request (Alpine)
+        if ($request->ajax()) {
+            $html = view('pages.admin.paths.partials.path-images-table', compact('path', 'images'))->render();
+            return response()->json(['html' => $html]);
+        }
+
+        return view('pages.admin.paths.show', compact('path', 'images'));
     }
 
     // Client-side path selection page
