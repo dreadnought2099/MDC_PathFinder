@@ -24,7 +24,7 @@
                             <!-- Dropdown Button -->
                             <button type="button" @click="toggleDropdown()"
                                 class="w-full border border-primary rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-primary 
-                                    dark:text-gray-300 bg-white dark:bg-gray-800 shadow-md flex items-center justify-between text-left">
+                                    dark:text-gray-300 bg-white dark:bg-blue-800/5 shadow-md flex items-center justify-between text-left">
                                 <span x-text="selectedName || 'Select a path'"
                                     :class="!selectedName ? 'text-gray-400' : ''"></span>
                                 <svg class="w-5 h-5 text-gray-400 transition-transform duration-200"
@@ -88,7 +88,7 @@
 
                     {{-- Path Image Limit Display --}}
                     <div id="pathLimitDisplay"
-                        class="mb-4 p-3 rounded-lg border-2 border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
+                        class="mb-4 p-3 rounded-lg border border-primary bg-blue-50 dark:bg-blue-800/5">
                         @php
                             $percentage = $maxImagesPerPath > 0 ? ($currentImageCount / $maxImagesPerPath) * 25 : 0;
                             $colorClass = 'text-green-600 dark:text-green-400';
