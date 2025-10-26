@@ -71,8 +71,8 @@
                                                     fill="currentColor">
                                                     <path fill-rule="evenodd"
                                                         d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586
-                                                            6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
-                                                            0 001.414 0l7-7a1 1 0 000-1.414z"
+                                                                                                                                    6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
+                                                                                                                                    0 001.414 0l7-7a1 1 0 000-1.414z"
                                                         clip-rule="evenodd" />
                                                 </svg>
                                             </span>
@@ -172,7 +172,6 @@
                         Upload Images
                     </button>
                 </form>
-                {{-- Progress Modal handled in the component --}}
             </x-upload-progress-modal>
         </div>
     @endif
@@ -258,30 +257,19 @@
             };
         }
 
-        {{-- 
-        ═══════════════════════════════════════════════════════════════
-        IMAGE UPLOAD CONFIGURATION
-        ═══════════════════════════════════════════════════════════════
-        Frontend Compression: 2000px (MAX_DIMENSION)
-        Backend Validation:   3000px (safety net for direct uploads/API)
-        Final Processing:     2000px WebP @ 75% quality
-        
-        This layered approach ensures:
-        1. Fast uploads (compressed before sending)
-        2. Safety net (rejects oversized direct uploads)
-        3. Consistent output (all images → 2000px WebP)
-        ═══════════════════════════════════════════════════════════════
-        --}}
+        // ==========================================================
+        // DYNAMIC PATH LIMIT DISPLAY SYSTEM
+        // ==========================================================
 
         document.addEventListener('DOMContentLoaded', function() {
-            const fileInput = document.getElementById('fileInput');
+
             const selectedFilesContainer = document.getElementById('selectedFiles');
             const submitBtn = document.getElementById('submitBtn');
             const uploadForm = document.getElementById('uploadForm');
             const pathIdInput = document.querySelector('input[name="path_id"]');
 
             // Exit early if required elements don't exist
-            if (!fileInput || !selectedFilesContainer || !submitBtn || !uploadForm || !pathIdInput) {
+            if (!selectedFilesContainer || !submitBtn || !uploadForm || !pathIdInput) {
                 console.error('Required form elements not found');
                 return;
             }
@@ -297,23 +285,94 @@
                 'image/jpeg', 'image/jpg', 'image/png', 'image/gif',
                 'image/bmp', 'image/svg+xml', 'image/webp'
             ];
-
-            // Client-side compression settings
             const COMPRESS_ENABLED = true;
-
-            // Frontend compresses to 2000px
-            // Backend validation allows up to 3000px (safety net for direct uploads)
             const MAX_DIMENSION = 2000;
-
             const COMPRESSION_QUALITY = 0.85;
 
-            // Add these variables at the top with other configuration
+            // Path limit tracking
             const MAX_IMAGES_PER_PATH = {{ $maxImagesPerPath ?? 25 }};
             let currentPathImageCount = {{ $currentImageCount ?? 0 }};
             let remainingSlots = {{ $remainingSlots ?? 25 }};
 
-            // Add this function to fetch path image count
+            // ====================================================================
+            // EVENT HANDLER FUNCTIONS (DEFINED FIRST)
+            // ====================================================================
+            function handleFileInputChange(e) {
+                addFiles(Array.from(e.target.files));
+            }
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            function handleDragEnter(e) {
+                if (remainingSlots > 0) {
+                    const dropzone = e.currentTarget;
+                    dropzone.classList.add('border-primary', 'bg-primary/5');
+                }
+            }
+
+            function handleDragLeave(e) {
+                const dropzone = e.currentTarget;
+                dropzone.classList.remove('border-primary', 'bg-primary/5');
+            }
+
+            function handleDrop(e) {
+                const dropzone = e.currentTarget;
+                dropzone.classList.remove('border-primary', 'bg-primary/5');
+                if (remainingSlots === 0) return;
+                const dt = e.dataTransfer;
+                const droppedFiles = Array.from(dt.files);
+                addFiles(droppedFiles);
+            }
+
+            // ====================================================================
+            // HELPER: ATTACH EVENT LISTENERS USING EVENT DELEGATION
+            // ====================================================================
+            function attachEventListeners() {
+                // Use the form as our stable container for event delegation
+                if (!uploadForm) {
+                    console.error('Upload form not found');
+                    return;
+                }
+
+                // File input change handler (delegated)
+                uploadForm.addEventListener('change', function(e) {
+                    if (e.target.id === 'fileInput') {
+                        handleFileInputChange(e);
+                    }
+                });
+
+                // Drag and drop handlers (delegated to form)
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    uploadForm.addEventListener(eventName, function(e) {
+                        const fileInput = document.getElementById('fileInput');
+                        const dropzone = fileInput?.closest('label');
+
+                        if (dropzone && (e.target === dropzone || dropzone.contains(e.target))) {
+                            preventDefaults(e);
+
+                            if (eventName === 'dragenter' || eventName === 'dragover') {
+                                handleDragEnter(e);
+                            } else if (eventName === 'dragleave') {
+                                handleDragLeave(e);
+                            } else if (eventName === 'drop') {
+                                handleDrop(e);
+                            }
+                        }
+                    }, false);
+                });
+            }
+
+            // ====================================================================
+            // FETCH PATH IMAGE COUNT (WITH GLOBAL SPINNER)
+            // ====================================================================
             async function fetchPathImageCount(pathId) {
+                if (window.showSpinner) {
+                    window.showSpinner();
+                }
+
                 try {
                     const response = await fetch(`{{ route('path-image.count') }}?path_id=${pathId}`, {
                         headers: {
@@ -328,22 +387,36 @@
                         remainingSlots = data.remaining_slots;
 
                         updatePathLimitDisplay();
+                        updateDropzoneState();
 
                         if (data.is_full) {
                             files = [];
                             renderPreviews();
                             updateSubmitButton();
-                            showError([
-                                `This path has reached the maximum limit of ${MAX_IMAGES_PER_PATH} images.`
-                            ]);
                         }
+                    } else {
+                        throw new Error('Failed to fetch path info');
                     }
                 } catch (error) {
                     console.error('Failed to fetch path image count:', error);
+                    const limitDisplay = document.getElementById('pathLimitDisplay');
+                    if (limitDisplay) {
+                        limitDisplay.innerHTML = `
+                            <div class="text-red-600 dark:text-red-400 text-sm p-3">
+                                ⚠️ Failed to load path information. Please refresh the page.
+                            </div>
+                        `;
+                    }
+                } finally {
+                    if (window.hideSpinner) {
+                        window.hideSpinner();
+                    }
                 }
             }
 
-            // Add this function to update the UI
+            // ====================================================================
+            // UPDATE PATH LIMIT DISPLAY
+            // ====================================================================
             function updatePathLimitDisplay() {
                 const limitDisplay = document.getElementById('pathLimitDisplay');
                 if (!limitDisplay) return;
@@ -383,6 +456,71 @@
                 `;
             }
 
+            // ====================================================================
+            // UPDATE DROPZONE STATE
+            // ====================================================================
+            function updateDropzoneState() {
+                const fileInput = document.getElementById('fileInput');
+                const dropzone = fileInput?.closest('label');
+
+                if (!dropzone) return;
+
+                if (remainingSlots === 0) {
+                    dropzone.className =
+                        'flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded p-4 overflow-auto relative opacity-50 cursor-not-allowed';
+
+                    fileInput.disabled = true;
+
+                    // Update only the text content, keep the file input
+                    const spans = dropzone.querySelectorAll('span');
+                    if (spans.length >= 1) {
+                        dropzone.innerHTML = `
+                            <span class="text-red-600 dark:text-red-400 font-bold mb-2">
+                                ⚠️ This path has reached the maximum limit (${MAX_IMAGES_PER_PATH} images)
+                            </span>
+                            <span class="text-xs text-gray-500">
+                                Please delete some images or select a different path to upload
+                            </span>
+                            <input type="file" id="fileInput" multiple accept="image/*" class="hidden" disabled>
+                        `;
+                    }
+                } else {
+                    dropzone.className =
+                        'flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary dark:hover:bg-gray-800 transition-colors p-4 overflow-auto relative';
+
+                    const currentInput = document.getElementById('fileInput');
+                    if (currentInput) {
+                        currentInput.disabled = false;
+                    }
+
+                    dropzone.innerHTML = `
+                        <span class="text-gray-600 dark:text-gray-300 mb-2">Drop images here or click to browse</span>
+                        <span class="text-xs text-gray-400">
+                            JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 10 MB each | max 20 per upload
+                        </span>
+                        <span class="text-xs text-primary font-medium mt-1">
+                            Path can accept ${remainingSlots} more image(s)
+                        </span>
+                        <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
+                    `;
+                }
+            }
+
+            // ====================================================================
+            // LISTEN FOR PATH CHANGES
+            // ====================================================================
+            window.addEventListener('path-changed', function(e) {
+                if (e.detail && e.detail.pathId) {
+                    files = [];
+                    renderPreviews();
+                    updateSubmitButton();
+                    fetchPathImageCount(e.detail.pathId);
+                }
+            });
+
+            // ====================================================================
+            // UTILITY FUNCTIONS
+            // ====================================================================
             function updateSubmitButton() {
                 const isDisabled = files.length === 0 || isSubmitting || remainingSlots === 0;
                 submitBtn.disabled = isDisabled;
@@ -413,7 +551,6 @@
                 const currentCount = files.length;
                 const potentialTotal = currentCount + newFiles.length;
 
-                // Check per-upload limit (20 files)
                 if (potentialTotal > MAX_FILES) {
                     errors.push(
                         `Maximum ${MAX_FILES} files per upload. Currently selected: ${currentCount}, trying to add: ${newFiles.length}`
@@ -425,7 +562,6 @@
                     };
                 }
 
-                // CHECK PER-PATH LIMIT ← ADD THIS
                 const totalImagesAfterUpload = currentPathImageCount + potentialTotal;
                 if (totalImagesAfterUpload > MAX_IMAGES_PER_PATH) {
                     const allowedToAdd = Math.max(0, remainingSlots - currentCount);
@@ -495,19 +631,14 @@
                 const fileError = document.getElementById('fileError');
                 fileError.innerHTML = messages.map(msg => `<div>⚠ ${msg}</div>`).join('');
                 fileError.classList.remove('hidden');
-
-                setTimeout(() => {
-                    fileError.classList.add('hidden');
-                }, 8000);
+                setTimeout(() => fileError.classList.add('hidden'), 8000);
             }
 
             async function compressImage(file) {
                 return new Promise((resolve) => {
                     const reader = new FileReader();
-
                     reader.onload = (e) => {
                         const img = new Image();
-
                         img.onload = () => {
                             const canvas = document.createElement('canvas');
                             let width = img.width;
@@ -525,7 +656,6 @@
 
                             canvas.width = width;
                             canvas.height = height;
-
                             const ctx = canvas.getContext('2d');
                             ctx.drawImage(img, 0, 0, width, height);
 
@@ -545,10 +675,8 @@
                                 COMPRESSION_QUALITY
                             );
                         };
-
                         img.src = e.target.result;
                     };
-
                     reader.readAsDataURL(file);
                 });
             }
@@ -571,7 +699,6 @@
                                 `"${file.name}" compressed: ${formatFileSize(originalSize)} → ${formatFileSize(compressed.size)}`
                             );
                         }
-
                         files.push(compressed);
                     } catch (error) {
                         console.error('Compression failed for', file.name, error);
@@ -586,9 +713,9 @@
                     successDiv.className =
                         'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded p-3 text-sm text-green-800 dark:text-green-200 mt-2';
                     successDiv.innerHTML = `
-                <div class="font-semibold mb-1">✓ Images optimized for upload:</div>
-                ${compressionInfo.map(info => `<div class="text-xs">${info}</div>`).join('')}
-            `;
+                        <div class="font-semibold mb-1">✓ Images optimized for upload:</div>
+                        ${compressionInfo.map(info => `<div class="text-xs">${info}</div>`).join('')}
+                    `;
                     selectedFilesContainer.insertAdjacentElement('beforebegin', successDiv);
                     setTimeout(() => successDiv.remove(), 8000);
                 }
@@ -616,8 +743,6 @@
                         updateSubmitButton();
                     }
                 }
-
-                fileInput.value = '';
             }
 
             function removeFile(index) {
@@ -655,22 +780,20 @@
 
                     reader.onload = e => {
                         div.innerHTML = `
-                    <img src="${e.target.result}" class="w-full h-24 object-cover">
-                    <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-1 truncate">
-                        ${file.name}
-                    </div>
-                    <div class="absolute top-1 left-1 bg-black/60 text-white text-xs px-1 rounded">
-                        ${formatFileSize(file.size)}
-                    </div>
-                    <button type="button" 
-                        class="absolute top-1 right-1 bg-red-500 text-white w-6 h-6 rounded-full
-                        flex items-center justify-center text-sm hover:bg-red-600 transition-colors
-                        opacity-0 group-hover:opacity-100"
-                        data-index="${index}" 
-                        title="Remove">
-                        ×
-                    </button>
-                `;
+                            <img src="${e.target.result}" class="w-full h-24 object-cover">
+                            <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-1 truncate">
+                                ${file.name}
+                            </div>
+                            <div class="absolute top-1 left-1 bg-black/60 text-white text-xs px-1 rounded">
+                                ${formatFileSize(file.size)}
+                            </div>
+                            <button type="button" 
+                                class="absolute top-1 right-1 bg-red-500 text-white w-6 h-6 rounded-full
+                                flex items-center justify-center text-sm hover:bg-red-600 transition-colors
+                                opacity-0 group-hover:opacity-100"
+                                data-index="${index}" 
+                                title="Remove">×</button>
+                        `;
 
                         const removeBtn = div.querySelector('button');
                         removeBtn.addEventListener('click', function() {
@@ -683,48 +806,13 @@
                 });
             }
 
-            // File input change handler
-            fileInput.addEventListener('change', function() {
-                addFiles(Array.from(this.files));
-            });
-
-            // Drag and drop handlers
-            const dropzone = fileInput.parentElement;
-
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                dropzone.addEventListener(eventName, preventDefaults, false);
-            });
-
-            function preventDefaults(e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-
-            ['dragenter', 'dragover'].forEach(eventName => {
-                dropzone.addEventListener(eventName, () => {
-                    dropzone.classList.add('border-primary', 'bg-primary/5');
-                });
-            });
-
-            ['dragleave', 'drop'].forEach(eventName => {
-                dropzone.addEventListener(eventName, () => {
-                    dropzone.classList.remove('border-primary', 'bg-primary/5');
-                });
-            });
-
-            dropzone.addEventListener('drop', function(e) {
-                const dt = e.dataTransfer;
-                const droppedFiles = Array.from(dt.files);
-                addFiles(droppedFiles);
-            });
-
-            // Form submit handler
+            // ====================================================================
+            // FORM SUBMIT HANDLER
+            // ====================================================================
             uploadForm.addEventListener('submit', function(e) {
                 e.preventDefault();
 
-                if (isSubmitting || files.length === 0) {
-                    return;
-                }
+                if (isSubmitting || files.length === 0) return;
 
                 const totalSize = getTotalSize();
                 if (totalSize > MAX_TOTAL_SIZE) {
@@ -735,16 +823,13 @@
                 }
 
                 if (files.length > MAX_FILES) {
-                    showError([
-                        `Number of files (${files.length}) exceeds maximum allowed (${MAX_FILES})`
-                    ]);
+                    showError([`Number of files (${files.length}) exceeds maximum allowed (${MAX_FILES})`]);
                     return;
                 }
 
                 isSubmitting = true;
                 updateSubmitButton();
 
-                // Show modal via Alpine event
                 window.dispatchEvent(new CustomEvent('upload-start'));
 
                 const formData = new FormData();
@@ -800,10 +885,14 @@
 
                 xhr.open('POST', uploadForm.action);
                 xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-                xhr.timeout = 300000; // 5 minutes
+                xhr.timeout = 300000;
                 xhr.send(formData);
             });
 
+            // ====================================================================
+            // INITIALIZE
+            // ====================================================================
+            attachEventListeners();
             updateSubmitButton();
             updatePathLimitDisplay();
         });
