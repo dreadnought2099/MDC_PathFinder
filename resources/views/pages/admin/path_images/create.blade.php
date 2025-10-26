@@ -70,8 +70,9 @@
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                                     fill="currentColor">
                                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586
-                                                                6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
-                                                                0 001.414 0l7-7a1 1 0 000-1.414z" clip-rule="evenodd" />
+                                                                            6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
+                                                                            0 001.414 0l7-7a1 1 0 000-1.414z"
+                                                        clip-rule="evenodd" />
                                                 </svg>
                                             </span>
                                         </button>
@@ -195,6 +196,21 @@
             };
         }
 
+        {{-- 
+        ═══════════════════════════════════════════════════════════════
+        IMAGE UPLOAD CONFIGURATION
+        ═══════════════════════════════════════════════════════════════
+        Frontend Compression: 2000px (MAX_DIMENSION)
+        Backend Validation:   3000px (safety net for direct uploads/API)
+        Final Processing:     2000px WebP @ 75% quality
+        
+        This layered approach ensures:
+        1. Fast uploads (compressed before sending)
+        2. Safety net (rejects oversized direct uploads)
+        3. Consistent output (all images → 2000px WebP)
+        ═══════════════════════════════════════════════════════════════
+        --}}
+        
         document.addEventListener('DOMContentLoaded', function() {
             const fileInput = document.getElementById('fileInput');
             const selectedFilesContainer = document.getElementById('selectedFiles');
@@ -222,7 +238,11 @@
 
             // Client-side compression settings
             const COMPRESS_ENABLED = true;
+
+            // Frontend compresses to 2000px
+            // Backend validation allows up to 3000px (safety net for direct uploads)
             const MAX_DIMENSION = 2000;
+
             const COMPRESSION_QUALITY = 0.85;
 
             function updateSubmitButton() {

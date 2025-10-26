@@ -91,6 +91,11 @@
                                           file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 
                                           file:bg-[#157ee1] file:hover:bg-white file:text-white file:text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                                             data-index="{{ $index }}">
+
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                            Max 10MB. Will be compressed to 2000px before upload.
+                                        </p>
+
                                         <!-- Clear button (hidden by default) -->
                                         <button type="button"
                                             class="clear-file-btn hidden absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-colors duration-200"
@@ -106,8 +111,9 @@
                                     <!-- Error message for file size -->
                                     <p class="file-size-error hidden text-red-600 text-xs mt-1"
                                         data-index="{{ $index }}">
-                                        File size must be less than 5MB
+                                        <!-- JavaScript will populate this dynamically -->
                                     </p>
+
                                     <!-- File name display -->
                                     <p class="file-name-display hidden text-gray-600 dark:text-gray-400 text-xs mt-1"
                                         data-index="{{ $index }}">
@@ -147,57 +153,190 @@
 
 @push('scripts')
     <script>
-        const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+        {{-- 
+        ═══════════════════════════════════════════════════════════════
+        IMAGE UPLOAD CONFIGURATION
+        ═══════════════════════════════════════════════════════════════
+        Frontend Compression: 2000px (MAX_DIMENSION)
+        Backend Validation:   3000px (safety net for direct uploads/API)
+        Final Processing:     2000px WebP @ 75% quality
+        
+        This layered approach ensures:
+        1. Fast uploads (compressed before sending)
+        2. Safety net (rejects oversized direct uploads)
+        3. Consistent output (all images → 2000px WebP)
+        ═══════════════════════════════════════════════════════════════
+     --}}
+
+        const MAX_FILE_SIZE_ORIGINAL = 10 * 1024 * 1024; // 10MB - what user can SELECT
+        const MAX_FILE_SIZE_COMPRESSED = 5 * 1024 * 1024; // 5MB - after compression
+        const MAX_DIMENSION = 2000;
+        const COMPRESSION_QUALITY = 0.85;
+
+        // Store compressed files for each input
+        const compressedFiles = new Map();
+
         const submitButton = document.getElementById('submitButton');
         const form = document.getElementById('pathImagesForm');
 
         // Save the current path ID to sessionStorage for the floating action button
         sessionStorage.setItem('selectedPathId', '{{ $path->id }}');
 
-        // Validate file size for all file inputs
-        function validateAllFileSizes() {
+        async function validateAndCompressFile(input) {
+            const index = input.dataset.index;
+            const errorMsg = document.querySelector(`.file-size-error[data-index="${index}"]`);
+            const clearBtn = document.querySelector(`.clear-file-btn[data-index="${index}"]`);
+            const fileNameDisplay = document.querySelector(`.file-name-display[data-index="${index}"]`);
+
+            // Clear previous state
+            errorMsg.classList.add('hidden');
+            compressedFiles.delete(index);
+
+            if (!input.files || !input.files[0]) {
+                clearBtn.classList.add('hidden');
+                fileNameDisplay.classList.add('hidden');
+                input.classList.remove('border-red-500', 'border-green-500', 'border-blue-500');
+                input.classList.add('border-primary');
+                return true;
+            }
+
+            const file = input.files[0];
+            clearBtn.classList.remove('hidden');
+
+            // Validate original file size (10MB limit)
+            if (file.size > MAX_FILE_SIZE_ORIGINAL) {
+                errorMsg.textContent =
+                    `File too large (${formatFileSize(file.size)}). Maximum ${formatFileSize(MAX_FILE_SIZE_ORIGINAL)}`;
+                errorMsg.classList.remove('hidden');
+                fileNameDisplay.classList.add('hidden');
+                input.classList.add('border-red-500');
+                input.classList.remove('border-primary', 'border-green-500', 'border-blue-500');
+                return false;
+            }
+
+            try {
+                // Show compression in progress with blue border
+                input.classList.remove('border-red-500', 'border-green-500');
+                input.classList.add('border-blue-500'); // Blue = processing
+
+                fileNameDisplay.innerHTML = `
+            <span class="text-blue-600 dark:text-blue-400">⏳ Compressing "${file.name}"...</span>
+        `;
+                fileNameDisplay.classList.remove('hidden');
+
+                // Compress the image
+                const compressed = await compressImage(file);
+
+                // Store compressed file
+                compressedFiles.set(index, compressed);
+
+                // Check if compressed file is under 5MB
+                if (compressed.size > MAX_FILE_SIZE_COMPRESSED) {
+                    errorMsg.textContent =
+                        `Compressed file still too large (${formatFileSize(compressed.size)}). Please use a smaller image.`;
+                    errorMsg.classList.remove('hidden');
+                    fileNameDisplay.classList.add('hidden');
+                    input.classList.add('border-red-500');
+                    input.classList.remove('border-primary', 'border-green-500', 'border-blue-500');
+                    return false;
+                }
+
+                // Success - green border
+                input.classList.remove('border-red-500', 'border-blue-500');
+                input.classList.add('border-green-500');
+
+                const savedBytes = file.size - compressed.size;
+                const savingsPercent = Math.round((savedBytes / file.size) * 100);
+
+                fileNameDisplay.innerHTML = `
+            <span class="font-medium text-green-600 dark:text-green-400">✓ Ready to upload</span><br>
+            <span class="text-gray-600 dark:text-gray-400">
+                ${formatFileSize(file.size)} → ${formatFileSize(compressed.size)} 
+                <span class="text-green-600 dark:text-green-400">(${savingsPercent}% smaller)</span>
+            </span>
+        `;
+                fileNameDisplay.classList.remove('hidden');
+
+                return true;
+            } catch (error) {
+                console.error('Compression error:', error);
+                errorMsg.textContent = 'Failed to compress image. Please try a different file.';
+                errorMsg.classList.remove('hidden');
+                fileNameDisplay.classList.add('hidden');
+                input.classList.add('border-red-500');
+                input.classList.remove('border-primary', 'border-green-500', 'border-blue-500');
+                return false;
+            }
+        }
+
+        async function validateAllFileSizes() {
             const fileInputs = document.querySelectorAll('.image-file-input');
-            let allValid = true;
+            const validationPromises = [];
 
             fileInputs.forEach(input => {
-                const index = input.dataset.index;
-                const errorMsg = document.querySelector(`.file-size-error[data-index="${index}"]`);
-                const clearBtn = document.querySelector(`.clear-file-btn[data-index="${index}"]`);
-                const fileNameDisplay = document.querySelector(`.file-name-display[data-index="${index}"]`);
-
-                if (input.files && input.files[0]) {
-                    const file = input.files[0];
-                    const fileSize = file.size;
-
-                    // Show clear button and file name
-                    clearBtn.classList.remove('hidden');
-                    fileNameDisplay.classList.remove('hidden');
-                    fileNameDisplay.textContent = `Selected: ${file.name}`;
-
-                    if (fileSize > MAX_FILE_SIZE) {
-                        errorMsg.classList.remove('hidden');
-                        input.classList.add('border-red-500');
-                        input.classList.remove('border-primary');
-                        allValid = false;
-                    } else {
-                        errorMsg.classList.add('hidden');
-                        input.classList.remove('border-red-500');
-                        input.classList.add('border-primary');
-                    }
-                } else {
-                    // Hide clear button, error message, and file name when no file selected
-                    clearBtn.classList.add('hidden');
-                    errorMsg.classList.add('hidden');
-                    fileNameDisplay.classList.add('hidden');
-                    input.classList.remove('border-red-500');
-                    input.classList.add('border-primary');
-                }
+                validationPromises.push(validateAndCompressFile(input));
             });
 
-            // Enable/disable submit button based on validation
-            submitButton.disabled = !allValid;
+            const results = await Promise.all(validationPromises);
+            const allValid = results.every(result => result === true);
 
+            submitButton.disabled = !allValid;
             return allValid;
+        }
+
+        async function compressImage(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+
+                reader.onload = (e) => {
+                    const img = new Image();
+
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+
+                        // Resize if larger than MAX_DIMENSION
+                        if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+                            if (width > height) {
+                                height = Math.round((height * MAX_DIMENSION) / width);
+                                width = MAX_DIMENSION;
+                            } else {
+                                width = Math.round((width * MAX_DIMENSION) / height);
+                                height = MAX_DIMENSION;
+                            }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        canvas.toBlob(
+                            (blob) => {
+                                if (blob) {
+                                    const compressedFile = new File([blob], file.name, {
+                                        type: 'image/jpeg',
+                                        lastModified: Date.now()
+                                    });
+                                    resolve(compressedFile);
+                                } else {
+                                    reject(new Error('Compression failed'));
+                                }
+                            },
+                            'image/jpeg',
+                            COMPRESSION_QUALITY
+                        );
+                    };
+
+                    img.onerror = () => reject(new Error('Failed to load image'));
+                    img.src = e.target.result;
+                };
+
+                reader.onerror = () => reject(new Error('Failed to read file'));
+                reader.readAsDataURL(file);
+            });
         }
 
         // Add event listeners to all file inputs
@@ -207,19 +346,27 @@
             });
         });
 
-        // Add event listeners to all clear buttons
         document.querySelectorAll('.clear-file-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const index = this.dataset.index;
                 const fileInput = document.querySelector(`.image-file-input[data-index="${index}"]`);
 
-                // Clear the file input
                 fileInput.value = '';
 
-                // Trigger validation to update UI
+                // Remove compressed file from map
+                compressedFiles.delete(index);
+
                 validateAllFileSizes();
             });
         });
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
 
         // Toggle all delete checkboxes
         function toggleAllDeletes() {
@@ -232,21 +379,73 @@
         }
 
         // Confirm before submitting if deletions are selected
-        form.addEventListener('submit', function(e) {
-            // Validate file sizes one more time before submission
-            if (!validateAllFileSizes()) {
-                e.preventDefault();
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const isValid = await validateAllFileSizes();
+            if (!isValid) {
                 alert('Please fix the file size errors before submitting.');
                 return;
             }
 
-            const deleteCheckboxes = document.querySelectorAll('input[type="checkbox"][name*="[delete]"]:checked');
-
+            const deleteCheckboxes = document.querySelectorAll(
+                'input[type="checkbox"][name*="[delete]"]:checked');
             if (deleteCheckboxes.length > 0) {
                 if (!confirm(`Delete ${deleteCheckboxes.length} image(s)? This cannot be undone.`)) {
-                    e.preventDefault();
+                    return;
                 }
             }
+
+            // Create FormData with compressed files
+            const formData = new FormData(form);
+            const newFormData = new FormData();
+
+            // Copy all non-file fields
+            for (let [key, value] of formData.entries()) {
+                if (!key.includes('[image_file]')) {
+                    newFormData.append(key, value);
+                }
+            }
+
+            // Add compressed files
+            compressedFiles.forEach((file, index) => {
+                newFormData.append(`images[${index}][image_file]`, file);
+            });
+
+            // Submit via AJAX
+            const xhr = new XMLHttpRequest();
+
+            xhr.upload.addEventListener('progress', function(e) {
+                if (e.lengthComputable) {
+                    const percentComplete = Math.round((e.loaded / e.total) * 100);
+                    submitButton.textContent = `Uploading... ${percentComplete}%`;
+                }
+            });
+
+            xhr.addEventListener('load', function() {
+                if (xhr.status >= 200 && xhr.status < 400) {
+                    window.location.reload();
+                } else {
+                    alert('Upload failed. Please try again.');
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Save Changes';
+                }
+            });
+
+            xhr.addEventListener('error', function() {
+                alert('Network error. Please check your connection and try again.');
+                submitButton.disabled = false;
+                submitButton.textContent = 'Save Changes';
+            });
+
+            xhr.open('POST', form.action);
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('input[name="_token"]').value);
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Uploading...';
+
+            xhr.send(newFormData);
         });
     </script>
 @endpush

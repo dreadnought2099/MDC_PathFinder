@@ -3,19 +3,35 @@
 namespace App\Http\Controllers\Admin\Path;
 
 use App\Http\Controllers\Controller;
-use App\Models\Path;
 use App\Models\PathImage;
+use App\Models\Path;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Intervention\Image\ImageManager;
-use Intervention\Image\Encoders\WebpEncoder;
 use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
 use Intervention\Image\Drivers\Gd\Driver as GdDriver;
+use Intervention\Image\Encoders\WebpEncoder;
 
+/**
+ * Path Image Management Controller
+ * 
+ * Handles bulk image uploads for paths with advanced image processing.
+ * 
+ * IMAGE PROCESSING:
+ * - Frontend: Compresses to 2000px before upload
+ * - Laravel: Validates 5MB + 3000px dimension limit
+ * - GD Safety: Additional 3000px check (non-Imagick only)
+ * - Backend: Final resize to 2000px + WebP conversion
+ * 
+ * DIFFERENCES FROM STAFF:
+ * - Larger dimensions (2000px vs 1200px) for path documentation
+ * - Bulk upload support (up to 20 images)
+ * - Lower WebP quality (70-75% vs 80%) due to larger images
+ */
 class PathImageController extends Controller
 {
-    private $manager;
+    private ImageManager $manager;
 
     public function __construct()
     {
@@ -56,6 +72,20 @@ class PathImageController extends Controller
         return view('pages.admin.path_images.create', compact('paths', 'defaultPath'));
     }
 
+    /**
+     * Store multiple path images with validation
+     * 
+     * VALIDATION:
+     * - Max 20 files per upload
+     * - Max 5MB per file
+     * - Max 3000x3000px dimensions (safety for direct uploads)
+     * - Frontend typically compresses to 2000px before reaching here
+     * 
+     * ERROR HANDLING:
+     * - Individual file failures don't stop entire upload
+     * - Errors logged and reported to user
+     * - Partial success supported
+     */
     public function store(Request $request)
     {
         if (!$request->hasFile('files') || count($request->file('files')) === 0) {
@@ -65,7 +95,12 @@ class PathImageController extends Controller
         $request->validate([
             'path_id' => 'required|exists:paths,id',
             'files'   => 'required|array|min:1|max:20',
-            'files.*' => 'required|image|max:5120',
+            'files.*' => [
+                'required',
+                'image',
+                'max:5120', // 5MB
+                'dimensions:max_width=3000,max_height=3000'
+            ],
         ]);
 
         $path = Path::findOrFail($request->path_id);
@@ -90,24 +125,21 @@ class PathImageController extends Controller
             } catch (\Exception $e) {
                 $errors[] = "Failed to upload {$file->getClientOriginalName()}: " . $e->getMessage();
 
-                Log::error("Image upload failed", [
-                    'file'  => $file->getClientOriginalName(),
-                    'size'  => $file->getSize(),
-                    'error' => $e->getMessage(),
+                Log::error("PathImage upload failed", [
+                    'path_id' => $path->id,
+                    'file'    => $file->getClientOriginalName(),
+                    'size'    => $file->getSize(),
+                    'error'   => $e->getMessage(),
                 ]);
             }
         }
 
-        // --- Prepare messages ---
         $message = "{$uploadedCount} image(s) uploaded successfully.";
 
         if (count($errors) > 0) {
             $warningMessage = $message . ' However, ' . count($errors) . ' file(s) failed.';
-
-            // Flash the warning message
             session()->flash('warning', $warningMessage);
 
-            // If it's AJAX, respond with JSON
             if ($request->ajax()) {
                 return response()->json([
                     'redirect' => route('path.show', $path),
@@ -117,14 +149,12 @@ class PathImageController extends Controller
                 ]);
             }
 
-            // Non-AJAX fallback
             return redirect()
                 ->route('path.show', $path)
                 ->with('warning', $warningMessage)
                 ->withErrors($errors);
         }
 
-        // --- Success case ---
         session()->flash('success', $message);
 
         if ($request->ajax()) {
@@ -135,32 +165,9 @@ class PathImageController extends Controller
             ]);
         }
 
-        // Fallback for non-AJAX
         return redirect()
             ->route('path.show', $path)
             ->with('success', $message);
-    }
-
-
-    public function edit(Request $request, Path $path, PathImage $pathImage = null)
-    {
-        $path->load(['fromRoom', 'toRoom']);
-
-        if ($pathImage && $pathImage->path_id !== $path->id) {
-            return redirect()->route('path.show', $path)
-                ->with('error', 'Image does not belong to this path.');
-        }
-
-        $pathImages = $pathImage
-            ? collect([$pathImage])
-            : PathImage::where('path_id', $path->id)->orderBy('image_order')->get();
-
-        if ($pathImages->isEmpty()) {
-            return redirect()->route('path.show', $path)
-                ->with('warning', 'No images found for this path.');
-        }
-
-        return view('pages.admin.path_images.edit', compact('path', 'pathImages'));
     }
 
     public function update(Request $request, $pathOrPathImage = null)
@@ -172,11 +179,19 @@ class PathImageController extends Controller
         }
     }
 
+    /**
+     * Update single path image
+     */
     public function updateSingle(Request $request, PathImage $pathImage)
     {
         $data = $request->validate([
             'image_order' => 'nullable|integer|min:1',
-            'image_file'  => 'nullable|image|max:5120',
+            'image_file'  => [
+                'nullable',
+                'image',
+                'max:5120',
+                'dimensions:max_width=3000,max_height=3000'
+            ],
         ]);
 
         if (isset($data['image_order'])) {
@@ -186,7 +201,9 @@ class PathImageController extends Controller
         if ($request->hasFile('image_file')) {
             try {
                 // Delete old file
-                Storage::disk('public')->delete($pathImage->image_file);
+                if (Storage::disk('public')->exists($pathImage->image_file)) {
+                    Storage::disk('public')->delete($pathImage->image_file);
+                }
 
                 // Process and save new image
                 $webpPath = $this->processAndSaveImage(
@@ -196,7 +213,13 @@ class PathImageController extends Controller
 
                 $pathImage->update(['image_file' => $webpPath]);
             } catch (\Exception $e) {
-                return back()->with('error', 'Failed to update image: ' . $e->getMessage());
+                Log::error('PathImage conversion failed', [
+                    'error' => $e->getMessage(),
+                    'path_image_id' => $pathImage->id
+                ]);
+                return back()->withErrors([
+                    'image_file' => 'Image processing failed. Please try a smaller image.'
+                ]);
             }
         }
 
@@ -205,6 +228,9 @@ class PathImageController extends Controller
             ->with('success', 'Image updated successfully.');
     }
 
+    /**
+     * Update multiple path images (bulk edit)
+     */
     public function updateMultiple(Request $request, $pathId = null)
     {
         $pathId = $pathId ?? $request->input('path_id');
@@ -218,11 +244,15 @@ class PathImageController extends Controller
             'images.*.delete' => 'nullable|boolean',
         ]);
 
-        // Validate file uploads separately by checking request files
+        // Validate file uploads separately
         $filesValidation = [];
         foreach ($request->file('images', []) as $index => $imageFiles) {
             if (isset($imageFiles['image_file'])) {
-                $filesValidation["images.{$index}.image_file"] = 'image|max:10240';
+                $filesValidation["images.{$index}.image_file"] = [
+                    'image',
+                    'max:5120',
+                    'dimensions:max_width=3000,max_height=3000'
+                ];
             }
         }
 
@@ -243,7 +273,9 @@ class PathImageController extends Controller
 
             // Handle deletion
             if (!empty($imageData['delete'])) {
-                Storage::disk('public')->delete($pathImage->image_file);
+                if (Storage::disk('public')->exists($pathImage->image_file)) {
+                    Storage::disk('public')->delete($pathImage->image_file);
+                }
                 $pathImage->delete();
                 $deletedCount++;
                 continue;
@@ -261,13 +293,19 @@ class PathImageController extends Controller
                     $file = $request->file("images.{$index}.image_file");
 
                     // Delete old file
-                    Storage::disk('public')->delete($pathImage->image_file);
+                    if (Storage::disk('public')->exists($pathImage->image_file)) {
+                        Storage::disk('public')->delete($pathImage->image_file);
+                    }
 
                     // Process and save new image
                     $webpPath = $this->processAndSaveImage($file, $path->id);
                     $updateData['image_file'] = $webpPath;
                 } catch (\Exception $e) {
                     $errors[] = "Failed to update image {$pathImage->id}: " . $e->getMessage();
+                    Log::error('PathImage update failed', [
+                        'error' => $e->getMessage(),
+                        'path_image_id' => $pathImage->id
+                    ]);
                     continue;
                 }
             }
@@ -307,90 +345,70 @@ class PathImageController extends Controller
         return $redirect;
     }
 
-    public function destroySingle(PathImage $pathImage)
-    {
-        $path = $pathImage->path;
-
-        Storage::disk('public')->delete($pathImage->image_file);
-        $pathImage->delete();
-
-        if (request()->expectsJson()) {
-            return response()->json(['message' => 'Image deleted successfully.'], 200);
-        }
-
-        return redirect()->route('path.show', $path)->with('success', 'Image deleted successfully.');
-    }
-
-    public function destroyMultiple(Request $request)
-    {
-        $request->validate([
-            'path_id' => 'required|exists:paths,id',
-            'image_ids' => 'required|array|min:1',
-            'image_ids.*' => 'required|exists:path_images,id',
-        ]);
-
-        $path = Path::findOrFail($request->path_id);
-        $deletedCount = 0;
-
-        foreach ($request->image_ids as $imageId) {
-            $pathImage = PathImage::where('id', $imageId)
-                ->where('path_id', $path->id)
-                ->first();
-
-            if ($pathImage) {
-                Storage::disk('public')->delete($pathImage->image_file);
-                $pathImage->delete();
-                $deletedCount++;
-            }
-        }
-
-        $successMessage = "{$deletedCount} image(s) deleted successfully.";
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                'redirect' => route('path.show', $path),
-                'message' => $successMessage,
-                'deleted_count' => $deletedCount,
-            ], 200);
-        }
-
-        return redirect()->route('path.show', $path)->with('success', $successMessage);
-    }
-
-    public function updateOrder(Request $request, Path $path)
-    {
-        $request->validate([
-            'image_orders' => 'required|array',
-            'image_orders.*.id' => 'required|exists:path_images,id',
-            'image_orders.*.order' => 'required|integer|min:1',
-        ]);
-
-        foreach ($request->image_orders as $imageData) {
-            PathImage::where('id', $imageData['id'])
-                ->where('path_id', $path->id)
-                ->update(['image_order' => $imageData['order']]);
-        }
-
-        if ($request->expectsJson()) {
-            return response()->json(['message' => 'Image order updated successfully.'], 200);
-        }
-
-        return redirect()->route('path.show', $path)->with('success', 'Image order updated successfully.');
-    }
-
     /**
-     * Process and save an uploaded image
-     * Uses Imagick if available, falls back to GD
+     * Process and save an uploaded image to WebP format
+     * 
+     * PROCESSING FLOW:
+     * ┌─────────────────────────────────────────────────────────────────┐
+     * │ Example: User uploads 2800x2100px, 4.5MB image                  │
+     * ├─────────────────────────────────────────────────────────────────┤
+     * │ 1. Frontend Compression (compressImage)                         │
+     * │    - Input: 2800x2100px                                         │
+     * │    - Output: 2000x1500px, ~1.5MB JPEG                           │
+     * ├─────────────────────────────────────────────────────────────────┤
+     * │ 2. Laravel Validation ✓                                         │
+     * │    - Size: 1.5MB < 5MB ✓                                        │
+     * │    - Dimensions: 2000x1500 < 3000x3000 ✓                        │
+     * ├─────────────────────────────────────────────────────────────────┤
+     * │ 3. GD Dimension Check (if needed)                               │
+     * │    - 2000x1500 < 3000px → No exception                          │
+     * ├─────────────────────────────────────────────────────────────────┤
+     * │ 4. Backend Processing (this method)                             │
+     * │    - Already 2000px, no resize needed                           │
+     * │    - Convert to WebP @ 75% quality                              │
+     * │    - Output: ~700KB WebP                                        │
+     * │    - Saved to storage/app/public/path_images/{id}/xxx.webp      │
+     * └─────────────────────────────────────────────────────────────────┘
+     * 
+     * QUALITY SETTINGS:
+     * - Files > 5MB: 70% quality (aggressive compression)
+     * - Files ≤ 5MB: 75% quality (balanced)
+     * - Lower than staff photos (80%) because path images are larger
+     * 
+     * DRIVER BEHAVIOR:
+     * - Imagick: Handles any dimension efficiently
+     * - GD: Requires 3000px pre-check to prevent memory issues
+     * 
+     * @param \Illuminate\Http\UploadedFile $file Image file to process
+     * @param int $pathId Path ID for storage folder
+     * @return string Relative path to saved WebP file
+     * @throws \Exception If GD encounters oversized image or processing fails
      */
     private function processAndSaveImage($file, $pathId)
     {
+        // GD driver safety check
+        if (!extension_loaded('imagick')) {
+            $imageInfo = getimagesize($file->getRealPath());
+            if ($imageInfo) {
+                [$width, $height] = $imageInfo;
+                $maxDimension = 3000;
+
+                if ($width > $maxDimension || $height > $maxDimension) {
+                    throw new \Exception(
+                        "Image dimensions too large. Maximum {$maxDimension}px on either side when using GD driver."
+                    );
+                }
+            }
+        }
+
         $baseName = uniqid('', true);
         $folder = "path_images/{$pathId}";
         $webpPath = "{$folder}/{$baseName}.webp";
 
+        // Process image
         $image = $this->manager->read($file);
 
-        // Resize if too large
+        // Resize if needed (max 2000px on longest side)
         $width = $image->width();
         $height = $image->height();
         $maxDimension = 2000;
@@ -406,12 +424,14 @@ class PathImageController extends Controller
         // Adjust quality based on file size
         $quality = 75;
         if ($file->getSize() > 5 * 1024 * 1024) {
-            $quality = 70;
+            $quality = 70; // More aggressive for large files
         }
 
+        // Convert to WebP
         $encodedImage = $image->encode(new WebpEncoder($quality));
         unset($image);
 
+        // Save to storage
         Storage::disk('public')->put($webpPath, (string) $encodedImage);
         unset($encodedImage);
 
