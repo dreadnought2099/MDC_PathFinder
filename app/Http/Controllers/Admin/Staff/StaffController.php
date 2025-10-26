@@ -83,14 +83,24 @@ class StaffController extends Controller
             'bio' => 'nullable|string',
             'email' => 'nullable|email|max:255|unique:staff,email',
             'phone_num' => 'nullable|string|max:20',
-            'photo_path' => 'nullable|image|max:5120',
+            'photo_path' => [
+                'nullable',
+                'image',
+                'max:5120',
+                'dimensions:max_width=4000,max_height=4000' // Image Dimension validation
+            ],
         ]);
 
         $staff = Staff::create($validated);
 
         if ($request->hasFile('photo_path')) {
-            $webpPath = $this->convertToWebP($request->file('photo_path'), "staffs/{$staff->id}");
-            $staff->update(['photo_path' => $webpPath]);
+            try {
+                $webpPath = $this->convertToWebP($request->file('photo_path'), "staffs/{$staff->id}");
+                $staff->update(['photo_path' => $webpPath]);
+            } catch (\Exception $e) {
+                Log::error('Image conversion failed', ['error' => $e->getMessage(), 'staff_id' => $staff->id]);
+                return back()->withErrors(['photo_path' => 'Image processing failed. Please try a smaller image.']);
+            }
         }
 
         session()->flash('success', "{$staff->full_name} was added successfully.");
@@ -141,7 +151,12 @@ class StaffController extends Controller
                 Rule::unique('staff', 'email')->ignore($staff->id),
             ],
             'phone_num' => 'nullable|string|max:20',
-            'photo_path' => 'nullable|image|max:5120',
+            'photo_path' => [
+                'nullable',
+                'image',
+                'max:5120',
+                'dimensions:max_width=4000,max_height=4000' // Image Dimension validation
+            ],
             'delete_photo' => 'nullable|string',
         ]);
 
@@ -157,10 +172,15 @@ class StaffController extends Controller
                 Storage::disk('public')->delete($staff->photo_path);
             }
 
-            $webpPath = $this->convertToWebP($request->file('photo_path'), "staffs/{$staff->id}");
-            $validated['photo_path'] = $webpPath;
+            try {
+                $webpPath = $this->convertToWebP($request->file('photo_path'), "staffs/{$staff->id}");
+                $validated['photo_path'] = $webpPath;
+            } catch (\Exception $e) {
+                Log::error('Image conversion failed', ['error' => $e->getMessage(), 'staff_id' => $staff->id]);
+                return back()->withErrors(['photo_path' => 'Image processing failed. Please try a smaller image.']);
+            }
         }
-
+        
         $staff->update($validated);
 
         session()->flash('success', "{$staff->full_name} updated successfully.");
@@ -248,6 +268,19 @@ class StaffController extends Controller
      */
     private function convertToWebP($file, $folder)
     {
+        // Check dimensions BEFORE processing if using GD
+        if (!extension_loaded('imagick')) {
+            $imageInfo = getimagesize($file->getRealPath());
+            if ($imageInfo) {
+                [$width, $height] = $imageInfo;
+                $maxDimension = 4000; // Adjust based on your server's memory_limit
+
+                if ($width > $maxDimension || $height > $maxDimension) {
+                    throw new \Exception("Image dimensions too large. Maximum {$maxDimension}px on either side when using GD driver.");
+                }
+            }
+        }
+
         $baseName = uniqid('', true);
         $webpPath = "{$folder}/{$baseName}.webp";
 
