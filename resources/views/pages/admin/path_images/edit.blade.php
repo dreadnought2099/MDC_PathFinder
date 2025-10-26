@@ -403,7 +403,7 @@
             xhr.upload.addEventListener('progress', function(e) {
                 if (e.lengthComputable) {
                     const percentComplete = Math.round((e.loaded / e.total) * 100);
-                    submitButton.textContent = `Uploading... ${percentComplete}%`;
+                    submitButton.textContent = `Saving... ${percentComplete}%`;
                 }
             });
 
@@ -428,7 +428,7 @@
             xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('input[name="_token"]').value);
 
             submitButton.disabled = true;
-            submitButton.textContent = 'Uploading...';
+            submitButton.textContent = 'Saving...';
 
             xhr.send(newFormData);
         });

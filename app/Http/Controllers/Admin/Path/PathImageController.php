@@ -110,7 +110,7 @@ class PathImageController extends Controller
 
         $request->validate([
             'path_id' => 'required|exists:paths,id',
-            'files'   => 'required|array|min:1|max:20',
+            'files'   => 'required|array|min:1|max:25',
             'files.*' => [
                 'required',
                 'image',

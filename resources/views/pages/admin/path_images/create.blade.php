@@ -71,8 +71,8 @@
                                                     fill="currentColor">
                                                     <path fill-rule="evenodd"
                                                         d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586
-                                                                                                                                    6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
-                                                                                                                                    0 001.414 0l7-7a1 1 0 000-1.414z"
+                                                                                                                                        6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
+                                                                                                                                        0 001.414 0l7-7a1 1 0 000-1.414z"
                                                         clip-rule="evenodd" />
                                                 </svg>
                                             </span>
@@ -278,9 +278,9 @@
             let isSubmitting = false;
 
             // ===== CONFIGURATION =====
-            const MAX_FILES = 20;
+            const MAX_FILES = 25;
             const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
-            const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // 100 MB
+            const MAX_TOTAL_SIZE = 250 * 1024 * 1024; // 100 MB
             const ALLOWED_TYPES = [
                 'image/jpeg', 'image/jpg', 'image/png', 'image/gif',
                 'image/bmp', 'image/svg+xml', 'image/webp'
@@ -629,9 +629,18 @@
 
             function showError(messages) {
                 const fileError = document.getElementById('fileError');
-                fileError.innerHTML = messages.map(msg => `<div>⚠ ${msg}</div>`).join('');
+                if (!fileError) return;
+
+                fileError.innerHTML = `
+                    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded p-3 text-sm text-red-800 dark:text-red-200">
+                        <div class="font-semibold mb-1">⚠ Upload Warning:</div>
+                        ${messages.map(msg => `<div class="mt-1">${msg}</div>`).join('')}
+                    </div>
+                `;
                 fileError.classList.remove('hidden');
-                setTimeout(() => fileError.classList.add('hidden'), 8000);
+
+                // Fade out gently after 10 seconds
+                setTimeout(() => fileError.classList.add('hidden'), 10000);
             }
 
             async function compressImage(file) {
