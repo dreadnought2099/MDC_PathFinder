@@ -399,6 +399,11 @@ class PathImageController extends Controller
             }
         }
 
+        // ADD THIS: Reorder if any images were deleted
+        if ($deletedCount > 0) {
+            $this->reorderPathImages($path->id);
+        }
+        
         $message = [];
         if ($updatedCount > 0) $message[] = "{$updatedCount} image(s) updated";
         if ($deletedCount > 0) $message[] = "{$deletedCount} image(s) deleted";
@@ -437,6 +442,7 @@ class PathImageController extends Controller
     public function destroySingle(PathImage $pathImage)
     {
         $path = $pathImage->path;
+        $pathId = $path->id; // Store this before deleting
 
         // Delete file from storage
         if (Storage::disk('public')->exists($pathImage->image_file)) {
@@ -444,6 +450,8 @@ class PathImageController extends Controller
         }
 
         $pathImage->delete();
+
+        $this->reorderPathImages($pathId);
 
         if (request()->expectsJson()) {
             return response()->json([
@@ -490,6 +498,8 @@ class PathImageController extends Controller
             }
         }
 
+        $this->reorderPathImages($path->id);
+
         $successMessage = "{$deletedCount} image(s) deleted successfully.";
 
         if ($request->expectsJson()) {
@@ -505,7 +515,22 @@ class PathImageController extends Controller
             ->route('path.show', $path)
             ->with('success', $successMessage);
     }
-    
+
+    /**
+     * Reorder path images sequentially after deletion
+     */
+    private function reorderPathImages($pathId)
+    {
+        $images = PathImage::where('path_id', $pathId)
+            ->orderBy('image_order')
+            ->get();
+
+        foreach ($images as $index => $image) {
+            $image->image_order = $index + 1;
+            $image->save(); // Individual save
+        }
+    }
+
     /**
      * Update the display order of path images
      * 
