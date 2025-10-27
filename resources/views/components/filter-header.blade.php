@@ -27,19 +27,11 @@
                 </select>
             </div>
         </div>
-
-        <!-- Edit Button (only on mobile, beside Sort) -->
-        @if (isset($slot) && !empty(trim($slot)))
-            <div class="sm:hidden flex-shrink-0 self-end xs:self-auto">
-                {{ $slot }}
-            </div>
-        @endif
     </div>
 
     <!-- Search Section -->
     <div class="flex items-center gap-2">
-        <form @submit.prevent="handleChange"
-            class="flex flex-col xxs:flex-row items-stretch xxs:items-center gap-2 w-full sm:w-auto">
+        <form @submit.prevent="handleChange" class="flex items-center gap-2 w-full sm:w-auto">
             <input type="text" x-model="search" placeholder="Search {{ $placeholder }}"
                 @input.debounce.500ms="handleChange"
                 class="font-sofia border border-primary rounded-md px-3 py-2 w-full sm:w-64 outline-none focus:ring focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white text-sm">
@@ -52,9 +44,9 @@
             </template>
         </form>
 
-        <!-- Edit Button (only on desktop, beside Search) -->
+        <!-- Edit Button (beside Search/Clear on all screens) -->
         @if (isset($slot) && !empty(trim($slot)))
-            <div class="hidden sm:block flex-shrink-0">
+            <div class="flex-shrink-0">
                 {{ $slot }}
             </div>
         @endif
