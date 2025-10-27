@@ -9,9 +9,9 @@
 
 <div x-data="searchSortHandler()" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
     <!-- Sort -->
-    <div class="flex items-center gap-2 dark:text-gray-300">
-        <label for="sort" class="text-sm font-medium">Sort By:</label>
-        <div class="flex gap-2">
+    <div class="flex flex-wrap items-center gap-2 dark:text-gray-300">
+        <label for="sort" class="text-sm font-medium whitespace-nowrap">Sort By:</label>
+        <div class="flex flex-wrap gap-2">
             <select x-model="sort" @change="handleChange"
                 class="border border-primary rounded p-1 text-sm dark:bg-gray-800 dark:text-white">
                 @foreach ($fields as $key => $label)
@@ -28,14 +28,14 @@
     </div>
 
     <!-- Search -->
-    <form @submit.prevent="handleChange" class="flex items-center gap-2 w-full sm:w-auto">
+    <form @submit.prevent="handleChange" class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
         <input type="text" x-model="search" placeholder="Search {{ $placeholder }}"
             @input.debounce.500ms="handleChange"
             class="font-sofia border border-primary rounded-md px-3 py-2 w-full sm:w-64 outline-none focus:ring focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white">
 
         <template x-if="search">
             <button type="button" @click="clearSearch"
-                class="px-4 bg-secondary text-white py-2 rounded-md hover:text-secondary border-2 border-secondary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover">
+                class="px-4 bg-secondary text-white py-2 rounded-md hover:text-secondary border-2 border-secondary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover whitespace-nowrap">
                 Clear
             </button>
         </template>

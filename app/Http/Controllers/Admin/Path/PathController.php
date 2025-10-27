@@ -65,6 +65,9 @@ class PathController extends Controller
             // Only search by numeric image_order
             if (is_numeric($search)) {
                 $imagesQuery->where('image_order', $search);
+            } else {
+                // If search is not numeric, return an empty result
+                $imagesQuery->whereRaw('0 = 1'); // always false
             }
         }
 
