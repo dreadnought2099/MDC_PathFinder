@@ -7,39 +7,58 @@
     'currentSearch' => '',
 ])
 
-<div x-data="searchSortHandler()" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-    <!-- Sort -->
-    <div class="flex flex-wrap items-center gap-2 dark:text-gray-300">
-        <label for="sort" class="text-sm font-medium whitespace-nowrap">Sort By:</label>
-        <div class="flex flex-wrap gap-2">
-            <select x-model="sort" @change="handleChange"
-                class="border border-primary rounded p-1 text-sm dark:bg-gray-800 dark:text-white">
-                @foreach ($fields as $key => $label)
-                    <option value="{{ $key }}">{{ $label }}</option>
-                @endforeach
-            </select>
+<div x-data="searchSortHandler()">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+        <!-- Sort -->
+        <div class="flex flex-wrap items-center gap-2 dark:text-gray-300">
+            <label for="sort" class="text-sm font-medium whitespace-nowrap">Sort By:</label>
+            <div class="flex flex-wrap gap-2">
+                <select x-model="sort" @change="handleChange"
+                    class="border border-primary rounded p-1 text-sm dark:bg-gray-800 dark:text-white">
+                    @foreach ($fields as $key => $label)
+                        <option value="{{ $key }}">{{ $label }}</option>
+                    @endforeach
+                </select>
 
-            <select x-model="direction" @change="handleChange"
-                class="border border-primary rounded p-1 text-sm dark:bg-gray-800 dark:text-white">
-                <option value="asc">Ascending</option>
-                <option value="desc">Descending</option>
-            </select>
+                <select x-model="direction" @change="handleChange"
+                    class="border border-primary rounded p-1 text-sm dark:bg-gray-800 dark:text-white">
+                    <option value="asc">Ascending</option>
+                    <option value="desc">Descending</option>
+                </select>
+            </div>
         </div>
+
+        <!-- Edit Button (only on mobile) -->
+        @if (isset($slot) && !empty(trim($slot)))
+            <div class="sm:hidden">
+                {{ $slot }}
+            </div>
+        @endif
     </div>
 
     <!-- Search -->
-    <form @submit.prevent="handleChange" class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-        <input type="text" x-model="search" placeholder="Search {{ $placeholder }}"
-            @input.debounce.500ms="handleChange"
-            class="font-sofia border border-primary rounded-md px-3 py-2 w-full sm:w-64 outline-none focus:ring focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white">
+    <div class="flex items-center gap-2 mb-4">
+        <form @submit.prevent="handleChange"
+            class="flex flex-col xxs:flex-row items-stretch xxs:items-center gap-2 w-full sm:w-auto">
+            <input type="text" x-model="search" placeholder="Search {{ $placeholder }}"
+                @input.debounce.500ms="handleChange"
+                class="font-sofia border border-primary rounded-md px-3 py-2 w-full sm:w-64 outline-none focus:ring focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white">
 
-        <template x-if="search">
-            <button type="button" @click="clearSearch"
-                class="px-4 bg-secondary text-white py-2 rounded-md hover:text-secondary border-2 border-secondary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover whitespace-nowrap">
-                Clear
-            </button>
-        </template>
-    </form>
+            <template x-if="search">
+                <button type="button" @click="clearSearch"
+                    class="px-4 bg-secondary text-white py-2 rounded-md hover:text-secondary border-2 border-secondary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover whitespace-nowrap">
+                    Clear
+                </button>
+            </template>
+        </form>
+
+        <!-- Edit Button (only on desktop) -->
+        @if (isset($slot) && !empty(trim($slot)))
+            <div class="hidden sm:block">
+                {{ $slot }}
+            </div>
+        @endif
+    </div>
 </div>
 
 @push('scripts')
@@ -72,7 +91,11 @@
                 },
 
                 async loadPage(page = 1) {
-                    showSpinner(); // show spinner
+                    // Check if spinner functions exist
+                    if (typeof showSpinner === 'function') {
+                        showSpinner();
+                    }
+
                     const params = new URLSearchParams({
                         search: this.search || '',
                         sort: this.sort,
@@ -101,8 +124,10 @@
                             if (tableElement) {
                                 tableElement.innerHTML = data.html;
 
-                                // Re-initialize GLightbox
-                                initGlightbox();
+                                // Re-initialize GLightbox if function exists
+                                if (typeof initGlightbox === 'function') {
+                                    initGlightbox();
+                                }
 
                                 // Re-setup pagination listener for new links
                                 this.$nextTick(() => {
@@ -118,10 +143,23 @@
                         window.history.pushState({}, '', url);
                     } catch (err) {
                         console.error('Error fetching data:', err);
-                        // Fallback to full page reload if AJAX fails
-                        window.location.href = url;
+                        // Show user-friendly error message
+                        const tableElement = document.querySelector('#records-table');
+                        if (tableElement) {
+                            tableElement.innerHTML = `
+                                <div class="text-center py-8">
+                                    <p class="text-red-600 dark:text-red-400">Failed to load data. Please try again.</p>
+                                    <button onclick="window.location.reload()" class="mt-4 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark">
+                                        Reload Page
+                                    </button>
+                                </div>
+                            `;
+                        }
                     } finally {
-                        hideSpinner();
+                        // Check if spinner functions exist
+                        if (typeof hideSpinner === 'function') {
+                            hideSpinner();
+                        }
                     }
                 },
 
