@@ -9,7 +9,7 @@
                 <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-300">
                     <span class="text-primary">Edit</span> Path Images
                 </h1>
-                <p class="text-gray-600 dark:text-gray-400 mt-1">
+                <p class="text-primary mt-1">
                     {{ $path->fromRoom->name }} → {{ $path->toRoom->name }}
                 </p>
             </div>
@@ -129,11 +129,10 @@
             <div class="h-20"></div>
         </form>
 
-        <!-- Actions - Fixed at bottom -->
-        <div
-            class="fixed bottom-0 left-0 right-0 z-50 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 p-4 bg-white dark:bg-gray-800 border-t-2 border-primary shadow-lg">
+        <!-- Actions - Fixed at bottom with padding to avoid floating actions -->
+        <div class="fixed bottom-0 left-0 right-0 z-40 flex justify-center p-4 pb-20 sm:pb-4">
             <div
-                class="container mx-auto px-4 max-w-6xl flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+                class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-2xl border border-primary shadow-lg rounded-lg px-6 py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 w-full max-w-2xl">
                 <button type="button" onclick="toggleAllDeletes()"
                     class="px-4 py-2 text-sm border-2 border-secondary text-white bg-secondary hover:text-secondary hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-secondary shadow-secondary-hover w-full sm:w-auto">
                     Toggle All Deletes
@@ -147,7 +146,6 @@
                 </div>
             </div>
         </div>
-        </form>
     </div>
 @endsection
 
