@@ -85,7 +85,7 @@
                             e.preventDefault();
                             const url = new URL(link.href);
                             const page = url.searchParams.get('page');
-                            this.loadPage(page);
+                            this.loadPage(page, true); // Pass true for pagination clicks
                         }
                     });
                 },
@@ -129,13 +129,15 @@
                                     initGlightbox();
                                 }
 
-                                // Re-setup pagination listener for new links
-                                this.$nextTick(() => {
-                                    window.scrollTo({
-                                        top: 0,
-                                        behavior: 'smooth'
+                                // Only scroll to top when pagination is clicked
+                                if (shouldScroll) {
+                                    this.$nextTick(() => {
+                                        window.scrollTo({
+                                            top: 0,
+                                            behavior: 'smooth'
+                                        });
                                     });
-                                });
+                                }
                             }
                         }
 
@@ -164,7 +166,7 @@
                 },
 
                 async handleChange() {
-                    await this.loadPage(1); // Reset to page 1 when filtering
+                    await this.loadPage(1, false); // Don't scroll on search/sort changes
                 },
 
                 clearSearch() {

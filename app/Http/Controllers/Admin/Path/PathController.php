@@ -57,11 +57,14 @@ class PathController extends Controller
     {
         $path->load(['fromRoom', 'toRoom']);
 
+        // Get search parameters
+        $search = $request->input('search', '');
+        $sort = $request->input('sort', 'image_order');
+        $direction = $request->input('direction', 'asc');
+
         $imagesQuery = $path->images();
 
         if ($request->filled('search')) {
-            $search = $request->search;
-
             // Only search by numeric image_order
             if (is_numeric($search)) {
                 $imagesQuery->where('image_order', $search);
@@ -72,7 +75,7 @@ class PathController extends Controller
         }
 
         $images = $imagesQuery
-            ->orderBy($request->get('sort', 'image_order'), $request->get('direction', 'asc'))
+            ->orderBy($sort, $direction)
             ->paginate(8)
             ->withQueryString();
 
@@ -82,7 +85,7 @@ class PathController extends Controller
             return response()->json(['html' => $html]);
         }
 
-        return view('pages.admin.paths.show', compact('path', 'images'));
+        return view('pages.admin.paths.show', compact('path', 'images', 'search', 'sort', 'direction'));
     }
 
     // Client-side path selection page

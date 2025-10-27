@@ -47,7 +47,8 @@
 
         <div class="relative">
             <div class="mb-4">
-                <x-filter-header :route="route('path.show', $path->id)" :fields="['image_order' => 'Image Order']" placeholder="image number">
+                <x-filter-header :route="route('path.show', $path->id)" :fields="['image_order' => 'Image Order']" placeholder="image number" :currentSearch="$search ?? ''"
+                    :currentSort="$sort ?? 'image_order'" :currentDirection="$direction ?? 'asc'">
                     <!-- Edit Button Slot -->
                     <div class="inline-block group">
                         <a href="{{ route('path-image.edit', $path->id) }}"
