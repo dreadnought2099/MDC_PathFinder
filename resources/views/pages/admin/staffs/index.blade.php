@@ -17,7 +17,7 @@
             </p>
 
             <!-- Sort Options -->
-            <div class="py-3">
+            <div class="py-3 mt-8">
                 <x-filter-header :route="route('staff.index')" placeholder="staff" :fields="[
                     'full_name' => 'Full Name',
                     'created_at' => 'Date Created',
@@ -27,10 +27,7 @@
             </div>
         </div>
 
-        <!-- Floating Actions -->
-        <div class="mb-4">
-            <x-floating-actions />
-        </div>
+        <x-floating-actions />
 
         <!-- Staff Table Container -->
         <div id="records-table">

@@ -7,26 +7,22 @@
     'currentSearch' => '',
 ])
 
-<div x-data="searchSortHandler()" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+<div x-data="searchSortHandler()" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 mt-6">
     <!-- Sort Section -->
-    <div class="flex flex-col xs:flex-row xs:items-center justify-between gap-2 dark:text-gray-300">
-        <div class="flex flex-col xxs:flex-row xxs:items-center gap-2">
-            <label for="sort" class="text-sm font-medium whitespace-nowrap">Sort By:</label>
-            <div class="flex gap-2">
-                <select x-model="sort" @change="handleChange"
-                    class="border border-primary rounded p-1 text-sm dark:bg-gray-800 dark:text-white flex-1 min-w-0">
-                    @foreach ($fields as $key => $label)
-                        <option value="{{ $key }}">{{ $label }}</option>
-                    @endforeach
-                </select>
+    <div class="flex items-center gap-2 dark:text-gray-300">
+        <label for="sort" class="text-sm font-medium whitespace-nowrap">Sort By:</label>
+        <select x-model="sort" @change="handleChange"
+            class="border border-primary rounded p-1 text-sm dark:bg-gray-800 dark:text-white">
+            @foreach ($fields as $key => $label)
+                <option value="{{ $key }}">{{ $label }}</option>
+            @endforeach
+        </select>
 
-                <select x-model="direction" @change="handleChange"
-                    class="border border-primary rounded p-1 text-sm dark:bg-gray-800 dark:text-white flex-1 min-w-0">
-                    <option value="asc">Ascending</option>
-                    <option value="desc">Descending</option>
-                </select>
-            </div>
-        </div>
+        <select x-model="direction" @change="handleChange"
+            class="border border-primary rounded p-1 text-sm dark:bg-gray-800 dark:text-white">
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+        </select>
     </div>
 
     <!-- Search Section -->
