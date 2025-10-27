@@ -191,7 +191,19 @@
         // ====================================================================
         // FETCH PATH IMAGE COUNT (WITH GLOBAL SPINNER)
         // ====================================================================
+        // ====================================================================
+        // FETCH PATH IMAGE COUNT (WITH GLOBAL SPINNER)
+        // ====================================================================
         async function fetchPathImageCount(pathId) {
+            // Prevent multiple simultaneous calls for the same path
+            if (window.fetchingPathData === pathId) {
+                console.log('⏳ Already fetching data for path:', pathId);
+                return;
+            }
+
+            window.fetchingPathData = pathId;
+            console.log('🔄 fetchPathImageCount called with pathId:', pathId);
+
             if (window.showSpinner) {
                 window.showSpinner();
             }
@@ -206,8 +218,16 @@
 
                 if (response.ok) {
                     const data = await response.json();
+                    console.log('📊 API Response:', data);
+
                     currentPathImageCount = data.current_count;
                     remainingSlots = data.remaining_slots;
+
+                    console.log('📈 Updated variables:', {
+                        currentPathImageCount,
+                        remainingSlots,
+                        MAX_IMAGES_PER_PATH
+                    });
 
                     updatePathLimitDisplay();
                     updateDropzoneState();
@@ -228,7 +248,7 @@
                     throw new Error('Failed to fetch path info');
                 }
             } catch (error) {
-                console.error('Failed to fetch path image count:', error);
+                console.error('❌ Failed to fetch path image count:', error);
                 const limitDisplay = document.getElementById('pathLimitDisplay');
                 if (limitDisplay) {
                     limitDisplay.innerHTML = `
@@ -237,10 +257,13 @@
                     </div>
                 `;
                 }
+
             } finally {
                 if (window.hideSpinner) {
                     window.hideSpinner();
                 }
+                // Clear the lock
+                window.fetchingPathData = null;
             }
         }
 
@@ -275,15 +298,15 @@
                     ? `<span class="text-sm ${colorClass} font-medium">${remainingSlots} slot${remainingSlots !== 1 ? 's' : ''} remaining</span>`
                     : `<span class="text-sm text-red-600 dark:text-red-400 font-bold">⚠️ PATH FULL</span>`
                 }
-            </div>
-            <div class="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
-                <div class="h-full rounded-full transition-all duration-300 ${bgClass}" style="width: ${Math.min(percentage, 100)}%"></div>
-            </div>
-            ${remainingSlots === 0 
-                ? `<p class="text-xs text-red-600 dark:text-red-400 mt-2">This path has reached the maximum limit. Please delete some images or select a different path.</p>`
-                : ''
-            }
-        `;
+                    </div>
+                    <div class="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                        <div class="h-full rounded-full transition-all duration-300 ${bgClass}" style="width: ${Math.min(percentage, 100)}%"></div>
+                    </div>
+                    ${remainingSlots === 0 
+                        ? `<p class="text-xs text-red-600 dark:text-red-400 mt-2">This path has reached the maximum limit. Please delete some images or select a different path.</p>`
+                        : ''
+                }
+            `;
         }
 
         // ====================================================================
@@ -392,13 +415,15 @@
                 },
 
                 selectPath(path) {
+                    console.log('🔄 selectPath called for:', path.display_name, 'ID:', path.id);
+
                     this.selectedId = path.id;
                     this.selectedName = path.display_name;
                     this.isOpen = false;
                     this.search = '';
                     this.filterPaths();
 
-                    // Use the module function to save selection
+                    // Use the module function to save selection - this will trigger path-changed event
                     if (typeof savePathSelection === 'function') {
                         savePathSelection(path.id);
                     } else {
@@ -421,10 +446,6 @@
                     if (pathIdInput) {
                         pathIdInput.value = path.id;
                     }
-
-                    // Fetch new path data and clear files
-                    fetchPathImageCount(path.id);
-
                     // Clear files safely (check if they exist first)
                     if (window.files !== undefined) {
                         window.files = [];
@@ -556,7 +577,6 @@
                     window.files = [];
                     renderPreviews();
                     updateSubmitButton();
-                    fetchPathImageCount(e.detail.pathId);
                 }
             });
 
@@ -876,7 +896,8 @@
 
                 if (window.files.length > MAX_FILES) {
                     showError([
-                        `Number of files (${window.files.length}) exceeds maximum allowed (${MAX_FILES})`]);
+                        `Number of files (${window.files.length}) exceeds maximum allowed (${MAX_FILES})`
+                    ]);
                     return;
                 }
 
