@@ -126,21 +126,21 @@
             </div>
 
             <!-- Spacer to prevent content from being hidden behind fixed buttons -->
-            <div class="h-20"></div>
+            <div class="h-28 sm:h-24"></div>
         </form>
 
-        <!-- Actions - Fixed at bottom with padding to avoid floating actions -->
-        <div class="fixed bottom-0 left-0 right-0 z-40 flex justify-center p-4 pb-20 sm:pb-4">
+        <!-- Actions - Fixed at bottom with responsive padding -->
+        <div class="fixed bottom-0 left-0 right-0 z-40 flex justify-center px-4 pt-3 pb-24 sm:pb-20 md:pb-4">
             <div
-                class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-2xl border border-primary shadow-lg rounded-lg px-6 py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 w-full max-w-2xl">
+                class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-2xl border border-primary shadow-lg rounded-lg px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 w-full max-w-2xl">
                 <button type="button" onclick="toggleAllDeletes()"
-                    class="px-4 py-2 text-sm border-2 border-secondary text-white bg-secondary hover:text-secondary hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-secondary shadow-secondary-hover w-full sm:w-auto">
+                    class="px-4 py-2 text-sm font-medium border-2 border-secondary text-white bg-secondary hover:text-secondary hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-secondary shadow-secondary-hover w-full sm:w-auto order-2 sm:order-1">
                     Toggle All Deletes
                 </button>
 
-                <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto order-1 sm:order-2">
                     <button type="submit" id="submitButton" form="pathImagesForm"
-                        class="px-4 py-2 text-sm border-2 border-primary text-white bg-primary hover:text-primary hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-primary shadow-primary-hover w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary disabled:hover:text-white">
+                        class="px-4 py-2 text-sm font-medium border-2 border-primary text-white bg-primary hover:text-primary hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-primary shadow-primary-hover w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary disabled:hover:text-white">
                         Save Changes
                     </button>
                 </div>
