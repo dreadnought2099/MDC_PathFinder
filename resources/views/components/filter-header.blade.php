@@ -7,54 +7,54 @@
     'currentSearch' => '',
 ])
 
-<div x-data="searchSortHandler()">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-        <!-- Sort -->
-        <div class="flex flex-wrap items-center gap-2 dark:text-gray-300">
+<div x-data="searchSortHandler()" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+    <!-- Sort Section -->
+    <div class="flex flex-col xs:flex-row xs:items-center justify-between gap-2 dark:text-gray-300">
+        <div class="flex flex-col xxs:flex-row xxs:items-center gap-2">
             <label for="sort" class="text-sm font-medium whitespace-nowrap">Sort By:</label>
-            <div class="flex flex-wrap gap-2">
+            <div class="flex gap-2">
                 <select x-model="sort" @change="handleChange"
-                    class="border border-primary rounded p-1 text-sm dark:bg-gray-800 dark:text-white">
+                    class="border border-primary rounded p-1 text-sm dark:bg-gray-800 dark:text-white flex-1 min-w-0">
                     @foreach ($fields as $key => $label)
                         <option value="{{ $key }}">{{ $label }}</option>
                     @endforeach
                 </select>
 
                 <select x-model="direction" @change="handleChange"
-                    class="border border-primary rounded p-1 text-sm dark:bg-gray-800 dark:text-white">
+                    class="border border-primary rounded p-1 text-sm dark:bg-gray-800 dark:text-white flex-1 min-w-0">
                     <option value="asc">Ascending</option>
                     <option value="desc">Descending</option>
                 </select>
             </div>
         </div>
 
-        <!-- Edit Button (only on mobile) -->
+        <!-- Edit Button (only on mobile, beside Sort) -->
         @if (isset($slot) && !empty(trim($slot)))
-            <div class="sm:hidden">
+            <div class="sm:hidden flex-shrink-0 self-end xs:self-auto">
                 {{ $slot }}
             </div>
         @endif
     </div>
 
-    <!-- Search -->
-    <div class="flex items-center gap-2 mb-4">
+    <!-- Search Section -->
+    <div class="flex items-center gap-2">
         <form @submit.prevent="handleChange"
             class="flex flex-col xxs:flex-row items-stretch xxs:items-center gap-2 w-full sm:w-auto">
             <input type="text" x-model="search" placeholder="Search {{ $placeholder }}"
                 @input.debounce.500ms="handleChange"
-                class="font-sofia border border-primary rounded-md px-3 py-2 w-full sm:w-64 outline-none focus:ring focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white">
+                class="font-sofia border border-primary rounded-md px-3 py-2 w-full sm:w-64 outline-none focus:ring focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white text-sm">
 
             <template x-if="search">
                 <button type="button" @click="clearSearch"
-                    class="px-4 bg-secondary text-white py-2 rounded-md hover:text-secondary border-2 border-secondary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover whitespace-nowrap">
+                    class="px-4 bg-secondary text-white py-2 rounded-md hover:text-secondary border-2 border-secondary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover whitespace-nowrap text-sm">
                     Clear
                 </button>
             </template>
         </form>
 
-        <!-- Edit Button (only on desktop) -->
+        <!-- Edit Button (only on desktop, beside Search) -->
         @if (isset($slot) && !empty(trim($slot)))
-            <div class="hidden sm:block">
+            <div class="hidden sm:block flex-shrink-0">
                 {{ $slot }}
             </div>
         @endif
@@ -90,7 +90,7 @@
                     });
                 },
 
-                async loadPage(page = 1) {
+                async loadPage(page = 1, shouldScroll = false) {
                     // Check if spinner functions exist
                     if (typeof showSpinner === 'function') {
                         showSpinner();
