@@ -40,67 +40,67 @@
                     </div>
                 </div>
 
-                <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div class="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
                     @foreach ($pathImages as $index => $image)
-                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 border border-primary">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-3 border border-primary">
                             <input type="hidden" name="images[{{ $index }}][id]" value="{{ $image->id }}">
 
                             <!-- Image -->
-                            <div class="relative mb-4">
+                            <div class="relative mb-3">
                                 <img src="{{ asset('storage/' . $image->image_file) }}"
-                                    alt="Image {{ $image->image_order }}" class="w-full h-48 object-cover rounded">
+                                    alt="Image {{ $image->image_order }}" class="w-full h-32 object-cover rounded">
 
                                 <!-- Order Badge -->
                                 <div
-                                    class="absolute top-2 left-2 bg-primary text-white px-2 py-1 rounded text-sm font-medium">
+                                    class="absolute top-1 left-1 bg-primary text-white px-1.5 py-0.5 rounded text-xs font-medium">
                                     {{ $image->image_order }}
                                 </div>
 
                                 <!-- Delete Checkbox -->
-                                <div class="absolute top-2 right-2">
+                                <div class="absolute top-1 right-1">
                                     <label
-                                        class="flex items-center bg-white rounded px-2 py-1 text-sm cursor-pointer text-red-600">
+                                        class="flex items-center bg-white rounded px-1.5 py-0.5 text-xs cursor-pointer text-red-600">
                                         <input type="checkbox" name="images[{{ $index }}][delete]" value="1"
-                                            class="text-red-600 mr-1 custom-time-input">
+                                            class="text-red-600 mr-1 custom-time-input w-3 h-3">
                                         Delete
                                     </label>
                                 </div>
                             </div>
 
                             <!-- Controls -->
-                            <div class="space-y-3">
+                            <div class="space-y-2">
                                 <!-- Order -->
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                                         Order
                                     </label>
                                     <input type="number" name="images[{{ $index }}][image_order]"
                                         value="{{ $image->image_order }}" min="1"
-                                        class="w-full px-3 py-2 border border-primary rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                                        class="w-full px-2 py-1.5 text-sm border border-primary rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
                                 </div>
 
                                 <!-- Replace File -->
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                                         Replace Image
                                     </label>
                                     <div class="relative">
                                         <input type="file" name="images[{{ $index }}][image_file]"
                                             accept="image/*"
-                                            class="image-file-input w-full text-sm border border-primary rounded px-3 py-2 
-                                          file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 
-                                          file:bg-[#157ee1] file:hover:bg-white file:text-white file:text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                                            class="image-file-input w-full text-xs border border-primary rounded px-2 py-1.5 
+                                                    file:mr-2 file:py-0.5 file:px-2 file:rounded file:border-0 
+                                                    file:bg-[#157ee1] file:hover:bg-white file:text-white file:text-xs focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                                             data-index="{{ $index }}">
 
-                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                            Max 10MB. Will be compressed to 2000px before upload.
+                                        <p class="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                                            Max 10MB. Compressed to 2000px.
                                         </p>
 
                                         <!-- Clear button (hidden by default) -->
                                         <button type="button"
-                                            class="clear-file-btn hidden absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-colors duration-200"
+                                            class="clear-file-btn hidden absolute right-1 top-1/2 -translate-y-1/2 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-colors duration-200"
                                             data-index="{{ $index }}" title="Clear selected file">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20"
                                                 fill="currentColor">
                                                 <path fill-rule="evenodd"
                                                     d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
@@ -109,13 +109,13 @@
                                         </button>
                                     </div>
                                     <!-- Error message for file size -->
-                                    <p class="file-size-error hidden text-red-600 text-xs mt-1"
+                                    <p class="file-size-error hidden text-red-600 text-[10px] mt-0.5"
                                         data-index="{{ $index }}">
                                         <!-- JavaScript will populate this dynamically -->
                                     </p>
 
                                     <!-- File name display -->
-                                    <p class="file-name-display hidden text-gray-600 dark:text-gray-400 text-xs mt-1"
+                                    <p class="file-name-display hidden text-gray-600 dark:text-gray-400 text-[10px] mt-0.5"
                                         data-index="{{ $index }}">
                                     </p>
                                 </div>
