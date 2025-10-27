@@ -71,8 +71,8 @@
                                                     fill="currentColor">
                                                     <path fill-rule="evenodd"
                                                         d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586
-                                                                                                                                        6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
-                                                                                                                                        0 001.414 0l7-7a1 1 0 000-1.414z"
+                                                            6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
+                                                            0 001.414 0l7-7a1 1 0 000-1.414z"
                                                         clip-rule="evenodd" />
                                                 </svg>
                                             </span>
@@ -179,6 +179,166 @@
 
 @push('scripts')
     <script>
+        // ====================================================================
+        // GLOBAL VARIABLES AND FUNCTIONS (for Alpine.js access)
+        // ====================================================================
+
+        // Path limit tracking - make these global
+        const MAX_IMAGES_PER_PATH = {{ $maxImagesPerPath ?? 25 }};
+        let currentPathImageCount = {{ $currentImageCount ?? 0 }};
+        let remainingSlots = {{ $remainingSlots ?? 25 }};
+
+        // ====================================================================
+        // FETCH PATH IMAGE COUNT (WITH GLOBAL SPINNER)
+        // ====================================================================
+        async function fetchPathImageCount(pathId) {
+            if (window.showSpinner) {
+                window.showSpinner();
+            }
+
+            try {
+                const response = await fetch(`{{ route('path-image.count') }}?path_id=${pathId}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    currentPathImageCount = data.current_count;
+                    remainingSlots = data.remaining_slots;
+
+                    updatePathLimitDisplay();
+                    updateDropzoneState();
+
+                    if (data.is_full) {
+                        // Use window.files to access the global files array
+                        if (window.files !== undefined) {
+                            window.files = [];
+                            if (typeof renderPreviews === 'function') {
+                                renderPreviews();
+                            }
+                            if (typeof updateSubmitButton === 'function') {
+                                updateSubmitButton();
+                            }
+                        }
+                    }
+                } else {
+                    throw new Error('Failed to fetch path info');
+                }
+            } catch (error) {
+                console.error('Failed to fetch path image count:', error);
+                const limitDisplay = document.getElementById('pathLimitDisplay');
+                if (limitDisplay) {
+                    limitDisplay.innerHTML = `
+                    <div class="text-red-600 dark:text-red-400 text-sm p-3">
+                        ⚠️ Failed to load path information. Please refresh the page.
+                    </div>
+                `;
+                }
+            } finally {
+                if (window.hideSpinner) {
+                    window.hideSpinner();
+                }
+            }
+        }
+
+        // ====================================================================
+        // UPDATE PATH LIMIT DISPLAY (Make this global)
+        // ====================================================================
+        function updatePathLimitDisplay() {
+            const limitDisplay = document.getElementById('pathLimitDisplay');
+            if (!limitDisplay) return;
+
+            const percentage = (currentPathImageCount / MAX_IMAGES_PER_PATH) * 100;
+            let colorClass = 'text-green-600 dark:text-green-400';
+            let bgClass = 'bg-tertiary';
+
+            if (percentage >= 90) {
+                colorClass = 'text-red-600 dark:text-red-400';
+                bgClass = 'bg-secondary';
+            } else if (percentage >= 70) {
+                colorClass = 'text-yellow-600 dark:text-yellow-400';
+                bgClass = 'bg-orange';
+            }
+
+            limitDisplay.innerHTML = `
+            <div class="flex items-center justify-between">
+                <div>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">Path Images:</span>
+                    <span class="${colorClass} text-lg font-bold ml-2">
+                        ${currentPathImageCount} / ${MAX_IMAGES_PER_PATH}
+                    </span>
+                </div>
+                ${remainingSlots > 0 
+                    ? `<span class="text-sm ${colorClass} font-medium">${remainingSlots} slot${remainingSlots !== 1 ? 's' : ''} remaining</span>`
+                    : `<span class="text-sm text-red-600 dark:text-red-400 font-bold">⚠️ PATH FULL</span>`
+                }
+            </div>
+            <div class="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                <div class="h-full rounded-full transition-all duration-300 ${bgClass}" style="width: ${Math.min(percentage, 100)}%"></div>
+            </div>
+            ${remainingSlots === 0 
+                ? `<p class="text-xs text-red-600 dark:text-red-400 mt-2">This path has reached the maximum limit. Please delete some images or select a different path.</p>`
+                : ''
+            }
+        `;
+        }
+
+        // ====================================================================
+        // UPDATE DROPZONE STATE (Make this global)
+        // ====================================================================
+        function updateDropzoneState() {
+            const fileInput = document.getElementById('fileInput');
+            const dropzone = fileInput?.closest('label');
+
+            if (!dropzone) return;
+
+            if (remainingSlots === 0) {
+                dropzone.className =
+                    'flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded p-4 overflow-auto relative opacity-50 cursor-not-allowed';
+
+                fileInput.disabled = true;
+
+                // Update only the text content, keep the file input
+                const spans = dropzone.querySelectorAll('span');
+                if (spans.length >= 1) {
+                    dropzone.innerHTML = `
+                    <span class="text-red-600 dark:text-red-400 font-bold mb-2">
+                        ⚠️ This path has reached the maximum limit (${MAX_IMAGES_PER_PATH} images)
+                    </span>
+                    <span class="text-xs text-gray-500">
+                        Please delete some images or select a different path to upload
+                    </span>
+                    <input type="file" id="fileInput" multiple accept="image/*" class="hidden" disabled>
+                `;
+                }
+            } else {
+                dropzone.className =
+                    'flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary dark:hover:bg-gray-800 transition-colors p-4 overflow-auto relative';
+
+                const currentInput = document.getElementById('fileInput');
+                if (currentInput) {
+                    currentInput.disabled = false;
+                }
+
+                dropzone.innerHTML = `
+                <span class="text-gray-600 dark:text-gray-300 mb-2">Drop images here or click to browse</span>
+                <span class="text-xs text-gray-400">
+                    JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 10 MB each | max 20 per upload
+                </span>
+                <span class="text-xs text-primary font-medium mt-1">
+                    Path can accept ${remainingSlots} more image(s)
+                </span>
+                <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
+            `;
+            }
+        }
+
+        // ====================================================================
+        // ALPINE.JS PATH DROPDOWN COMPONENT
+        // ====================================================================
         function pathDropdown(paths, defaultPathId) {
             return {
                 isOpen: false,
@@ -238,15 +398,43 @@
                     this.search = '';
                     this.filterPaths();
 
-                    sessionStorage.setItem('selectedPathId', path.id);
-                    this.updateBrowserUrl();
+                    // Use the module function to save selection
+                    if (typeof savePathSelection === 'function') {
+                        savePathSelection(path.id);
+                    } else {
+                        // Fallback
+                        sessionStorage.setItem('selectedPathId', path.id);
+                        window.dispatchEvent(new CustomEvent('path-changed', {
+                            detail: {
+                                pathId: path.id
+                            }
+                        }));
+                    }
 
-                    // Dispatch event to trigger image count fetch
-                    window.dispatchEvent(new CustomEvent('path-changed', {
-                        detail: {
-                            pathId: path.id
+                    // Update URL without page reload
+                    const baseUrl = "{{ route('path-image.create', ':pathId') }}";
+                    const newUrl = baseUrl.replace(':pathId', path.id);
+                    window.history.replaceState({}, '', newUrl);
+
+                    // Update the form's path_id input
+                    const pathIdInput = document.querySelector('input[name="path_id"]');
+                    if (pathIdInput) {
+                        pathIdInput.value = path.id;
+                    }
+
+                    // Fetch new path data and clear files
+                    fetchPathImageCount(path.id);
+
+                    // Clear files safely (check if they exist first)
+                    if (window.files !== undefined) {
+                        window.files = [];
+                        if (typeof renderPreviews === 'function') {
+                            renderPreviews();
                         }
-                    }));
+                        if (typeof updateSubmitButton === 'function') {
+                            updateSubmitButton();
+                        }
+                    }
                 },
 
                 updateBrowserUrl() {
@@ -262,7 +450,6 @@
         // ==========================================================
 
         document.addEventListener('DOMContentLoaded', function() {
-
             const selectedFilesContainer = document.getElementById('selectedFiles');
             const submitBtn = document.getElementById('submitBtn');
             const uploadForm = document.getElementById('uploadForm');
@@ -274,7 +461,8 @@
                 return;
             }
 
-            let files = [];
+            // Make files global so Alpine.js can access it
+            window.files = [];
             let isSubmitting = false;
 
             // ===== CONFIGURATION =====
@@ -288,11 +476,6 @@
             const COMPRESS_ENABLED = true;
             const MAX_DIMENSION = 2000;
             const COMPRESSION_QUALITY = 0.85;
-
-            // Path limit tracking
-            const MAX_IMAGES_PER_PATH = {{ $maxImagesPerPath ?? 25 }};
-            let currentPathImageCount = {{ $currentImageCount ?? 0 }};
-            let remainingSlots = {{ $remainingSlots ?? 25 }};
 
             // ====================================================================
             // EVENT HANDLER FUNCTIONS (DEFINED FIRST)
@@ -366,152 +549,11 @@
             }
 
             // ====================================================================
-            // FETCH PATH IMAGE COUNT (WITH GLOBAL SPINNER)
-            // ====================================================================
-            async function fetchPathImageCount(pathId) {
-                if (window.showSpinner) {
-                    window.showSpinner();
-                }
-
-                try {
-                    const response = await fetch(`{{ route('path-image.count') }}?path_id=${pathId}`, {
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json',
-                        }
-                    });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        currentPathImageCount = data.current_count;
-                        remainingSlots = data.remaining_slots;
-
-                        updatePathLimitDisplay();
-                        updateDropzoneState();
-
-                        if (data.is_full) {
-                            files = [];
-                            renderPreviews();
-                            updateSubmitButton();
-                        }
-                    } else {
-                        throw new Error('Failed to fetch path info');
-                    }
-                } catch (error) {
-                    console.error('Failed to fetch path image count:', error);
-                    const limitDisplay = document.getElementById('pathLimitDisplay');
-                    if (limitDisplay) {
-                        limitDisplay.innerHTML = `
-                            <div class="text-red-600 dark:text-red-400 text-sm p-3">
-                                ⚠️ Failed to load path information. Please refresh the page.
-                            </div>
-                        `;
-                    }
-                } finally {
-                    if (window.hideSpinner) {
-                        window.hideSpinner();
-                    }
-                }
-            }
-
-            // ====================================================================
-            // UPDATE PATH LIMIT DISPLAY
-            // ====================================================================
-            function updatePathLimitDisplay() {
-                const limitDisplay = document.getElementById('pathLimitDisplay');
-                if (!limitDisplay) return;
-
-                const percentage = (currentPathImageCount / MAX_IMAGES_PER_PATH) * 100;
-                let colorClass = 'text-green-600 dark:text-green-400';
-                let bgClass = 'bg-tertiary';
-
-                if (percentage >= 90) {
-                    colorClass = 'text-red-600 dark:text-red-400';
-                    bgClass = 'bg-secondary';
-                } else if (percentage >= 70) {
-                    colorClass = 'text-yellow-600 dark:text-yellow-400';
-                    bgClass = 'bg-orange';
-                }
-
-                limitDisplay.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <span class="text-sm text-gray-600 dark:text-gray-400">Path Images:</span>
-                            <span class="${colorClass} text-lg font-bold ml-2">
-                                ${currentPathImageCount} / ${MAX_IMAGES_PER_PATH}
-                            </span>
-                        </div>
-                        ${remainingSlots > 0 
-                            ? `<span class="text-sm ${colorClass} font-medium">${remainingSlots} slot${remainingSlots !== 1 ? 's' : ''} remaining</span>`
-                            : `<span class="text-sm text-red-600 dark:text-red-400 font-bold">⚠️ PATH FULL</span>`
-                        }
-                    </div>
-                    <div class="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
-                        <div class="h-full rounded-full transition-all duration-300 ${bgClass}" style="width: ${Math.min(percentage, 100)}%"></div>
-                    </div>
-                    ${remainingSlots === 0 
-                        ? `<p class="text-xs text-red-600 dark:text-red-400 mt-2">This path has reached the maximum limit. Please delete some images or select a different path.</p>`
-                        : ''
-                    }
-                `;
-            }
-
-            // ====================================================================
-            // UPDATE DROPZONE STATE
-            // ====================================================================
-            function updateDropzoneState() {
-                const fileInput = document.getElementById('fileInput');
-                const dropzone = fileInput?.closest('label');
-
-                if (!dropzone) return;
-
-                if (remainingSlots === 0) {
-                    dropzone.className =
-                        'flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded p-4 overflow-auto relative opacity-50 cursor-not-allowed';
-
-                    fileInput.disabled = true;
-
-                    // Update only the text content, keep the file input
-                    const spans = dropzone.querySelectorAll('span');
-                    if (spans.length >= 1) {
-                        dropzone.innerHTML = `
-                            <span class="text-red-600 dark:text-red-400 font-bold mb-2">
-                                ⚠️ This path has reached the maximum limit (${MAX_IMAGES_PER_PATH} images)
-                            </span>
-                            <span class="text-xs text-gray-500">
-                                Please delete some images or select a different path to upload
-                            </span>
-                            <input type="file" id="fileInput" multiple accept="image/*" class="hidden" disabled>
-                        `;
-                    }
-                } else {
-                    dropzone.className =
-                        'flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-primary dark:hover:bg-gray-800 transition-colors p-4 overflow-auto relative';
-
-                    const currentInput = document.getElementById('fileInput');
-                    if (currentInput) {
-                        currentInput.disabled = false;
-                    }
-
-                    dropzone.innerHTML = `
-                        <span class="text-gray-600 dark:text-gray-300 mb-2">Drop images here or click to browse</span>
-                        <span class="text-xs text-gray-400">
-                            JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 10 MB each | max 20 per upload
-                        </span>
-                        <span class="text-xs text-primary font-medium mt-1">
-                            Path can accept ${remainingSlots} more image(s)
-                        </span>
-                        <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
-                    `;
-                }
-            }
-
-            // ====================================================================
             // LISTEN FOR PATH CHANGES
             // ====================================================================
             window.addEventListener('path-changed', function(e) {
                 if (e.detail && e.detail.pathId) {
-                    files = [];
+                    window.files = [];
                     renderPreviews();
                     updateSubmitButton();
                     fetchPathImageCount(e.detail.pathId);
@@ -522,13 +564,14 @@
             // UTILITY FUNCTIONS
             // ====================================================================
             function updateSubmitButton() {
-                const isDisabled = files.length === 0 || isSubmitting || remainingSlots === 0;
+                const isDisabled = window.files.length === 0 || isSubmitting || remainingSlots === 0;
                 submitBtn.disabled = isDisabled;
 
                 if (remainingSlots === 0) {
                     submitBtn.textContent = 'Path Full - Cannot Upload';
-                } else if (files.length > 0) {
-                    submitBtn.textContent = `Upload ${files.length} Image${files.length > 1 ? 's' : ''}`;
+                } else if (window.files.length > 0) {
+                    submitBtn.textContent =
+                        `Upload ${window.files.length} Image${window.files.length > 1 ? 's' : ''}`;
                 } else {
                     submitBtn.textContent = 'Upload Images';
                 }
@@ -543,12 +586,12 @@
             }
 
             function getTotalSize() {
-                return files.reduce((total, file) => total + file.size, 0);
+                return window.files.reduce((total, file) => total + file.size, 0);
             }
 
             function validateFiles(newFiles) {
                 const errors = [];
-                const currentCount = files.length;
+                const currentCount = window.files.length;
                 const potentialTotal = currentCount + newFiles.length;
 
                 if (potentialTotal > MAX_FILES) {
@@ -596,7 +639,7 @@
                         return;
                     }
 
-                    const exists = files.some(f => f.name === file.name && f.size === file.size);
+                    const exists = window.files.some(f => f.name === file.name && f.size === file.size);
                     if (exists) {
                         errors.push(`"${file.name}" - Already added.`);
                         return;
@@ -632,11 +675,11 @@
                 if (!fileError) return;
 
                 fileError.innerHTML = `
-                    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded p-3 text-sm text-red-800 dark:text-red-200">
-                        <div class="font-semibold mb-1">⚠ Upload Warning:</div>
-                        ${messages.map(msg => `<div class="mt-1">${msg}</div>`).join('')}
-                    </div>
-                `;
+                <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded p-3 text-sm text-red-800 dark:text-red-200">
+                    <div class="font-semibold mb-1">⚠ Upload Warning:</div>
+                    ${messages.map(msg => `<div class="mt-1">${msg}</div>`).join('')}
+                </div>
+            `;
                 fileError.classList.remove('hidden');
 
                 // Fade out gently after 10 seconds
@@ -708,10 +751,10 @@
                                 `"${file.name}" compressed: ${formatFileSize(originalSize)} → ${formatFileSize(compressed.size)}`
                             );
                         }
-                        files.push(compressed);
+                        window.files.push(compressed);
                     } catch (error) {
                         console.error('Compression failed for', file.name, error);
-                        files.push(file);
+                        window.files.push(file);
                     }
                 }
 
@@ -722,9 +765,9 @@
                     successDiv.className =
                         'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded p-3 text-sm text-green-800 dark:text-green-200 mt-2';
                     successDiv.innerHTML = `
-                        <div class="font-semibold mb-1">✓ Images optimized for upload:</div>
-                        ${compressionInfo.map(info => `<div class="text-xs">${info}</div>`).join('')}
-                    `;
+                    <div class="font-semibold mb-1">✓ Images optimized for upload:</div>
+                    ${compressionInfo.map(info => `<div class="text-xs">${info}</div>`).join('')}
+                `;
                     selectedFilesContainer.insertAdjacentElement('beforebegin', successDiv);
                     setTimeout(() => successDiv.remove(), 8000);
                 }
@@ -747,7 +790,7 @@
                     if (COMPRESS_ENABLED) {
                         processFilesWithCompression(validation.validFiles);
                     } else {
-                        files.push(...validation.validFiles);
+                        window.files.push(...validation.validFiles);
                         renderPreviews();
                         updateSubmitButton();
                     }
@@ -755,54 +798,54 @@
             }
 
             function removeFile(index) {
-                files.splice(index, 1);
+                window.files.splice(index, 1);
                 renderPreviews();
                 updateSubmitButton();
             }
 
             function renderPreviews() {
                 selectedFilesContainer.innerHTML = '';
-                if (!files.length) return;
+                if (!window.files.length) return;
 
                 const totalSize = getTotalSize();
-                const afterUploadTotal = currentPathImageCount + files.length;
+                const afterUploadTotal = currentPathImageCount + window.files.length;
                 const limitColor = afterUploadTotal > MAX_IMAGES_PER_PATH * 0.9 ? 'text-red-600' : 'text-blue-800';
 
                 const infoBanner = document.createElement('div');
                 infoBanner.className =
                     'col-span-full bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded p-3 text-sm';
                 infoBanner.innerHTML = `
-                    <div class="flex justify-between items-center text-blue-800 dark:text-blue-200">
-                        <span><strong>${files.length}</strong> of ${MAX_FILES} files selected</span>
-                        <span><strong>${formatFileSize(totalSize)}</strong> of ${formatFileSize(MAX_TOTAL_SIZE)}</span>
-                    </div>
-                    <div class="mt-2 ${limitColor} dark:${limitColor} font-medium">
-                        Path will have <strong>${afterUploadTotal} / ${MAX_IMAGES_PER_PATH}</strong> images after upload
-                    </div>
-                `;
+                <div class="flex justify-between items-center text-blue-800 dark:text-blue-200">
+                    <span><strong>${window.files.length}</strong> of ${MAX_FILES} files selected</span>
+                    <span><strong>${formatFileSize(totalSize)}</strong> of ${formatFileSize(MAX_TOTAL_SIZE)}</span>
+                </div>
+                <div class="mt-2 ${limitColor} dark:${limitColor} font-medium">
+                    Path will have <strong>${afterUploadTotal} / ${MAX_IMAGES_PER_PATH}</strong> images after upload
+                </div>
+            `;
                 selectedFilesContainer.appendChild(infoBanner);
 
-                files.forEach((file, index) => {
+                window.files.forEach((file, index) => {
                     const reader = new FileReader();
                     const div = document.createElement('div');
                     div.className = 'relative rounded overflow-hidden border shadow-sm group';
 
                     reader.onload = e => {
                         div.innerHTML = `
-                            <img src="${e.target.result}" class="w-full h-24 object-cover">
-                            <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-1 truncate">
-                                ${file.name}
-                            </div>
-                            <div class="absolute top-1 left-1 bg-black/60 text-white text-xs px-1 rounded">
-                                ${formatFileSize(file.size)}
-                            </div>
-                            <button type="button" 
-                                class="absolute top-1 right-1 bg-red-500 text-white w-6 h-6 rounded-full
-                                flex items-center justify-center text-sm hover:bg-red-600 transition-colors
-                                opacity-0 group-hover:opacity-100"
-                                data-index="${index}" 
-                                title="Remove">×</button>
-                        `;
+                        <img src="${e.target.result}" class="w-full h-24 object-cover">
+                        <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-1 truncate">
+                            ${file.name}
+                        </div>
+                        <div class="absolute top-1 left-1 bg-black/60 text-white text-xs px-1 rounded">
+                            ${formatFileSize(file.size)}
+                        </div>
+                        <button type="button" 
+                            class="absolute top-1 right-1 bg-red-500 text-white w-6 h-6 rounded-full
+                            flex items-center justify-center text-sm hover:bg-red-600 transition-colors
+                            opacity-0 group-hover:opacity-100"
+                            data-index="${index}" 
+                            title="Remove">×</button>
+                    `;
 
                         const removeBtn = div.querySelector('button');
                         removeBtn.addEventListener('click', function() {
@@ -821,7 +864,7 @@
             uploadForm.addEventListener('submit', function(e) {
                 e.preventDefault();
 
-                if (isSubmitting || files.length === 0) return;
+                if (isSubmitting || window.files.length === 0) return;
 
                 const totalSize = getTotalSize();
                 if (totalSize > MAX_TOTAL_SIZE) {
@@ -831,8 +874,9 @@
                     return;
                 }
 
-                if (files.length > MAX_FILES) {
-                    showError([`Number of files (${files.length}) exceeds maximum allowed (${MAX_FILES})`]);
+                if (window.files.length > MAX_FILES) {
+                    showError([
+                        `Number of files (${window.files.length}) exceeds maximum allowed (${MAX_FILES})`]);
                     return;
                 }
 
@@ -845,7 +889,7 @@
                 formData.append('_token', document.querySelector('input[name="_token"]').value);
                 formData.append('path_id', pathIdInput.value);
 
-                files.forEach(file => {
+                window.files.forEach(file => {
                     formData.append('files[]', file);
                 });
 

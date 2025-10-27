@@ -1,37 +1,43 @@
 export function savePathSelection(pathId) {
     sessionStorage.setItem("selectedPathId", pathId);
-}
 
-export function updatePathLinkBeforeNavigate(createRouteBase) {
-    const storedPathId = sessionStorage.getItem("selectedPathId");
-    if (storedPathId) {
-        const newUrl = createRouteBase.replace(":pathId", storedPathId);
-        window.location.href = newUrl;
-        return true;
+    // Also update the floating link if it exists on the current page
+    const link = document.getElementById("floatingPathImageLink");
+    if (link) {
+        const routeBase = link.dataset.routeBase;
+        if (routeBase) {
+            link.href = routeBase.replace(":pathId", pathId);
+            link.classList.remove(
+                "opacity-50",
+                "cursor-not-allowed",
+                "pointer-events-none"
+            );
+        }
     }
-    return false;
+
+    // Dispatch event for other components (like create.blade.php)
+    window.dispatchEvent(
+        new CustomEvent("path-changed", {
+            detail: { pathId: pathId },
+        })
+    );
 }
 
 export function initializeFloatingLink() {
     const link = document.getElementById("floatingPathImageLink");
     if (!link) return;
 
-    const routeBase = link.dataset.routeBase;
-    if (!routeBase) return;
-
-    // Update href if sessionStorage already has path
+    // Just ensure the link is updated with current session storage
     const storedPathId = sessionStorage.getItem("selectedPathId");
     if (storedPathId) {
-        link.href = routeBase.replace(":pathId", storedPathId);
-    }
-
-    // Attach click handler
-    link.addEventListener("click", (event) => {
-        const storedPathId = sessionStorage.getItem("selectedPathId");
-        if (storedPathId) {
-            event.preventDefault();
+        const routeBase = link.dataset.routeBase;
+        if (routeBase) {
             link.href = routeBase.replace(":pathId", storedPathId);
-            window.location.href = link.href;
+            link.classList.remove(
+                "opacity-50",
+                "cursor-not-allowed",
+                "pointer-events-none"
+            );
         }
-    });
+    }
 }

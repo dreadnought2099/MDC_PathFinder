@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="robots" content="noindex, nofollow">
-   <title>@yield('title', config('app.name'))</title>
+    <title>@yield('title', config('app.name'))</title>
 
     <!-- Theme script: must run before Tailwind CSS -->
     <script>
@@ -21,7 +21,7 @@
                 document.documentElement.classList.remove("dark");
             }
         })();
-    </script>   
+    </script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="icon" href="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png">

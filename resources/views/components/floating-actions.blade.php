@@ -17,13 +17,14 @@
                     </a>
 
                     @php
-                        $firstPath = \App\Models\Path::first();
+                        // Get the selected path from session storage or first path
+                        $selectedPathId = session('selectedPathId');
+                        $path = $selectedPathId ? \App\Models\Path::find($selectedPathId) : \App\Models\Path::first();
                     @endphp
 
-                    <a id="floatingPathImageLink"
-                        href="{{ $firstPath ? route('path-image.create', $firstPath->id) : '#' }}"
+                    <a id="floatingPathImageLink" href="{{ $path ? route('path-image.create', $path->id) : '#' }}"
                         data-route-base="{{ route('path-image.create', ':pathId') }}"
-                        class="group flex items-center space-x-2 {{ !$firstPath ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}">
+                        class="group flex items-center space-x-2 {{ !$path ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}">
                         <div
                             class="flex items-center justify-center w-12 h-12 hover:scale-120 transition-all duration-300">
                             <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
@@ -81,3 +82,50 @@
         @endif
     </div>
 </div>
+
+
+<script>
+    // Initialize the floating link when component loads
+    document.addEventListener('DOMContentLoaded', function() {
+        const link = document.getElementById('floatingPathImageLink');
+        if (!link) return;
+
+        // Update the link based on current session storage
+        const updateFloatingLink = () => {
+            const storedPathId = sessionStorage.getItem('selectedPathId');
+            const routeBase = link.dataset.routeBase;
+
+            if (storedPathId && routeBase) {
+                const newHref = routeBase.replace(':pathId', storedPathId);
+                link.href = newHref;
+
+                // Enable the link if it was disabled
+                link.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+            }
+        };
+
+        // Update immediately
+        updateFloatingLink();
+
+        // Also update when path changes (listen to the same event your create.blade.php uses)
+        window.addEventListener('path-changed', function(e) {
+            if (e.detail && e.detail.pathId) {
+                updateFloatingLink();
+            }
+        });
+
+        // Simple click handler - let normal navigation happen
+        link.addEventListener('click', function(e) {
+            const storedPathId = sessionStorage.getItem('selectedPathId');
+            if (!storedPathId) {
+                e.preventDefault();
+                alert('Please select a path first');
+                return;
+            }
+
+            // Update href one more time before navigation
+            updateFloatingLink();
+            // Allow default navigation to proceed
+        });
+    });
+</script>

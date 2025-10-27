@@ -72,7 +72,16 @@ class PathImageController extends Controller
                 ->with('warning', 'No paths available. Please create a path first.');
         }
 
-        $defaultPath = $path ?? $paths->first();
+        // Priority: URL parameter > session > first path
+        if ($path) {
+            $defaultPath = $path;
+        } else {
+            $selectedPathId = session('selectedPathId');
+            $defaultPath = $selectedPathId ? Path::find($selectedPathId) : $paths->first();
+        }
+
+        // Always update session with the current path
+        session(['selectedPathId' => $defaultPath->id]);
 
         // Get current image count for the default path
         $currentImageCount = PathImage::where('path_id', $defaultPath->id)->count();
@@ -87,7 +96,7 @@ class PathImageController extends Controller
             'remainingSlots'
         ));
     }
-
+    
     /**
      * Store multiple path images with validation
      * 
@@ -403,7 +412,7 @@ class PathImageController extends Controller
         if ($deletedCount > 0) {
             $this->reorderPathImages($path->id);
         }
-        
+
         $message = [];
         if ($updatedCount > 0) $message[] = "{$updatedCount} image(s) updated";
         if ($deletedCount > 0) $message[] = "{$deletedCount} image(s) deleted";
