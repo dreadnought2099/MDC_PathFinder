@@ -61,7 +61,7 @@
                 </div>
             </div>
 
-            <x-filter-header :route="route('path.show', $path->id)" :fields="['image_order' => 'Image Order', 'image_file' => 'Filename']" placeholder="image number" />
+            <x-filter-header :route="route('path.show', $path->id)" :fields="['image_order' => 'Image Order']" placeholder="image number" />
 
             <div id="records-table">
                 @include('pages.admin.paths.partials.path-images-table', ['images' => $images])
