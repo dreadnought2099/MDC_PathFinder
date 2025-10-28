@@ -363,6 +363,8 @@
         border-color: #60a5fa;
     }
 
+    /* Hover effect for links */
+
     .hover-underline {
         @apply relative inline-block;
     }
@@ -377,6 +379,8 @@
         @apply left-0 w-full;
     }
 
+    /* Edit hyperlink */
+    
     .hover-underline-edit {
         @apply relative inline-block;
     }
@@ -390,6 +394,7 @@
     .hover-underline-edit:hover::after {
         @apply left-0 w-full;
     }
+
 
     /* Delete hyperlink */
     .hover-underline-delete {
@@ -406,6 +411,7 @@
         @apply left-0 w-full;
     }
 
+
     /* Assign Staff hyperlink */
     .hover-underline-tertiary {
         @apply relative inline-block;
@@ -420,6 +426,8 @@
     .hover-underline-tertiary:hover::after {
         @apply left-0 w-full;
     }
+
+
     /* ========================================
         CARD COMPONENTS - Added for reusable card styling with box shadow
         ======================================== */

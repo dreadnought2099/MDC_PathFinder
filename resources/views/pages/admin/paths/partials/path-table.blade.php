@@ -75,16 +75,16 @@
                                     {{-- View --}}
                                     <div class="relative inline-block group">
                                         <a href="{{ route('path.show', $path->id) }}"
-                                            class="hover-underline inline-flex items-center justify-center p-2 rounded-lg hover:scale-125 transition duration-200">
+                                            class="hover-underline inline-flex items-center justify-center w-11 h-11 transition-all duration-200 hover:scale-125">
                                             <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/view.png"
                                                 alt="View"
                                                 class="block w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 object-contain">
                                         </a>
                                         <div
-                                            class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-3 py-1.5 text-xs font-medium text-white bg-gray-900 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap dark:bg-gray-700 pointer-events-none z-10">
+                                            class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
                                             View
                                             <div
-                                                class="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-t-[5px] border-t-gray-900 dark:border-t-gray-700 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent">
+                                                class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-l-gray-900 dark:border-l-gray-700 border-t-4 border-t-transparent border-b-4 border-b-transparent">
                                             </div>
                                         </div>
                                     </div>
@@ -93,17 +93,17 @@
                                     <div class="relative inline-block group">
                                         <a id="pathRowImageLink_{{ $path->id }}"
                                             href="{{ route('path-image.create', $path->id) }}"
-                                            class="hover-underline inline-flex items-center justify-center p-2 rounded-lg hover:scale-125 transition duration-200"
+                                            class="hover-underline inline-flex items-center justify-center w-11 h-11 transition-all duration-200 hover:scale-125"
                                             onclick="savePathSelection({{ $path->id }})">
                                             <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/image.png"
                                                 alt="Add Image"
                                                 class="block w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 object-contain">
                                         </a>
                                         <div
-                                            class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-3 py-1.5 text-xs font-medium text-white bg-gray-900 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap dark:bg-gray-700 pointer-events-none z-10">
+                                            class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
                                             Add Path Image
                                             <div
-                                                class="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-t-[5px] border-t-gray-900 dark:border-t-gray-700 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent">
+                                                class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-l-gray-900 dark:border-l-gray-700 border-t-4 border-t-transparent border-b-4 border-b-transparent">
                                             </div>
                                         </div>
                                     </div>
@@ -111,16 +111,16 @@
                                     {{-- Edit --}}
                                     <div class="relative inline-block group">
                                         <a href="{{ route('path-image.edit', $path->id) }}"
-                                            class="hover-underline-edit inline-flex items-center justify-center p-2 rounded-lg hover:scale-125 transition duration-200">
+                                            class="hover-underline-edit inline-flex items-center justify-center w-11 h-11 transition-all duration-200 hover:scale-125">
                                             <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/edit.png"
                                                 alt="Edit"
                                                 class="block w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 object-contain">
                                         </a>
                                         <div
-                                            class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-3 py-1.5 text-xs font-medium text-white bg-gray-900 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap dark:bg-gray-700 pointer-events-none z-10">
+                                            class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block">
                                             Edit
                                             <div
-                                                class="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-t-[5px] border-t-gray-900 dark:border-t-gray-700 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent">
+                                                class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-l-gray-900 dark:border-l-gray-700 border-t-4 border-t-transparent border-b-4 border-b-transparent">
                                             </div>
                                         </div>
                                     </div>
