@@ -190,9 +190,6 @@
         // ====================================================================
         // FETCH PATH IMAGE COUNT (WITH GLOBAL SPINNER)
         // ====================================================================
-        // ====================================================================
-        // FETCH PATH IMAGE COUNT (WITH GLOBAL SPINNER)
-        // ====================================================================
         async function fetchPathImageCount(pathId) {
             // Prevent multiple simultaneous calls for the same path
             if (window.fetchingPathData === pathId) {
