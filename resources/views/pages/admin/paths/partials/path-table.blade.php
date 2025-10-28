@@ -1,4 +1,4 @@
-<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden dark:bg-gray-900 dark:border-gray-700">
+<div class="bg-white rounded-xl shadow-sm border-2 border-primary overflow-hidden dark:bg-gray-900 dark:border-gray-700">
     <div class="overflow-x-auto">
         <table class="w-full">
             <thead>
@@ -31,7 +31,7 @@
                     @if ($path->fromRoom && $path->toRoom)
                         @php $hasImage = $path->images->isNotEmpty(); @endphp
                         <tr
-                            class="hover:bg-gray-50 transition-colors duration-150 dark:hover:bg-gray-800 {{ $hasImage ? 'bg-blue-50/30 dark:bg-blue-900/10' : '' }}">
+                            class="hover:bg-gray-200 transition-all duration-300 ease-[var(--ease-in-out-expo-smooth)] dark:bg-gray-800 dark:hover:bg-gray-700 {{ $hasImage ? 'bg-blue-50/30 dark:bg-blue-900/10' : '' }}">
 
                             <!-- ID -->
                             <td class="px-6 py-5 text-sm font-medium text-gray-900 dark:text-gray-100">

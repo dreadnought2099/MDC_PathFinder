@@ -12,6 +12,10 @@
     --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
         "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
         "Noto Color Emoji";
+    --ease-in-expo: cubic-bezier(0.95, 0.05, 0.795, 0.035);
+    --ease-in-expo-smooth: cubic-bezier(0.9, 0.05, 0.7, 0.25);
+    --ease-in-out-expo-smooth: cubic-bezier(0.85, 0, 0.15, 1);
+    --ease-gentle: cubic-bezier(0.76, 0, 0.24, 1);
 }
 
 @font-face {
@@ -380,7 +384,7 @@
     }
 
     /* Edit hyperlink */
-    
+
     .hover-underline-edit {
         @apply relative inline-block;
     }
@@ -394,7 +398,6 @@
     .hover-underline-edit:hover::after {
         @apply left-0 w-full;
     }
-
 
     /* Delete hyperlink */
     .hover-underline-delete {
@@ -411,7 +414,6 @@
         @apply left-0 w-full;
     }
 
-
     /* Assign Staff hyperlink */
     .hover-underline-tertiary {
         @apply relative inline-block;
@@ -426,7 +428,6 @@
     .hover-underline-tertiary:hover::after {
         @apply left-0 w-full;
     }
-
 
     /* ========================================
         CARD COMPONENTS - Added for reusable card styling with box shadow

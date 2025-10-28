@@ -26,9 +26,9 @@
                     </th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200 dark:divide-gray-600">
+            <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                 @foreach ($staffs as $staff)
-                    <tr class="hover:bg-gray-50 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-800">
+                    <tr class="transition-all duration-300 ease-[var(--ease-in-out-expo-smooth)] dark:bg-gray-800 dark:hover:bg-gray-700 hover:bg-gray-200">
                         <!-- Staff ID -->
                         <td
                             class="px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-300">

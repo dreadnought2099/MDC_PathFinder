@@ -18,11 +18,11 @@
                     </th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200 dark:divide-gray-600">
+            <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                 @forelse($rooms as $room)
                     @if (auth()->user()->hasRole('Admin') || auth()->user()->room_id == $room->id)
                         <tr
-                            class="hover:bg-gray-50 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-800">
+                            class="transition-all duration-300 ease-[var(--ease-in-out-expo-smooth)] dark:bg-gray-800 dark:hover:bg-gray-700 hover:bg-gray-200">
                             <!-- ID -->
                             <td class="px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 dark:text-gray-300">
                                 {{ $room->id }}
