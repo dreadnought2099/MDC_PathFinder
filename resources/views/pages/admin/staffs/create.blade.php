@@ -5,8 +5,7 @@
 
     <div
         class="max-w-4xl mx-auto mt-10 mb-10 rounded-lg border-2 shadow-2xl border-primary p-4 sm:p-6 md:p-8 dark:bg-gray-800">
-        <h2 class="text-2xl text-center mb-8"><span class="text-primary">Add</span> <span class="dark:text-gray-300">Staff
-                Member</span></h2>
+        <h2 class="text-2xl text-center mb-8 font-bold dark:text-gray-300 text-gray-800"><span class="text-primary">Add</span> Staff</h2>
 
         <form action="{{ route('staff.store') }}" method="POST" enctype="multipart/form-data" data-upload>
             @csrf

@@ -18,9 +18,19 @@ use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
 use Intervention\Image\Drivers\Gd\Driver as GdDriver;
 
+/**
+ * Room Management Controller
+ * 
+ * IMAGE PROCESSING PIPELINE (NOW MATCHES STAFF/PATH PATTERN):
+ * 1. Frontend: Compresses to 2000px before upload
+ * 2. Laravel: Validates 5MB + 3000px dimension limit (safety net)
+ * 3. GD Check: Additional 3000px safety check (non-Imagick only)
+ * 4. Backend: Final resize to 2000px + WebP conversion
+ * 5. Error Handling: Graceful failures with logging
+ */
 class RoomController extends Controller
 {
-    private $manager;
+    private ImageManager $manager;
 
     public function __construct()
     {
@@ -102,10 +112,23 @@ class RoomController extends Controller
             ],
             'description' => 'nullable|string',
             'room_type' => 'required|in:regular,entrance_point',
-            'image_path' => 'nullable|image|max:10240',
+            // FIXED: Added dimension validation
+            'image_path' => [
+                'nullable',
+                'image',
+                'max:5120', // 5MB (reduced from 10MB)
+                'dimensions:max_width=3000,max_height=3000' // NEW: Safety limit
+            ],
             'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200',
             'carousel_images' => 'nullable|array|max:15',
-            'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
+            // FIXED: Added dimension validation
+            'carousel_images.*' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png',
+                'max:5120', // 5MB (reduced from 10MB)
+                'dimensions:max_width=3000,max_height=3000' // NEW: Safety limit
+            ],
             'office_hours' => 'nullable|array',
         ]);
 
@@ -133,7 +156,7 @@ class RoomController extends Controller
                 }
             }
 
-            // Process cover image - Convert to WebP
+            // FIXED: Process cover image with proper error handling
             if ($request->hasFile('image_path')) {
                 try {
                     $webpPath = $this->convertToWebP(
@@ -142,9 +165,14 @@ class RoomController extends Controller
                     );
                     $room->image_path = $webpPath;
                 } catch (\Exception $e) {
-                    Log::error('Cover image WebP conversion failed', [
+                    Log::error('Cover image conversion failed', [
                         'room_id' => $room->id,
                         'error' => $e->getMessage()
+                    ]);
+                    // Don't fail entire operation, just skip image
+                    DB::rollBack();
+                    return back()->withInput()->withErrors([
+                        'image_path' => 'Image processing failed. Please try a smaller image.'
                     ]);
                 }
             }
@@ -173,7 +201,7 @@ class RoomController extends Controller
                 'qr_code_path' => $qrPath,
             ]);
 
-            // Process carousel images - Convert to WebP
+            // FIXED: Process carousel images with proper error handling
             if ($request->hasFile('carousel_images')) {
                 $uploadedCount = 0;
                 $failedCount = 0;
@@ -191,9 +219,10 @@ class RoomController extends Controller
                         ]);
 
                         $uploadedCount++;
+                        gc_collect_cycles(); // NEW: Memory cleanup
                     } catch (\Exception $e) {
                         $failedCount++;
-                        Log::error('Carousel image WebP conversion failed', [
+                        Log::error('Carousel image conversion failed', [
                             'room_id' => $room->id,
                             'file' => $carouselImage->getClientOriginalName(),
                             'error' => $e->getMessage()
@@ -284,10 +313,23 @@ class RoomController extends Controller
             ],
             'description' => 'nullable|string',
             'room_type' => 'required|in:regular,entrance_point',
-            'image_path' => 'nullable|image|max:10240',
+            // FIXED: Added dimension validation
+            'image_path' => [
+                'nullable',
+                'image',
+                'max:5120',
+                'dimensions:max_width=3000,max_height=3000'
+            ],
             'video_path' => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:51200',
             'carousel_images' => 'nullable|array|max:15',
-            'carousel_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
+            // FIXED: Added dimension validation
+            'carousel_images.*' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png',
+                'max:5120',
+                'dimensions:max_width=3000,max_height=3000'
+            ],
             'office_hours' => 'nullable|array',
         ]);
 
@@ -394,7 +436,7 @@ class RoomController extends Controller
             }
 
             // -----------------------------
-            // Handle Cover Image upload
+            // FIXED: Handle Cover Image upload with error handling
             // -----------------------------
             if ($request->hasFile('image_path')) {
                 // Delete old image using the stored path
@@ -402,10 +444,21 @@ class RoomController extends Controller
                     Storage::disk('public')->delete($oldImagePath);
                 }
 
-                $room->image_path = $this->convertToWebP(
-                    $request->file('image_path'),
-                    "offices/{$room->id}/cover_images"
-                );
+                try {
+                    $room->image_path = $this->convertToWebP(
+                        $request->file('image_path'),
+                        "offices/{$room->id}/cover_images"
+                    );
+                } catch (\Exception $e) {
+                    Log::error('Cover image conversion failed', [
+                        'room_id' => $room->id,
+                        'error' => $e->getMessage()
+                    ]);
+                    DB::rollBack();
+                    return back()->withInput()->withErrors([
+                        'image_path' => 'Image processing failed. Please try a smaller image.'
+                    ]);
+                }
             }
 
             // -----------------------------
@@ -441,17 +494,37 @@ class RoomController extends Controller
                 }
             }
 
+            // FIXED: Handle carousel uploads with error handling
             if ($request->hasFile('carousel_images')) {
-                foreach ($request->file('carousel_images') as $carouselImage) {
-                    $webpPath = $this->convertToWebP(
-                        $carouselImage,
-                        "offices/{$room->id}/carousel"
-                    );
+                $uploadedCount = 0;
+                $failedCount = 0;
 
-                    RoomImage::create([
-                        'room_id' => $room->id,
-                        'image_path' => $webpPath
-                    ]);
+                foreach ($request->file('carousel_images') as $carouselImage) {
+                    try {
+                        $webpPath = $this->convertToWebP(
+                            $carouselImage,
+                            "offices/{$room->id}/carousel"
+                        );
+
+                        RoomImage::create([
+                            'room_id' => $room->id,
+                            'image_path' => $webpPath
+                        ]);
+
+                        $uploadedCount++;
+                        gc_collect_cycles(); // NEW: Memory cleanup
+                    } catch (\Exception $e) {
+                        $failedCount++;
+                        Log::error('Carousel image conversion failed', [
+                            'room_id' => $room->id,
+                            'file' => $carouselImage->getClientOriginalName(),
+                            'error' => $e->getMessage()
+                        ]);
+                    }
+                }
+
+                if ($failedCount > 0) {
+                    session()->flash('warning', "{$uploadedCount} carousel image(s) uploaded successfully, but {$failedCount} failed.");
                 }
             }
 
@@ -572,26 +645,76 @@ class RoomController extends Controller
     }
 
     /**
-     * Convert already-compressed image to WebP format
-     * Frontend handles compression, backend handles format optimization
-     * Uses Imagick if available, falls back to GD
+     * Convert uploaded image to WebP format with optimization
+     * 
+     * PROCESSING FLOW (NOW MATCHES STAFF/PATH):
+     * ┌─────────────────────────────────────────────────────────────────┐
+     * │ Example: User uploads 2800x2100px, 4.5MB image                  │
+     * ├─────────────────────────────────────────────────────────────────┤
+     * │ 1. Frontend Compression (compressImageCanvas)                   │
+     * │    - Input: 2800x2100px                                         │
+     * │    - Output: 2000x1500px, ~1.5MB JPEG                           │
+     * ├─────────────────────────────────────────────────────────────────┤
+     * │ 2. Laravel Validation ✓                                         │
+     * │    - Size: 1.5MB < 5MB ✓                                        │
+     * │    - Dimensions: 2000x1500 < 3000x3000 ✓                        │
+     * ├─────────────────────────────────────────────────────────────────┤
+     * │ 3. GD Dimension Check (if needed)                               │
+     * │    - 2000x1500 < 3000px → No exception                          │
+     * ├─────────────────────────────────────────────────────────────────┤
+     * │ 4. Backend Processing (this method)                             │
+     * │    - scaleDown(2000) → Already 2000px, no resize                │
+     * │    - Convert to WebP @ 85% quality                              │
+     * │    - Output: ~700KB WebP                                        │
+     * │    - Saved to storage/app/public/offices/{id}/xxx.webp          │
+     * └─────────────────────────────────────────────────────────────────┘
+     * 
+     * EDGE CASES:
+     * - Direct API upload (5000x4000px): Rejected by Laravel validation
+     * - Corrupted image: Caught by try-catch, logged, returns error
+     * - GD without Imagick (3500px image): Pre-checked at line 350-358
+     * 
+     * DRIVER BEHAVIOR:
+     * - Imagick: Handles any dimension efficiently, no pre-check needed
+     * - GD: Requires 3000px pre-check to prevent memory exhaustion
+     * 
+     * @param \Illuminate\Http\UploadedFile $file Image file to process
+     * @param string $folder Storage path (e.g., "offices/123/cover_images")
+     * @return string Relative path to saved WebP file
+     * @throws \Exception If GD encounters >3000px image or processing fails
      */
     private function convertToWebP($file, $folder)
     {
+        // GD driver safety check (Imagick handles large images efficiently)
+        if (!extension_loaded('imagick')) {
+            $imageInfo = getimagesize($file->getRealPath());
+            if ($imageInfo) {
+                [$width, $height] = $imageInfo;
+                $maxDimension = 3000;
+
+                if ($width > $maxDimension || $height > $maxDimension) {
+                    throw new \Exception(
+                        "Image dimensions too large. Maximum {$maxDimension}px on either side when using GD driver."
+                    );
+                }
+            }
+        }
+
         $baseName = uniqid('', true);
         $webpPath = "{$folder}/{$baseName}.webp";
 
-        // Read the already-compressed image from frontend
+        // Process: Load → Resize → Convert → Save
         $image = $this->manager->read($file);
 
-        // NO resizing - image is already properly sized by frontend
-        // Just convert to WebP with high quality since it's pre-compressed
+        // NEW: Resize to 2000px max (matches frontend compression target)
+        $image->scaleDown(width: 2000);
+
+        // Convert to WebP with high quality (frontend already compressed)
         $encodedImage = $image->toWebp(85);
 
-        // Store the WebP image
         Storage::disk('public')->put($webpPath, (string) $encodedImage);
 
-        // Clean up
+        // Clean up memory
         unset($image, $encodedImage);
 
         return $webpPath;

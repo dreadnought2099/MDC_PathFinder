@@ -4,9 +4,7 @@
     <x-floating-actions />
 
     <div class="container max-w-lg mx-auto mt-10 border-2 border-primary rounded-md dark:bg-gray-800">
-        <h1 class="text-3xl font-bold text-center p-6 text-gray-800 dark:text-gray-300 mb-6">Create <span
-                class="text-primary">Office
-                User</span></h1>
+        <h1 class="text-3xl font-bold text-center p-6 text-gray-800 dark:text-gray-300 mb-6"><span class="text-primary">Create</span> Office User</h1>
 
         <form action="{{ route('room-user.store') }}" method="POST" id="roomUserForm"
             class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
