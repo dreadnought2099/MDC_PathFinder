@@ -69,10 +69,9 @@
                                             <span x-show="selectedId == path.id" class="float-right text-primary">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                                     fill="currentColor">
-                                                    <path fill-rule="evenodd"
-                                                        d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586
-                                                            6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
-                                                            0 001.414 0l7-7a1 1 0 000-1.414z"
+                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586
+                                                                                6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
+                                                                                0 001.414 0l7-7a1 1 0 000-1.414z"
                                                         clip-rule="evenodd" />
                                                 </svg>
                                             </span>
@@ -197,12 +196,10 @@
         async function fetchPathImageCount(pathId) {
             // Prevent multiple simultaneous calls for the same path
             if (window.fetchingPathData === pathId) {
-                console.log('⏳ Already fetching data for path:', pathId);
                 return;
             }
 
             window.fetchingPathData = pathId;
-            console.log('🔄 fetchPathImageCount called with pathId:', pathId);
 
             if (window.showSpinner) {
                 window.showSpinner();
@@ -218,16 +215,9 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('📊 API Response:', data);
 
                     currentPathImageCount = data.current_count;
                     remainingSlots = data.remaining_slots;
-
-                    console.log('📈 Updated variables:', {
-                        currentPathImageCount,
-                        remainingSlots,
-                        MAX_IMAGES_PER_PATH
-                    });
 
                     updatePathLimitDisplay();
                     updateDropzoneState();
@@ -374,7 +364,7 @@
                 selectedId: defaultPathId,
                 selectedName: '',
 
-                init() {
+                init: async function() {
                     const storedId = sessionStorage.getItem('selectedPathId');
                     const targetId = storedId ? parseInt(storedId, 10) : this.selectedId;
                     const selected = this.paths.find(p => p.id === targetId);
@@ -387,10 +377,38 @@
                         if (this.selectedId !== defaultPathId) {
                             this.updateBrowserUrl();
                         }
+
+                        // Dispatch event so other modules can react (floating link etc.)
+                        window.dispatchEvent(new CustomEvent("path-changed", {
+                            detail: {
+                                pathId: this.selectedId
+                            }
+                        }));
+
+                        // Call the global fetch function (not this.fetchPathImageCount)
+                        if (typeof fetchPathImageCount === 'function') {
+                            await fetchPathImageCount(this.selectedId);
+                        } else if (typeof window.fetchPathImageCount === 'function') {
+                            await window.fetchPathImageCount(this.selectedId);
+                        }
                     } else {
                         this.selectedId = defaultPathId;
                         const defaultPath = this.paths.find(p => p.id === defaultPathId);
                         this.selectedName = defaultPath ? defaultPath.display_name : '';
+
+                        if (defaultPathId) {
+                            window.dispatchEvent(new CustomEvent("path-changed", {
+                                detail: {
+                                    pathId: defaultPathId
+                                }
+                            }));
+
+                            if (typeof fetchPathImageCount === 'function') {
+                                await fetchPathImageCount(defaultPathId);
+                            } else if (typeof window.fetchPathImageCount === 'function') {
+                                await window.fetchPathImageCount(defaultPathId);
+                            }
+                        }
                     }
 
                     this.filteredPaths = this.paths;
@@ -415,46 +433,55 @@
                 },
 
                 selectPath(path) {
-                    console.log('🔄 selectPath called for:', path.display_name, 'ID:', path.id);
 
+                    // 1️⃣ Update local state
                     this.selectedId = path.id;
                     this.selectedName = path.display_name;
                     this.isOpen = false;
                     this.search = '';
                     this.filterPaths();
 
-                    // Use the module function to save selection - this will trigger path-changed event
+                    // 2️⃣ Save selection globally (and trigger "path-changed" event)
                     if (typeof savePathSelection === 'function') {
                         savePathSelection(path.id);
                     } else {
-                        // Fallback
+                        // Fallback if module isn’t loaded
                         sessionStorage.setItem('selectedPathId', path.id);
-                        window.dispatchEvent(new CustomEvent('path-changed', {
-                            detail: {
-                                pathId: path.id
-                            }
-                        }));
+                        window.dispatchEvent(
+                            new CustomEvent('path-changed', {
+                                detail: {
+                                    pathId: path.id
+                                }
+                            })
+                        );
                     }
 
-                    // Update URL without page reload
+                    // 3️⃣ Update browser URL (no reload)
                     const baseUrl = "{{ route('path-image.create', ':pathId') }}";
                     const newUrl = baseUrl.replace(':pathId', path.id);
                     window.history.replaceState({}, '', newUrl);
 
-                    // Update the form's path_id input
+                    // 4️⃣ Update hidden form input (for Laravel form submission)
                     const pathIdInput = document.querySelector('input[name="path_id"]');
                     if (pathIdInput) {
                         pathIdInput.value = path.id;
                     }
-                    // Clear files safely (check if they exist first)
+
+                    // 5️⃣ Clear previous files (reset UI cleanly)
                     if (window.files !== undefined) {
                         window.files = [];
-                        if (typeof renderPreviews === 'function') {
-                            renderPreviews();
-                        }
-                        if (typeof updateSubmitButton === 'function') {
-                            updateSubmitButton();
-                        }
+                        if (typeof renderPreviews === 'function') renderPreviews();
+                        if (typeof updateSubmitButton === 'function') updateSubmitButton();
+                    }
+
+                    // 6️⃣ Immediately fetch the new path's image count
+                    // (use global or window function depending on how it's declared)
+                    if (typeof fetchPathImageCount === 'function') {
+                        fetchPathImageCount(path.id);
+                    } else if (typeof window.fetchPathImageCount === 'function') {
+                        window.fetchPathImageCount(path.id);
+                    } else {
+                        console.warn('⚠️ fetchPathImageCount not found — cannot update path info.');
                     }
                 },
 
@@ -570,13 +597,27 @@
             }
 
             // ====================================================================
-            // LISTEN FOR PATH CHANGES
+            // LISTEN FOR PATH CHANGES (RESET + REFETCH)
             // ====================================================================
-            window.addEventListener('path-changed', function(e) {
+            window.addEventListener('path-changed', async function(e) {
                 if (e.detail && e.detail.pathId) {
+                    const newPathId = e.detail.pathId;
+
+                    // 1️⃣ Reset global tracking variables
+                    currentPathImageCount = 0;
+                    remainingSlots = MAX_IMAGES_PER_PATH;
+
+                    // 2️⃣ Clear files and UI immediately
                     window.files = [];
-                    renderPreviews();
-                    updateSubmitButton();
+                    if (typeof renderPreviews === 'function') renderPreviews();
+                    if (typeof updateSubmitButton === 'function') updateSubmitButton();
+
+                    // 3️⃣ Update limit display to show reset state
+                    updatePathLimitDisplay();
+                    updateDropzoneState();
+
+                    // 4️⃣ Fetch new path data cleanly
+                    await fetchPathImageCount(newPathId);
                 }
             });
 
