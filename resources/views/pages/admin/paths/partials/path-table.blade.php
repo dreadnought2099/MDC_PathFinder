@@ -39,12 +39,12 @@
                             </td>
 
                             <!-- From Room -->
-                            <td class="px-6 py-5 text-sm font-semibold text-primary dark:text-primary-light">
+                            <td class="px-6 py-5 text-sm text-gray-900 dark:text-gray-300">
                                 {{ $path->fromRoom->name }}
                             </td>
 
                             <!-- To Room -->
-                            <td class="px-6 py-5 text-sm font-semibold text-primary dark:text-primary-light">
+                            <td class="px-6 py-5 text-sm text-gray-900 dark:text-gray-300">
                                 {{ $path->toRoom->name }}
                             </td>
 
