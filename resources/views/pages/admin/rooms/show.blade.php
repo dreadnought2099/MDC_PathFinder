@@ -116,7 +116,7 @@
 
                                 <!-- Staff Info -->
                                 <div class="p-2 sm:p-3 text-center space-y-0.5">
-                                    <a href="{{ route('staff.client-show', $member->token) }}" target="_blank"
+                                    <a href="{{ route('staff.show', $member->id) }}" target="_blank"
                                         rel="noopener noreferrer"
                                         class="block text-sm sm:text-base font-semibold text-slate-800 dark:text-gray-200 
                                 hover:text-primary transition-colors duration-200 truncate">
