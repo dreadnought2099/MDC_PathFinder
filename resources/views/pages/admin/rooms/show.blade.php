@@ -80,74 +80,77 @@
                 </div>
             @endif
 
-            {{-- Assigned Staff --}}
-            @if ($room->staff->isNotEmpty())
-                <section class="mt-8 w-full" x-data="{
-                    expanded: false,
-                    total: {{ $room->staff->count() }},
-                    screenWidth: window.innerWidth,
-                    get itemsToShow() {
-                        if (this.screenWidth >= 1024) return 5; // lg breakpoint - desktop
-                        return 2; // mobile
-                    }
-                }" x-init="window.addEventListener('resize', () => { screenWidth = window.innerWidth })">
-                    <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 text-center">
-                        Assigned Staff
-                    </h2>
+            <section class="mt-8 w-full">
+                <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 text-center">
+                    Assigned Staff
+                </h2>
 
-                    <!-- Grid container -->
-                    <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5">
-                        @foreach ($room->staff as $index => $member)
-                            <div x-show="expanded || {{ $index }} < itemsToShow"
-                                x-transition:enter="transition ease-out duration-500"
-                                x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-                                x-transition:leave="transition ease-in duration-400"
-                                x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-                                class="bg-gradient-to-br from-slate-50 to-white dark:from-gray-700 dark:to-gray-800 
-                        rounded-lg shadow-sm hover:shadow-md border border-primary
-                        overflow-hidden group transform hover:scale-[1.02] transition-all duration-300 ease-out origin-top">
+                @if ($room->staff->isNotEmpty())
+                    <div x-data="{
+                        expanded: false,
+                        total: {{ $room->staff->count() }},
+                        screenWidth: window.innerWidth,
+                        get itemsToShow() {
+                            if (this.screenWidth >= 1024) return 5; // lg breakpoint - desktop
+                            return 2; // mobile
+                        }
+                    }" x-init="window.addEventListener('resize', () => { screenWidth = window.innerWidth })">
+                        <!-- staff grid -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5">
+                            @foreach ($room->staff as $index => $member)
+                                <div x-show="expanded || {{ $index }} < itemsToShow"
+                                    x-transition:enter="transition ease-out duration-500"
+                                    x-transition:enter-start="opacity-0 scale-95"
+                                    x-transition:enter-end="opacity-100 scale-100"
+                                    x-transition:leave="transition ease-in duration-400"
+                                    x-transition:leave-start="opacity-100 scale-100"
+                                    x-transition:leave-end="opacity-0 scale-95"
+                                    class="bg-gradient-to-br from-slate-50 to-white dark:from-gray-700 dark:to-gray-800 
+                                            rounded-lg shadow-sm hover:shadow-md border border-primary
+                                            overflow-hidden group transform hover:scale-[1.02] transition-all duration-300 ease-out origin-top">
 
-                                <!-- Staff Image -->
-                                <div class="cursor-pointer overflow-hidden"
-                                    @click="openModal('{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/pathfinder-bannerv2.png') }}')">
-                                    <img src="{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/pathfinder-bannerv2.png') }}"
-                                        alt="{{ $member->full_name }}"
-                                        class="w-full h-28 sm:h-32 md:h-36 object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
-                                        loading="lazy">
+                                    <!-- Staff Image -->
+                                    <div class="cursor-pointer overflow-hidden"
+                                        @click="openModal('{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/pathfinder-bannerv2.png') }}')">
+                                        <img src="{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/pathfinder-bannerv2.png') }}"
+                                            alt="{{ $member->full_name }}"
+                                            class="w-full h-28 sm:h-32 md:h-36 object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
+                                            loading="lazy">
+                                    </div>
+
+                                    <!-- Staff Info -->
+                                    <div class="p-2 sm:p-3 text-center space-y-0.5">
+                                        <a href="{{ route('staff.show', $member->id) }}" target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="block text-sm sm:text-base font-semibold text-slate-800 dark:text-gray-200 
+                                                hover:text-primary transition-colors duration-200 truncate">
+                                            {{ $member->full_name }}
+                                        </a>
+                                        <p class="text-xs sm:text-sm text-slate-600 dark:text-gray-300 truncate">
+                                            {{ $member->position ?? 'No position' }}
+                                        </p>
+                                    </div>
                                 </div>
+                            @endforeach
+                        </div>
 
-                                <!-- Staff Info -->
-                                <div class="p-2 sm:p-3 text-center space-y-0.5">
-                                    <a href="{{ route('staff.show', $member->id) }}" target="_blank"
-                                        rel="noopener noreferrer"
-                                        class="block text-sm sm:text-base font-semibold text-slate-800 dark:text-gray-200 
-                                hover:text-primary transition-colors duration-200 truncate">
-                                        {{ $member->full_name }}
-                                    </a>
-                                    <p class="text-xs sm:text-sm text-slate-600 dark:text-gray-300 truncate">
-                                        {{ $member->position ?? 'No position' }}
-                                    </p>
-                                </div>
-                            </div>
-                        @endforeach
+                        <!-- Toggle Button -->
+                        <div class="text-center mt-5"
+                            x-show="(screenWidth >= 1024 && total > 5) || (screenWidth < 1024 && total > 2)" x-transition
+                            x-cloak>
+                            <button @click="expanded = !expanded"
+                                class="px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full border border-primary 
+                                        text-primary hover:bg-primary hover:text-white transition-colors duration-200">
+                                <span x-text="expanded ? 'Show Less' : 'Show More'"></span>
+                            </button>
+                        </div>
                     </div>
-
-                    <!-- Toggle Button -->
-                    <div class="text-center mt-5"
-                        x-show="(screenWidth >= 1024 && total > 5) || (screenWidth < 1024 && total > 2)" x-transition
-                        x-cloak>
-                        <button @click="expanded = !expanded"
-                            class="px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full border border-primary 
-                    text-primary hover:bg-primary hover:text-white transition-colors duration-200">
-                            <span x-text="expanded ? 'Show Less' : 'Show More'"></span>
-                        </button>
-                    </div>
-                </section>
-            @else
-                <p class="text-center text-gray-500 dark:text-gray-400 text-sm sm:text-base italic mt-4">
-                    No staff assigned to this office.
-                </p>
-            @endif
+                @else
+                    <p class="text-center text-gray-500 dark:text-gray-400 dark:bg-gray-800 text-sm sm:text-base italic mt-4 border-2 border-primary rounded-lg p-4">
+                        No staff assigned to this office.
+                    </p>
+                @endif
+            </section>
 
             {{-- Office Hours --}}
             <div class="mt-6 w-full">
@@ -183,7 +186,7 @@
                             @endforeach
                         </div>
                     @else
-                        <div class="text-center text-gray-500 italic text-sm sm:text-base">
+                        <div class="text-center text-gray-500 dark:text-gray-400 italic text-sm sm:text-base">
                             No office hours specified
                         </div>
                     @endif
@@ -274,7 +277,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Initialize GLightbox first
             initGlightbox();
-            
+
             const modal = document.getElementById('imageModal');
             const modalImage = document.getElementById('modalImage');
             const downloadBtn = document.getElementById('downloadBtn');
