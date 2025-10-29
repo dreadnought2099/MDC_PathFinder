@@ -290,9 +290,9 @@
                 autoplayVideos: false,
                 moreText: 'View Image',
                 svg: {
-                    close: '<img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png" alt="Close"/>',
-                    next: '<img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/next.svg" alt="Next"/>',
-                    prev: '<img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/prev.svg" alt="Previous"/>',
+                    close: '<img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder@f0f57bf/public/icons/exit.png" alt="Close"/>',
+                    next: '<img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder@f0f57bf/public/icons/next.svg" alt="Next"/>',
+                    prev: '<img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder@f0f57bf/public/icons/prev.svg" alt="Previous"/>',
                 }
             });
         }
