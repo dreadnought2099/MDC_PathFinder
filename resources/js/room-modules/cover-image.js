@@ -1,10 +1,22 @@
+/**
+ * coverImage.js - Cover Image Upload Handler
+ *
+ * UPDATED PROCESSING FLOW (MATCHES RoomController.php):
+ * 1. Validate original file (type check only)
+ * 2. Compress to 2000px max, 85% quality → JPEG
+ * 3. Post-validate compressed file (5MB, 3000px limits)
+ * 4. Set input files to compressed version
+ * 5. Show preview
+ */
+
 import {
     compressImageCanvas,
     validateImageFile,
     showTemporaryMessage,
 } from "./utils";
 
-const MAX_IMAGE_SIZE_MB = 10;
+// UPDATED: Reduced to 5MB to match controller validation
+const MAX_IMAGE_SIZE_MB = 5;
 let compressedCoverFile = null;
 
 export function initializeCoverImage() {
@@ -60,7 +72,7 @@ export function initializeCoverImage() {
             if (removeCheckbox) removeCheckbox.checked = false;
         }
         const removeImageFlag = document.getElementById("remove_image_path");
-        if (removeImageFlag) removeImageFlag.value = "0"; //  ensure not marked for deletion
+        if (removeImageFlag) removeImageFlag.value = "0";
     });
 
     // Drag & Drop
@@ -82,9 +94,9 @@ export function initializeCoverImage() {
                 if (placeholderText) placeholderText.style.display = "";
                 coverInput.value = "";
                 compressedCoverFile = null;
-                if (removeImageFlag) removeImageFlag.value = "1"; // mark for deletion
+                if (removeImageFlag) removeImageFlag.value = "1";
             } else {
-                if (removeImageFlag) removeImageFlag.value = "0"; // reset if unchecked
+                if (removeImageFlag) removeImageFlag.value = "0";
             }
         });
     }
@@ -104,25 +116,46 @@ function handleDragEvent(e) {
         const files = Array.from(e.dataTransfer.files || []);
         if (files.length > 0) {
             compressAndPreviewCoverImage(files[0]);
-            showTemporaryMessage(
-                "Cover image added from drag & drop",
-                "success"
-            );
             const removeImageFlag =
                 document.getElementById("remove_image_path");
-            if (removeImageFlag) removeImageFlag.value = "0"; // reset flag
+            if (removeImageFlag) removeImageFlag.value = "0";
         }
     }
 }
 
 // Compress and preview cover image
 async function compressAndPreviewCoverImage(file) {
-    if (!validateImageFile(file, MAX_IMAGE_SIZE_MB, true)) return;
+    // Pre-compression validation (check if file is image)
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+    if (!allowedTypes.includes(file.type)) {
+        showTemporaryMessage(
+            "Invalid image type. Only JPEG and PNG are allowed.",
+            "error"
+        );
+        return;
+    }
 
     try {
         showTemporaryMessage("Compressing cover image...", "info");
         const originalSizeMB = (file.size / 1024 / 1024).toFixed(2);
+
+        // Compress image (2000px max, 85% quality)
         const compressedFile = await compressImageCanvas(file, 2000, 0.85);
+
+        // Post-compression validation (5MB, 3000px limits)
+        const isValid = await validateImageFile(
+            compressedFile,
+            MAX_IMAGE_SIZE_MB,
+            true
+        );
+        if (!isValid) {
+            showTemporaryMessage(
+                "Compressed image still too large. Please use a smaller image.",
+                "error"
+            );
+            return;
+        }
+
         const compressedSizeMB = (compressedFile.size / 1024 / 1024).toFixed(2);
         compressedCoverFile = compressedFile;
 
@@ -140,11 +173,9 @@ async function compressAndPreviewCoverImage(file) {
     } catch (error) {
         console.error("Compression failed:", error);
         showTemporaryMessage(
-            "Compression failed, using original image",
+            "Compression failed. Please try a different image.",
             "error"
         );
-        compressedCoverFile = file;
-        showCoverPreview(file);
     }
 }
 

@@ -1,3 +1,15 @@
+/**
+ * carouselImages.js - Carousel Images Upload Handler
+ *
+ * UPDATED VALIDATION FLOW (MATCHES RoomController.php):
+ * 1. Check total count (existing + new ≤ 15)
+ * 2. Pre-validate files (type check only)
+ * 3. Compress each file (2000px, 85% quality)
+ * 4. Post-validate compressed files (5MB, 3000px)
+ * 5. Add valid files to selectedFiles array
+ * 6. Skip invalid files (don't block entire batch)
+ */
+
 import {
     compressImageCanvas,
     validateImageFile,
@@ -5,7 +17,8 @@ import {
 } from "./utils";
 
 const MAX_CAROUSEL_FILES = 15;
-const MAX_IMAGE_SIZE_MB = 10;
+// UPDATED: Reduced to 5MB to match controller validation
+const MAX_IMAGE_SIZE_MB = 5;
 
 let selectedFiles = []; // NEW files (File objects)
 let existingImageData = []; // { id, src, filename } from DOM (edit)
@@ -148,25 +161,31 @@ function handleCarouselFiles(newFiles) {
     if (!carouselInput) return;
     carouselInput.value = "";
 
-   const totalActiveExisting = existingImageData.length; // only images currently displayed
-const totalNewFiles = selectedFiles.length + newFiles.length;
-const totalImages = totalActiveExisting + totalNewFiles;
+    const totalActiveExisting = existingImageData.length; // only images currently displayed
+    const totalNewFiles = selectedFiles.length + newFiles.length;
+    const totalImages = totalActiveExisting + totalNewFiles;
 
-if (totalImages > MAX_CAROUSEL_FILES) {
-    const available = MAX_CAROUSEL_FILES - totalActiveExisting - selectedFiles.length;
-    showTemporaryMessage(
-        `You can only add ${available} more image(s). Maximum is ${MAX_CAROUSEL_FILES} total.`,
-        "error"
-    );
-    return;
-}
+    if (totalImages > MAX_CAROUSEL_FILES) {
+        const available =
+            MAX_CAROUSEL_FILES - totalActiveExisting - selectedFiles.length;
+        showTemporaryMessage(
+            `You can only add ${available} more image(s). Maximum is ${MAX_CAROUSEL_FILES} total.`,
+            "error"
+        );
+        return;
+    }
 
-
+    // Pre-validate file types (before compression)
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
     const invalidFiles = newFiles.filter(
-        (file) => !validateImageFile(file, MAX_IMAGE_SIZE_MB, false)
+        (file) => !allowedTypes.includes(file.type)
     );
+
     if (invalidFiles.length) {
-        showTemporaryMessage("Some files are invalid or too large.", "error");
+        showTemporaryMessage(
+            "Some files have invalid types. Only JPEG and PNG are allowed.",
+            "error"
+        );
         return;
     }
 
@@ -179,12 +198,29 @@ async function compressCarouselImages(newFiles) {
         const compressedFiles = [];
         let totalOriginalSize = 0;
         let totalCompressedSize = 0;
+        let failedCount = 0;
 
         for (let i = 0; i < newFiles.length; i++) {
             const file = newFiles[i];
             totalOriginalSize += file.size;
             try {
                 const compressed = await compressImageCanvas(file, 2000, 0.85);
+
+                // Post-compression validation (5MB, 3000px limits)
+                const isValid = await validateImageFile(
+                    compressed,
+                    MAX_IMAGE_SIZE_MB,
+                    false
+                );
+
+                if (!isValid) {
+                    failedCount++;
+                    console.warn(
+                        `Skipped ${file.name}: Validation failed after compression`
+                    );
+                    continue;
+                }
+
                 const finalFile = new File(
                     [compressed],
                     file.name.replace(/\.[^/.]+$/, ".jpg"),
@@ -194,9 +230,8 @@ async function compressCarouselImages(newFiles) {
                 compressedCarouselFiles.set(file.name, finalFile);
                 totalCompressedSize += finalFile.size;
             } catch (err) {
+                failedCount++;
                 console.error(`Failed to compress ${file.name}`, err);
-                compressedFiles.push(file);
-                totalCompressedSize += file.size;
             }
 
             const progress = Math.round(((i + 1) / newFiles.length) * 100);
@@ -215,11 +250,17 @@ async function compressCarouselImages(newFiles) {
 
         const originalMB = (totalOriginalSize / 1024 / 1024).toFixed(2);
         const compressedMB = (totalCompressedSize / 1024 / 1024).toFixed(2);
+
+        let message = `${compressedFiles.length} image(s) compressed: ${originalMB}MB → ${compressedMB}MB`;
+        if (failedCount > 0) {
+            message += `. ${failedCount} image(s) were too large and skipped.`;
+        }
+
         setTimeout(
             () =>
                 showTemporaryMessage(
-                    `${newFiles.length} image(s) compressed: ${originalMB}MB → ${compressedMB}MB`,
-                    "success"
+                    message,
+                    failedCount > 0 ? "warning" : "success"
                 ),
             350
         );

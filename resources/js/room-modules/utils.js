@@ -1,3 +1,12 @@
+/**
+ * utils.js - Utility Functions for Image Processing
+ *
+ * UPDATED TO MATCH RoomController.php:
+ * - Max file size: 5MB (reduced from 10MB)
+ * - Max dimensions: 3000x3000px (NEW - matches Laravel validation)
+ * - Compression target: 2000px (matches backend processing)
+ */
+
 export function showTemporaryMessage(text, type = "info") {
     if (typeof window.showTemporaryMessage === "function") {
         window.showTemporaryMessage(text, type);
@@ -30,6 +39,20 @@ export function clearError(row) {
     if (msg) msg.remove();
 }
 
+/**
+ * Compress image using canvas - Frontend compression layer
+ *
+ * MATCHES CONTROLLER PIPELINE:
+ * - Compresses to 2000px max dimension (same as backend target)
+ * - Converts to JPEG for consistent format
+ * - Quality: 85% base, 80% for 5-8MB, 75% for >8MB
+ * - This is the FIRST step before Laravel validation
+ *
+ * @param {File} file - Original image file
+ * @param {number} maxDimension - Max width/height (default: 2000px)
+ * @param {number} quality - JPEG quality 0-1 (default: 0.85)
+ * @returns {Promise<File>} Compressed JPEG file
+ */
 export async function compressImageCanvas(
     file,
     maxDimension = 2000,
@@ -43,6 +66,7 @@ export async function compressImageCanvas(
                 let width = img.width;
                 let height = img.height;
 
+                // Resize if exceeds max dimension
                 if (width > maxDimension || height > maxDimension) {
                     if (width > height) {
                         height = Math.round((height * maxDimension) / width);
@@ -61,6 +85,7 @@ export async function compressImageCanvas(
                 ctx.imageSmoothingQuality = "high";
                 ctx.drawImage(img, 0, 0, width, height);
 
+                // Adjust quality based on original file size
                 let targetQuality = quality;
                 const sizeMB = file.size / 1024 / 1024;
                 if (sizeMB > 8) targetQuality = 0.75;
@@ -83,7 +108,7 @@ export async function compressImageCanvas(
                             );
                             resolve(compressedFile);
                         } else {
-                            resolve(file);
+                            resolve(file); // Use original if compression didn't help
                         }
                     },
                     "image/jpeg",
@@ -98,15 +123,97 @@ export async function compressImageCanvas(
     });
 }
 
-export function validateImageFile(file, maxSizeMB = 10, showError = true) {
+/**
+ * Validate image file - Frontend validation layer
+ *
+ * ⚠️ UPDATED: NOW ASYNC AND CHECKS DIMENSIONS
+ *
+ * MATCHES CONTROLLER VALIDATION:
+ * - Max size: 5MB (reduced from 10MB to match controller)
+ * - Max dimensions: 3000x3000px (NEW - matches Laravel validation)
+ * - Allowed types: JPEG, PNG only
+ * - This validation happens AFTER compression
+ *
+ * @param {File} file - Image file to validate
+ * @param {number} maxSizeMB - Max file size in MB (default: 5MB)
+ * @param {boolean} showError - Show error message (default: true)
+ * @returns {Promise<boolean>} True if valid, false otherwise
+ */
+export async function validateImageFile(file, maxSizeMB = 5, showError = true) {
     const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+
+    // Check file type
     if (!allowedTypes.includes(file.type)) {
-        if (showError) showTemporaryMessage("Invalid image type.", "error");
+        if (showError) {
+            showTemporaryMessage(
+                "Invalid image type. Only JPEG and PNG are allowed.",
+                "error"
+            );
+        }
         return false;
     }
+
+    // Check file size (5MB limit matches controller)
     if (file.size > maxSizeMB * 1024 * 1024) {
-        if (showError) showTemporaryMessage("Image too large.", "error");
+        if (showError) {
+            showTemporaryMessage(
+                `Image too large. Maximum ${maxSizeMB}MB allowed.`,
+                "error"
+            );
+        }
         return false;
     }
+
+    // Check dimensions (3000x3000px limit matches controller)
+    try {
+        const dimensions = await getImageDimensions(file);
+        const maxDimension = 3000;
+
+        if (
+            dimensions.width > maxDimension ||
+            dimensions.height > maxDimension
+        ) {
+            if (showError) {
+                showTemporaryMessage(
+                    `Image dimensions too large. Maximum ${maxDimension}px on either side. Current: ${dimensions.width}x${dimensions.height}px`,
+                    "error"
+                );
+            }
+            return false;
+        }
+    } catch (error) {
+        console.error("Failed to check image dimensions:", error);
+        // Allow file if dimension check fails (backend will catch it)
+    }
+
     return true;
+}
+
+/**
+ * Get image dimensions from file
+ * Helper function for dimension validation
+ *
+ * @param {File} file - Image file
+ * @returns {Promise<{width: number, height: number}>}
+ */
+function getImageDimensions(file) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+
+        img.onload = () => {
+            URL.revokeObjectURL(url);
+            resolve({
+                width: img.width,
+                height: img.height,
+            });
+        };
+
+        img.onerror = () => {
+            URL.revokeObjectURL(url);
+            reject(new Error("Failed to load image"));
+        };
+
+        img.src = url;
+    });
 }
