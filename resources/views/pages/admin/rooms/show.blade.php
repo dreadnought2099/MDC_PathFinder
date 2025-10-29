@@ -190,24 +190,37 @@
 
             {{-- QR Code --}}
             @if ($room->qr_code_path && Storage::disk('public')->exists($room->qr_code_path))
-                <div class="mt-12 text-center">
-                    <div class="bg-white rounded-2xl shadow-lg p-8 border-2 border-primary dark:bg-gray-800 inline-block">
-                        <h3 class="text-2xl font-bold text-slate-800 mb-6 dark:text-gray-300">{{ $room->name }} QR Code
-                        </h3>
-                        <div class="inline-block bg-slate-50 p-6 rounded-xl border-2 border-primary mb-6">
-                            <img src="{{ Storage::url($room->qr_code_path) }}?v={{ $room->updated_at->timestamp }}"
-                                alt="QR Code for {{ $room->name }}" class="max-w-[200px] mx-auto" />
-                        </div>
-                        <div>
-                            <a href="{{ route('room.print-qrcode', $room->id) }}" target="_blank"
-                                class="inline-flex items-center gap-2 text-white bg-primary border border-primary hover:text-primary hover:bg-white px-4 py-4 text-sm rounded-md transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 dark:hover:bg-gray-800">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
-                                    </path>
-                                </svg>
-                                Print QR Code
-                            </a>
+                <div class="mt-6 sm:mt-8 md:mt-12 px-4 sm:px-6 lg:px-8">
+                    <div class="max-w-md mx-auto">
+                        <div
+                            class="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 md:p-8 border-2 border-primary dark:bg-gray-800">
+                            <!-- Title -->
+                            <h3
+                                class="text-lg sm:text-xl md:text-2xl font-bold text-slate-800 mb-4 sm:mb-5 md:mb-6 dark:text-gray-300 text-center break-words">
+                                {{ $room->name }} QR Code
+                            </h3>
+
+                            <!-- QR Code Container -->
+                            <div
+                                class="bg-slate-50 p-4 sm:p-5 md:p-6 rounded-lg sm:rounded-xl border-2 border-primary mb-4 sm:mb-5 md:mb-6">
+                                <img src="{{ Storage::url($room->qr_code_path) }}?v={{ $room->updated_at->timestamp }}"
+                                    alt="QR Code for {{ $room->name }}"
+                                    class="w-full max-w-[150px] sm:max-w-[180px] md:max-w-[200px] mx-auto" />
+                            </div>
+
+                            <!-- Print Button -->
+                            <div class="text-center">
+                                <a href="{{ route('room.print-qrcode', $room->id) }}" target="_blank"
+                                    class="inline-flex items-center justify-center gap-2 w-full sm:w-auto text-white bg-primary border border-primary hover:text-primary hover:bg-white px-4 sm:px-5 md:px-6 py-3 sm:py-3.5 md:py-4 text-sm sm:text-base rounded-md transition-all duration-300 shadow-lg hover:shadow-xl active:scale-95 sm:transform sm:hover:scale-105 dark:hover:bg-gray-800">
+                                    <svg class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
+                                        </path>
+                                    </svg>
+                                    <span class="whitespace-nowrap">Print QR Code</span>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
