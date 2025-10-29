@@ -63,12 +63,16 @@
 
             {{-- Carousel Images --}}
             @if ($room->images && $room->images->count())
-                <div>
-                    <h2 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 text-center">Gallery</h2>
+                <section x-data="showMoreHandler({ total: {{ $room->images->count() }}, lgLimit: 8, smLimit: 4 })" class="mt-8 w-full">
+                    <h2 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 text-center">
+                        Gallery
+                    </h2>
+
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
                         @foreach ($room->images as $index => $image)
                             <a href="{{ asset('storage/' . $image->image_path) }}" class="glightbox"
-                                data-gallery="room-{{ $room->id }}" data-title="Office Image {{ $index + 1 }}">
+                                data-gallery="room-{{ $room->id }}" data-title="Office Image {{ $index + 1 }}"
+                                x-show="expanded || {{ $index }} < itemsToShow" x-transition>
                                 <div
                                     class="overflow-hidden rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer border-2 border-primary">
                                     <img src="{{ asset('storage/' . $image->image_path) }}"
@@ -77,76 +81,64 @@
                             </a>
                         @endforeach
                     </div>
-                </div>
+
+                    <!-- Toggle Button -->
+                    <div class="text-center mt-5" x-show="shouldShowButton" x-transition x-cloak>
+                        <button @click="toggle"
+                            class="px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full border border-primary 
+                        text-primary hover:bg-primary hover:text-white transition-colors duration-200">
+                            <span x-text="expanded ? 'Show Less' : 'Show More'"></span>
+                        </button>
+                    </div>
+                </section>
             @endif
 
-            <section class="mt-8 w-full">
+            <section x-data="showMoreHandler({ total: {{ $room->staff->count() }}, lgLimit: 5, smLimit: 2 })" class="mt-8 w-full">
                 <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 text-center">
                     Assigned Staff
                 </h2>
 
                 @if ($room->staff->isNotEmpty())
-                    <div x-data="{
-                        expanded: false,
-                        total: {{ $room->staff->count() }},
-                        screenWidth: window.innerWidth,
-                        get itemsToShow() {
-                            if (this.screenWidth >= 1024) return 5; // lg breakpoint - desktop
-                            return 2; // mobile
-                        }
-                    }" x-init="window.addEventListener('resize', () => { screenWidth = window.innerWidth })">
-                        <!-- staff grid -->
-                        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5">
-                            @foreach ($room->staff as $index => $member)
-                                <div x-show="expanded || {{ $index }} < itemsToShow"
-                                    x-transition:enter="transition ease-out duration-500"
-                                    x-transition:enter-start="opacity-0 scale-95"
-                                    x-transition:enter-end="opacity-100 scale-100"
-                                    x-transition:leave="transition ease-in duration-400"
-                                    x-transition:leave-start="opacity-100 scale-100"
-                                    x-transition:leave-end="opacity-0 scale-95"
-                                    class="bg-gradient-to-br from-slate-50 to-white dark:from-gray-700 dark:to-gray-800 
-                                            rounded-lg shadow-sm hover:shadow-md border border-primary
-                                            overflow-hidden group transform hover:scale-[1.02] transition-all duration-300 ease-out origin-top">
-
-                                    <!-- Staff Image -->
-                                    <div class="cursor-pointer overflow-hidden"
-                                        @click="openModal('{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/pathfinder-bannerv2.png') }}')">
-                                        <img src="{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/pathfinder-bannerv2.png') }}"
-                                            alt="{{ $member->full_name }}"
-                                            class="w-full h-28 sm:h-32 md:h-36 object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
-                                            loading="lazy">
-                                    </div>
-
-                                    <!-- Staff Info -->
-                                    <div class="p-2 sm:p-3 text-center space-y-0.5">
-                                        <a href="{{ route('staff.show', $member->id) }}" target="_blank"
-                                            rel="noopener noreferrer"
-                                            class="block text-sm sm:text-base font-semibold text-slate-800 dark:text-gray-200 
-                                                hover:text-primary transition-colors duration-200 truncate">
-                                            {{ $member->full_name }}
-                                        </a>
-                                        <p class="text-xs sm:text-sm text-slate-600 dark:text-gray-300 truncate">
-                                            {{ $member->position ?? 'No position' }}
-                                        </p>
-                                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5">
+                        @foreach ($room->staff as $index => $member)
+                            <div x-show="expanded || {{ $index }} < itemsToShow" x-transition
+                                class="bg-gradient-to-br from-slate-50 to-white dark:from-gray-700 dark:to-gray-800 
+                            rounded-lg shadow-sm hover:shadow-md border border-primary
+                            overflow-hidden group transform hover:scale-[1.02] transition-all duration-300 ease-out origin-top">
+                                <div class="cursor-pointer overflow-hidden"
+                                    @click="openModal('{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/pathfinder-bannerv2.png') }}')">
+                                    <img src="{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/pathfinder-bannerv2.png') }}"
+                                        alt="{{ $member->full_name }}"
+                                        class="w-full h-28 sm:h-32 md:h-36 object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
+                                        loading="lazy">
                                 </div>
-                            @endforeach
-                        </div>
 
-                        <!-- Toggle Button -->
-                        <div class="text-center mt-5"
-                            x-show="(screenWidth >= 1024 && total > 5) || (screenWidth < 1024 && total > 2)" x-transition
-                            x-cloak>
-                            <button @click="expanded = !expanded"
-                                class="px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full border border-primary 
-                                        text-primary hover:bg-primary hover:text-white transition-colors duration-200">
-                                <span x-text="expanded ? 'Show Less' : 'Show More'"></span>
-                            </button>
-                        </div>
+                                <div class="p-2 sm:p-3 text-center space-y-0.5">
+                                    <a href="{{ route('staff.show', $member->id) }}" target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="block text-sm sm:text-base font-semibold text-slate-800 dark:text-gray-200 
+                                hover:text-primary transition-colors duration-200 truncate">
+                                        {{ $member->full_name }}
+                                    </a>
+                                    <p class="text-xs sm:text-sm text-slate-600 dark:text-gray-300 truncate">
+                                        {{ $member->position ?? 'No position' }}
+                                    </p>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <!-- Toggle Button -->
+                    <div class="text-center mt-5" x-show="shouldShowButton" x-transition x-cloak>
+                        <button @click="toggle"
+                            class="px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full border border-primary 
+                        text-primary hover:bg-primary hover:text-white transition-colors duration-200">
+                            <span x-text="expanded ? 'Show Less' : 'Show More'"></span>
+                        </button>
                     </div>
                 @else
-                    <p class="text-center text-gray-500 dark:text-gray-400 dark:bg-gray-800 text-sm sm:text-base italic mt-4 border-2 border-primary rounded-lg p-4">
+                    <p
+                        class="text-center text-gray-500 dark:text-gray-400 dark:bg-gray-800 text-sm sm:text-base italic mt-4 border-2 border-primary rounded-lg p-4">
                         No staff assigned to this office.
                     </p>
                 @endif
@@ -254,11 +246,42 @@
 
 @push('scripts')
     <script>
-        function initGlightbox() {
-            if (window.glightboxInstance) {
-                window.glightboxInstance.destroy();
-            }
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('showMoreHandler', ({
+                total,
+                lgLimit = 6,
+                smLimit = 3
+            }) => ({
+                expanded: false,
+                total,
+                screenWidth: window.innerWidth,
+                get itemsToShow() {
+                    return this.screenWidth >= 1024 ? lgLimit : smLimit;
+                },
+                get shouldShowButton() {
+                    return this.total > this.itemsToShow;
+                },
+                toggle() {
+                    this.expanded = !this.expanded;
+                },
+                init() {
+                    const updateWidth = () => this.screenWidth = window.innerWidth;
+                    window.addEventListener('resize', updateWidth);
+                    this.$watch('expanded', value => {
+                        if (!value) window.scrollTo({
+                            top: this.$el.offsetTop - 100,
+                            behavior: 'smooth'
+                        });
+                    });
+                },
+            }));
+        });
 
+        // -----------------------------
+        // Existing logic (modal, desc, glightbox, etc.)
+        // -----------------------------
+        function initGlightbox() {
+            if (window.glightboxInstance) window.glightboxInstance.destroy();
             window.glightboxInstance = GLightbox({
                 selector: '.glightbox',
                 touchNavigation: true,
@@ -275,7 +298,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize GLightbox first
             initGlightbox();
 
             const modal = document.getElementById('imageModal');
@@ -296,19 +318,17 @@
                 document.body.style.overflow = 'auto';
             };
 
-            modal.addEventListener('click', (e) => {
+            modal.addEventListener('click', e => {
                 if (e.target === modal) closeModal();
             });
-
-            document.addEventListener('keydown', (e) => {
+            document.addEventListener('keydown', e => {
                 if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
             });
 
-            downloadBtn.addEventListener('click', async (e) => {
+            downloadBtn.addEventListener('click', async e => {
                 e.preventDefault();
                 const imgSrc = modalImage.src;
                 if (!imgSrc) return;
-
                 try {
                     const response = await fetch(imgSrc);
                     const blob = await response.blob();
@@ -333,8 +353,7 @@
             });
 
             if (!desc || !btn) return;
-
-            const fullText = desc.dataset.fullText.trim();
+            const fullText = desc.dataset.fullText?.trim() ?? '';
             desc.textContent = fullText;
 
             function isOverflowing(el) {
@@ -347,10 +366,8 @@
             }
 
             let expanded = false;
-
             btn.addEventListener('click', () => {
                 expanded = !expanded;
-
                 if (expanded) {
                     desc.classList.remove('max-h-16', 'sm:max-h-20', 'md:max-h-24', 'lg:max-h-32',
                         'overflow-hidden');
