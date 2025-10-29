@@ -66,13 +66,15 @@
                 <div>
                     <h2 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 text-center">Gallery</h2>
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
-                        @foreach ($room->images as $image)
-                            <div
-                                class="overflow-hidden rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer border-2 border-primary">
-                                <img src="{{ asset('storage/' . $image->image_path) }}" alt="Gallery Image"
-                                    class="w-full h-32 sm:h-40 object-cover"
-                                    onclick="openModal('{{ asset('storage/' . $image->image_path) }}')" />
-                            </div>
+                        @foreach ($room->images as $index => $image)
+                            <a href="{{ asset('storage/' . $image->image_path) }}" class="glightbox"
+                                data-gallery="room-{{ $room->id }}" data-title="Office Image {{ $index + 1 }}">
+                                <div
+                                    class="overflow-hidden rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer border-2 border-primary">
+                                    <img src="{{ asset('storage/' . $image->image_path) }}"
+                                        alt="Office Image {{ $index + 1 }}" class="w-full h-32 sm:h-40 object-cover" />
+                                </div>
+                            </a>
                         @endforeach
                     </div>
                 </div>
@@ -249,7 +251,30 @@
 
 @push('scripts')
     <script>
+        function initGlightbox() {
+            if (window.glightboxInstance) {
+                window.glightboxInstance.destroy();
+            }
+
+            window.glightboxInstance = GLightbox({
+                selector: '.glightbox',
+                touchNavigation: true,
+                loop: true,
+                zoomable: true,
+                autoplayVideos: false,
+                moreText: 'View Image',
+                svg: {
+                    close: '<img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/exit.png" alt="Close"/>',
+                    next: '<svg width="25" height="40" viewBox="0 0 25 40" xmlns="http://www.w3.org/2000/svg"><path d="M5 0 L25 20 L5 40" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+                    prev: '<svg width="25" height="40" viewBox="0 0 25 40" xmlns="http://www.w3.org/2000/svg"><path d="M20 0 L0 20 L20 40" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+                }
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
+            // Initialize GLightbox first
+            initGlightbox();
+            
             const modal = document.getElementById('imageModal');
             const modalImage = document.getElementById('modalImage');
             const downloadBtn = document.getElementById('downloadBtn');
