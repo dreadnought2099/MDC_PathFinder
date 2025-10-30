@@ -457,7 +457,7 @@
                     this.search = '';
                     this.filterPaths();
 
-                    // 2️⃣ Save selection globally (and trigger "path-changed" event)
+                    // Save selection globally (and trigger "path-changed" event)
                     if (typeof savePathSelection === 'function') {
                         savePathSelection(path.id);
                     } else {
@@ -472,25 +472,25 @@
                         );
                     }
 
-                    // 3️⃣ Update browser URL (no reload)
+                    // Update browser URL (no reload)
                     const baseUrl = "{{ route('path-image.create', ':pathId') }}";
                     const newUrl = baseUrl.replace(':pathId', path.id);
                     window.history.replaceState({}, '', newUrl);
 
-                    // 4️⃣ Update hidden form input (for Laravel form submission)
+                    // Update hidden form input (for Laravel form submission)
                     const pathIdInput = document.querySelector('input[name="path_id"]');
                     if (pathIdInput) {
                         pathIdInput.value = path.id;
                     }
 
-                    // 5️⃣ Clear previous files (reset UI cleanly)
+                    // Clear previous files (reset UI cleanly)
                     if (window.files !== undefined) {
                         window.files = [];
                         if (typeof renderPreviews === 'function') renderPreviews();
                         if (typeof updateSubmitButton === 'function') updateSubmitButton();
                     }
 
-                    // 6️⃣ Immediately fetch the new path's image count
+                    // Immediately fetch the new path's image count
                     // (use global or window function depending on how it's declared)
                     if (typeof fetchPathImageCount === 'function') {
                         fetchPathImageCount(path.id);
