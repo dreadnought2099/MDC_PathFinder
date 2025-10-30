@@ -147,10 +147,13 @@ class RoomUserController extends Controller
         // uses a collection filter instead of reject() for readability:
         $rooms = $allRooms->filter(fn($room) => !in_array($room->id, $assignedRoomIds))->values();
 
+        // Get the currently assigned room for this user (if any)
+        $selectedRoom = $user->room; // assuming user has `room()` relationship
+
         // Authorization (optional, if using policies)
         $this->authorize('update', $user);
 
-        return view('pages.admin.room-users.edit', compact('user', 'rooms'));
+        return view('pages.admin.room-users.edit', compact('user', 'rooms', 'selectedRoom'));
     }
 
     public function show(User $user)
