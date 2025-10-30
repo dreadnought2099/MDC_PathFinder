@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+    <x-floating-actions />
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div class="mb-8 relative">
             <!-- Centered Header -->
@@ -53,7 +54,7 @@
                     </div>
                     <div class="flex-1">
                         <h2 class="text-2xl font-bold text-white">{{ $user->name ?? 'Not provided' }}</h2>
-                        <p class="text-blue-100 mt-1">{{ $user->username }}</p>
+                        <p class="font-sofia text-blue-100 mt-1">{{ $user->username }}</p>
                     </div>
                 </div>
             </div>
