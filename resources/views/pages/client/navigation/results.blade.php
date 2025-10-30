@@ -68,6 +68,17 @@
                                         class="photo-layer active" alt="Path Image" loading="lazy">
                                     <img src="" class="photo-layer" alt="Next Image" loading="lazy">
 
+                                    <!-- Fullscreen button -->
+                                    <button
+                                        class="fullscreen-btn bg-black/75 text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 border-white/20 hover:bg-black/90 hover:scale-110 transition-all duration-200 absolute top-2 sm:top-4 left-2 sm:left-4 z-10"
+                                        title="Enter Fullscreen">
+                                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                        </svg>
+                                    </button>
+
                                     <!-- Navigation buttons (centered at bottom) -->
                                     <div
                                         class="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-2 sm:gap-4 z-10">
@@ -90,7 +101,6 @@
                                 </div>
                             @else
                                 <div class="text-center py-6 sm:py-10 lg:py-12 text-gray-400">
-                                    <i class="fas fa-image text-2xl sm:text-3xl lg:text-4xl mb-2 sm:mb-4"></i>
                                     <h4 class="text-base sm:text-lg lg:text-xl">No Images Found</h4>
                                     <p class="text-xs sm:text-sm lg:text-base">This path doesn't have any images yet.</p>
                                 </div>
@@ -162,13 +172,159 @@
                 const [imgA, imgB] = viewer.querySelectorAll('.photo-layer');
                 const prevBtn = viewer.querySelector('.prev-btn');
                 const nextBtn = viewer.querySelector('.next-btn');
+                const fullscreenBtn = viewer.querySelector('.fullscreen-btn');
+                const imageCounter = viewer.querySelector('.image-counter');
                 let showingA = true;
+                let isFullscreen = false;
 
                 // Check if we have a saved state for this specific path
                 if (savedState && savedState.pathIndex === pathIndex) {
                     currentIndex = Math.min(savedState.imageIndex, imageSet.length - 1);
                     hasRestoredState = true;
                 }
+
+                const enterFullscreen = () => {
+                    viewer.classList.add('fullscreen');
+                    document.body.classList.add('viewer-fullscreen-active');
+                    document.body.style.overflow = 'hidden';
+                    isFullscreen = true;
+
+                    // Update fullscreen button icon
+                    fullscreenBtn.innerHTML = `
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    `;
+                    fullscreenBtn.title = 'Exit Fullscreen';
+
+                    // Position all controls for fullscreen
+                    positionControlsForFullscreen();
+
+                    // Ensure images fill the screen
+                    updateImageDisplayForFullscreen();
+                };
+
+                const exitFullscreen = () => {
+                    viewer.classList.remove('fullscreen');
+                    document.body.classList.remove('viewer-fullscreen-active');
+                    document.body.style.overflow = '';
+                    isFullscreen = false;
+
+                    // Update fullscreen button icon
+                    fullscreenBtn.innerHTML = `
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+                        </svg>
+                    `;
+                    fullscreenBtn.title = 'Enter Fullscreen';
+
+                    // Reset control positions
+                    resetControlPositions();
+
+                    // Reset image display
+                    resetImageDisplay();
+                };
+
+                const positionControlsForFullscreen = () => {
+                    // Position all controls with fixed positioning
+                    [fullscreenBtn, prevBtn, nextBtn, imageCounter].forEach(control => {
+                        if (control) {
+                            control.style.position = 'fixed';
+                            control.style.zIndex = '10000';
+                        }
+                    });
+
+                    fullscreenBtn.style.top = '1.5rem';
+                    fullscreenBtn.style.left = '1.5rem';
+
+                    prevBtn.style.bottom = '2rem';
+                    prevBtn.style.left = '2rem';
+
+                    nextBtn.style.bottom = '2rem';
+                    nextBtn.style.right = '2rem';
+
+                    imageCounter.style.top = '1.5rem';
+                    imageCounter.style.right = '1.5rem';
+                };
+
+                const resetControlPositions = () => {
+                    // Reset all control positions
+                    [fullscreenBtn, prevBtn, nextBtn, imageCounter].forEach(control => {
+                        if (control) {
+                            control.style.position = '';
+                            control.style.top = '';
+                            control.style.bottom = '';
+                            control.style.left = '';
+                            control.style.right = '';
+                            control.style.zIndex = '';
+                        }
+                    });
+                };
+
+                const updateImageDisplayForFullscreen = () => {
+                    // Make images fill the entire screen
+                    [imgA, imgB].forEach(img => {
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+                        img.style.maxWidth = '100vw';
+                        img.style.maxHeight = '100vh';
+                        img.style.objectFit = 'contain';
+                        img.style.position = 'fixed';
+                        img.style.top = '0';
+                        img.style.left = '0';
+                        img.style.right = '0';
+                        img.style.bottom = '0';
+                        img.style.margin = 'auto';
+                    });
+                };
+
+                const resetImageDisplay = () => {
+                    // Reset image display to normal
+                    [imgA, imgB].forEach(img => {
+                        img.style.width = '';
+                        img.style.height = '';
+                        img.style.maxWidth = '';
+                        img.style.maxHeight = '';
+                        img.style.objectFit = '';
+                        img.style.position = '';
+                        img.style.top = '';
+                        img.style.left = '';
+                        img.style.right = '';
+                        img.style.bottom = '';
+                        img.style.margin = '';
+                    });
+                };
+
+                const toggleFullscreen = () => {
+                    if (isFullscreen) {
+                        exitFullscreen();
+                    } else {
+                        enterFullscreen();
+                    }
+                };
+
+                // Fullscreen button event
+                fullscreenBtn?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleFullscreen();
+                });
+
+                // Exit fullscreen on Escape key
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && isFullscreen) {
+                        exitFullscreen();
+                    }
+
+                    // Keyboard navigation in fullscreen
+                    if (isFullscreen) {
+                        if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                            showImage(currentIndex - 1, 'forward');
+                        } else if (e.key === 'ArrowRight' && currentIndex < imageSet.length - 1) {
+                            showImage(currentIndex + 1, 'backward');
+                        }
+                    }
+                });
 
                 const initializeViewer = () => {
                     // Clear both images first
@@ -217,9 +373,8 @@
                 };
 
                 const updateImageCounter = () => {
-                    const counter = viewer.querySelector('.image-counter');
-                    if (counter) {
-                        counter.textContent = `${currentIndex + 1} / ${imageSet.length}`;
+                    if (imageCounter) {
+                        imageCounter.textContent = `${currentIndex + 1} / ${imageSet.length}`;
                     }
                 };
 
