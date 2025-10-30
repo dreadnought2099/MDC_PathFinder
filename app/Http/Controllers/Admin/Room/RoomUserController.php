@@ -145,7 +145,7 @@ class RoomUserController extends Controller
 
         // Filter out already assigned rooms 
         // uses a collection filter instead of reject() for readability:
-        $rooms = $allRooms->filter(fn($room) => !in_array($room->id, $assignedRoomIds));
+        $rooms = $allRooms->filter(fn($room) => !in_array($room->id, $assignedRoomIds))->values();
 
         // Authorization (optional, if using policies)
         $this->authorize('update', $user);
