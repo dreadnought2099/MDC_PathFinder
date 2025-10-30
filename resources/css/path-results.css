@@ -17,13 +17,9 @@
     z-index: 2;
 }
 
-/* Balanced container - not too big, not too small */
 .viewer {
-    /* Balanced: min(240px), preferred(30% of viewport width), max(400px) */
     height: clamp(240px, 30vw, 400px);
     max-height: 50vh;
-    /* Never exceed 50% of screen height */
-    transition: all 0.3s ease;
 }
 
 /* Reasonable mobile sizing */
