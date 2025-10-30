@@ -17,7 +17,7 @@ class RoomUserController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth', 'role:Admin'])->only([
+        $this->middleware('auth')->only([
             'create',
             'store',
             'edit',
@@ -230,6 +230,8 @@ class RoomUserController extends Controller
      */
     public function destroy(User $user)
     {
+        $this->authorize('delete', $user);
+
         // Prevent admin from deleting their own account
         if (Auth::id() === $user->id) {
             return back()->with('error', 'You cannot delete your own account.');
@@ -285,6 +287,7 @@ class RoomUserController extends Controller
     public function forceDelete($id)
     {
         $user = User::onlyTrashed()->find($id);
+        $this->authorize('delete', $user);
 
         if (!$user) {
             return redirect()->route('recycle-bin')
