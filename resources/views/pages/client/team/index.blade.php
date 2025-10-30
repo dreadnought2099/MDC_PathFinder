@@ -52,7 +52,7 @@
                     <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/profile.jpeg" alt="Profile"
                         class="w-36 h-36 group  rounded-full object-cover border border-primary group-hover:scale-110 transition-transform duration-300 ease-in-out">
 
-                    <h2 class="mt-6 text-lg font-semibold text-gray-600 dark:text-gray-300">
+                    <h2 class="mt-6 text-lg font-semibold text-gray-800 dark:text-gray-300">
                         Joshua A. Salabe
                     </h2>
 
@@ -77,7 +77,7 @@
                     <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/profile.jpeg" alt="Profile"
                         class="w-36 h-36 group  rounded-full object-cover border border-primary group-hover:scale-110 transition-transform duration-300 ease-in-out">
 
-                    <h2 class="mt-6 text-lg font-semibold text-gray-600 dark:text-gray-300">
+                    <h2 class="mt-6 text-lg font-semibold text-gray-800 dark:text-gray-300">
                         Chris Marie Calesa
                     </h2>
 
@@ -102,7 +102,7 @@
                     <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/profile.jpeg" alt="Profile"
                         class="w-36 h-36 group  rounded-full object-cover border border-primary group-hover:scale-110 transition-transform duration-300 ease-in-out">
 
-                    <h2 class="mt-6 text-lg font-semibold text-gray-600 dark:text-gray-300">
+                    <h2 class="mt-6 text-lg font-semibold text-gray-800 dark:text-gray-300">
                         Joana Jean Astacaan
                     </h2>
 
@@ -127,7 +127,7 @@
                     <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/profile.jpeg" alt="Profile"
                         class="w-36 h-36 group  rounded-full object-cover border border-primary group-hover:scale-110 transition-transform duration-300 ease-in-out">
 
-                    <h2 class="mt-6 text-lg font-semibold text-gray-600 dark:text-gray-300">
+                    <h2 class="mt-6 text-lg font-semibold text-gray-800 dark:text-gray-300">
                         Raymart E. Magallanes
                     </h2>
 
