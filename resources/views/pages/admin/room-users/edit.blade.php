@@ -21,10 +21,92 @@
         @endphp
 
         <!-- Edit User Form -->
-        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 border-2 border-primary">
+        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 border-2 border-primary">
             <form action="{{ route('room-user.update', $user->id) }}" method="POST" class="space-y-6">
                 @csrf
                 @method('PUT')
+
+                <!-- Office Selection -->
+                @if ($user->hasRole('Office Manager'))
+                    <div x-data="officeDropdown({{ $rooms->toJson() }}, {{ $selectedRoom->id ?? 'null' }})" x-init="init()" class="relative mb-6 w-full"
+                        @click.away="closeDropdown()">
+                        <label class="block font-sofia text-gray-500 dark:text-gray-300 mb-2">Assign Office</label>
+
+                        <!-- Dropdown Button -->
+                        <button type="button" @click="toggleDropdown()" @keydown.arrow-down.prevent="focusNext()"
+                            @keydown.arrow-up.prevent="focusPrev()" @keydown.enter.prevent="selectFocused()"
+                            class="w-full font-sofia border border-primary rounded-lg px-4 py-3 
+                                    focus:outline-none focus:ring-2 focus:ring-primary 
+                                    dark:text-gray-200 bg-white dark:bg-gray-800 shadow-md 
+                                    flex items-center justify-between text-left transition-all duration-200"
+                            :aria-expanded="isOpen" aria-haspopup="listbox">
+                            <span x-text="selectedName || 'Select an office'"
+                                :class="!selectedName ? 'text-gray-400' : 'text-gray-700 dark:text-gray-200'"></span>
+                            <svg class="w-5 h-5 text-gray-400 transition-transform duration-200"
+                                :class="{ 'rotate-180': isOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+
+                        <!-- Dropdown Panel -->
+                        <div x-show="isOpen" x-transition
+                            class="absolute z-50 w-full mt-2 bg-white text-gray-800 dark:bg-gray-800 
+                                            border border-primary rounded-lg shadow-lg overflow-auto max-h-60"
+                            style="display: none;" role="listbox">
+                            <!-- Search input -->
+                            <div class="p-2 border-b border-gray-200 dark:border-gray-700">
+                                <input x-ref="searchInput" type="text" x-model="search" @input="filterOffices()"
+                                    placeholder="Search offices..."
+                                    class="w-full font-sofia px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                    focus:outline-none focus:ring-2 focus:ring-primary 
+                                    dark:bg-gray-700 dark:text-gray-300 text-sm">
+                            </div>
+
+                            <!-- "No Office Assigned" Option -->
+                            <button type="button" @click="selectOffice(null)"
+                                :class="{ 'bg-gray-100 dark:bg-gray-700': focusedIndex === -1 && !selectedId }"
+                                @mouseenter="focusedIndex = -1"
+                                class="w-full text-left px-4 py-3 hover:bg-primary hover:text-white hover:bg-opacity-10 dark:text-gray-300
+                                dark:hover:bg-gray-700 hover:pl-6 hover:border-l-4 hover:border-primary transition-all duration-200 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
+                                role="option" :aria-selected="selectedId === null">
+                                No Office Assigned
+                            </button>
+
+                            <!-- Office Options -->
+                            <template x-if="filteredOffices.length === 0">
+                                <div class="px-4 py-3 text-gray-500 dark:text-gray-400 text-center text-sm font-sofia">
+                                    No offices found
+                                </div>
+                            </template>
+
+                            <template x-for="(office, index) in filteredOffices" :key="office.id">
+                                <button type="button" @click="selectOffice(office)" @mouseenter="focusedIndex = index"
+                                    :class="{
+                                        'bg-primary bg-opacity-5 font-medium text-white': selectedId == office.id,
+                                        'bg-gray-100 dark:bg-gray-700': focusedIndex === index && selectedId != office
+                                            .id,
+                                        'text-gray-700 dark:text-gray-300': selectedId != office.id
+                                    }"
+                                    class="w-full text-left px-4 py-3 hover:bg-primary hover:text-white hover:bg-opacity-10 
+                                            dark:hover:bg-gray-700 hover:pl-6 hover:border-l-4 hover:border-primary transition-all duration-200 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
+                                    role="option" :aria-selected="selectedId === office.id">
+                                    <span x-text="office.name"></span>
+                                    <span x-show="selectedId == office.id" class="float-right text-primary">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                            fill="currentColor">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586
+                                                6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
+                                                0 001.414 0l7-7a1 1 0 000-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                    </span>
+                                </button>
+                            </template>
+                        </div>
+
+                        <!-- Hidden input -->
+                        <input type="hidden" name="room_id" x-model="selectedId">
+                    </div>
+                @endif
 
                 <!-- Name -->
                 <div class="relative mt-4">
@@ -59,7 +141,8 @@
 
                     <button type="button" onclick="togglePassword('password')"
                         class="absolute right-3 top-3 text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-gray-200">
-                        <svg id="password-eye" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg id="password-eye" class="w-5 h-5" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -103,30 +186,6 @@
                     <p id="confirmFeedback" class="text-sm mt-1"></p>
                 </div>
 
-                <!-- Office Selection -->
-                @if (!$user->hasRole('Admin'))
-                    <div>
-                        <label for="room_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Assign Office
-                        </label>
-                        <select name="room_id" id="room_id"
-                            class="font-sofia mt-1 px-4 py-2 block w-full rounded-md border border-gray-400 dark:border-gray-600 shadow-sm 
-                                    focus:ring-2 focus:ring-primary focus:border-primary outline-none
-                                    dark:bg-gray-700 dark:text-gray-200">
-                            <option value="" {{ $user->room_id === null ? 'selected' : '' }}>No Office Assigned
-                            </option>
-                            @foreach ($rooms as $room)
-                                <option value="{{ $room->id }}" {{ $user->room_id == $room->id ? 'selected' : '' }}>
-                                    {{ $room->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                            Only available offices are shown. Assigned offices are hidden.
-                        </p>
-                    </div>
-                @endif
-
                 <!-- Action Buttons -->
                 <div>
                     <button type="submit"
@@ -142,6 +201,92 @@
 
 @push('scripts')
     <script>
+        function officeDropdown(offices, defaultOfficeId) {
+            return {
+                isOpen: false,
+                search: '',
+                selectedId: defaultOfficeId,
+                selectedName: '',
+                allOffices: typeof offices === 'string' ? JSON.parse(offices) : offices,
+                filteredOffices: [],
+                focusedIndex: -1, // -1 will represent "No Office Assigned"
+
+                init() {
+                    this.filteredOffices = this.allOffices;
+
+                    // Set initial selected name
+                    if (this.selectedId) {
+                        const selected = this.allOffices.find(o => o.id == this.selectedId);
+                        if (selected) this.selectedName = selected.name;
+                    } else {
+                        this.selectedName = '';
+                    }
+                },
+
+                toggleDropdown() {
+                    this.isOpen = !this.isOpen;
+                    if (this.isOpen) this.$nextTick(() => this.$refs.searchInput?.focus());
+                    else this.closeDropdown();
+                },
+
+                closeDropdown() {
+                    this.isOpen = false;
+                    this.search = '';
+                    this.filteredOffices = this.allOffices;
+                    this.focusedIndex = -1;
+                },
+
+                filterOffices() {
+                    const term = this.search.toLowerCase().trim();
+                    this.filteredOffices = this.allOffices.filter(o => o.name.toLowerCase().includes(term));
+                    this.focusedIndex = -1;
+                },
+
+                selectOffice(office) {
+                    if (office === null) {
+                        this.selectedId = null;
+                        this.selectedName = '';
+                    } else {
+                        this.selectedId = office.id;
+                        this.selectedName = office.name;
+                    }
+                    this.closeDropdown();
+                },
+
+                // Keyboard navigation
+                focusNext() {
+                    if (!this.isOpen) return this.toggleDropdown();
+                    if (this.focusedIndex < this.filteredOffices.length - 1) this.focusedIndex++;
+                    else this.focusedIndex = -1; // loop to "No Office Assigned"
+                    this.scrollToFocused();
+                },
+
+                focusPrev() {
+                    if (!this.isOpen) return this.toggleDropdown();
+                    if (this.focusedIndex > -1) this.focusedIndex--;
+                    else this.focusedIndex = this.filteredOffices.length - 1;
+                    this.scrollToFocused();
+                },
+
+                selectFocused() {
+                    if (this.focusedIndex === -1) this.selectOffice(null);
+                    else this.selectOffice(this.filteredOffices[this.focusedIndex]);
+                },
+
+                scrollToFocused() {
+                    this.$nextTick(() => {
+                        const buttons = this.$el.querySelectorAll('button');
+                        if (this.focusedIndex >= 0) buttons[this.focusedIndex + 1]?.scrollIntoView({
+                            block: 'nearest'
+                        }); // +1 to skip "No Office Assigned"
+                        else buttons[0]?.scrollIntoView({
+                            block: 'nearest'
+                        }); // "No Office Assigned"
+                    });
+                }
+            }
+        }
+
         function togglePassword(fieldId) {
             const input = document.getElementById(fieldId);
             const eyeIcon = document.getElementById(`${fieldId}-eye`);
