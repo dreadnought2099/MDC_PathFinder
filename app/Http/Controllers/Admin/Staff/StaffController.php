@@ -149,6 +149,8 @@ class StaffController extends Controller
 
     public function show(Staff $staff)
     {
+        $this->authorize('view', $staff);
+        
         return view('pages.admin.staffs.show', compact('staff'));
     }
 

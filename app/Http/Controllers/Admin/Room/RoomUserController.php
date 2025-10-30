@@ -155,12 +155,8 @@ class RoomUserController extends Controller
 
     public function show(User $user)
     {
-        $authUser = Auth::user();
+        $this->authorize('view', $user);
 
-        // Office Managers can only view users from their own room
-        if ($authUser->hasRole('Office Manager') && $user->room_id !== $authUser->room_id) {
-            abort(403, 'You can only view users from your assigned office.');
-        }
         return view('pages.admin.room-users.show', compact('user'));
     }
 

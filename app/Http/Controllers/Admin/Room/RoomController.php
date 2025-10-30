@@ -40,7 +40,6 @@ class RoomController extends Controller
             'destroy',
             'restore',
             'forceDelete',
-            'recycleBin'
         ]);
 
         // Use Imagick if available, fallback to GD
@@ -258,6 +257,9 @@ class RoomController extends Controller
 
     public function show(Room $room)
     {
+        // Authorization check (important!)
+        $this->authorize('view', $room);
+
         $room->load([
             'images' => function ($query) {
                 $query->withTrashed();
