@@ -20,7 +20,7 @@
                     'absolute cursor-text left-0 -top-3 text-sm font-sofia text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 mx-1 px-1 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3 peer-focus:text-primary peer-focus:text-sm peer-focus:bg-white dark:peer-focus:bg-gray-800 peer-focus:px-2 peer-focus:rounded-md';
             @endphp
 
-            <!-- Room Selection -->
+            <!-- Office Selection -->
             <div x-data="officeDropdown({{ $rooms->toJson() }}, {{ $selectedRoom->id ?? 'null' }})" class="relative mb-6 w-full" @click.away="closeDropdown()">
 
                 <label class="block font-sofia text-gray-500 dark:text-gray-300 mb-2">Assign Office</label>

@@ -83,7 +83,11 @@ class RoomUserController extends Controller
     // Show form
     public function create(Request $request)
     {
-        $rooms = Room::all();
+        // Get IDs of already assigned rooms
+        $assignedRoomIds = User::whereNotNull('room_id')->pluck('room_id')->toArray();
+
+        // Show only unassigned rooms
+        $rooms = Room::whereNotIn('id', $assignedRoomIds)->get();
 
         // Determine selected room: query parameter first, fallback to first room
         $roomId = $request->query('roomId') ?? ($rooms->first()->id ?? null);
@@ -97,7 +101,6 @@ class RoomUserController extends Controller
 
         return view('pages.admin.room-users.create', compact('rooms', 'staff', 'selectedRoom'));
     }
-
 
     // Store new room user
     public function store(Request $request)
