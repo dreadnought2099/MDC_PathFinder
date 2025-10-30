@@ -48,7 +48,7 @@
                     <!-- Dropdown Panel -->
                     <div x-show="isOpen" x-transition
                         class="absolute z-50 w-full mt-2 bg-white text-gray-800 dark:bg-gray-800 
-               border border-primary rounded-lg shadow-lg overflow-hidden"
+                                border border-primary rounded-lg shadow-lg overflow-hidden"
                         style="display: none;">
 
                         <!-- Search input -->
@@ -56,8 +56,8 @@
                             <input x-ref="searchInput" type="text" x-model="search" @input="filterOffices()"
                                 placeholder="Search offices..."
                                 class="w-full font-sofia px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
-                       focus:outline-none focus:ring-2 focus:ring-primary 
-                       dark:bg-gray-700 dark:text-gray-300 text-sm">
+                                    focus:outline-none focus:ring-2 focus:ring-primary 
+                                    dark:bg-gray-700 dark:text-gray-300 text-sm">
                         </div>
 
                         <!-- Office Options -->
