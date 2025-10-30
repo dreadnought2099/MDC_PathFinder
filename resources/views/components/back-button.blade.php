@@ -26,7 +26,7 @@
         } elseif ($currentRouteName === 'path-image.create') {
             $backUrl = route('path.index');
         } elseif ($currentRouteName === 'room-user.create') {
-            $backUrl = route('room.index');
+            $backUrl = route('room-user.index');
         }
     }
 
