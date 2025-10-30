@@ -70,8 +70,8 @@
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                                     fill="currentColor">
                                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586
-                                                                        6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
-                                                                        0 001.414 0l7-7a1 1 0 000-1.414z"
+                                                                                6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
+                                                                                0 001.414 0l7-7a1 1 0 000-1.414z"
                                                         clip-rule="evenodd" />
                                                 </svg>
                                             </span>
@@ -461,7 +461,7 @@
                     if (typeof savePathSelection === 'function') {
                         savePathSelection(path.id);
                     } else {
-                        // Fallback if module isn’t loaded
+                        // Fallback if module isn't loaded
                         sessionStorage.setItem('selectedPathId', path.id);
                         window.dispatchEvent(
                             new CustomEvent('path-changed', {
@@ -875,19 +875,34 @@
             }
 
             function removeFile(index) {
+                // Store current scroll position BEFORE any DOM changes
+                const scrollPosition = window.scrollY;
+
+                // 1. Remove file from array FIRST
                 window.files.splice(index, 1);
+
+                // 2. THEN render previews with updated files array
                 renderPreviews();
                 updateSubmitButton();
+
+                // 3. Restore scroll position immediately
+                window.scrollTo(0, scrollPosition);
             }
 
             function renderPreviews() {
+                const selectedFilesContainer = document.getElementById('selectedFiles');
+                if (!selectedFilesContainer) return;
+
+                // Clear container
                 selectedFilesContainer.innerHTML = '';
+
                 if (!window.files.length) return;
 
                 const totalSize = getTotalSize();
                 const afterUploadTotal = currentPathImageCount + window.files.length;
                 const limitColor = afterUploadTotal > MAX_IMAGES_PER_PATH * 0.9 ? 'text-red-600' : 'text-blue-800';
 
+                // Create info banner
                 const infoBanner = document.createElement('div');
                 infoBanner.className =
                     'col-span-full bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded p-3 text-sm';
@@ -902,38 +917,50 @@
             `;
                 selectedFilesContainer.appendChild(infoBanner);
 
+                // Create file previews with instant object URLs
                 window.files.forEach((file, index) => {
-                    const reader = new FileReader();
                     const div = document.createElement('div');
                     div.className = 'relative rounded overflow-hidden border shadow-sm group';
 
-                    reader.onload = e => {
-                        div.innerHTML = `
-                        <img src="${e.target.result}" class="w-full h-24 object-cover">
-                        <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-1 truncate">
-                            ${file.name}
-                        </div>
-                        <div class="absolute top-1 left-1 bg-black/60 text-white text-xs px-1 rounded">
-                            ${formatFileSize(file.size)}
-                        </div>
-                        <button type="button" 
-                            class="absolute top-1 right-1 bg-red-500 text-white w-6 h-6 rounded-full
-                            flex items-center justify-center text-sm hover:bg-red-600 transition-colors
-                            opacity-0 group-hover:opacity-100"
-                            data-index="${index}" 
-                            title="Remove">×</button>
-                    `;
+                    // Use object URL for instant rendering
+                    const objectUrl = URL.createObjectURL(file);
 
-                        const removeBtn = div.querySelector('button');
-                        removeBtn.addEventListener('click', function() {
-                            removeFile(parseInt(this.dataset.index));
-                        });
+                    div.innerHTML = `
+                    <img src="${objectUrl}" class="w-full h-24 object-cover">
+                    <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-1 truncate">
+                        ${file.name}
+                    </div>
+                    <div class="absolute top-1 left-1 bg-black/60 text-white text-xs px-1 rounded">
+                        ${formatFileSize(file.size)}
+                    </div>
+                    <button type="button" 
+                        class="absolute top-1 right-1 bg-red-500 text-white w-6 h-6 rounded-full
+                        flex items-center justify-center text-sm hover:bg-red-600 transition-colors
+                        opacity-0 group-hover:opacity-100"
+                        data-index="${index}" 
+                        title="Remove">×</button>
+                `;
+
+                    // Clean up object URL when image loads or container is removed
+                    const img = div.querySelector('img');
+                    img.onload = () => {
+                        // Small delay to ensure image is rendered before cleanup
+                        setTimeout(() => URL.revokeObjectURL(objectUrl), 100);
                     };
 
-                    reader.readAsDataURL(file);
                     selectedFilesContainer.appendChild(div);
                 });
             }
+
+            // Event delegation for remove buttons
+            document.addEventListener('click', function(e) {
+                if (e.target.matches('#selectedFiles button[data-index]')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const index = parseInt(e.target.getAttribute('data-index'));
+                    removeFile(index);
+                }
+            });
 
             // ====================================================================
             // FORM SUBMIT HANDLER
