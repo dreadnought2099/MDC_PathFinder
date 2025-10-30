@@ -132,7 +132,17 @@ class RoomUserController extends Controller
     public function edit(User $user)
     {
         // Load rooms for dropdown selection
-        $rooms = Room::all();
+        $allRooms = Room::all();
+
+        // Get IDs of rooms that already have an office manager (excluding current user's room)
+        $assignedRoomIds = User::whereNotNull('room_id')
+            ->where('id', '!=', $user->id)
+            ->pluck('room_id')
+            ->toArray();
+
+        // Filter out already assigned rooms 
+        // uses a collection filter instead of reject() for readability:
+        $rooms = $allRooms->filter(fn($room) => !in_array($room->id, $assignedRoomIds));
 
         // Authorization (optional, if using policies)
         $this->authorize('update', $user);
@@ -174,6 +184,18 @@ class RoomUserController extends Controller
                 return back()->with('error', 'Admins cannot be assigned to any office.');
             }
         } else {
+            // Check if room_id is being changed
+            if ($request->filled('room_id') && $request->room_id != $user->room_id) {
+                // Check if another user is already assigned to this room
+                $existingUser = User::where('room_id', $request->room_id)
+                    ->where('id', '!=', $user->id)
+                    ->first();
+
+                if ($existingUser) {
+                    return back()->withInput()->with('error', 'This office already has an assigned Office Manager.');
+                }
+            }
+
             $data['room_id'] = $request->room_id ?: null;
         }
 

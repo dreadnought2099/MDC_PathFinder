@@ -53,8 +53,8 @@
                 </div>
 
                 <div class="relative mb-4">
-                    <input type="password" name="password" id="password" class="{{ $inputClasses }}" placeholder="Password"
-                        required>
+                    <input type="password" name="password" id="password" class="{{ $inputClasses }}"
+                        placeholder="Password">
                     <label for="password" class="{{ $labelClasses }}">Password</label>
 
                     <button type="button" onclick="togglePassword('password')"
@@ -81,7 +81,7 @@
                 <!-- Confirm Password -->
                 <div class="relative mb-4">
                     <input type="password" name="password_confirmation" id="password_confirmation"
-                        placeholder="Confirm Password" class="{{ $inputClasses }}" required>
+                        placeholder="Confirm Password" class="{{ $inputClasses }}">
                     <label for="password_confirmation" class="{{ $labelClasses }}">Confirm Password</label>
 
                     <button type="button" onclick="togglePassword('password_confirmation')"
@@ -102,18 +102,18 @@
 
                     <p id="confirmFeedback" class="text-sm mt-1"></p>
                 </div>
-                
-                <!-- Room Selection -->
+
+                <!-- Office Selection -->
                 @if (!$user->hasRole('Admin'))
                     <div>
                         <label for="room_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Assign Room
+                            Assign Office
                         </label>
                         <select name="room_id" id="room_id"
                             class="font-sofia mt-1 px-4 py-2 block w-full rounded-md border border-gray-400 dark:border-gray-600 shadow-sm 
                                     focus:ring-2 focus:ring-primary focus:border-primary outline-none
                                     dark:bg-gray-700 dark:text-gray-200">
-                            <option value="" {{ $user->room_id === null ? 'selected' : '' }}>No Room Assigned
+                            <option value="" {{ $user->room_id === null ? 'selected' : '' }}>No Office Assigned
                             </option>
                             @foreach ($rooms as $room)
                                 <option value="{{ $room->id }}" {{ $user->room_id == $room->id ? 'selected' : '' }}>
@@ -121,6 +121,9 @@
                                 </option>
                             @endforeach
                         </select>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            Only available offices are shown. Assigned offices are hidden.
+                        </p>
                     </div>
                 @endif
 
