@@ -70,8 +70,8 @@
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
                                                     fill="currentColor">
                                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586
-                                                                                6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
-                                                                                0 001.414 0l7-7a1 1 0 000-1.414z"
+                                                                        6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1
+                                                                        0 001.414 0l7-7a1 1 0 000-1.414z"
                                                         clip-rule="evenodd" />
                                                 </svg>
                                             </span>
@@ -262,6 +262,7 @@
             if (!limitDisplay) return;
 
             const percentage = (currentPathImageCount / MAX_IMAGES_PER_PATH) * 100;
+
             let colorClass = 'text-green-600 dark:text-green-400';
             let bgClass = 'bg-tertiary';
 
@@ -274,25 +275,43 @@
             }
 
             limitDisplay.innerHTML = `
-            <div class="flex items-center justify-between">
-                <div>
-                    <span class="text-sm text-gray-600 dark:text-gray-400">Path Images:</span>
-                    <span class="${colorClass} text-lg font-bold ml-2">
-                        ${currentPathImageCount} / ${MAX_IMAGES_PER_PATH}
-                    </span>
-                </div>
-                ${remainingSlots > 0 
-                    ? `<span class="text-sm ${colorClass} font-medium">${remainingSlots} slot${remainingSlots !== 1 ? 's' : ''} remaining</span>`
-                    : `<span class="text-sm text-red-600 dark:text-red-400 font-bold">⚠️ PATH FULL</span>`
-                }
+                <div class="space-y-2 sm:space-y-3">
+                    <!-- Header Section -->
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <!-- Counter -->
+                        <div class="flex items-center flex-wrap gap-1 sm:gap-2">
+                            <span class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Path Images:</span>
+                            <span class="${colorClass} text-base sm:text-lg font-bold">
+                                ${currentPathImageCount} / ${MAX_IMAGES_PER_PATH}
+                            </span>
+                        </div>
+                        
+                        <!-- Remaining Slots -->
+                        ${remainingSlots > 0 
+                            ? `<span class="text-xs sm:text-sm ${colorClass} font-medium">
+                                    ${remainingSlots} slot${remainingSlots !== 1 ? 's' : ''} remaining
+                                </span>`
+                            : `<span class="text-xs sm:text-sm text-red-600 dark:text-red-400 font-bold">
+                                    ⚠️ PATH FULL
+                                </span>`
+                        }
                     </div>
-                    <div class="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
-                        <div class="h-full rounded-full transition-all duration-300 ${bgClass}" style="width: ${Math.min(percentage, 100)}%"></div>
+                    
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 sm:h-2 overflow-hidden">
+                        <div class="h-full rounded-full transition-all duration-300 ${bgClass}" 
+                            style="width: ${Math.min(percentage, 100)}%">
+                        </div>
                     </div>
+                    
+                    <!-- Warning Message -->
                     ${remainingSlots === 0 
-                        ? `<p class="text-xs text-red-600 dark:text-red-400 mt-2">This path has reached the maximum limit. Please delete some images or select a different path.</p>`
+                        ? `<p class="text-xs sm:text-sm text-red-600 dark:text-red-400 leading-relaxed">
+                                This path has reached the maximum limit. Please delete some images or select a different path.
+                            </p>`
                         : ''
-                }
+                    }
+                </div>
             `;
         }
 
@@ -431,7 +450,7 @@
 
                 selectPath(path) {
 
-                    // 1️⃣ Update local state
+                    //  Update local state
                     this.selectedId = path.id;
                     this.selectedName = path.display_name;
                     this.isOpen = false;
@@ -600,20 +619,20 @@
                 if (e.detail && e.detail.pathId) {
                     const newPathId = e.detail.pathId;
 
-                    // 1️⃣ Reset global tracking variables
+                    //  Reset global tracking variables
                     currentPathImageCount = 0;
                     remainingSlots = MAX_IMAGES_PER_PATH;
 
-                    // 2️⃣ Clear files and UI immediately
+                    //  Clear files and UI immediately
                     window.files = [];
                     if (typeof renderPreviews === 'function') renderPreviews();
                     if (typeof updateSubmitButton === 'function') updateSubmitButton();
 
-                    // 3️⃣ Update limit display to show reset state
+                    //  Update limit display to show reset state
                     updatePathLimitDisplay();
                     updateDropzoneState();
 
-                    // 4️⃣ Fetch new path data cleanly
+                    // Fetch new path data cleanly
                     await fetchPathImageCount(newPathId);
                 }
             });
