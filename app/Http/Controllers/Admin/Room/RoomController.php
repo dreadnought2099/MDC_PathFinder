@@ -552,6 +552,8 @@ class RoomController extends Controller
 
     public function destroy(Room $room, EntrancePointService $entrancePointService)
     {
+        $this->authorize('delete', $room);
+
         if ($room->room_type === 'entrance_point') {
             $entrancePointService->removeEntrancePointPaths($room);
         } else {
@@ -605,6 +607,7 @@ class RoomController extends Controller
     public function forceDelete($id)
     {
         $room = Room::onlyTrashed()->findOrFail($id);
+        $this->authorize('delete', $room);
 
         foreach ([$room->image_path, $room->video_path, $room->qr_code_path] as $path) {
             if ($path && Storage::disk('public')->exists($path)) {

@@ -150,7 +150,7 @@ class StaffController extends Controller
     public function show(Staff $staff)
     {
         $this->authorize('view', $staff);
-        
+
         return view('pages.admin.staffs.show', compact('staff'));
     }
 
@@ -246,6 +246,7 @@ class StaffController extends Controller
     public function destroy($id)
     {
         $staff = Staff::findOrFail($id);
+        $this->authorize('delete', $staff);
         $staff->delete();
         return redirect()->route('staff.index')
             ->with('success', "{$staff->full_name} moved to recycle bin");
@@ -262,6 +263,7 @@ class StaffController extends Controller
     public function forceDelete($id)
     {
         $staff = Staff::onlyTrashed()->findOrFail($id);
+        $this->authorize('delete', $staff);
 
         if (Storage::disk('public')->exists('staffs/' . $staff->id)) {
             Storage::disk('public')->deleteDirectory('staffs/' . $staff->id);
