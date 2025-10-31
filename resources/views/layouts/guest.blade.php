@@ -104,7 +104,6 @@
                     'itemListElement' => [
                         ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => url('/')],
                         ['@type' => 'ListItem', 'position' => 2, 'name' => 'About', 'item' => url('/about')],
-                        ['@type' => 'ListItem', 'position' => 3, 'name' => 'Team', 'item' => url('/meet-the-team')],
                     ],
                 ],
                 [

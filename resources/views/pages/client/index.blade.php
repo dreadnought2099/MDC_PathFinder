@@ -21,19 +21,11 @@
             <!-- Center spacer -->
             <div class="flex-1"></div>
 
-            <!-- Right: About + Dark Mode -->
-            <div class="w-48 flex items-center">
-                <!-- Slot 1: About Page -->
-                <div class="flex-1 flex justify-end">
-                    <x-about-page />
-                </div>
-
-                <!-- Slot 2: Dark Mode Toggle -->
-                <div class="flex-1 flex justify-end">
-                    <x-dark-mode-toggle />
-                </div>
+            <div class="w-48 flex items-center gap-2">
+                <x-team-modal />
+                <x-about-page />
+                <x-dark-mode-toggle />
             </div>
-
         </div>
 
         <!-- Main Content -->

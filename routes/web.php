@@ -21,7 +21,6 @@ use Illuminate\Support\Facades\Route;
 // Public pages
 Route::get('/', [HomeController::class, 'index'])->name('index');
 Route::get('/about', fn() => view('pages.client.about.index'))->name('about');
-Route::get('/meet-the-team', fn() => view('pages.client.team.index'))->name('pages.team');
 
 // Scanner & token-based room routes
 Route::get('/scan-marker', [ScannerController::class, 'index'])->name('scan.index');
