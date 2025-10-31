@@ -25,7 +25,7 @@
                 sm:bottom-4 sm:right-4 
                 md:bottom-5 md:right-5 
                 lg:bottom-6 lg:right-6 
-                flex flex-col items-end space-y-2 z-50">
+                flex flex-col items-end space-y-2 z-40">
         <div class="relative inline-block group">
             <a href="{{ $scanUrl }}"
                 class="inline-flex items-center justify-center 
@@ -41,7 +41,8 @@
                       xl:p-4 xl:w-16 xl:h-16">
 
                 <!-- Fixed QR Code Icon with proper aspect ratio -->
-                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/qr-code.png" alt="Scan Office"
+                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/qr-code.png"
+                    alt="Scan Office"
                     class="transition-all duration-300 ease-in-out 
                           group-hover:scale-110 group-hover:brightness-110
                           object-contain object-center
