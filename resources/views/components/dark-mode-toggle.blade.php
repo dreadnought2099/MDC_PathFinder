@@ -31,36 +31,37 @@
         document.addEventListener("DOMContentLoaded", () => {
             const toggle = document.getElementById("darkModeToggle");
             const root = document.documentElement;
+            const themeKey = root.dataset.themeScope || "theme"; // fallback
 
             if (!toggle) return;
 
-            // Function to sync the toggle UI with current dark mode
             function updateToggleState() {
                 toggle.classList.toggle("active", root.classList.contains("dark"));
             }
 
-            // Set initial toggle state
+            // Initialize from localStorage
+            const savedTheme = localStorage.getItem(themeKey);
+            const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+            if (savedTheme === "dark" || (!savedTheme && prefersDark)) {
+                root.classList.add("dark");
+            } else {
+                root.classList.remove("dark");
+            }
+
             updateToggleState();
 
-            // Handle toggle click
+            // Toggle handler
             toggle.addEventListener("click", () => {
                 root.classList.toggle("dark");
                 updateToggleState();
-
-                localStorage.setItem(
-                    "theme",
-                    root.classList.contains("dark") ? "dark" : "light"
-                );
+                localStorage.setItem(themeKey, root.classList.contains("dark") ? "dark" : "light");
             });
 
-            // Listen for system theme changes (when no manual preference is set)
-            window.matchMedia("(prefers-color-scheme: dark)").addEventListener('change', (e) => {
-                if (!localStorage.getItem("theme")) {
-                    if (e.matches) {
-                        root.classList.add("dark");
-                    } else {
-                        root.classList.remove("dark");
-                    }
+            // React to system theme only if user hasn’t set a preference
+            window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", e => {
+                if (!localStorage.getItem(themeKey)) {
+                    root.classList.toggle("dark", e.matches);
                     updateToggleState();
                 }
             });

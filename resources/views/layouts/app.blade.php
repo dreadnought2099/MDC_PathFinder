@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 {{-- Added x-data x-cloak to hide Alpine.js flash/jitter --}}
-<html lang="en" class="bg-white dark:bg-gray-900" x-data x-cloak>
+<html lang="en" class="bg-white dark:bg-gray-900" x-data x-cloak data-theme-scope="app_theme">
 
 <head>
     <meta charset="UTF-8">
@@ -13,7 +13,7 @@
     <!-- Theme script: must run before Tailwind CSS -->
     <script>
         (function() {
-            const theme = localStorage.getItem("theme");
+            const theme = localStorage.getItem("app_theme");
             const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
             if (theme === "dark" || (!theme && prefersDark)) {
                 document.documentElement.classList.add("dark");
