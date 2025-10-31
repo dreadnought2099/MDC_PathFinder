@@ -3,8 +3,7 @@
 @section('content')
     <div class="min-h-screen dark:bg-gray-900 flex flex-col">
         <!-- Top bar -->
-        <div
-            class="w-full flex items-center p-2 sm:p-4 bg-white dark:bg-gray-900 sticky top-0 z-50">
+        <div class="w-full flex items-center p-2 sm:p-4 bg-white dark:bg-gray-900 sticky top-0 z-50">
             <div class="w-full sm:w-48 flex items-center justify-start">
                 <!-- Left: Back button -->
                 <a href="{{ route('index') }}"
@@ -21,13 +20,15 @@
             <div class="flex-1 hidden sm:block"></div>
 
             <!-- Right controls -->
-            <div class="w-full sm:w-48 flex items-center justify-end gap-2">
+            <div class="flex items-center gap-6">
+                <x-team-modal />
                 <x-about-page />
                 <x-dark-mode-toggle />
             </div>
         </div>
 
-        <x-floating-q-r href="{{ route('scan.index') }}" icon="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/qr-code.png" alt="Scan Office"
+        <x-floating-q-r href="{{ route('scan.index') }}"
+            icon="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/qr-code.png" alt="Scan Office"
             title="Scan office to know more" />
 
         <div class="flex justify-center mt-4 sm:mt-8 px-4 sm:px-0 font-sofia">

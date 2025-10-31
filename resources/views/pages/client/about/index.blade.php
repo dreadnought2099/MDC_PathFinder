@@ -17,8 +17,7 @@
     <div class="min-h-screen dark:bg-gray-900 flex flex-col">
 
         <!-- Top Bar -->
-        <div
-            class="w-full flex items-center p-4 bg-white dark:bg-gray-900 sticky top-0 z-50">
+        <div class="w-full flex items-center p-4 bg-white dark:bg-gray-900 sticky top-0 z-50">
 
             <!-- Left: fixed width container for back button -->
             <div class="w-48 flex items-center">
@@ -35,17 +34,10 @@
             <!-- Center spacer -->
             <div class="flex-1"></div>
 
-            <!-- Right: fixed width container for About + Dark Mode -->
-            <div class="w-48 flex items-center">
-                <!-- Slot 1: About Page -->
-                <div class="flex-1 flex justify-end">
-                    <x-about-page />
-                </div>
-
-                <!-- Slot 2: Dark Mode Toggle -->
-                <div class="flex-1 flex justify-end">
-                    <x-dark-mode-toggle />
-                </div>
+            <div class="flex items-center gap-6">
+                <x-team-modal />
+                <x-about-page />
+                <x-dark-mode-toggle />
             </div>
         </div>
 

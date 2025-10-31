@@ -21,7 +21,7 @@
             <!-- Center spacer -->
             <div class="flex-1"></div>
 
-            <div class="w-48 flex items-center gap-2">
+            <div class="flex items-center gap-6">
                 <x-team-modal />
                 <x-about-page />
                 <x-dark-mode-toggle />

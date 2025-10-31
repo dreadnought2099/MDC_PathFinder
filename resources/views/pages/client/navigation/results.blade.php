@@ -20,7 +20,8 @@
             <div class="flex-1 hidden sm:block"></div>
 
             <!-- Right controls -->
-            <div class="w-full sm:w-48 flex items-center justify-end gap-2">
+            <div class="flex items-center gap-6">
+                <x-team-modal />
                 <x-about-page />
                 <x-dark-mode-toggle />
             </div>
