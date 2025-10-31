@@ -3,7 +3,8 @@
 @section('content')
     <div class="min-h-screen dark:bg-gray-900 mb-8">
         <!-- Top navigation bar with back button and dark mode toggle -->
-        <div class="bg-white flex justify-between items-center p-4 mb-2 sticky top-0 z-50
+        <div
+            class="bg-white flex justify-between items-center p-2 sm:p-4 mb-2 sticky top-0 z-50
            dark:bg-gray-900">
 
             <!-- Left: Back button -->
@@ -20,11 +21,13 @@
                     @endphp
 
                     <a href="{{ $backUrl }}"
-                        class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 dark:text-gray-300">
-                        <svg class="h-6 w-6 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 dark:text-gray-300 text-sm sm:text-base">
+                        <svg class="h-4 w-4 sm:h-6 sm:w-6 mr-1" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                         </svg>
-                        <span class="font-medium">{{ $backText }}</span>
+                        <span class="font-medium hidden sm:inline">{{ $backText }}</span>
+                        <span class="font-medium sm:hidden">Back</span>
                     </a>
                 @else
                     @php
@@ -50,11 +53,13 @@
                     @endphp
 
                     <a href="{{ $backUrl }}"
-                        class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 dark:text-gray-300">
-                        <svg class="h-6 w-6 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 dark:text-gray-300 text-sm sm:text-base">
+                        <svg class="h-4 w-4 sm:h-6 sm:w-6 mr-1" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                         </svg>
-                        <span class="font-medium">{{ $backText }}</span>
+                        <span class="font-medium hidden sm:inline">{{ $backText }}</span>
+                        <span class="font-medium sm:hidden">Back</span>
                     </a>
                 @endif
             </div>
@@ -62,7 +67,7 @@
             <!-- Center spacer -->
             <div class="flex-1"></div>
 
-            <div class="flex items-center gap-6">
+            <div class="flex items-center gap-3 sm:gap-6">
                 <x-team-modal />
                 <x-about-page />
                 <x-dark-mode-toggle />

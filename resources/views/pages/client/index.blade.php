@@ -14,7 +14,7 @@
         <div class="w-full flex items-center p-4 bg-white dark:bg-gray-900 sticky top-0 z-50">
 
             <!-- Left: reserved space (same width as back button would occupy) -->
-            <div class="w-48 flex items-center">
+            <div class="w-24 sm:w-48 flex items-center">
                 <!-- No back button on index, but space is reserved for alignment -->
             </div>
 
@@ -27,7 +27,7 @@
                 <x-dark-mode-toggle />
             </div>
         </div>
-
+        
         <!-- Main Content -->
         <div class="flex flex-col flex-grow justify-between items-center px-4 sm:px-6 lg:px-8">
             <!-- Top: Welcome Message -->

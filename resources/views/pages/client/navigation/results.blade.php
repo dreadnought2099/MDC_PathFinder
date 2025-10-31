@@ -4,7 +4,7 @@
     <div class="min-h-screen dark:bg-gray-900 flex flex-col">
         <!-- Top bar -->
         <div class="w-full flex items-center p-2 sm:p-4 bg-white dark:bg-gray-900 sticky top-0 z-50">
-            <div class="w-full sm:w-48 flex items-center justify-start">
+            <div class="w-auto sm:w-48 flex items-center justify-start">
                 <!-- Left: Back button -->
                 <a href="{{ route('paths.select') }}"
                     class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 dark:text-gray-300 text-sm sm:text-base">
@@ -17,10 +17,10 @@
                 </a>
             </div>
 
-            <div class="flex-1 hidden sm:block"></div>
+            <div class="flex-1"></div>
 
             <!-- Right controls -->
-            <div class="flex items-center gap-6">
+            <div class="flex items-center gap-3 sm:gap-6">
                 <x-team-modal />
                 <x-about-page />
                 <x-dark-mode-toggle />

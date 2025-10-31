@@ -3,7 +3,7 @@
 <div x-data="{ open: false }" @keydown.escape.window="open = false" class="relative group">
     <!-- Trigger Button -->
     <button @click="open = true"
-        class="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300" title="Meet the Team">
+        class="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 cursor-pointer">
         <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/team.png" alt="Team Icon"
             class="w-8 h-8 sm:w-10 sm:h-10 hover:scale-110 transition-transform duration-300">
     </button>
