@@ -27,10 +27,6 @@
             </div>
         </div>
 
-        <x-floating-q-r href="{{ route('scan.index') }}"
-            icon="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/qr-code.png" alt="Scan Office"
-            title="Scan office to know more" />
-
         <div class="flex justify-center mt-4 sm:mt-8 px-4 sm:px-0 font-sofia">
             <div x-data="staffSearch()" class="relative w-full max-w-md">
                 <input type="text" x-model="query" @input.debounce.300ms="filterStaff" placeholder="Search staff"

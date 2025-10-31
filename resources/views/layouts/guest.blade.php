@@ -174,6 +174,7 @@
 </head>
 
 {{-- If child page provides "body-class" section, use it; otherwise fallback --}}
+
 <body class="@yield('body-class', 'bg-white dark:bg-gray-900')">
     <div id="success-message-container" class="fixed top-4 right-4 z-[9999] max-w-md">
         @if (session('success') || session('error') || session('info') || session('warning') || $errors->any())
@@ -351,6 +352,10 @@
     <div class="cursor-outline fixed pointer-events-none rounded-full z-[9999]"></div>
 
     <div class="cursor-particles fixed pointer-events-none z-[9998]"></div>
+
+    @unless (request()->routeIs('scan.index'))
+        <x-floating-qr />
+    @endunless
 </body>
 
 </html>

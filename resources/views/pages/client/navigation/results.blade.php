@@ -27,10 +27,6 @@
             </div>
         </div>
 
-        <!-- Floating QR -->
-        <x-floating-q-r href="{{ route('scan.index') }}" icon="{{ asset('icons/qr-code.png') }}" alt="Scan Office"
-            title="Scan office to know more" />
-
         <!-- Main content -->
         <div class="flex-grow flex items-center justify-center px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
             <div

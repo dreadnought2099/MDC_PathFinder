@@ -41,10 +41,6 @@
                 </h1>
             </div>
 
-            <!-- Floating QR Code -->
-            <x-floating-q-r href="{{ route('scan.index') }}" icon="{{ asset('icons/qr-code.png') }}" alt="Scan Office"
-                title="Scan office to know more" />
-
             <!-- Bottom: Navigation Button -->
             <div class="flex justify-center mb-12 sm:mb-16 lg:mb-20">
                 <div class="relative inline-block group">
