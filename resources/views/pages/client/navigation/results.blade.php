@@ -235,9 +235,6 @@
                             align-items: center !important;
                         `;
                     }
-
-                    // Ensure images fill the screen
-                    updateImageDisplayForFullscreen();
                 };
 
                 const exitFullscreen = () => {
@@ -264,43 +261,6 @@
                         // Clear inline styles
                         navContainer.style.cssText = '';
                     }
-
-                    // Reset image display
-                    resetImageDisplay();
-                };
-
-                const updateImageDisplayForFullscreen = () => {
-                    // Make images fill the entire screen
-                    [imgA, imgB].forEach(img => {
-                        img.style.width = '100%';
-                        img.style.height = '100%';
-                        img.style.maxWidth = '100vw';
-                        img.style.maxHeight = '100vh';
-                        img.style.objectFit = 'contain';
-                        img.style.position = 'fixed';
-                        img.style.top = '0';
-                        img.style.left = '0';
-                        img.style.right = '0';
-                        img.style.bottom = '0';
-                        img.style.margin = 'auto';
-                    });
-                };
-
-                const resetImageDisplay = () => {
-                    // Reset image display to normal
-                    [imgA, imgB].forEach(img => {
-                        img.style.width = '';
-                        img.style.height = '';
-                        img.style.maxWidth = '';
-                        img.style.maxHeight = '';
-                        img.style.objectFit = '';
-                        img.style.position = '';
-                        img.style.top = '';
-                        img.style.left = '';
-                        img.style.right = '';
-                        img.style.bottom = '';
-                        img.style.margin = '';
-                    });
                 };
 
                 const toggleFullscreen = () => {
