@@ -353,7 +353,7 @@
 
     <div class="cursor-particles fixed pointer-events-none z-[9998]"></div>
 
-    @unless (request()->routeIs('scan.index'))
+    @unless (request()->routeIs('scan.index') || request()->is('admin*'))
         <x-floating-qr />
     @endunless
 </body>

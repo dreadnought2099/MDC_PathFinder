@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="bg-white dark:bg-gray-900" x-data x-cloak>
+<html lang="en" class="bg-white dark:bg-gray-900" x-data x-cloak data-theme-scope="guest_theme">
 
 <head>
     <meta charset="UTF-8">
@@ -10,7 +10,7 @@
 
     <script>
         (function() {
-            const theme = localStorage.getItem("theme");
+            const theme = localStorage.getItem("guest_theme");
             const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
             if (theme === "dark" || (!theme && prefersDark)) {
                 document.documentElement.classList.add("dark");

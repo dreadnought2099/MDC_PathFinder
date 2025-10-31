@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="bg-white dark:bg-gray-900">
+<html lang="en" class="bg-white dark:bg-gray-900" data-theme-scope="app_theme">
 
 <head>
     <meta charset="UTF-8">
@@ -11,7 +11,7 @@
     <!-- Theme script runs before CSS -->
     <script>
         (function() {
-            const theme = localStorage.getItem("theme");
+            const theme = localStorage.getItem("app_theme");
             const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
             if (theme === "dark" || (!theme && prefersDark)) {
