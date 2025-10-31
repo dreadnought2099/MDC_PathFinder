@@ -203,11 +203,38 @@
 
                     // Update fullscreen button icon
                     fullscreenBtn.innerHTML = `
-                            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
-                        `;
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    `;
                     fullscreenBtn.title = 'Exit Fullscreen';
+
+                    // Force center the navigation container with more aggressive approach
+                    const navContainer = viewer.querySelector('.nav-container');
+                    if (navContainer) {
+                        // Clear all existing classes
+                        navContainer.className = 'nav-container';
+
+                        // Apply inline styles with !important via cssText
+                        navContainer.style.cssText = `
+                            position: fixed !important;
+                            bottom: 2rem !important;
+                            left: 50% !important;
+                            right: auto !important;
+                            top: auto !important;
+                            transform: translateX(-50%) !important;
+                            -webkit-transform: translateX(-50%) !important;
+                            z-index: 10001 !important;
+                            display: flex !important;
+                            flex-direction: row !important;
+                            gap: 1rem !important;
+                            margin: 0 !important;
+                            padding: 0 !important;
+                            width: auto !important;
+                            justify-content: center !important;
+                            align-items: center !important;
+                        `;
+                    }
 
                     // Ensure images fill the screen
                     updateImageDisplayForFullscreen();
@@ -226,6 +253,17 @@
                         </svg>
                     `;
                     fullscreenBtn.title = 'Enter Fullscreen';
+
+                    // Restore original navigation container styles
+                    const navContainer = viewer.querySelector('.nav-container');
+                    if (navContainer) {
+                        // Restore Tailwind classes
+                        navContainer.className =
+                            'nav-container absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-2 sm:gap-4 z-10';
+
+                        // Clear inline styles
+                        navContainer.style.cssText = '';
+                    }
 
                     // Reset image display
                     resetImageDisplay();

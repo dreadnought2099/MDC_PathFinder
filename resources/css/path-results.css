@@ -165,17 +165,31 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* Fullscreen navigation - Enhanced visibility */
-.viewer.fullscreen .nav-container {
-    position: fixed;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
+/* Fullscreen navigation - Fixed centering with maximum specificity */
+.viewer.fullscreen .nav-container,
+.viewer.fullscreen div.nav-container,
+.viewer.fullscreen .absolute.nav-container {
+    position: fixed !important;
+    bottom: 2rem !important;
+    left: 50% !important;
+    right: auto !important;
+    top: auto !important;
+    inset: auto !important;
+    transform: translateX(-50%) !important;
+    -webkit-transform: translateX(-50%) !important;
     display: flex !important;
-    gap: 1rem;
-    z-index: 10001;
+    flex-direction: row !important;
+    gap: 1rem !important;
+    z-index: 10001 !important;
     visibility: visible !important;
     opacity: 1 !important;
+    margin: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 0 !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: auto !important;
 }
 
 /* Force the buttons to use larger sizes in fullscreen */
@@ -189,6 +203,7 @@
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    flex-shrink: 0 !important;
 }
 
 .viewer.fullscreen .nav-btn:hover {
@@ -218,6 +233,12 @@
     }
 }
 
+/* Hide the original nav container when in fullscreen */
+.viewer.fullscreen > .absolute.bottom-2,
+.viewer.fullscreen > .absolute.bottom-4 {
+    display: none !important;
+}
+
 /* Image counter in fullscreen */
 .viewer.fullscreen .image-counter {
     position: fixed;
@@ -230,11 +251,6 @@
     font-size: 1.2rem;
     z-index: 10000;
     transition: all 0.3s ease;
-}
-
-/* Hide original navigation container in fullscreen */
-.viewer.fullscreen > .absolute.bottom-2 {
-    display: none;
 }
 
 /* Ensure no padding or margins interfere with fullscreen */
