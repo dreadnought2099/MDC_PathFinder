@@ -81,7 +81,7 @@
 
                                     <!-- Navigation buttons (centered at bottom) -->
                                     <div
-                                        class="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-2 sm:gap-4 z-10">
+                                        class="nav-container absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-2 sm:gap-4 z-10">
                                         <button
                                             class="nav-btn prev-btn bg-primary hover:bg-primary/90 text-white w-8 h-8 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-full flex items-center justify-center shadow-md hover:shadow-lg text-sm sm:text-xl lg:text-2xl border-2 border-white/20 hover:scale-110 active:scale-95 transition-all duration-200 select-none disabled:opacity-50 disabled:cursor-not-allowed"
                                             disabled>
@@ -124,7 +124,7 @@
                 <!-- Start new navigation button -->
                 <div class="mt-4 sm:mt-8 flex justify-center">
                     <a href="{{ route('paths.select', ['from' => $toRoom->id]) }}"
-                        class="px-4 py-2 sm:px-6 sm:py-3 lg:px-8 lg:py-4 text-sm sm:text-base lg:text-lg rounded-md bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary dark:hover:bg-gray-800 shadow-primary-light transition-all cursor-pointer">
+                        class="px-4 py-2 sm:px-6 sm:py-3 lg:px-8 lg:py-4 text-sm sm:text-base lg:text-lg rounded-md bg-primary text-white hover:bg-white hover:text-primary border-2 border-primary dark:hover:bg-gray-800 shadow-primary-hover transition-all cursor-pointer">
                         Start New Navigation
                     </a>
                 </div>
@@ -203,14 +203,11 @@
 
                     // Update fullscreen button icon
                     fullscreenBtn.innerHTML = `
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    `;
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        `;
                     fullscreenBtn.title = 'Exit Fullscreen';
-
-                    // Position all controls for fullscreen
-                    positionControlsForFullscreen();
 
                     // Ensure images fill the screen
                     updateImageDisplayForFullscreen();
@@ -230,47 +227,8 @@
                     `;
                     fullscreenBtn.title = 'Enter Fullscreen';
 
-                    // Reset control positions
-                    resetControlPositions();
-
                     // Reset image display
                     resetImageDisplay();
-                };
-
-                const positionControlsForFullscreen = () => {
-                    // Position all controls with fixed positioning
-                    [fullscreenBtn, prevBtn, nextBtn, imageCounter].forEach(control => {
-                        if (control) {
-                            control.style.position = 'fixed';
-                            control.style.zIndex = '10000';
-                        }
-                    });
-
-                    fullscreenBtn.style.top = '1.5rem';
-                    fullscreenBtn.style.left = '1.5rem';
-
-                    prevBtn.style.bottom = '2rem';
-                    prevBtn.style.left = '2rem';
-
-                    nextBtn.style.bottom = '2rem';
-                    nextBtn.style.right = '2rem';
-
-                    imageCounter.style.top = '1.5rem';
-                    imageCounter.style.right = '1.5rem';
-                };
-
-                const resetControlPositions = () => {
-                    // Reset all control positions
-                    [fullscreenBtn, prevBtn, nextBtn, imageCounter].forEach(control => {
-                        if (control) {
-                            control.style.position = '';
-                            control.style.top = '';
-                            control.style.bottom = '';
-                            control.style.left = '';
-                            control.style.right = '';
-                            control.style.zIndex = '';
-                        }
-                    });
                 };
 
                 const updateImageDisplayForFullscreen = () => {

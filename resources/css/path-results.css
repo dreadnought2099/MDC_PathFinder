@@ -7,7 +7,8 @@
     object-position: center;
     opacity: 0;
     z-index: 1;
-    transition: transform 0.6s ease, opacity 0.6s ease;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: transform, opacity;
     background: #000;
 }
@@ -20,6 +21,7 @@
 .viewer {
     height: clamp(240px, 30vw, 400px);
     max-height: 50vh;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Reasonable mobile sizing */
@@ -27,6 +29,7 @@
     .viewer {
         height: clamp(200px, 35vw, 320px);
         max-height: 45vh;
+        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     }
 }
 
@@ -34,48 +37,57 @@
     .viewer {
         height: clamp(180px, 40vw, 280px);
         max-height: 40vh;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 }
 
-/* Forward transition */
+/* Enhanced forward transition */
 .forward-new {
-    transform: scale(1.1);
+    transform: translateX(20px) scale(1.05);
     opacity: 0;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .forward-new.active {
-    transform: scale(1);
+    transform: translateX(0) scale(1);
     opacity: 1;
 }
 
 .forward-old {
-    transform: scale(1);
+    transform: translateX(0) scale(1);
     opacity: 1;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .forward-old:not(.active) {
-    transform: scale(0.9);
+    transform: translateX(-20px) scale(0.95);
     opacity: 0;
 }
 
-/* Backward transition */
+/* Enhanced backward transition */
 .backward-new {
-    transform: scale(0.9);
+    transform: translateX(-20px) scale(0.95);
     opacity: 0;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .backward-new.active {
-    transform: scale(1);
+    transform: translateX(0) scale(1);
     opacity: 1;
 }
 
 .backward-old {
-    transform: scale(1);
+    transform: translateX(0) scale(1);
     opacity: 1;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .backward-old:not(.active) {
-    transform: scale(1.1);
+    transform: translateX(20px) scale(1.05);
     opacity: 0;
 }
 
@@ -83,6 +95,7 @@
 .viewer:focus {
     outline: 2px solid #3b82f6;
     outline-offset: 2px;
+    transition: outline-color 0.3s ease;
 }
 
 /* Fullscreen styles - FULL IMAGE DISPLAY */
@@ -101,6 +114,7 @@
     justify-content: center;
     padding: 0;
     margin: 0;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .viewer.fullscreen .photo-layer {
@@ -115,6 +129,8 @@
     right: 0;
     bottom: 0;
     margin: auto;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .viewer.fullscreen .photo-layer.active {
@@ -123,7 +139,7 @@
     object-fit: contain;
 }
 
-/* Fullscreen controls - ensure they're visible and properly positioned */
+/* Fullscreen controls - SIMPLIFIED APPROACH */
 .viewer.fullscreen .fullscreen-btn {
     position: fixed;
     top: 1.5rem;
@@ -139,51 +155,67 @@
     justify-content: center;
     cursor: pointer;
     z-index: 10000;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .viewer.fullscreen .fullscreen-btn:hover {
     background: rgba(0, 0, 0, 0.9);
     border-color: rgba(255, 255, 255, 0.6);
-    transform: scale(1.1);
+    transform: scale(1.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* Navigation buttons in fullscreen */
-.viewer.fullscreen .nav-btn {
+/* Fullscreen navigation - Enhanced visibility */
+.viewer.fullscreen .nav-container {
     position: fixed;
     bottom: 2rem;
-    background: rgba(59, 130, 246, 0.9);
-    color: white;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    width: 4rem;
-    height: 4rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 10000;
-    transition: all 0.3s ease;
-    font-size: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex !important;
+    gap: 1rem;
+    z-index: 10001;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Force the buttons to use larger sizes in fullscreen */
+.viewer.fullscreen .nav-btn {
+    width: 3.5rem !important;
+    height: 3.5rem !important;
+    min-width: 3.5rem !important;
+    min-height: 3.5rem !important;
+    background: rgba(0, 0, 0, 0.8) !important;
+    border: 2px solid rgba(255, 255, 255, 0.4) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .viewer.fullscreen .nav-btn:hover {
-    background: rgba(59, 130, 246, 1);
-    transform: scale(1.1);
+    background: rgba(0, 0, 0, 0.95) !important;
+    border-color: rgba(255, 255, 255, 0.7) !important;
+    transform: scale(1.15) !important;
 }
 
-.viewer.fullscreen .nav-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
+.viewer.fullscreen .nav-btn svg {
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+    color: white !important;
 }
 
-.viewer.fullscreen .prev-btn {
-    left: 2rem;
-}
+/* Larger buttons on larger screens */
+@media (min-width: 1024px) {
+    .viewer.fullscreen .nav-btn {
+        width: 4rem !important;
+        height: 4rem !important;
+        min-width: 4rem !important;
+        min-height: 4rem !important;
+    }
 
-.viewer.fullscreen .next-btn {
-    right: 2rem;
+    .viewer.fullscreen .nav-btn svg {
+        width: 1.75rem !important;
+        height: 1.75rem !important;
+    }
 }
 
 /* Image counter in fullscreen */
@@ -197,6 +229,7 @@
     border-radius: 0.5rem;
     font-size: 1.2rem;
     z-index: 10000;
+    transition: all 0.3s ease;
 }
 
 /* Hide original navigation container in fullscreen */
@@ -209,4 +242,50 @@ body.viewer-fullscreen-active {
     overflow: hidden;
     padding: 0;
     margin: 0;
+    transition: overflow 0.3s ease;
+}
+
+/* Enhanced button active states */
+.nav-btn:active,
+.fullscreen-btn:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+}
+
+/* Smooth loading states */
+.photo-layer.loading {
+    opacity: 0.8;
+    filter: blur(1px);
+    transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+/* Enhanced touch interactions */
+.viewer {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: pan-y pinch-zoom;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .viewer,
+    .photo-layer,
+    .fullscreen-btn,
+    .nav-btn,
+    .image-counter {
+        transition-duration: 0.1s !important;
+    }
+
+    .forward-new,
+    .forward-old,
+    .backward-new,
+    .backward-old {
+        transform: none !important;
+    }
+}
+
+/* Performance optimizations */
+.photo-layer {
+    backface-visibility: hidden;
+    perspective: 1000px;
+    transform-style: preserve-3d;
 }
