@@ -173,10 +173,14 @@
     </script>
 </head>
 
-{{-- If child page provides "body-class" section, use it; otherwise fallback --}}
+@php
+    // Auto-show back button on non-home pages
+    $showBackButton = !request()->routeIs('index');
+@endphp
 
+{{-- If child page provides "body-class" section, use it; otherwise fallback --}}
 <body class="@yield('body-class', 'bg-white dark:bg-gray-900')">
-    <x-guest-navabar />
+    <x-guest-navbar :show-back-button="$showBackButton ?? false" />
 
     <div id="success-message-container" class="fixed top-4 right-4 z-[9999] max-w-md">
         @if (session('success') || session('error') || session('info') || session('warning') || $errors->any())
