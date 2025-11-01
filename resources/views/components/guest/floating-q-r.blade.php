@@ -20,7 +20,7 @@
     @endphp
 
     <div
-        class="fixed 
+        class="floating-qr fixed 
                 bottom-3 right-3 
                 sm:bottom-4 sm:right-4 
                 md:bottom-5 md:right-5 

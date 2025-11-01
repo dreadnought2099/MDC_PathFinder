@@ -104,6 +104,8 @@
     align-items: center !important;
     margin: 0 !important;
     padding: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
 }
 
 /* Fullscreen photo layer */
@@ -333,4 +335,9 @@ body.viewer-fullscreen-active {
         width: 1.25rem !important;
         height: 1.25rem !important;
     }
+}
+
+body.viewer-fullscreen-active nav,
+body.viewer-fullscreen-active .floating-qr {
+    display: none !important;
 }

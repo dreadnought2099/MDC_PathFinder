@@ -1,14 +1,14 @@
 import gsap from "gsap";
 
 export function initLandingAnimations() {
-    // ✅ Helper: Animate only if element exists
+    // Helper: Animate only if element exists
     function animateIfExists(target, vars) {
         if (document.querySelector(target)) {
             gsap.to(target, vars);
         }
     }
 
-    // ✅ SVG Circle Animations
+    // SVG Circle Animations
     animateIfExists(".svg-circle-1", {
         x: 50,
         y: 30,
@@ -35,7 +35,7 @@ export function initLandingAnimations() {
         ease: "sine.inOut",
     });
 
-    // ✅ SVG Path Animations
+    // SVG Path Animations
     animateIfExists(".svg-path-1", {
         attr: { d: "M 0 100 Q 250 150 500 100" },
         duration: 4,
@@ -52,7 +52,7 @@ export function initLandingAnimations() {
         ease: "sine.inOut",
     });
 
-    // ✅ Main Timeline (fade/slide elements in sequence)
+    // Main Timeline (fade/slide elements in sequence)
     const tl = gsap.timeline({
         defaults: { ease: "power3.out" },
     });
@@ -95,7 +95,7 @@ export function initLandingAnimations() {
         );
     }
 
-    // ✅ Subtle parallax on mouse move
+    // Subtle parallax on mouse move
     const mm = gsap.matchMedia();
 
     mm.add("(min-width: 768px)", () => {
