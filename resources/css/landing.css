@@ -1,0 +1,27 @@
+/* Reset initial states */
+.welcome-badge {
+    transform: translateY(-10px);
+}
+
+.main-title {
+    transform: translateY(20px);
+}
+
+.subtitle {
+    transform: translateY(10px);
+}
+
+.cta-button {
+    transform: scale(0.95);
+}
+
+/* Smooth rendering */
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure proper spacing */
+body {
+    overflow-x: hidden;
+}
