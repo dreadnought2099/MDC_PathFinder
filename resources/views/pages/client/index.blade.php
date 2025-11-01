@@ -9,7 +9,7 @@
 
 @section('content')
     <div
-        class="min-h-screen moving-gradient flex flex-col relative overflow-hidden bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+        class="min-h-screen flex flex-col relative overflow-hidden">
 
         <!-- Animated SVG Background -->
         <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-30 dark:opacity-20"

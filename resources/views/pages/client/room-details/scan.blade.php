@@ -1,7 +1,7 @@
 @extends('layouts.guest')
 
 @section('content')
-    <div class="min-h-screen moving-gradient">
+    <div class="min-h-screen">
         <!-- Main content area -->
         @if ($room)
             @include('pages.client.room-details.details', ['room' => $room])

@@ -4,7 +4,6 @@
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
 
-            {{-- Left: Logo or Back Button --}}
             <div class="flex-shrink-0">
                 @if ($showBackButton)
                     <x-guest.guest-back-button />

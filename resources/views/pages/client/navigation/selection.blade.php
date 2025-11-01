@@ -1,7 +1,7 @@
 @extends('layouts.guest')
 
 @section('content')
-    <div class="min-h-screen moving-gradient flex flex-col">
+    <div class="min-h-screen flex flex-col">
         <div class="flex justify-center mt-4 sm:mt-8 px-4 sm:px-0 font-sofia">
             <div x-data="staffSearch()" class="relative w-full max-w-md">
                 <input type="text" x-model="query" @input.debounce.300ms="filterStaff" placeholder="Search staff"

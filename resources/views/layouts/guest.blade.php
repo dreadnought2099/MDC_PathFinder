@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="bg-white dark:bg-gray-900" x-data x-cloak data-theme-scope="guest_theme">
+<html lang="en" x-data x-cloak data-theme-scope="guest_theme">
 
 <head>
     <meta charset="UTF-8">
