@@ -1,14 +1,13 @@
 @extends('layouts.guest')
 
 @section('content')
-    <div class="min-h-screen dark:bg-gray-900 mb-8">
+    <div class="min-h-screen dark:bg-gray-900">
         <!-- Top navigation bar with back button and dark mode toggle -->
         <div
-            class="bg-white flex justify-between items-center p-2 sm:p-4 mb-2 sticky top-0 z-50
-           dark:bg-gray-900">
+            class="bg-white flex justify-between items-center p-3 sm:p-4 lg:p-5 sticky top-0 z-50 dark:bg-gray-900 shadow-sm">
 
             <!-- Left: Back button -->
-            <div>
+            <div class="flex-shrink-0">
                 @if ($room)
                     @php
                         $returnRoute = request('return');
@@ -22,7 +21,7 @@
 
                     <a href="{{ $backUrl }}"
                         class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 dark:text-gray-300 text-sm sm:text-base">
-                        <svg class="h-4 w-4 sm:h-6 sm:w-6 mr-1" fill="none" stroke="currentColor" stroke-width="2"
+                        <svg class="h-5 w-5 sm:h-6 sm:w-6 mr-1 sm:mr-2" fill="none" stroke="currentColor" stroke-width="2"
                             viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                         </svg>
@@ -54,8 +53,8 @@
 
                     <a href="{{ $backUrl }}"
                         class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 dark:text-gray-300 text-sm sm:text-base">
-                        <svg class="h-4 w-4 sm:h-6 sm:w-6 mr-1" fill="none" stroke="currentColor" stroke-width="2"
-                            viewBox="0 0 24 24">
+                        <svg class="h-5 w-5 sm:h-6 sm:w-6 mr-1 sm:mr-2" fill="none" stroke="currentColor"
+                            stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                         </svg>
                         <span class="font-medium hidden sm:inline">{{ $backText }}</span>
@@ -64,10 +63,8 @@
                 @endif
             </div>
 
-            <!-- Center spacer -->
-            <div class="flex-1"></div>
-
-            <div class="flex items-center gap-3 sm:gap-6">
+            <!-- Right: Action buttons -->
+            <div class="flex items-center gap-2 sm:gap-3 lg:gap-4 flex-shrink-0">
                 <x-team-modal />
                 <x-about-page />
                 <x-dark-mode-toggle />
@@ -79,41 +76,45 @@
             @include('pages.client.room-details.details', ['room' => $room])
         @else
             <!-- QR Scanner Content -->
-            <div class="w-full min-h-screen flex flex-col justify-center items-center text-center px-4 py-6">
+            <div
+                class="w-full min-h-[calc(100vh-64px)] flex flex-col justify-center items-center px-4 py-6 sm:py-8 lg:py-12">
                 <!-- Main content -->
                 <div
-                    class="flex-grow flex flex-col justify-center items-center border-2 border-primary p-6 rounded-2xl max-w-2xl w-full">
-                    <h1 class="text-3xl font-bold text-gray-800 mb-4 text-primary dark:text-gray-100">
+                    class="flex-grow flex flex-col justify-center items-center border-2 border-primary p-4 sm:p-6 lg:p-8 rounded-2xl max-w-2xl w-full">
+                    <h1
+                        class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-3 sm:mb-4 text-primary dark:text-gray-100 text-center">
                         {{ config('app.name') }}
                     </h1>
-                    <p class="text-gray-600 mb-6 dark:text-gray-300">
+                    <p
+                        class="text-sm sm:text-base lg:text-lg text-gray-600 mb-6 sm:mb-8 dark:text-gray-300 text-center max-w-md">
                         Point your camera at a QR code to start exploring campus rooms.
                     </p>
 
                     <!-- Camera scanner -->
-                    <div class="max-w-lg w-full mx-auto">
-                        <div id="qr-reader" class="relative mx-auto mb-4 rounded-lg overflow-hidden"
-                            style="max-width: 350px;">
+                    <div class="w-full max-w-lg mx-auto">
+                        <div id="qr-reader" class="relative mx-auto mb-4 sm:mb-6 rounded-lg overflow-hidden w-full"
+                            style="max-width: min(350px, 100%);">
                         </div>
 
                         <!-- Control buttons -->
-                        <div class="flex flex-col gap-3 items-center">
+                        <div class="flex flex-col gap-2 items-center w-full">
                             <!-- Stop button -->
                             <button id="stopBtn"
-                                class="w-full max-w-xs bg-secondary hover:text-secondary hover:bg-white text-white border-2 border-secondary dark:hover:bg-gray-800 py-2 px-4 rounded-md transition-all duration-300 ease-in-out cursor-pointer shadow-secondary-hover">
+                                class="w-full max-w-xs bg-secondary hover:text-secondary hover:bg-white text-white border-2 border-secondary dark:hover:bg-gray-800 py-2 px-4 rounded-md transition-all duration-300 ease-in-out cursor-pointer shadow-secondary-hover text-sm font-medium">
                                 Stop Scanning
                             </button>
 
                             <!-- Manual restart button -->
                             <button id="restartBtn"
-                                class="w-full max-w-xs bg-primary hover:bg-white hover:text-primary border-2 border-primary text-white dark:hover:bg-gray-800 py-2 px-4 rounded-md transition-all duration-300 cursor-pointer shadow-primary-hover">
+                                class="w-full max-w-xs bg-primary hover:bg-white hover:text-primary border-2 border-primary text-white dark:hover:bg-gray-800 py-2 px-4 rounded-md transition-all duration-300 cursor-pointer shadow-primary-hover text-sm font-medium">
                                 Restart Camera
                             </button>
                         </div>
 
                         <!-- Results and status messages -->
                         <div id="qr-reader-results"
-                            class="mt-4 text-sm text-gray-600 text-center dark:text-gray-300 min-h-[24px]"></div>
+                            class="mt-4 sm:mt-6 text-xs sm:text-sm text-gray-600 text-center dark:text-gray-300 min-h-[24px] px-2">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -172,8 +173,8 @@
 
                     resultsDiv.innerHTML = `
                     <div class="${colors[type]} flex items-center justify-center gap-2">
-                        <img src="${icons[type]}" alt="${type}" class="h-4 w-4" />
-                        <span>${message}</span>
+                        <img src="${icons[type]}" alt="${type}" class="h-4 w-4 flex-shrink-0" />
+                        <span class="break-words">${message}</span>
                     </div>
                 `;
                 }

@@ -24,10 +24,8 @@ Route::get('/about', fn() => view('pages.client.about.index'))->name('about');
 
 // Scanner & token-based room routes
 Route::get('/scan-marker', [ScannerController::class, 'index'])->name('scan.index');
-Route::get('/scan-marker/{token}', [TokenController::class, 'getRoomByToken'])
-    ->name('scan.room')->where('token', '[a-f0-9]{64}');
-Route::get('/rooms/{token}/exists', [TokenController::class, 'checkRoomExists'])
-    ->name('rooms.exists')->where('token', '[a-f0-9]{64}');
+Route::get('/scan-marker/{token}', [TokenController::class, 'getRoomByToken'])->name('scan.room')->where('token', '[a-f0-9]{64}');
+Route::get('/rooms/{token}/exists', [TokenController::class, 'checkRoomExists'])->name('rooms.exists')->where('token', '[a-f0-9]{64}');
 
 // Client-facing staff
 Route::get('/staff/search', [StaffController::class, 'search'])->name('search');
