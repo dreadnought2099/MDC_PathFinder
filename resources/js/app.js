@@ -1,5 +1,6 @@
 import "./bootstrap";
 import gsap from "gsap";
+import { initLandingAnimations } from "./landing-animations";
 import { initializeFloatingLink, savePathSelection } from "./path-selection";
 
 // Make GSAP available globally
@@ -10,6 +11,7 @@ window.savePathSelection = savePathSelection;
 
 document.addEventListener("DOMContentLoaded", () => {
     initializeFloatingLink();
+    initLandingAnimations();
 });
 
 class ImgReveal extends HTMLElement {

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./moving-gradient.css";
+@import "./landing.css";
 @import "./path-results.css";
 @source "../views";
 
