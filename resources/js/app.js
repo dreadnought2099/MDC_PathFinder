@@ -1,6 +1,5 @@
 import "./bootstrap";
 import gsap from "gsap";
-import { initLandingAnimations } from "./landing-animations";
 import { initializeFloatingLink, savePathSelection } from "./path-selection";
 
 // Make GSAP available globally
@@ -11,10 +10,6 @@ window.savePathSelection = savePathSelection;
 
 document.addEventListener("DOMContentLoaded", () => {
     initializeFloatingLink();
-    // Check if we're on the landing page by looking for the welcome badge
-    if (document.querySelector(".welcome-badge")) {
-        initLandingAnimations();
-    }
 });
 
 class ImgReveal extends HTMLElement {

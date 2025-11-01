@@ -77,13 +77,13 @@
 
                         <div class="flex gap-3 mt-auto">
                             <a href="https://www.instagram.com/skerm_art/"
-                                class="hover:scale-110 transition-transform duration-300 bg-gray-100 dark:bg-gray-700 p-2 rounded-lg hover:bg-primary/10"
+                                class="hover:scale-120 transition-transform duration-300 p-2 rounded-md hover-underline"
                                 target="_blank" rel="noopener noreferrer">
                                 <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/instagram.png"
                                     alt="Instagram" class="w-6 h-6">
                             </a>
                             <a href="https://letterboxd.com/RMAGALLANEZ/"
-                                class="hover:scale-110 transition-transform duration-300 bg-gray-100 dark:bg-gray-700 p-2 rounded-lg hover:bg-primary/10"
+                                class="hover:scale-120 transition-transform duration-300 p-2 rounded-md hover-underline"
                                 target="_blank" rel="noopener noreferrer">
                                 <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/letterboxd.png"
                                     alt="Letterboxd" class="w-6 h-6">
@@ -110,13 +110,13 @@
 
                         <div class="flex gap-3 mt-auto">
                             <a href="https://www.instagram.com/skerm_art/"
-                                class="hover:scale-110 transition-transform duration-300 bg-gray-100 dark:bg-gray-700 p-2 rounded-lg hover:bg-primary/10"
+                                class="hover:scale-120 transition-transform duration-300 p-2 rounded-md hover-underline"
                                 target="_blank" rel="noopener noreferrer">
                                 <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/instagram.png"
                                     alt="Instagram" class="w-6 h-6">
                             </a>
                             <a href="https://letterboxd.com/RMAGALLANEZ/"
-                                class="hover:scale-110 transition-transform duration-300 bg-gray-100 dark:bg-gray-700 p-2 rounded-lg hover:bg-primary/10"
+                                class="hover:scale-120 transition-transform duration-300 p-2 rounded-md hover-underline"
                                 target="_blank" rel="noopener noreferrer">
                                 <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/letterboxd.png"
                                     alt="Letterboxd" class="w-6 h-6">
@@ -143,13 +143,13 @@
 
                         <div class="flex gap-3 mt-auto">
                             <a href="https://www.instagram.com/skerm_art/"
-                                class="hover:scale-110 transition-transform duration-300 bg-gray-100 dark:bg-gray-700 p-2 rounded-lg hover:bg-primary/10"
+                                class="hover:scale-120 transition-transform duration-300 p-2 rounded-md hover-underline"
                                 target="_blank" rel="noopener noreferrer">
                                 <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/instagram.png"
                                     alt="Instagram" class="w-6 h-6">
                             </a>
                             <a href="https://letterboxd.com/RMAGALLANEZ/"
-                                class="hover:scale-110 transition-transform duration-300 bg-gray-100 dark:bg-gray-700 p-2 rounded-lg hover:bg-primary/10"
+                                class="hover:scale-120 transition-transform duration-300 p-2 rounded-md hover-underline"
                                 target="_blank" rel="noopener noreferrer">
                                 <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/letterboxd.png"
                                     alt="Letterboxd" class="w-6 h-6">
@@ -176,13 +176,13 @@
 
                         <div class="flex gap-3 mt-auto">
                             <a href="https://www.instagram.com/skerm_art/"
-                                class="hover:scale-110 transition-transform duration-300 bg-gray-100 dark:bg-gray-700 p-2 rounded-lg hover:bg-primary/10"
+                                class="hover:scale-120 transition-transform duration-300 p-2 rounded-md hover-underline"
                                 target="_blank" rel="noopener noreferrer">
                                 <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/instagram.png"
                                     alt="Instagram" class="w-6 h-6">
                             </a>
                             <a href="https://letterboxd.com/RMAGALLANEZ/"
-                                class="hover:scale-110 transition-transform duration-300 bg-gray-100 dark:bg-gray-700 p-2 rounded-lg hover:bg-primary/10"
+                                class="hover:scale-120 transition-transform duration-300 p-2 rounded-md hover-underline"
                                 target="_blank" rel="noopener noreferrer">
                                 <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/letterboxd.png"
                                     alt="Letterboxd" class="w-6 h-6">
