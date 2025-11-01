@@ -27,8 +27,6 @@
             </div>
         </div>
 
-        <x-floating-actions />
-
         <!-- Staff Table Container -->
         <div id="records-table">
             @include('pages.admin.staffs.partials.staff-table', ['staffs' => $staffs])

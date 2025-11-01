@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-floating-actions />
     <div class="container mx-auto px-4 py-8 max-w-6xl dark:text-gray-300">
         <!-- Header -->
         <div class="mb-8">

@@ -2,8 +2,6 @@
 
 @section('content')
     @if (auth()->user()->hasRole('Admin'))
-        <x-floating-actions />
-
         <div class="max-w-7xl mx-auto mt-8">
             <!-- Page Title -->
             <div class="text-center mb-8">

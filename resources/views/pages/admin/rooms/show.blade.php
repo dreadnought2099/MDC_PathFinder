@@ -3,8 +3,6 @@
 @section('content')
     <div class="min-h-screen">
         <div class="container mx-auto p-8 max-w-6xl">
-            <x-floating-actions />
-
             <section
                 class="relative w-full h-[400px] sm:h-[500px] md:h-[600px] rounded-2xl  border-2 border-primary mb-12 group transition-all duration-700 ease-out overflow-hidden">
 

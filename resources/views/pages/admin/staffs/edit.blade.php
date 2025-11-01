@@ -1,8 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-floating-actions />
-
     <div
         class="max-w-4xl mx-auto mt-10 mb-10 rounded-lg border-2 shadow-2xl border-primary p-4 sm:p-6 md:p-8 dark:bg-gray-800">
         <h2 class="text-2xl text-center mb-8"><span class="text-primary">Edit</span> <span class="dark:text-gray-300">Staff

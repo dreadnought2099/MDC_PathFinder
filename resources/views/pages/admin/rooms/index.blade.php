@@ -28,11 +28,6 @@
             </div>
         </div>
 
-        <!-- Floating Actions -->
-        <div class="mb-4">
-            <x-floating-actions />
-        </div>
-
         <!-- Room Table Container -->
         <div id="records-table">
             @include('pages.admin.rooms.partials.room-table', ['rooms' => $rooms])

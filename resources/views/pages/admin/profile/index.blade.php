@@ -2,9 +2,6 @@
 
 @section('content')
     <div class="container mx-auto p-6">
-
-        <x-floating-actions />
-
         <div class="max-w-lg mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border-2 border-primary relative">
             <img-reveal class="block text-center relative">
                 <h2 class="trigger-text text-4xl text-center mb-6 text-primary inline-block">Profile</h2> <img

@@ -30,11 +30,6 @@
             <div id="records-table">
                 @include('pages.admin.paths.partials.path-table', ['paths' => $paths])
             </div>
-
-            <!-- Floating Actions -->
-            <div class="mb-6 px-4 sm:px-6 lg:px-0 flex justify-end flex-wrap gap-2">
-                <x-floating-actions />
-            </div>
         </div>
     </div>
 @endsection

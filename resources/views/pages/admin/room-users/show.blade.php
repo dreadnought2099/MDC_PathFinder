@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-floating-actions />
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div class="mb-8 relative">
             <!-- Centered Header -->

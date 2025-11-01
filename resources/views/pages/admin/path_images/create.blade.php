@@ -4,8 +4,6 @@
 
 @section('content')
     @if (auth()->user()->hasRole('Admin'))
-        <x-floating-actions />
-
         <div class="max-w-xl mx-auto mt-10 rounded-lg border-2 shadow-2xl border-primary p-6 mb-8">
             <h2 class="text-2xl text-center mb-6 dark:text-gray-300 text-gray-800 font-bold">
                 <span class="text-primary">Upload</span> Path Images

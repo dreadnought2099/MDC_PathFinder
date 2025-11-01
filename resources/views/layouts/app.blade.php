@@ -148,8 +148,11 @@
         @yield('content')
     </main>
 
-    <!-- Upload Progress Modal -->
+    <!-- Upload Progress Component -->
     <x-upload-progress-modal />
+
+    <!-- Floating Actions Component -->
+    <x-floating-actions />
 
     <!-- FilePond -->
     <script src="https://unpkg.com/filepond@4.31.1/dist/filepond.min.js"></script>

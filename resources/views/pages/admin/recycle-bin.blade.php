@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-floating-actions />
     <div x-data="{
         tab: sessionStorage.getItem('activeTab') || 'rooms',
         setTab(newTab) {

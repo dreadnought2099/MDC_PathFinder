@@ -1,8 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-floating-actions />
-
     <div class="max-w-7xl mx-auto mt-8 px-4 sm:px-6 lg:px-8">
         <!-- Page Title -->
         <div class="text-center mb-6 sm:mb-8">

@@ -3,8 +3,6 @@
 @section('title', 'Path Details')
 
 @section('content')
-    <x-floating-actions />
-
     <div class="container mx-auto max-w-6xl px-4 py-6">
         <!-- Header -->
         <div class="mb-12 text-center">
