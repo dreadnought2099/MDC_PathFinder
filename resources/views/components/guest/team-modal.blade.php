@@ -62,7 +62,7 @@
                     <div
                         class="group bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-2xl border-2 border-primary transition-all duration-300 p-6 flex flex-col items-center text-center shadow-primary-hover">
                         <div class="relative mb-4">
-                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/profile.jpeg"
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png"
                                 alt="Joshua A. Salabe"
                                 class="w-28 h-28 rounded-full object-cover group-hover:scale-105 transition-transform duration-300 shadow-primary-hover">
                         </div>
@@ -95,7 +95,7 @@
                     <div
                         class="group bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-2xl border-2 border-primary transition-all duration-300 p-6 flex flex-col items-center text-center shadow-primary-hover">
                         <div class="relative mb-4">
-                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/profile.jpeg"
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png"
                                 alt="Chris Marie Calesa"
                                 class="w-28 h-28 rounded-full object-cover group-hover:scale-105 transition-transform duration-300 shadow-primary-hover">
                         </div>
@@ -128,7 +128,7 @@
                     <div
                         class="group bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-2xl border-2 border-primary transition-all duration-300 p-6 flex flex-col items-center text-center shadow-primary-hover">
                         <div class="relative mb-4">
-                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/profile.jpeg"
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png"
                                 alt="Joana Jean Astacaan"
                                 class="w-28 h-28 rounded-full object-cover group-hover:scale-105 transition-transform duration-300 shadow-primary-hover">
                         </div>

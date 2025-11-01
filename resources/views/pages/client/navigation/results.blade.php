@@ -25,7 +25,6 @@
                         <div
                             class="bg-white dark:bg-gray-800 shadow rounded-lg p-3 sm:p-5 mb-4 sm:mb-8 text-center border-2 border-primary">
                             <h2 class="text-base sm:text-xl mb-3 sm:mb-4 dark:text-gray-300">
-                                <i class="fas fa-images mr-1 sm:mr-2 text-sm sm:text-base"></i>
                                 <span class="path-title">{{ $path->name ?? 'Path ' . $loop->iteration }}</span>
                             </h2>
 
