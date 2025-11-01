@@ -8,15 +8,10 @@
             <div class="flex-shrink-0">
                 @if ($showBackButton)
                     <x-guest.guest-back-button />
-                @else
-                    <a href="{{ route('index') }}" class="text-xl font-bold text-primary">
-                        {{ config('app.name') }}
-                    </a>
                 @endif
             </div>
 
-            {{-- Right: Navigation Items --}}
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center gap-4 sm:gap-6 h-16">
                 <x-dark-mode-toggle />
                 <x-guest.about-page />
                 <x-guest.team-modal />
