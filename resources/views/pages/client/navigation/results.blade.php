@@ -2,31 +2,6 @@
 
 @section('content')
     <div class="min-h-screen dark:bg-gray-900 flex flex-col">
-        <!-- Top bar -->
-        <div class="w-full flex items-center p-2 sm:p-4 bg-white dark:bg-gray-900 sticky top-0 z-50">
-            <div class="w-auto sm:w-48 flex items-center justify-start">
-                <!-- Left: Back button -->
-                <a href="{{ route('paths.select') }}"
-                    class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 dark:text-gray-300 text-sm sm:text-base">
-                    <svg class="h-4 w-4 sm:h-6 sm:w-6 mr-1" fill="none" stroke="currentColor" stroke-width="2"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
-                    <span class="font-medium hidden sm:inline">Back to Selection</span>
-                    <span class="font-medium sm:hidden">Back</span>
-                </a>
-            </div>
-
-            <div class="flex-1"></div>
-
-            <!-- Right controls -->
-            <div class="flex items-center gap-3 sm:gap-6">
-                <x-team-modal />
-                <x-about-page />
-                <x-dark-mode-toggle />
-            </div>
-        </div>
-
         <!-- Main content -->
         <div class="flex-grow flex items-center justify-center px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
             <div

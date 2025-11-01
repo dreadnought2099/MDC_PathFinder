@@ -31,17 +31,6 @@
                 fill="none" />
         </svg>
 
-        <!-- Top Bar -->
-        <div
-            class="w-full flex items-center justify-between p-6 lg:p-8 sticky top-0 z-50 nav-bar backdrop-blur-md bg-white/70 dark:bg-gray-900/70">
-            <div class="flex-1"></div>
-            <div class="flex items-center gap-4 lg:gap-6 nav-items">
-                <x-team-modal />
-                <x-about-page />
-                <x-dark-mode-toggle />
-            </div>
-        </div>
-
         <!-- Main Content - Centered -->
         <div class="flex-1 flex flex-col items-center justify-center px-6 sm:px-8 lg:px-12 py-12 relative z-10">
 

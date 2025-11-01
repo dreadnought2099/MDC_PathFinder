@@ -15,34 +15,6 @@
     @endphp
 
     <div class="min-h-screen dark:bg-gray-900 flex flex-col">
-
-        <!-- Top Bar -->
-        <div class="w-full flex items-center p-2 sm:p-4 bg-white dark:bg-gray-900 sticky top-0 z-50">
-
-            <!-- Left: fixed width container for back button -->
-            <div class="w-auto sm:w-48 flex items-center">
-                <!-- Back button always present on About page -->
-                <a href="{{ route('index') }}"
-                    class="flex items-center text-gray-700 hover:text-primary transition-colors duration-200 dark:text-gray-300 text-sm sm:text-base">
-                    <svg class="h-4 w-4 sm:h-6 sm:w-6 mr-1" fill="none" stroke="currentColor" stroke-width="2"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
-                    <span class="font-medium hidden sm:inline">Back to Home</span>
-                    <span class="font-medium sm:hidden">Back</span>
-                </a>
-            </div>
-
-            <!-- Center spacer -->
-            <div class="flex-1"></div>
-
-            <div class="flex items-center gap-3 sm:gap-6">
-                <x-team-modal />
-                <x-about-page />
-                <x-dark-mode-toggle />
-            </div>
-        </div>
-
         <div class="min-h-[70vh] flex flex-col items-center justify-center space-y-12 px-6 md:px-16 py-12">
             @foreach (['about' => 'What is <span class="text-primary">' . config('app.name') . '</span>?', 'overview' => '<span class="text-primary">Overview</span> of Content'] as $key => $title)
                 <div class="w-full max-w-3xl mx-auto md:px-8">

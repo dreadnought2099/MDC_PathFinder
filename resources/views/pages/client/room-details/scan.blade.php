@@ -62,13 +62,6 @@
                     </a>
                 @endif
             </div>
-
-            <!-- Right: Action buttons -->
-            <div class="flex items-center gap-2 sm:gap-3 lg:gap-4 flex-shrink-0">
-                <x-team-modal />
-                <x-about-page />
-                <x-dark-mode-toggle />
-            </div>
         </div>
 
         <!-- Main content area -->

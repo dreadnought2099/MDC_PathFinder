@@ -52,20 +52,6 @@ export function initLandingAnimations() {
         }
     });
 
-    // Navigation bar - subtle entrance
-    tl.from('.nav-bar', {
-        y: -20,
-        opacity: 0,
-        duration: 0.6
-    });
-
-    tl.from('.nav-items > *', {
-        y: -10,
-        opacity: 0,
-        duration: 0.4,
-        stagger: 0.1
-    }, '-=0.3');
-
     // Welcome badge
     tl.to('.welcome-badge', {
         opacity: 1,
