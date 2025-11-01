@@ -1,7 +1,7 @@
 @extends('layouts.guest')
 
 @section('content')
-    <div class="min-h-screen dark:bg-gray-900">
+    <div class="min-h-screen moving-gradient">
         <!-- Main content area -->
         @if ($room)
             @include('pages.client.room-details.details', ['room' => $room])
@@ -11,7 +11,7 @@
                 class="w-full min-h-[calc(100vh-64px)] flex flex-col justify-center items-center px-4 py-6 sm:py-8 lg:py-12">
                 <!-- Main content -->
                 <div
-                    class="flex-grow flex flex-col justify-center items-center border-2 border-primary p-4 sm:p-6 lg:p-8 rounded-2xl max-w-2xl w-full">
+                    class="flex-grow flex flex-col justify-center items-center dark:bg-gray-800 border-2 border-primary p-4 sm:p-6 lg:p-8 rounded-2xl max-w-2xl w-full">
                     <h1
                         class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-3 sm:mb-4 text-primary dark:text-gray-100 text-center">
                         {{ config('app.name') }}

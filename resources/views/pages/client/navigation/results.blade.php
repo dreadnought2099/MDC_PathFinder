@@ -1,7 +1,7 @@
 @extends('layouts.guest')
 
 @section('content')
-    <div class="min-h-screen dark:bg-gray-900 flex flex-col">
+    <div class="min-h-screen moving-gradient flex flex-col">
         <!-- Main content -->
         <div class="flex-grow flex items-center justify-center px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
             <div

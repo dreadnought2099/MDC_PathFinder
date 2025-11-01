@@ -48,7 +48,7 @@
                 </h2>
                 <button @click="open = false"
                     class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors w-6">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -80,13 +80,13 @@
                                 class="hover:scale-120 transition-transform duration-300 p-2 rounded-md hover-underline"
                                 target="_blank" rel="noopener noreferrer">
                                 <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/instagram.png"
-                                    alt="Instagram" class="w-6 h-6">
+                                    alt="Instagram" class="w-8 h-8">
                             </a>
                             <a href="https://letterboxd.com/RMAGALLANEZ/"
                                 class="hover:scale-120 transition-transform duration-300 p-2 rounded-md hover-underline"
                                 target="_blank" rel="noopener noreferrer">
                                 <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/letterboxd.png"
-                                    alt="Letterboxd" class="w-6 h-6">
+                                    alt="Letterboxd" class="w-8 h-8">
                             </a>
                         </div>
                     </div>
@@ -113,13 +113,13 @@
                                 class="hover:scale-120 transition-transform duration-300 p-2 rounded-md hover-underline"
                                 target="_blank" rel="noopener noreferrer">
                                 <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/instagram.png"
-                                    alt="Instagram" class="w-6 h-6">
+                                    alt="Instagram" class="w-8 h-8">
                             </a>
                             <a href="https://letterboxd.com/RMAGALLANEZ/"
                                 class="hover:scale-120 transition-transform duration-300 p-2 rounded-md hover-underline"
                                 target="_blank" rel="noopener noreferrer">
                                 <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/letterboxd.png"
-                                    alt="Letterboxd" class="w-6 h-6">
+                                    alt="Letterboxd" class="w-8 h-8">
                             </a>
                         </div>
                     </div>
@@ -146,13 +146,13 @@
                                 class="hover:scale-120 transition-transform duration-300 p-2 rounded-md hover-underline"
                                 target="_blank" rel="noopener noreferrer">
                                 <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/instagram.png"
-                                    alt="Instagram" class="w-6 h-6">
+                                    alt="Instagram" class="w-8 h-8">
                             </a>
                             <a href="https://letterboxd.com/RMAGALLANEZ/"
                                 class="hover:scale-120 transition-transform duration-300 p-2 rounded-md hover-underline"
                                 target="_blank" rel="noopener noreferrer">
                                 <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/letterboxd.png"
-                                    alt="Letterboxd" class="w-6 h-6">
+                                    alt="Letterboxd" class="w-8 h-8">
                             </a>
                         </div>
                     </div>
@@ -179,13 +179,13 @@
                                 class="hover:scale-120 transition-transform duration-300 p-2 rounded-md hover-underline"
                                 target="_blank" rel="noopener noreferrer">
                                 <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/instagram.png"
-                                    alt="Instagram" class="w-6 h-6">
+                                    alt="Instagram" class="w-8 h-8">
                             </a>
                             <a href="https://letterboxd.com/RMAGALLANEZ/"
                                 class="hover:scale-120 transition-transform duration-300 p-2 rounded-md hover-underline"
                                 target="_blank" rel="noopener noreferrer">
                                 <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/letterboxd.png"
-                                    alt="Letterboxd" class="w-6 h-6">
+                                    alt="Letterboxd" class="w-8 h-8">
                             </a>
                         </div>
                     </div>

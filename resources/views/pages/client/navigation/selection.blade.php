@@ -1,11 +1,11 @@
 @extends('layouts.guest')
 
 @section('content')
-    <div class="min-h-screen dark:bg-gray-900 flex flex-col">
+    <div class="min-h-screen moving-gradient flex flex-col">
         <div class="flex justify-center mt-4 sm:mt-8 px-4 sm:px-0 font-sofia">
             <div x-data="staffSearch()" class="relative w-full max-w-md">
                 <input type="text" x-model="query" @input.debounce.300ms="filterStaff" placeholder="Search staff"
-                    class="w-full border border-primary focus:ring-2 focus:border-primary focus:ring-primary focus:outline-none rounded-lg p-2 pr-8 text-sm sm:text-base dark:bg-gray-700 dark:text-gray-300 transition-all duration-200">
+                    class="w-full bg-white border border-primary focus:ring-2 focus:border-primary focus:ring-primary focus:outline-none rounded-lg p-2 pr-8 text-sm sm:text-base dark:bg-gray-800 dark:text-gray-300 transition-all duration-200">
 
                 <ul x-show="results.length"
                     class="absolute w-full bg-white dark:bg-gray-800 dark:text-gray-300 border border-primary rounded-lg mt-1 max-h-48 sm:max-h-60 overflow-y-auto z-50 shadow-lg">

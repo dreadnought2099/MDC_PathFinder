@@ -8,7 +8,7 @@
 @section('twitter_description', 'Navigate the MDC campus easily with MDC PathFinder.')
 
 @section('content')
-    <div class="min-h-screen dark:bg-gray-900 flex flex-col">
+    <div class="min-h-screen moving-gradient flex flex-col">
         
         <!-- Main Content -->
         <div class="flex flex-col flex-grow justify-between items-center px-4 sm:px-6 lg:px-8">
