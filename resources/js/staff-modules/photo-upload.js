@@ -36,10 +36,22 @@ export function setupPhotoUpload(options = {}) {
     });
 
     // --- NORMAL FILE INPUT CHANGE ---
-    photoInput.addEventListener("change", async () => {
-        const file = photoInput.files?.[0];
-        if (file) await handleFile(file);
-    });
+    photoInput.addEventListener(
+        "change",
+        async (e) => {
+            e.preventDefault(); // Prevent default handling
+            e.stopImmediatePropagation(); // Stop other listeners
+
+            const file = photoInput.files?.[0];
+            if (file) {
+                // Clear the input immediately to prevent form submission of original
+                const originalFile = file;
+                photoInput.value = "";
+                await handleFile(originalFile);
+            }
+        },
+        { capture: true }
+    ); // Capture phase to run before other handlers
 
     // --- CORE FILE HANDLER ---
     async function handleFile(file) {
@@ -61,27 +73,50 @@ export function setupPhotoUpload(options = {}) {
             window.showTemporaryMessage?.("Compressing image...", "info");
 
             // Compress
-            const compressedFile = await compressImageCanvas(file);
+            const compressedFile = await compressImageCanvas(
+                file,
+                1200,
+                1200,
+                0.85
+            );
 
-            // Replace original FileList
+            // CRITICAL FIX: Create a fresh Blob then File to strip ALL metadata
+            const cleanBlob = await fetch(
+                URL.createObjectURL(compressedFile)
+            ).then((r) => r.blob());
+
+            const cleanFile = new File(
+                [cleanBlob],
+                `staff_photo_${Date.now()}.jpg`,
+                {
+                    type: "image/jpeg",
+                    lastModified: Date.now(),
+                }
+            );
+
+            // Replace original FileList with clean file
             const dt = new DataTransfer();
-            dt.items.add(compressedFile);
+            dt.items.add(cleanFile);
             photoInput.files = dt.files;
+
+            // Verify the input now has correct file
+            if (photoInput.files[0]) {
+            }
 
             // Preview
             createPreview({
                 input: photoInput,
                 container: previewContainer,
                 placeholder,
-                file: compressedFile,
+                file: cleanFile,
             });
 
-            onCompressEnd?.(file.size, compressedFile.size);
+            onCompressEnd?.(file.size, cleanFile.size);
 
             window.showTemporaryMessage?.(
                 `Image compressed: ${formatFileSize(
                     file.size
-                )} → ${formatFileSize(compressedFile.size)}`,
+                )} → ${formatFileSize(cleanFile.size)}`,
                 "success"
             );
         } catch (err) {
