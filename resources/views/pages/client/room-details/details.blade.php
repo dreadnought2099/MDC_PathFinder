@@ -1,191 +1,194 @@
-<div class="min-h-screen w-full px-4 sm:px-8 md:px-12 lg:px-16 py-6 space-y-12 mx-auto">
-    <!-- Cover Image -->
-    <section
-        class="relative w-full h-[400px] sm:h-[500px] md:h-[600px] rounded-2xl  border-2 border-primary mb-12 group transition-all duration-700 ease-out overflow-hidden">
+<div class="min-h-screen w-full p-4 sm:p-6 md:p-8 lg:p-10">
+    <div class="w-full px-6 sm:px-10 md:px-16 lg:px-20 xl:px-24 py-8 sm:py-10 md:py-12 space-y-12 mx-auto max-w-7xl bg-white dark:bg-gray-900 rounded-2xl shadow-lg border-2 border-primary transition-colors duration-300">
+        <!-- Cover Image -->
+        <section
+            class="relative w-full h-[400px] sm:h-[500px] md:h-[600px] rounded-2xl  border-2 border-primary mb-12 group transition-all duration-700 ease-out overflow-hidden">
 
-        @php
-            $hasImage = $room->image_path && Storage::exists('public/' . $room->image_path);
-            $imageSrc = $hasImage ? Storage::url($room->image_path) : asset('images/pathfinder-bannerv2.png');
-        @endphp
+            @php
+                $hasImage = $room->image_path && Storage::exists('public/' . $room->image_path);
+                $imageSrc = $hasImage ? Storage::url($room->image_path) : asset('images/pathfinder-bannerv2.png');
+            @endphp
 
-        <img src="{{ $room->image_path ? Storage::url($room->image_path) : asset('images/pathfinder-bannerv2.png') }}"
-            alt="{{ $room->name }}"
-            class="absolute inset-0 w-full h-full object-cover brightness-75 transition-transform duration-700 ease-out group-hover:scale-105 cursor-pointer"
-            onclick="openModal('{{ $room->image_path ? Storage::url($room->image_path) : asset('images/pathfinder-bannerv2.png') }}')" />
+            <img src="{{ $room->image_path ? Storage::url($room->image_path) : asset('images/pathfinder-bannerv2.png') }}"
+                alt="{{ $room->name }}"
+                class="absolute inset-0 w-full h-full object-cover brightness-75 transition-transform duration-700 ease-out group-hover:scale-105 cursor-pointer"
+                onclick="openModal('{{ $room->image_path ? Storage::url($room->image_path) : asset('images/pathfinder-bannerv2.png') }}')" />
 
-        <!-- Gradient Overlay -->
-        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent pointer-events-none">
-        </div>
-
-        <!-- Overlay Content -->
-        <div
-            class="absolute bottom-0 left-0 right-0 top-0 flex flex-col justify-end p-4 sm:p-8 md:p-12 text-white pointer-events-none">
-            <div class="space-y-3 sm:space-y-4 max-w-3xl pointer-events-auto">
-                <h1
-                    class="text-transparent bg-clip-text bg-gradient-to-tr from-blue-300 to-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold drop-shadow-2xl leading-tight">
-                    {{ $room->name }}
-                </h1>
-
-                @if ($room->description)
-                    <div class="relative max-w-3xl">
-                        <p id="roomDescription"
-                            class="font-sofia text-gray-200 text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl leading-relaxed drop-shadow transition-all duration-300 max-h-16 sm:max-h-20 md:max-h-24 lg:max-h-32 overflow-hidden pr-2 scrollbar-thin scrollbar-thumb-primary relative"
-                            data-full-text="{{ $room->description }}">
-                            {{ $room->description }}
-                        </p>
-
-                        <button id="toggleDescriptionBtn"
-                            class="mt-2 text-xs sm:text-sm md:text-base text-transparent bg-clip-text bg-gradient-to-tr from-blue-300 to-white font-semibold hover-underline focus:outline-none">
-                            See more
-                        </button>
-                    </div>
-                @endif
+            <!-- Gradient Overlay -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent pointer-events-none">
             </div>
-        </div>
-    </section>
 
-    <!-- Video -->
-    @if ($room->video_path)
-        <div>
-            <h2 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 text-center">Office Video
-            </h2>
-            <video controls class="w-full rounded-lg shadow-md border-2 border-primary max-h-[400px]">
-                <source src="{{ asset('storage/' . $room->video_path) }}" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        </div>
-    @endif
+            <!-- Overlay Content -->
+            <div
+                class="absolute bottom-0 left-0 right-0 top-0 flex flex-col justify-end p-4 sm:p-8 md:p-12 text-white pointer-events-none">
+                <div class="space-y-3 sm:space-y-4 max-w-3xl pointer-events-auto">
+                    <h1
+                        class="text-transparent bg-clip-text bg-gradient-to-tr from-blue-300 to-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold drop-shadow-2xl leading-tight">
+                        {{ $room->name }}
+                    </h1>
 
-    <!-- Gallery -->
-    @if ($room->images && $room->images->count())
-        <section x-data="showMoreHandler({ total: {{ $room->images->count() }}, lgLimit: 8, smLimit: 4 })" class="mt-8 w-full">
-            <h2 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 text-center">
-                Gallery
-            </h2>
+                    @if ($room->description)
+                        <div class="relative max-w-3xl">
+                            <p id="roomDescription"
+                                class="font-sofia text-gray-200 text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl leading-relaxed drop-shadow transition-all duration-300 max-h-16 sm:max-h-20 md:max-h-24 lg:max-h-32 overflow-hidden pr-2 scrollbar-thin scrollbar-thumb-primary relative"
+                                data-full-text="{{ $room->description }}">
+                                {{ $room->description }}
+                            </p>
 
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
-                @foreach ($room->images as $index => $image)
-                    <a href="{{ asset('storage/' . $image->image_path) }}" class="glightbox"
-                        data-gallery="room-{{ $room->id }}" data-title="Office Image {{ $index + 1 }}"
-                        x-show="expanded || {{ $index }} < itemsToShow" x-transition>
-                        <div
-                            class="overflow-hidden rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer border-2 border-primary">
-                            <img src="{{ asset('storage/' . $image->image_path) }}"
-                                alt="Office Image {{ $index + 1 }}" class="w-full h-32 sm:h-40 object-cover" />
+                            <button id="toggleDescriptionBtn"
+                                class="mt-2 text-xs sm:text-sm md:text-base text-transparent bg-clip-text bg-gradient-to-tr from-blue-300 to-white font-semibold hover-underline focus:outline-none">
+                                See more
+                            </button>
                         </div>
-                    </a>
-                @endforeach
-            </div>
-
-            <!-- Toggle Button -->
-            <div class="text-center mt-5" x-show="shouldShowButton" x-transition x-cloak>
-                <button @click="toggle"
-                    class="px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full border border-primary 
-                        text-primary hover:bg-primary hover:text-white transition-colors duration-200">
-                    <span x-text="expanded ? 'Show Less' : 'Show More'"></span>
-                </button>
+                    @endif
+                </div>
             </div>
         </section>
-    @endif
 
-    <section x-data="showMoreHandler({ total: {{ $room->staff->count() }}, lgLimit: 5, smLimit: 2 })" class="mt-8 w-full">
-        <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 text-center">
-            Assigned Staff
-        </h2>
-
-        @if ($room->staff->isNotEmpty())
-            <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5">
-                @foreach ($room->staff as $index => $member)
-                    <div x-show="expanded || {{ $index }} < itemsToShow" x-transition
-                        class="bg-gradient-to-br from-slate-50 to-white dark:from-gray-700 dark:to-gray-800 
-                            rounded-lg shadow-sm hover:shadow-md border border-primary
-                            overflow-hidden group transform hover:scale-[1.02] transition-all duration-300 ease-out origin-top">
-                        <div class="cursor-pointer overflow-hidden"
-                            @click="openModal('{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/pathfinder-bannerv2.png') }}')">
-                            <img src="{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/pathfinder-bannerv2.png') }}"
-                                alt="{{ $member->full_name }}"
-                                class="w-full h-28 sm:h-32 md:h-36 object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
-                                loading="lazy">
-                        </div>
-
-                        <div class="p-2 sm:p-3 text-center space-y-0.5">
-                            <a href="{{ route('staff.client-show', $member->token) }}" target="_blank" rel="noopener noreferrer"
-                                class="block text-sm sm:text-base font-semibold text-slate-800 dark:text-gray-200 
-                                hover:text-primary transition-colors duration-200 truncate">
-                                {{ $member->full_name }}
-                            </a>
-                            <p class="text-xs sm:text-sm text-slate-600 dark:text-gray-300 truncate">
-                                {{ $member->position ?? 'No position' }}
-                            </p>
-                        </div>
-                    </div>
-                @endforeach
+        <!-- Video -->
+        @if ($room->video_path)
+            <div>
+                <h2 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 text-center">Office Video
+                </h2>
+                <video controls class="w-full rounded-lg shadow-md border-2 border-primary max-h-[400px]">
+                    <source src="{{ asset('storage/' . $room->video_path) }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
             </div>
-
-            <!-- Toggle Button -->
-            <div class="text-center mt-5" x-show="shouldShowButton" x-transition x-cloak>
-                <button @click="toggle"
-                    class="px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full border border-primary 
-                        text-primary hover:bg-primary hover:text-white transition-colors duration-200">
-                    <span x-text="expanded ? 'Show Less' : 'Show More'"></span>
-                </button>
-            </div>
-        @else
-            <p
-                class="text-center text-gray-500 dark:text-gray-400 dark:bg-gray-800 text-sm sm:text-base italic mt-4 border-2 border-primary rounded-lg p-4">
-                No staff assigned to this office.
-            </p>
         @endif
-    </section>
 
-    <!-- Office Hours -->
-    <div class="mt-6 w-full">
-        <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 text-center">
-            Office Hours
-        </h2>
+        <!-- Gallery -->
+        @if ($room->images && $room->images->count())
+            <section x-data="showMoreHandler({ total: {{ $room->images->count() }}, lgLimit: 8, smLimit: 4 })" class="mt-8 w-full">
+                <h2 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 text-center">
+                    Gallery
+                </h2>
 
-        <div
-            class="bg-gray-50 dark:bg-gray-800 border-2 border-primary rounded-lg sm:rounded-xl p-4 sm:p-6 md:p-8 shadow-sm">
-
-            @if ($room->grouped_office_hours && count($room->grouped_office_hours) > 0)
-                <div class="space-y-3 sm:space-y-4 md:space-y-5">
-                    @foreach ($room->grouped_office_hours as $timeRange => $days)
-                        <div class="flex flex-row justify-between items-center gap-2 sm:gap-4 md:gap-6">
-
-                            <!-- Days -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
+                    @foreach ($room->images as $index => $image)
+                        <a href="{{ asset('storage/' . $image->image_path) }}" class="glightbox"
+                            data-gallery="room-{{ $room->id }}" data-title="Office Image {{ $index + 1 }}"
+                            x-show="expanded || {{ $index }} < itemsToShow" x-transition>
                             <div
-                                class="font-medium text-xs sm:text-sm md:text-base text-gray-800 dark:text-gray-300 flex-1 text-left">
-                                {{ $room->formatDaysGroup($days) }}
+                                class="overflow-hidden rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer border-2 border-primary">
+                                <img src="{{ asset('storage/' . $image->image_path) }}"
+                                    alt="Office Image {{ $index + 1 }}" class="w-full h-32 sm:h-40 object-cover" />
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+
+                <!-- Toggle Button -->
+                <div class="text-center mt-5" x-show="shouldShowButton" x-transition x-cloak>
+                    <button @click="toggle"
+                        class="px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full border border-primary 
+                            text-primary hover:bg-primary hover:text-white transition-colors duration-200">
+                        <span x-text="expanded ? 'Show Less' : 'Show More'"></span>
+                    </button>
+                </div>
+            </section>
+        @endif
+
+        <section x-data="showMoreHandler({ total: {{ $room->staff->count() }}, lgLimit: 5, smLimit: 2 })" class="mt-8 w-full">
+            <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 text-center">
+                Assigned Staff
+            </h2>
+
+            @if ($room->staff->isNotEmpty())
+                <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5">
+                    @foreach ($room->staff as $index => $member)
+                        <div x-show="expanded || {{ $index }} < itemsToShow" x-transition
+                            class="bg-gradient-to-br from-slate-50 to-white dark:from-gray-700 dark:to-gray-800 
+                                rounded-lg shadow-sm hover:shadow-md border border-primary
+                                overflow-hidden group transform hover:scale-[1.02] transition-all duration-300 ease-out origin-top">
+                            <div class="cursor-pointer overflow-hidden"
+                                @click="openModal('{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/pathfinder-bannerv2.png') }}')">
+                                <img src="{{ $member->photo_path ? Storage::url($member->photo_path) : asset('images/pathfinder-bannerv2.png') }}"
+                                    alt="{{ $member->full_name }}"
+                                    class="w-full h-28 sm:h-32 md:h-36 object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
+                                    loading="lazy">
                             </div>
 
-                            <!-- Time Range -->
-                            <div class="text-xs sm:text-sm md:text-base text-right">
-                                @if (strtolower($timeRange) === 'closed')
-                                    <span class="text-red-600 font-semibold">Closed</span>
-                                @else
-                                    <span class="text-gray-600 dark:text-gray-300 font-medium">
-                                        {{ $timeRange }}
-                                    </span>
-                                @endif
+                            <div class="p-2 sm:p-3 text-center space-y-0.5">
+                                <a href="{{ route('staff.client-show', $member->token) }}" target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="block text-sm sm:text-base font-semibold text-slate-800 dark:text-gray-200 
+                                    hover:text-primary transition-colors duration-200 truncate">
+                                    {{ $member->full_name }}
+                                </a>
+                                <p class="text-xs sm:text-sm text-slate-600 dark:text-gray-300 truncate">
+                                    {{ $member->position ?? 'No position' }}
+                                </p>
                             </div>
                         </div>
                     @endforeach
                 </div>
-            @else
-                <div class="text-center text-gray-500 italic text-sm sm:text-base">
-                    No office hours specified
-                </div>
-            @endif
-        </div>
-    </div>
 
-    <!-- Fun Fact (if exists) -->
-    @if (isset($fact) && $fact)
-        <div class="mt-6 text-center">
-            <h2 class="text-sm sm:text-base md:text-lg text-gray-800 dark:text-gray-200">Did you know?</h2>
-            <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 italic">{{ $fact }}</p>
+                <!-- Toggle Button -->
+                <div class="text-center mt-5" x-show="shouldShowButton" x-transition x-cloak>
+                    <button @click="toggle"
+                        class="px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full border border-primary 
+                            text-primary hover:bg-primary hover:text-white transition-colors duration-200">
+                        <span x-text="expanded ? 'Show Less' : 'Show More'"></span>
+                    </button>
+                </div>
+            @else
+                <p
+                    class="text-center text-gray-500 dark:text-gray-400 dark:bg-gray-800 text-sm sm:text-base italic mt-4 border-2 border-primary rounded-lg p-4">
+                    No staff assigned to this office.
+                </p>
+            @endif
+        </section>
+
+        <!-- Office Hours -->
+        <div class="mt-6 w-full">
+            <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 text-center">
+                Office Hours
+            </h2>
+
+            <div
+                class="bg-gray-50 dark:bg-gray-800 border-2 border-primary rounded-lg sm:rounded-xl p-4 sm:p-6 md:p-8 shadow-sm">
+
+                @if ($room->grouped_office_hours && count($room->grouped_office_hours) > 0)
+                    <div class="space-y-3 sm:space-y-4 md:space-y-5">
+                        @foreach ($room->grouped_office_hours as $timeRange => $days)
+                            <div class="flex flex-row justify-between items-center gap-2 sm:gap-4 md:gap-6">
+
+                                <!-- Days -->
+                                <div
+                                    class="font-medium text-xs sm:text-sm md:text-base text-gray-800 dark:text-gray-300 flex-1 text-left">
+                                    {{ $room->formatDaysGroup($days) }}
+                                </div>
+
+                                <!-- Time Range -->
+                                <div class="text-xs sm:text-sm md:text-base text-right">
+                                    @if (strtolower($timeRange) === 'closed')
+                                        <span class="text-red-600 font-semibold">Closed</span>
+                                    @else
+                                        <span class="text-gray-600 dark:text-gray-300 font-medium">
+                                            {{ $timeRange }}
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-center text-gray-500 italic text-sm sm:text-base">
+                        No office hours specified
+                    </div>
+                @endif
+            </div>
         </div>
-    @endif
+
+        <!-- Fun Fact (if exists) -->
+        @if (isset($fact) && $fact)
+            <div class="mt-6 text-center">
+                <h2 class="text-sm sm:text-base md:text-lg text-gray-800 dark:text-gray-200">Did you know?</h2>
+                <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 italic">{{ $fact }}</p>
+            </div>
+        @endif
+    </div>
 </div>
 
 <!-- Reusable Image Modal Markup -->
