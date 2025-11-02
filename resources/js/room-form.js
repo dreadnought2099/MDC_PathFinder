@@ -4,6 +4,7 @@ import { initializeVideoUpload } from "./room-modules/video-upload";
 import { initializeOfficeHours } from "./room-modules/office-hours";
 import { initializeFormSubmission } from "./room-modules/form-submission";
 import { initializeConditionalFields } from "./room-modules/conditional-fields";
+import { initializeTextareaAutoResize } from "./room-modules/textarea-auto-resize";
 
 document.addEventListener("DOMContentLoaded", function () {
     window.existingOfficeHours = window.existingOfficeHours || {};
@@ -26,6 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
         isUploading = uploading;
     });
     initializeConditionalFields();
+    initializeTextareaAutoResize();
 });
 
 // Make removeFile globally available for inline Blade onclick handlers

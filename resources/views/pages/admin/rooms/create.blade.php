@@ -2,7 +2,8 @@
 
 @section('content')
     <div class="max-w-4xl mx-auto mt-10 mb-10 rounded-lg border-2 shadow-2xl border-primary p-6 dark:bg-gray-800">
-        <h2 class="text-2xl text-center mb-12 font-bold dark:text-gray-300 text-gray-800"><span class="text-primary">Add</span> New Office</h2>
+        <h2 class="text-2xl text-center mb-12 font-bold dark:text-gray-300 text-gray-800"><span
+                class="text-primary">Add</span> New Office</h2>
 
         <x-upload-progress-modal>
             <form action="{{ route('room.store') }}" method="POST" enctype="multipart/form-data" id="room-form">
@@ -48,8 +49,11 @@
 
                 <!-- Description (Full Width) -->
                 <div class="relative mb-6">
-                    <textarea name="description" placeholder="Description" class="{{ $inputClasses }}" rows="3">{{ old('description') }}</textarea>
-                    <label class="{{ $labelClasses }}">Description</label>
+                    <textarea name="description" id="description" placeholder="Description" rows="3"
+                        class="{{ $inputClasses }} resize-none overflow-y-auto max-h-60 leading-relaxed">{{ old('description', $room->description ?? '') }}</textarea>
+
+                    <label for="description" class="{{ $labelClasses }}">Description</label>
+
                     @error('description')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror
