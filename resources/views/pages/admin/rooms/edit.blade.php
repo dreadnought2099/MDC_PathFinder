@@ -51,9 +51,12 @@
 
                 <!-- Description (Full Width) -->
                 <div class="relative mb-6">
-                    <textarea name="description" id="description" placeholder="Description"
-                        class="{{ $inputClasses }} resize-none overflow-hidden" rows="3">{{ old('description', $room->description) }}</textarea>
-                    <label class="{{ $labelClasses }}">Description</label>
+                    <textarea name="description" id="description" placeholder="Description" rows="3"
+                        class="{{ $inputClasses }} resize-none overflow-y-auto max-h-60 leading-relaxed">{{ old('description', $room->description ?? '') }}
+                    </textarea>
+
+                    <label for="description" class="{{ $labelClasses }}">Description</label>
+
                     @error('description')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror

@@ -1,5 +1,6 @@
 <div class="min-h-screen w-full p-4 sm:p-6 md:p-8 lg:p-10">
-    <div class="w-full px-6 sm:px-10 md:px-16 lg:px-20 xl:px-24 py-8 sm:py-10 md:py-12 space-y-12 mx-auto max-w-7xl bg-white dark:bg-gray-900 rounded-2xl shadow-lg border-2 border-primary transition-colors duration-300">
+    <div
+        class="w-full px-6 sm:px-10 md:px-16 lg:px-20 xl:px-24 py-8 sm:py-10 md:py-12 space-y-12 mx-auto max-w-7xl bg-white dark:bg-gray-900 rounded-2xl shadow-lg border-2 border-primary transition-colors duration-300">
         <!-- Cover Image -->
         <section
             class="relative w-full h-[400px] sm:h-[500px] md:h-[600px] rounded-2xl  border-2 border-primary mb-12 group transition-all duration-700 ease-out overflow-hidden">
@@ -29,14 +30,14 @@
 
                     @if ($room->description)
                         <div class="relative max-w-3xl">
-                            <p id="roomDescription"
-                                class="font-sofia text-gray-200 text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl leading-relaxed drop-shadow transition-all duration-300 max-h-16 sm:max-h-20 md:max-h-24 lg:max-h-32 overflow-hidden pr-2 scrollbar-thin scrollbar-thumb-primary relative"
+                            <div id="roomDescription"
+                                class="font-sofia text-gray-200 text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl leading-relaxed drop-shadow transition-all duration-300 max-h-16 sm:max-h-20 md:max-h-24 lg:max-h-32 overflow-hidden pr-2 scrollbar-thin scrollbar-thumb-primary relative whitespace-pre-line space-y-3"
                                 data-full-text="{{ $room->description }}">
                                 {{ $room->description }}
-                            </p>
+                            </div>
 
                             <button id="toggleDescriptionBtn"
-                                class="mt-2 text-xs sm:text-sm md:text-base text-transparent bg-clip-text bg-gradient-to-tr from-blue-300 to-white font-semibold hover-underline focus:outline-none">
+                                class="hidden mt-2 text-xs sm:text-sm md:text-base text-transparent bg-clip-text bg-gradient-to-tr from-blue-300 to-white font-semibold hover-underline focus:outline-none">
                                 See more
                             </button>
                         </div>
@@ -345,31 +346,56 @@
             });
 
             if (!desc || !btn) return;
+
+            // Always ensure text is properly displayed
             const fullText = desc.dataset.fullText?.trim() ?? '';
             desc.textContent = fullText;
 
+            // Helper function to check overflow
             function isOverflowing(el) {
                 return el.scrollHeight > el.clientHeight;
             }
 
+            // NEW: If the text does not overflow, show it fully and hide the button
             if (!isOverflowing(desc)) {
+                desc.classList.remove(
+                    'max-h-16',
+                    'sm:max-h-20',
+                    'md:max-h-24',
+                    'lg:max-h-32',
+                    'overflow-hidden'
+                );
                 btn.style.display = 'none';
                 return;
             }
 
+            // If the text overflows, keep “See more” button visible
+            btn.style.display = 'inline-block';
+
             let expanded = false;
             btn.addEventListener('click', () => {
                 expanded = !expanded;
+
                 if (expanded) {
-                    desc.classList.remove('max-h-16', 'sm:max-h-20', 'md:max-h-24', 'lg:max-h-32',
-                        'overflow-hidden');
+                    desc.classList.remove(
+                        'max-h-16',
+                        'sm:max-h-20',
+                        'md:max-h-24',
+                        'lg:max-h-32',
+                        'overflow-hidden'
+                    );
                     desc.classList.add('overflow-y-auto');
                     desc.style.maxHeight = '200px';
                     btn.textContent = 'See less';
                 } else {
                     desc.classList.remove('overflow-y-auto');
-                    desc.classList.add('max-h-16', 'sm:max-h-20', 'md:max-h-24', 'lg:max-h-32',
-                        'overflow-hidden');
+                    desc.classList.add(
+                        'max-h-16',
+                        'sm:max-h-20',
+                        'md:max-h-24',
+                        'lg:max-h-32',
+                        'overflow-hidden'
+                    );
                     desc.style.maxHeight = null;
                     btn.textContent = 'See more';
                 }

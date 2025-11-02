@@ -38,7 +38,7 @@
                                 </div>
 
                                 <button id="toggleDescriptionBtn"
-                                    class="mt-2 text-xs sm:text-sm md:text-base text-transparent bg-clip-text bg-gradient-to-tr from-blue-300 to-white font-semibold hover-underline focus:outline-none">
+                                    class="hidden mt-2 text-xs sm:text-sm md:text-base text-transparent bg-clip-text bg-gradient-to-tr from-blue-300 to-white font-semibold hover-underline focus:outline-none">
                                     See more
                                 </button>
                             </div>
@@ -372,31 +372,56 @@
             });
 
             if (!desc || !btn) return;
+
+            // Always ensure text is properly displayed
             const fullText = desc.dataset.fullText?.trim() ?? '';
             desc.textContent = fullText;
 
+            // Helper function to check overflow
             function isOverflowing(el) {
                 return el.scrollHeight > el.clientHeight;
             }
 
+            // NEW: If the text does not overflow, show it fully and hide the button
             if (!isOverflowing(desc)) {
+                desc.classList.remove(
+                    'max-h-16',
+                    'sm:max-h-20',
+                    'md:max-h-24',
+                    'lg:max-h-32',
+                    'overflow-hidden'
+                );
                 btn.style.display = 'none';
                 return;
             }
 
+            // If the text overflows, keep “See more” button visible
+            btn.style.display = 'inline-block';
+
             let expanded = false;
             btn.addEventListener('click', () => {
                 expanded = !expanded;
+
                 if (expanded) {
-                    desc.classList.remove('max-h-16', 'sm:max-h-20', 'md:max-h-24', 'lg:max-h-32',
-                        'overflow-hidden');
+                    desc.classList.remove(
+                        'max-h-16',
+                        'sm:max-h-20',
+                        'md:max-h-24',
+                        'lg:max-h-32',
+                        'overflow-hidden'
+                    );
                     desc.classList.add('overflow-y-auto');
                     desc.style.maxHeight = '200px';
                     btn.textContent = 'See less';
                 } else {
                     desc.classList.remove('overflow-y-auto');
-                    desc.classList.add('max-h-16', 'sm:max-h-20', 'md:max-h-24', 'lg:max-h-32',
-                        'overflow-hidden');
+                    desc.classList.add(
+                        'max-h-16',
+                        'sm:max-h-20',
+                        'md:max-h-24',
+                        'lg:max-h-32',
+                        'overflow-hidden'
+                    );
                     desc.style.maxHeight = null;
                     btn.textContent = 'See more';
                 }
