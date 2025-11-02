@@ -144,7 +144,7 @@
     @include('components.navbar')
 
     <!-- Main Content -->
-    <main class="flex-grow container mx-auto px-4">
+    <main class="flex-grow container mx-auto px-4 pt-20">
         @yield('content')
     </main>
 
