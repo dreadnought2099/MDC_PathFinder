@@ -31,11 +31,11 @@
 
                         @if ($room->description)
                             <div class="relative max-w-3xl">
-                                <p id="roomDescription"
-                                    class="font-sofia text-gray-200 text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl leading-relaxed drop-shadow transition-all duration-300 max-h-16 sm:max-h-20 md:max-h-24 lg:max-h-32 overflow-hidden pr-2 scrollbar-thin scrollbar-thumb-primary relative"
+                                <div id="roomDescription"
+                                    class="font-sofia text-gray-200 text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl leading-relaxed drop-shadow transition-all duration-300 max-h-16 sm:max-h-20 md:max-h-24 lg:max-h-32 overflow-hidden pr-2 scrollbar-thin scrollbar-thumb-primary relative whitespace-pre-line space-y-3"
                                     data-full-text="{{ $room->description }}">
                                     {{ $room->description }}
-                                </p>
+                                </div>
 
                                 <button id="toggleDescriptionBtn"
                                     class="mt-2 text-xs sm:text-sm md:text-base text-transparent bg-clip-text bg-gradient-to-tr from-blue-300 to-white font-semibold hover-underline focus:outline-none">
