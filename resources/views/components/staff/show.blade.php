@@ -1,6 +1,6 @@
 @props(['staff'])
 
-<div class="min-h-screen bg-white py-8 px-4 dark:bg-gray-900">
+<div class="min-h-screen py-8 px-4">
     <div class="max-w-2xl mx-auto">
 
         <!-- Profile Card -->
