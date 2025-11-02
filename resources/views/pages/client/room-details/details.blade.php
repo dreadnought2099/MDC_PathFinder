@@ -265,6 +265,22 @@
                     close: '<img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder@f0f57bf/public/icons/exit.png" alt="Close"/>',
                     next: '<img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder@f0f57bf/public/icons/next.svg" alt="Next"/>',
                     prev: '<img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder@f0f57bf/public/icons/prev.svg" alt="Previous"/>',
+                },
+                // Add event callbacks to handle focus properly
+                onOpen: () => {
+                    // Remove focus from the triggering element
+                    if (document.activeElement) {
+                        document.activeElement.blur();
+                    }
+                    // Store the element that triggered the lightbox
+                    window.glightboxTrigger = document.activeElement;
+                },
+                onClose: () => {
+                    // Return focus to the triggering element when closing
+                    if (window.glightboxTrigger) {
+                        window.glightboxTrigger.focus();
+                        window.glightboxTrigger = null;
+                    }
                 }
             });
         }
@@ -282,6 +298,10 @@
                 modalImage.src = src.trim();
                 modal.classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
+                // Blur the active element to prevent focus issues
+                if (document.activeElement) {
+                    document.activeElement.blur();
+                }
             };
 
             window.closeModal = function() {

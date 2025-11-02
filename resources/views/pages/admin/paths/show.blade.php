@@ -90,6 +90,20 @@
                     close: '<img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder@f0f57bf/public/icons/exit.png" alt="Close"/>',
                     next: '<img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder@f0f57bf/public/icons/next.svg" alt="Next"/>',
                     prev: '<img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder@f0f57bf/public/icons/prev.svg" alt="Previous"/>',
+                },
+
+                // ADD THESE CALLBACKS:
+                onOpen: () => {
+                    if (document.activeElement) {
+                        document.activeElement.blur();
+                    }
+                    window.glightboxTrigger = document.activeElement;
+                },
+                onClose: () => {
+                    if (window.glightboxTrigger) {
+                        window.glightboxTrigger.focus();
+                        window.glightboxTrigger = null;
+                    }
                 }
             });
         }
