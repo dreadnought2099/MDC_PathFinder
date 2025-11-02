@@ -63,7 +63,7 @@
                         group-hover:opacity-100 group-hover:visible 
                         transition-all duration-300 whitespace-nowrap 
                         pointer-events-none
-                        hidden sm:block">
+                        hidden sm:block font-sofia">
 
                 Scan Office QR
 
