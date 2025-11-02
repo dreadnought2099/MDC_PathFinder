@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (bioTextarea) setupAutoResize(bioTextarea);
 
     // Form submission handler with Alpine.js modal support
-    const form = document.querySelector("form[action*='staff']");
+    const form = document.getElementById("staff-form");
     if (form) {
 
         let isSubmitting = false;
