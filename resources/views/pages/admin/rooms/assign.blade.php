@@ -8,7 +8,7 @@
                 <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-1 dark:text-gray-100">
                     <img-reveal>
                         <span class="trigger-text text-primary">Assign</span>
-                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/cat-laptop.gif"
+                        <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/cat.gif"
                             alt="GIF" class="reveal-img">
                     </img-reveal>
                     Staff to Office
