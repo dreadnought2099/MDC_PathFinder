@@ -23,7 +23,7 @@
 
         <!-- Main content -->
         <div class="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8">
-            <div class="w-full max-w-lg bg-white border-2 border-primary dark:bg-gray-800 shadow-lg rounded-md p-6">
+            <div class="w-full max-w-lg text-gray-800 bg-white border-2 border-primary dark:bg-gray-800 shadow-lg rounded-md p-6">
                 <h2 class="text-2xl mb-6 text-center dark:text-gray-200">
                     Select Starting Point & Destination
                 </h2>
@@ -36,7 +36,7 @@
                             Starting Point
                         </label>
 
-                        <div class="relative">
+                        <div class="font-sofia relative">
                             <input type="text" id="from_room_search" autocomplete="off"
                                 placeholder="Search or select an office"
                                 class="w-full border border-primary focus:ring-2 focus:border-primary focus:ring-primary focus:outline-none rounded-lg p-2 pr-8 dark:bg-gray-700 dark:text-gray-200 transition-all duration-200">
@@ -72,7 +72,7 @@
                             Destination
                         </label>
 
-                        <div class="relative">
+                        <div class="font-sofia relative">
                             <input type="text" id="to_room_search" autocomplete="off"
                                 placeholder="Search or select an office"
                                 class="w-full border border-primary focus:ring-2 focus:border-primary focus:ring-primary focus:outline-none rounded-lg p-2 pr-8 dark:bg-gray-700 dark:text-gray-200 transition-all duration-200">
