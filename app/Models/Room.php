@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class Room extends Model
 {
@@ -49,6 +50,11 @@ class Room extends Model
     public function incomingPaths()
     {
         return $this->hasMany(Path::class, 'to_room_id');
+    }
+
+    public function officeManager()
+    {
+        return $this->hasOne(User::class)->whereHas('roles', fn($q) => $q->where('name', 'Office Manager'));
     }
 
     /**

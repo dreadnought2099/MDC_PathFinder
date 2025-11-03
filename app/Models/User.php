@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Spatie\Permission\Traits\HasRoles;
@@ -59,7 +60,8 @@ class User extends Authenticatable
         ];
     }
 
-    protected static function booted(){
+    protected static function booted()
+    {
         static::saving(function ($user) {
             if ($user->hasRole('Admin')) {
                 $user->room_id = null; // Admins should not be assigned to any room
@@ -72,6 +74,12 @@ class User extends Authenticatable
         return $this->belongsTo(Room::class);
     }
 
+    // Clear all active sessions and remember token
+    public function clearSessions()
+    {
+        DB::table('sessions')->where('user_id', $this->id)->delete();
+        $this->update(['remember_token' => null]);
+    }
 
     /**
      * Generate one-time recovery codes, hash them for storage,

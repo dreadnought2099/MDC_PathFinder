@@ -34,7 +34,7 @@
                             {{ $user->getRoleNames()->implode(', ') ?? '-' }}</td>
                         <td class="px-4 sm:px-6 py-2 flex flex-wrap items-center space-x-1 sm:space-x-3">
 
-                            @if (auth()->user()->hasRole('Admin') || auth()->user()->can('view room users'))
+                            @can('view', $user)
                                 <div class="relative inline-block group">
                                     <a href="{{ route('room-user.show', $user->id) }}"
                                         class="hover-underline hover:scale-125 ease-in-out transform transition-transform duration-200">
@@ -56,8 +56,9 @@
                                         </div>
                                     </div>
                                 </div>
-                            @endif
-                            @if (auth()->user()->hasRole('Admin'))
+                            @endcan
+
+                            @can('edit', $user)
                                 <div class="relative inline-block group">
                                     <a href="{{ route('room-user.edit', $user->id) }}"
                                         class="hover-underline-edit hover:scale-125 ease-in-out transform transition-transform duration-200">
@@ -78,6 +79,9 @@
                                         </div>
                                     </div>
                                 </div>
+                            @endcan
+
+                            @can('update', $user)
                                 <div class="relative inline-block group">
                                     <button type="button"
                                         onclick="openToggleModal('{{ $user->id }}', '{{ $user->username }}', '{{ $user->is_active ? 'disable' : 'enable' }}')"
@@ -104,6 +108,9 @@
                                         </div>
                                     </div>
                                 </div>
+                            @endcan
+
+                            @can('delete', $user)
                                 <div class="relative inline-block group">
                                     <button
                                         onclick="openUserModal('{{ $user->id }}', '{{ addslashes($user->username) }}')"
@@ -126,7 +133,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            @endif
+                            @endcan
                         </td>
                     </tr>
                 @empty
