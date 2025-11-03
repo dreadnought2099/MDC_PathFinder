@@ -13,7 +13,7 @@
                 group-hover:opacity-100 group-hover:visible transition-all duration-300 
                 whitespace-nowrap dark:bg-gray-700 pointer-events-none font-sofia">
         Meet the Team
-        
+
         <!-- Arrow -->
         <div
             class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 
@@ -61,11 +61,15 @@
                     <!-- Team Member 1 -->
                     <div
                         class="group bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-2xl border-2 border-primary transition-all duration-300 p-6 flex flex-col items-center text-center shadow-primary-hover">
-                        <div class="relative mb-4">
-                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png"
-                                alt="Joshua A. Salabe"
-                                class="w-28 h-28 rounded-full object-cover group-hover:scale-105 transition-transform duration-300 shadow-primary-hover">
-                        </div>
+                        <img-reveal>
+                            <span class="trigger-text relative mb-4">
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png"
+                                    alt="Joshua A. Salabe"
+                                    class="w-28 h-28 rounded-full object-cover group-hover:scale-105 transition-transform duration-300 shadow-primary-hover">
+                            </span>
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/gru-hi.gif"
+                                alt="GIF" class="reveal-img">
+                        </img-reveal>
 
                         <h3 class="text-base font-bold text-gray-800 dark:text-gray-200 mb-1">
                             Joshua A. Salabe
@@ -94,11 +98,15 @@
                     <!-- Team Member 2 -->
                     <div
                         class="group bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-2xl border-2 border-primary transition-all duration-300 p-6 flex flex-col items-center text-center shadow-primary-hover">
-                        <div class="relative mb-4">
-                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png"
-                                alt="Chris Marie Calesa"
-                                class="w-28 h-28 rounded-full object-cover group-hover:scale-105 transition-transform duration-300 shadow-primary-hover">
-                        </div>
+                        <img-reveal>
+                            <span class="trigger-text relative mb-4">
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png"
+                                    alt="Chris Marie Calesa"
+                                    class="w-28 h-28 rounded-full object-cover group-hover:scale-105 transition-transform duration-300 shadow-primary-hover">
+                            </span>
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/dance.gif"
+                                alt="GIF" class="reveal-img">
+                        </img-reveal>
 
                         <h3 class="text-base font-bold text-gray-800 dark:text-gray-200 mb-1">
                             Chris Marie Calesa
@@ -127,11 +135,16 @@
                     <!-- Team Member 3 -->
                     <div
                         class="group bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-2xl border-2 border-primary transition-all duration-300 p-6 flex flex-col items-center text-center shadow-primary-hover">
-                        <div class="relative mb-4">
-                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png"
-                                alt="Joana Jean Astacaan"
-                                class="w-28 h-28 rounded-full object-cover group-hover:scale-105 transition-transform duration-300 shadow-primary-hover">
-                        </div>
+
+                        <img-reveal>
+                            <span class="trigger-text relative mb-4">
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png"
+                                    alt="Joana Jean Astacaan"
+                                    class="w-28 h-28 rounded-full object-cover group-hover:scale-105 transition-transform duration-300 shadow-primary-hover">
+                            </span>
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/dance-minion.gif"
+                                alt="GIF" class="reveal-img">
+                        </img-reveal>
 
                         <h3 class="text-base font-bold text-gray-800 dark:text-gray-200 mb-1">
                             Joana Jean Astacaan
@@ -160,11 +173,16 @@
                     <!-- Team Member 4 -->
                     <div
                         class="group bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-2xl border-2 border-primary transition-all duration-300 p-6 flex flex-col items-center text-center shadow-primary-hover">
-                        <div class="relative mb-4">
-                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/profile.jpeg"
-                                alt="Raymart E. Magallanes"
-                                class="w-28 h-28 rounded-full object-cover group-hover:scale-105 transition-transform duration-300 shadow-primary-hover">
-                        </div>
+
+                        <img-reveal>
+                            <span class="trigger-text relative mb-4">
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/profile.jpeg"
+                                    alt="Raymart E. Magallanes"
+                                    class="w-28 h-28 rounded-full object-cover group-hover:scale-105 transition-transform duration-300 shadow-primary-hover">
+                            </span>
+                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/dance-minion2.gif"
+                                alt="GIF" class="reveal-img">
+                        </img-reveal>
 
                         <h3 class="text-base font-bold text-gray-800 dark:text-gray-200 mb-1">
                             Raymart E. Magallanes
