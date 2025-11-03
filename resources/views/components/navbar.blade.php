@@ -30,14 +30,14 @@
                     class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 dark:border-gray-700 rounded-xl shadow-lg z-[60] overflow-hidden">
 
                     <a href="{{ route('admin.profile') }}"
-                        class="block px-4 py-2 text-sm text-gray-800 dark:text-gray-300 hover:bg-primary hover:text-white transition-colors duration-150">
+                        class="block px-4 py-2 text-sm text-primary hover:bg-primary hover:text-white transition-colors duration-150">
                         Profile
                     </a>
 
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit"
-                            class="w-full text-left px-4 py-2 text-sm text-gray-800 dark:text-gray-300 hover:bg-secondary hover:text-white transition-colors duration-150 cursor-pointer">
+                            class="w-full text-left px-4 py-2 text-sm text-secondary hover:bg-secondary hover:text-white transition-colors duration-150 cursor-pointer">
                             Logout
                         </button>
                     </form>

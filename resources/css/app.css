@@ -86,24 +86,18 @@
 
     /* Modern thin scrollbar with custom color */
     ::-webkit-scrollbar {
-        width: 8px;
-        /* thin vertical scrollbar */
-        height: 8px;
-        /* thin horizontal scrollbar */
+        width: 10px;
+        height: 10px;
     }
 
     ::-webkit-scrollbar-track {
         background: transparent;
-        /* minimal track */
     }
 
     ::-webkit-scrollbar-thumb {
         background-color: #157ee1;
-        /* your custom color */
         border-radius: 9999px;
-        /* fully rounded */
         border: 2px solid transparent;
-        /* padding effect */
         background-clip: content-box;
         transition: background-color 0.2s ease, transform 0.2s ease;
     }
