@@ -5,7 +5,7 @@
         <div class="max-w-lg mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border-2 border-primary relative">
             <img-reveal class="block text-center relative">
                 <h2 class="trigger-text text-4xl text-center mb-6 text-primary inline-block">Profile</h2> <img
-                    src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/gru-hi.gif" alt="GIF"
+                    src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/flex-minion.gif" alt="GIF"
                     class="reveal-img">
             </img-reveal>
 
