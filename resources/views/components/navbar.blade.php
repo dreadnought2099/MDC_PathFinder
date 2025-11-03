@@ -11,7 +11,7 @@
         <div class="flex items-center space-x-6 sm:space-x-8 pr-2">
             <x-dark-mode-toggle />
 
-            <div class="relative" x-data="{ open: false }" x-cloak>
+            <div class="relative" x-data="{ open: false, borderColor: '' }" x-cloak>
                 <!-- Profile Button -->
                 <button @click="open = !open"
                     class="flex items-center gap-2 focus:outline-none cursor-pointer text-gray-800 dark:text-gray-300 hover:text-primary transition">
@@ -27,16 +27,21 @@
 
                 <!-- Dropdown -->
                 <div x-show="open" x-transition @click.away="open = false"
-                    class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 dark:border-gray-700 rounded-xl shadow-lg z-[60] overflow-hidden">
+                    :class="`absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 dark:border-gray-700 rounded-xl shadow-lg z-[60] overflow-hidden transition-all duration-150 ${borderColor ? 'ring-2 ring-inset ring-offset-0' : ''}`"
+                    :style="borderColor ? '--tw-ring-color: ' + borderColor : ''">
 
-                    <a href="{{ route('admin.profile') }}"
+                    <!-- Profile Item -->
+                    <a href="{{ route('admin.profile') }}" @mouseenter="borderColor = 'var(--color-primary)'"
+                        @mouseleave="borderColor = ''"
                         class="block px-4 py-2 text-sm text-primary hover:bg-primary hover:text-white transition-colors duration-150">
                         Profile
                     </a>
 
+                    <!-- Logout Item -->
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit"
+                        <button type="submit" @mouseenter="borderColor = 'var(--color-secondary)'"
+                            @mouseleave="borderColor = ''"
                             class="w-full text-left px-4 py-2 text-sm text-secondary hover:bg-secondary hover:text-white transition-colors duration-150 cursor-pointer">
                             Logout
                         </button>
