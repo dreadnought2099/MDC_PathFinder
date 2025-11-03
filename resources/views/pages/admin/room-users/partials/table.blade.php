@@ -58,7 +58,7 @@
                                 </div>
                             @endcan
 
-                            @can('edit', $user)
+                            @can('update', $user)
                                 <div class="relative inline-block group">
                                     <a href="{{ route('room-user.edit', $user->id) }}"
                                         class="hover-underline-edit hover:scale-125 ease-in-out transform transition-transform duration-200">

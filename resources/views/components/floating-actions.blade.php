@@ -1,7 +1,7 @@
 <div>
     <!-- It is never too late to be what you might have been. - George Eliot -->
     <div x-data="{ open: false }" @click.away="open = false"
-        class="fixed bottom-6 right-6 flex flex-col items-end space-y-2 z-50">
+        class="fixed bottom-6 right-6 flex flex-col items-end space-y-2 z-49">
         <!-- Buttons -->
         @if (auth()->user()->hasRole('Admin'))
             <template x-if="open">
