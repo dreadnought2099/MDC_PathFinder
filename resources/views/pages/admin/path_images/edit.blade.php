@@ -21,9 +21,16 @@
             @method('PATCH')
             <input type="hidden" name="path_id" value="{{ $path->id }}">
 
+            <!-- Pagination - Top -->
+            @if (method_exists($pathImages, 'links'))
+                <div id="paginationTop" class="mb-4">
+                    {{ $pathImages->appends(request()->query())->links('pagination::tailwind') }}
+                </div>
+            @endif
+
             <!-- Images Grid with Add Button -->
             <div class="relative mb-8">
-                <!-- Add Path Image Button - Positioned at top right corner -->
+                <!-- Add Path Image Button -->
                 <div class="absolute -top-3 -right-3 z-10 group">
                     <a href="{{ route('path-image.create', $path->id) }}"
                         class="hover-underline inline-flex items-center justify-center p-2 rounded-md hover:scale-125 transition duration-200 bg-white dark:bg-gray-800 shadow-md border border-primary">
@@ -39,96 +46,24 @@
                     </div>
                 </div>
 
-                <div class="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-                    @foreach ($pathImages as $index => $image)
-                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-3 border border-primary">
-                            <input type="hidden" name="images[{{ $index }}][id]" value="{{ $image->id }}">
-
-                            <!-- Image -->
-                            <div class="relative mb-3">
-                                <img src="{{ asset('storage/' . $image->image_file) }}"
-                                    alt="Image {{ $image->image_order }}" class="w-full h-32 object-cover rounded">
-
-                                <!-- Order Badge -->
-                                <div
-                                    class="absolute top-1 left-1 bg-primary text-white px-1.5 py-0.5 rounded text-xs font-medium">
-                                    {{ $image->image_order }}
-                                </div>
-
-                                <!-- Delete Checkbox -->
-                                <div class="absolute top-1 right-1">
-                                    <label
-                                        class="flex items-center bg-white rounded px-1.5 py-0.5 text-xs cursor-pointer text-red-600">
-                                        <input type="checkbox" name="images[{{ $index }}][delete]" value="1"
-                                            class="text-red-600 mr-1 custom-time-input w-3 h-3">
-                                        Delete
-                                    </label>
-                                </div>
-                            </div>
-
-                            <!-- Controls -->
-                            <div class="space-y-2">
-                                <!-- Order -->
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        Order
-                                    </label>
-                                    <input type="number" name="images[{{ $index }}][image_order]"
-                                        value="{{ $image->image_order }}" min="1"
-                                        class="w-full px-2 py-1.5 text-sm border border-primary rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
-                                </div>
-
-                                <!-- Replace File -->
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        Replace Image
-                                    </label>
-                                    <div class="relative">
-                                        <input type="file" name="images[{{ $index }}][image_file]"
-                                            accept="image/*"
-                                            class="image-file-input w-full text-xs border border-primary rounded px-2 py-1.5 
-                                                    file:mr-2 file:py-0.5 file:px-2 file:rounded file:border-0 
-                                                    file:bg-[#157ee1] file:hover:bg-white file:text-white file:text-xs focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                                            data-index="{{ $index }}">
-
-                                        <p class="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
-                                            Max 10MB. Compressed to 2000px.
-                                        </p>
-
-                                        <!-- Clear button (hidden by default) -->
-                                        <button type="button"
-                                            class="clear-file-btn hidden absolute right-1 top-1/2 -translate-y-1/2 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-colors duration-200"
-                                            data-index="{{ $index }}" title="Clear selected file">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20"
-                                                fill="currentColor">
-                                                <path fill-rule="evenodd"
-                                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                                    clip-rule="evenodd" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                    <!-- Error message for file size -->
-                                    <p class="file-size-error hidden text-red-600 text-[10px] mt-0.5"
-                                        data-index="{{ $index }}">
-                                        <!-- JavaScript will populate this dynamically -->
-                                    </p>
-
-                                    <!-- File name display -->
-                                    <p class="file-name-display hidden text-gray-600 dark:text-gray-400 text-[10px] mt-0.5"
-                                        data-index="{{ $index }}">
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
+                <!-- Grid Container -->
+                <div id="imagesGridContainer">
+                    @include('pages.admin.path_images.partials.images-grid')
                 </div>
             </div>
 
-            <!-- Spacer to prevent content from being hidden behind fixed buttons -->
+            <!-- Pagination - Bottom -->
+            @if (method_exists($pathImages, 'links'))
+                <div id="paginationBottom" class="mb-6">
+                    {{ $pathImages->appends(request()->query())->links('pagination::tailwind') }}
+                </div>
+            @endif
+
+            <!-- Spacer -->
             <div class="h-28 sm:h-24"></div>
         </form>
 
-        <!-- Actions - Fixed at bottom with responsive padding -->
+        <!-- Actions - Fixed at bottom -->
         <div class="fixed bottom-0 left-0 right-0 z-40 flex justify-center px-4 pt-3 pb-24 sm:pb-20 md:pb-4">
             <div
                 class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-2xl border border-primary shadow-lg rounded-lg px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 w-full max-w-2xl">
@@ -150,42 +85,212 @@
 
 @push('scripts')
     <script>
-        const MAX_FILE_SIZE_ORIGINAL = 10 * 1024 * 1024; // 10MB - what user can SELECT
-        const MAX_FILE_SIZE_COMPRESSED = 5 * 1024 * 1024; // 5MB - after compression
+        const MAX_FILE_SIZE_ORIGINAL = 10 * 1024 * 1024;
+        const MAX_FILE_SIZE_COMPRESSED = 5 * 1024 * 1024;
         const MAX_DIMENSION = 2000;
         const COMPRESSION_QUALITY = 0.85;
 
-        // Store compressed files for each input
         const compressedFiles = new Map();
-
         const submitButton = document.getElementById('submitButton');
         const form = document.getElementById('pathImagesForm');
 
-        // Save the current path ID to sessionStorage for the floating action button
         sessionStorage.setItem('selectedPathId', '{{ $path->id }}');
 
-        async function validateAndCompressFile(input) {
-            const index = input.dataset.index;
-            const errorMsg = document.querySelector(`.file-size-error[data-index="${index}"]`);
-            const clearBtn = document.querySelector(`.clear-file-btn[data-index="${index}"]`);
-            const fileNameDisplay = document.querySelector(`.file-name-display[data-index="${index}"]`);
+        // ===== STATE MANAGEMENT FOR PAGINATION =====
+        const formState = {
+            orders: {},
+            deletes: new Set(),
+            files: {},
+            compressedFiles: {}
+        };
 
-            // Clear previous state
+        function initializeHandlers() {
+            // Order input changes
+            document.querySelectorAll('.order-input').forEach(input => {
+                input.addEventListener('change', function() {
+                    const imageId = this.dataset.imageId;
+                    formState.orders[imageId] = this.value;
+
+                    const badge = this.closest('.image-card')?.querySelector('.order-badge-value');
+                    if (badge) badge.textContent = this.value;
+                });
+            });
+
+            // Delete checkbox changes
+            document.querySelectorAll('.delete-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const imageId = this.dataset.imageId;
+                    if (this.checked) {
+                        formState.deletes.add(imageId);
+                    } else {
+                        formState.deletes.delete(imageId);
+                    }
+                });
+            });
+
+            // File input handling with compression
+            document.querySelectorAll('.image-file-input').forEach(input => {
+                input.addEventListener('change', function() {
+                    validateAndCompressFile(this);
+                });
+            });
+
+            // Clear file buttons
+            document.querySelectorAll('.clear-file-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const imageId = this.dataset.imageId;
+                    const fileInput = document.querySelector(
+                        `.image-file-input[data-image-id="${imageId}"]`);
+                    const fileNameDisplay = document.querySelector(
+                        `.file-name-display[data-image-id="${imageId}"]`);
+                    const fileSizeError = document.querySelector(
+                        `.file-size-error[data-image-id="${imageId}"]`);
+
+                    fileInput.value = '';
+                    this.classList.add('hidden');
+                    fileNameDisplay.classList.add('hidden');
+                    fileSizeError.classList.add('hidden');
+                    fileInput.classList.remove('border-red-500', 'border-green-500', 'border-blue-500');
+                    fileInput.classList.add('border-primary');
+
+                    delete formState.files[imageId];
+                    delete formState.compressedFiles[imageId];
+                    compressedFiles.delete(imageId);
+
+                    validateAllFileSizes();
+                });
+            });
+        }
+
+        function restoreFormState() {
+            // Restore orders
+            Object.keys(formState.orders).forEach(imageId => {
+                const input = document.querySelector(`.order-input[data-image-id="${imageId}"]`);
+                if (input) {
+                    input.value = formState.orders[imageId];
+                    const badge = input.closest('.image-card')?.querySelector('.order-badge-value');
+                    if (badge) badge.textContent = formState.orders[imageId];
+                }
+            });
+
+            // Restore deletes
+            formState.deletes.forEach(imageId => {
+                const checkbox = document.querySelector(`.delete-checkbox[data-image-id="${imageId}"]`);
+                if (checkbox) checkbox.checked = true;
+            });
+
+            // Restore files
+            Object.keys(formState.files).forEach(imageId => {
+                const fileInput = document.querySelector(`.image-file-input[data-image-id="${imageId}"]`);
+                const clearBtn = document.querySelector(`.clear-file-btn[data-image-id="${imageId}"]`);
+                const fileNameDisplay = document.querySelector(`.file-name-display[data-image-id="${imageId}"]`);
+
+                if (fileInput && formState.files[imageId]) {
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(formState.files[imageId]);
+                    fileInput.files = dataTransfer.files;
+
+                    if (clearBtn) clearBtn.classList.remove('hidden');
+
+                    // Restore compressed file if exists
+                    if (formState.compressedFiles[imageId]) {
+                        compressedFiles.set(imageId, formState.compressedFiles[imageId]);
+
+                        const file = formState.files[imageId];
+                        const compressed = formState.compressedFiles[imageId];
+                        const savedBytes = file.size - compressed.size;
+                        const savingsPercent = Math.round((savedBytes / file.size) * 100);
+
+                        fileInput.classList.remove('border-red-500', 'border-blue-500', 'border-primary');
+                        fileInput.classList.add('border-green-500');
+
+                        if (fileNameDisplay) {
+                            fileNameDisplay.innerHTML = `
+                                <span class="font-medium text-green-600 dark:text-green-400">✓ Ready to upload</span><br>
+                                <span class="text-gray-600 dark:text-gray-400">
+                                    ${formatFileSize(file.size)} → ${formatFileSize(compressed.size)} 
+                                    <span class="text-green-600 dark:text-green-400">(${savingsPercent}% smaller)</span>
+                                </span>
+                            `;
+                            fileNameDisplay.classList.remove('hidden');
+                        }
+                    }
+                }
+            });
+        }
+
+        // ===== AJAX PAGINATION =====
+        function setupPagination() {
+            document.querySelectorAll('#paginationTop a, #paginationBottom a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const url = this.getAttribute('href');
+
+                    // Show spinner
+                    if (window.showSpinner) window.showSpinner();
+
+                    fetch(url, {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById('imagesGridContainer').innerHTML = data.html;
+
+                            if (data.pagination) {
+                                const paginationTop = document.getElementById('paginationTop');
+                                const paginationBottom = document.getElementById('paginationBottom');
+
+                                if (paginationTop) paginationTop.innerHTML = data.pagination;
+                                if (paginationBottom) paginationBottom.innerHTML = data.pagination;
+                            }
+
+                            initializeHandlers();
+                            restoreFormState();
+                            setupPagination();
+
+                            window.scrollTo({
+                                top: 0,
+                                behavior: 'smooth'
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error loading page:', error);
+                            alert('Failed to load images. Please try again.');
+                        })
+                        .finally(() => {
+                            // Hide spinner
+                            if (window.hideSpinner) window.hideSpinner();
+                        });
+                });
+            });
+        }
+
+        // ===== FILE COMPRESSION =====
+        async function validateAndCompressFile(input) {
+            const imageId = input.dataset.imageId;
+            const errorMsg = document.querySelector(`.file-size-error[data-image-id="${imageId}"]`);
+            const clearBtn = document.querySelector(`.clear-file-btn[data-image-id="${imageId}"]`);
+            const fileNameDisplay = document.querySelector(`.file-name-display[data-image-id="${imageId}"]`);
+
             errorMsg.classList.add('hidden');
-            compressedFiles.delete(index);
+            compressedFiles.delete(imageId);
+            delete formState.compressedFiles[imageId];
 
             if (!input.files || !input.files[0]) {
                 clearBtn.classList.add('hidden');
                 fileNameDisplay.classList.add('hidden');
                 input.classList.remove('border-red-500', 'border-green-500', 'border-blue-500');
                 input.classList.add('border-primary');
+                delete formState.files[imageId];
                 return true;
             }
 
             const file = input.files[0];
+            formState.files[imageId] = file;
             clearBtn.classList.remove('hidden');
 
-            // Validate original file size (10MB limit)
             if (file.size > MAX_FILE_SIZE_ORIGINAL) {
                 errorMsg.textContent =
                     `File too large (${formatFileSize(file.size)}). Maximum ${formatFileSize(MAX_FILE_SIZE_ORIGINAL)}`;
@@ -197,22 +302,17 @@
             }
 
             try {
-                // Show compression in progress with blue border
                 input.classList.remove('border-red-500', 'border-green-500');
-                input.classList.add('border-blue-500'); // Blue = processing
+                input.classList.add('border-blue-500');
 
-                fileNameDisplay.innerHTML = `
-            <span class="text-blue-600 dark:text-blue-400">⏳ Compressing "${file.name}"...</span>
-        `;
+                fileNameDisplay.innerHTML =
+                    `<span class="text-blue-600 dark:text-blue-400">⏳ Compressing "${file.name}"...</span>`;
                 fileNameDisplay.classList.remove('hidden');
 
-                // Compress the image
                 const compressed = await compressImage(file);
+                compressedFiles.set(imageId, compressed);
+                formState.compressedFiles[imageId] = compressed;
 
-                // Store compressed file
-                compressedFiles.set(index, compressed);
-
-                // Check if compressed file is under 5MB
                 if (compressed.size > MAX_FILE_SIZE_COMPRESSED) {
                     errorMsg.textContent =
                         `Compressed file still too large (${formatFileSize(compressed.size)}). Please use a smaller image.`;
@@ -223,7 +323,6 @@
                     return false;
                 }
 
-                // Success - green border
                 input.classList.remove('border-red-500', 'border-blue-500');
                 input.classList.add('border-green-500');
 
@@ -231,12 +330,12 @@
                 const savingsPercent = Math.round((savedBytes / file.size) * 100);
 
                 fileNameDisplay.innerHTML = `
-            <span class="font-medium text-green-600 dark:text-green-400">✓ Ready to upload</span><br>
-            <span class="text-gray-600 dark:text-gray-400">
-                ${formatFileSize(file.size)} → ${formatFileSize(compressed.size)} 
-                <span class="text-green-600 dark:text-green-400">(${savingsPercent}% smaller)</span>
-            </span>
-        `;
+                    <span class="font-medium text-green-600 dark:text-green-400">✓ Ready to upload</span><br>
+                    <span class="text-gray-600 dark:text-gray-400">
+                        ${formatFileSize(file.size)} → ${formatFileSize(compressed.size)} 
+                        <span class="text-green-600 dark:text-green-400">(${savingsPercent}% smaller)</span>
+                    </span>
+                `;
                 fileNameDisplay.classList.remove('hidden');
 
                 return true;
@@ -256,8 +355,15 @@
             const validationPromises = [];
 
             fileInputs.forEach(input => {
-                validationPromises.push(validateAndCompressFile(input));
+                if (input.files && input.files[0]) {
+                    validationPromises.push(validateAndCompressFile(input));
+                }
             });
+
+            if (validationPromises.length === 0) {
+                submitButton.disabled = false;
+                return true;
+            }
 
             const results = await Promise.all(validationPromises);
             const allValid = results.every(result => result === true);
@@ -278,7 +384,6 @@
                         let width = img.width;
                         let height = img.height;
 
-                        // Resize if larger than MAX_DIMENSION
                         if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
                             if (width > height) {
                                 height = Math.round((height * MAX_DIMENSION) / width);
@@ -321,27 +426,6 @@
             });
         }
 
-        // Add event listeners to all file inputs
-        document.querySelectorAll('.image-file-input').forEach(input => {
-            input.addEventListener('change', function() {
-                validateAllFileSizes();
-            });
-        });
-
-        document.querySelectorAll('.clear-file-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const index = this.dataset.index;
-                const fileInput = document.querySelector(`.image-file-input[data-index="${index}"]`);
-
-                fileInput.value = '';
-
-                // Remove compressed file from map
-                compressedFiles.delete(index);
-
-                validateAllFileSizes();
-            });
-        });
-
         function formatFileSize(bytes) {
             if (bytes === 0) return '0 Bytes';
             const k = 1024;
@@ -350,17 +434,22 @@
             return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
         }
 
-        // Toggle all delete checkboxes
         function toggleAllDeletes() {
-            const checkboxes = document.querySelectorAll('input[type="checkbox"][name*="[delete]"]');
+            const checkboxes = document.querySelectorAll('.delete-checkbox');
             const allChecked = Array.from(checkboxes).every(cb => cb.checked);
 
             checkboxes.forEach(cb => {
+                const imageId = cb.dataset.imageId;
                 cb.checked = !allChecked;
+
+                if (cb.checked) {
+                    formState.deletes.add(imageId);
+                } else {
+                    formState.deletes.delete(imageId);
+                }
             });
         }
 
-        // Confirm before submitting if deletions are selected
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -370,31 +459,77 @@
                 return;
             }
 
-            const deleteCheckboxes = document.querySelectorAll(
-                'input[type="checkbox"][name*="[delete]"]:checked');
-            if (deleteCheckboxes.length > 0) {
-                if (!confirm(`Delete ${deleteCheckboxes.length} image(s)? This cannot be undone.`)) {
+            // Count total deletes from formState (not just visible checkboxes)
+            if (formState.deletes.size > 0) {
+                if (!confirm(`Delete ${formState.deletes.size} image(s)? This cannot be undone.`)) {
                     return;
                 }
             }
 
-            // Create FormData with compressed files
             const formData = new FormData(form);
             const newFormData = new FormData();
 
-            // Copy all non-file fields
+            // Copy all non-file fields first
             for (let [key, value] of formData.entries()) {
                 if (!key.includes('[image_file]')) {
                     newFormData.append(key, value);
                 }
             }
 
-            // Add compressed files
-            compressedFiles.forEach((file, index) => {
-                newFormData.append(`images[${index}][image_file]`, file);
+            // Track which image IDs we've already added
+            const processedImageIds = new Set();
+
+            // Collect image IDs from current page's hidden inputs
+            document.querySelectorAll('input[name^="images["][name$="][id]"]').forEach(input => {
+                const matches = input.name.match(/images\[(\d+)\]\[id\]/);
+                if (matches) {
+                    processedImageIds.add(matches[1]);
+                }
             });
 
-            // Submit via AJAX
+            // Add ALL delete checkboxes from formState (including from other pages)
+            formState.deletes.forEach(imageId => {
+                newFormData.append(`images[${imageId}][delete]`, '1');
+
+                // Ensure we have the image ID - always add it
+                if (!processedImageIds.has(imageId)) {
+                    newFormData.append(`images[${imageId}][id]`, imageId);
+                    processedImageIds.add(imageId);
+                }
+            });
+
+            // Add ALL order changes from formState (including from other pages)
+            Object.keys(formState.orders).forEach(imageId => {
+                // Check if this order is already in the form data
+                let orderExists = false;
+                for (let [key] of formData.entries()) {
+                    if (key === `images[${imageId}][image_order]`) {
+                        orderExists = true;
+                        break;
+                    }
+                }
+
+                // Set the order value (will update if exists, add if not)
+                newFormData.set(`images[${imageId}][image_order]`, formState.orders[imageId]);
+
+                // Ensure we have the image ID
+                if (!processedImageIds.has(imageId)) {
+                    newFormData.append(`images[${imageId}][id]`, imageId);
+                    processedImageIds.add(imageId);
+                }
+            });
+
+            // Add compressed files
+            compressedFiles.forEach((file, imageId) => {
+                newFormData.append(`images[${imageId}][image_file]`, file);
+
+                // Ensure we have the image ID for file uploads too
+                if (!processedImageIds.has(imageId)) {
+                    newFormData.append(`images[${imageId}][id]`, imageId);
+                    processedImageIds.add(imageId);
+                }
+            });
+
             const xhr = new XMLHttpRequest();
 
             xhr.upload.addEventListener('progress', function(e) {
@@ -429,5 +564,9 @@
 
             xhr.send(newFormData);
         });
+
+        // Initialize
+        initializeHandlers();
+        setupPagination();
     </script>
 @endpush

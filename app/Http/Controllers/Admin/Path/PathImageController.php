@@ -96,7 +96,7 @@ class PathImageController extends Controller
             'remainingSlots'
         ));
     }
-    
+
     /**
      * Store multiple path images with validation
      * 
@@ -250,13 +250,36 @@ class PathImageController extends Controller
                 ->with('error', 'Image does not belong to this path.');
         }
 
-        $pathImages = $pathImage
-            ? collect([$pathImage])
-            : PathImage::where('path_id', $path->id)->orderBy('image_order')->get();
+        // Handle single image vs all images
+        if ($pathImage) {
+            // Single image - no pagination needed
+            $pathImages = collect([$pathImage]);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'html' => view('pages.admin.path_images.partials.images-grid', compact('pathImages'))->render(),
+                    'pagination' => '', // No pagination for single image
+                ]);
+            }
+
+            return view('pages.admin.path_images.edit', compact('path', 'pathImages'));
+        }
+
+        // Multiple images - use pagination
+        $pathImages = PathImage::where('path_id', $path->id)
+            ->orderBy('image_order')
+            ->paginate(9);
 
         if ($pathImages->isEmpty()) {
             return redirect()->route('path.show', $path)
                 ->with('warning', 'No images found for this path.');
+        }
+
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => view('pages.admin.path_images.partials.images-grid', compact('pathImages'))->render(),
+                'pagination' => $pathImages->appends(request()->query())->links('pagination::tailwind')->render(),
+            ]);
         }
 
         return view('pages.admin.path_images.edit', compact('path', 'pathImages'));
