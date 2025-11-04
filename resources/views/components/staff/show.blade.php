@@ -4,7 +4,7 @@
     <div class="max-w-2xl mx-auto">
 
         <!-- Profile Card -->
-        <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-primary dark:bg-gray-800">
+        <div class="font-sofia bg-white rounded-2xl shadow-lg overflow-hidden border border-primary dark:bg-gray-800">
 
             <!-- Header -->
             <div class="bg-gradient-to-r from-blue-500 to-blue-700 px-6 py-4 md:px-8 md:py-6">
@@ -48,7 +48,7 @@
                                 <div>
                                     <p class="font-semibold text-gray-800 mb-1 dark:text-gray-300">Bio</p>
                                     <p id="bioText"
-                                        class="font-sofia text-gray-600 leading-relaxed dark:text-gray-300 break-words break-all whitespace-pre-line max-w-full overflow-hidden">
+                                        class="text-gray-600 leading-relaxed dark:text-gray-300 break-words break-all whitespace-pre-line max-w-full overflow-hidden">
                                         {{ $staff->bio ?? 'N/A' }}
                                     </p>
                                     <button id="toggleBio"
@@ -70,7 +70,7 @@
                                 <div class="min-w-0"> <!-- ensure flex item shrinks -->
                                     <p class="font-semibold text-gray-800 dark:text-gray-300">Email</p>
                                     <p
-                                        class="font-sofia text-gray-600 dark:text-gray-300 break-words whitespace-normal">
+                                        class="text-gray-600 dark:text-gray-300 break-words whitespace-normal">
                                         {{ $staff->email ?? 'N/A' }}
                                     </p>
                                 </div>
@@ -86,7 +86,7 @@
                                 </div>
                                 <div>
                                     <p class="font-semibold text-gray-800 dark:text-gray-300">Position</p>
-                                    <p class="font-sofia text-gray-600 dark:text-gray-300">
+                                    <p class="text-gray-600 dark:text-gray-300">
                                         {{ $staff->position ?? 'N/A' }}</p>
                                 </div>
                             </div>
@@ -101,7 +101,7 @@
                                 </div>
                                 <div>
                                     <p class="font-semibold text-gray-800 dark:text-gray-300">Phone</p>
-                                    <p class="font-sofia text-gray-600 dark:text-gray-300">
+                                    <p class="text-gray-600 dark:text-gray-300">
                                         {{ $staff->phone_num ?? 'N/A' }}</p>
                                 </div>
                             </div>

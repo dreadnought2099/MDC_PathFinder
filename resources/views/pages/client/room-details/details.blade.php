@@ -110,7 +110,7 @@
                                     loading="lazy">
                             </div>
 
-                            <div class="p-2 sm:p-3 text-center space-y-0.5">
+                            <div class="font-sofia p-2 sm:p-3 text-center space-y-0.5">
                                 <a href="{{ route('staff.client-show', $member->token) }}" target="_blank"
                                     rel="noopener noreferrer"
                                     class="block text-sm sm:text-base font-semibold text-slate-800 dark:text-gray-200 
@@ -186,7 +186,7 @@
         @if (isset($fact) && $fact)
             <div class="mt-6 text-center">
                 <h2 class="text-sm sm:text-base md:text-lg text-gray-800 dark:text-gray-200">Did you know?</h2>
-                <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 italic">{{ $fact }}</p>
+                <p class="font-sofia text-xs sm:text-sm text-gray-500 dark:text-gray-400 italic">{{ $fact }}</p>
             </div>
         @endif
     </div>
