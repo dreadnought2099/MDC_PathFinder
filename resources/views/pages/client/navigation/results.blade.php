@@ -439,7 +439,7 @@
                     if (!hasAnnouncedEnd && currentIndex === imageSet.length - 1) {
                         hasAnnouncedEnd = true;
                         speakInstruction(
-                            `You have reached ${toRoom}. You may now exit the navigation viewer.`
+                            `You have reached ${toRoom}. You may now exit full screen mode. To learn more about ${toRoom}, please scan the QR code posted on the wall.`
                         );
                     }
                 };
