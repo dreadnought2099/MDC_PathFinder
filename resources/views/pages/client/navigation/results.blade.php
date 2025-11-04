@@ -104,9 +104,52 @@
     </div>
 @endsection
 
+<script>
+    const fromRoom = @json($fromRoom->name ?? ($fromRoom->room_name ?? 'Unknown Office'));
+    const toRoom = @json($toRoom->name ?? ($toRoom->room_name ?? 'Unknown Office'));
+</script>
+
 @push('scripts')
     <script>
+        let hasPlayedStartInstruction = false;
+
+        function speakInstruction(text) {
+            if (!('speechSynthesis' in window)) {
+                console.warn('Speech synthesis not supported.');
+                return;
+            }
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 1;
+            utterance.pitch = 1;
+
+            // Do NOT cancel here — it interrupts ongoing speech
+            speechSynthesis.speak(utterance);
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
+            if (hasPlayedStartInstruction) return; // prevent re-triggering
+            hasPlayedStartInstruction = true;
+
+            // Reset any leftover speech from previous navigation
+            speechSynthesis.cancel();
+
+            // Delay a bit for smoother UX
+            setTimeout(() => {
+                const fromRoom = "{{ $fromRoom->name ?? 'Unknown Room' }}";
+                const toRoom = "{{ $toRoom->name ?? 'Unknown Room' }}";
+                const firstLine = `You are now navigating from ${fromRoom} to ${toRoom}.`;
+                speakInstruction(firstLine);
+
+                // Delay second line dynamically
+                const delay = firstLine.length * 80 + 1000;
+                setTimeout(() => {
+                    speakInstruction(
+                        "For better navigation experience, please switch to full screen mode.");
+                }, delay);
+            }, 1500);
+
             // Generate a unique storage key based on the current path
             const storageKey = `pathNavigation_${btoa('{{ $fromRoom->id }}-{{ $toRoom->id }}')}`;
 
@@ -146,6 +189,8 @@
             // Load saved state once at the beginning
             const savedState = loadNavigationState();
             let hasRestoredState = false;
+            let hasAnnouncedStart = false;
+            let hasAnnouncedEnd = false;
 
             document.querySelectorAll('.viewer').forEach((viewer, pathIndex) => {
                 const imageSet = JSON.parse(viewer.dataset.images || '[]');
@@ -390,6 +435,13 @@
 
                     // Preload adjacent images for next navigation
                     setTimeout(preloadAdjacentImages, 100);
+
+                    if (!hasAnnouncedEnd && currentIndex === imageSet.length - 1) {
+                        hasAnnouncedEnd = true;
+                        speakInstruction(
+                            `You have reached ${toRoom}. You may now exit the navigation viewer.`
+                        );
+                    }
                 };
 
                 // Initialize the viewer
