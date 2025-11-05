@@ -137,8 +137,8 @@
 
             // Delay a bit for smoother UX
             setTimeout(() => {
-                const fromRoom = "{{ $fromRoom->name ?? 'Unknown Room' }}";
-                const toRoom = "{{ $toRoom->name ?? 'Unknown Room' }}";
+                const fromRoom = "{{ $fromRoom->name ?? 'Unknown Office' }}";
+                const toRoom = "{{ $toRoom->name ?? 'Unknown Office' }}";
                 const firstLine = `You are now navigating from ${fromRoom} to ${toRoom}.`;
                 speakInstruction(firstLine);
 
