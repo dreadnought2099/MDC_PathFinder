@@ -107,6 +107,7 @@
 <script>
     const fromRoom = @json($fromRoom->name ?? ($fromRoom->room_name ?? 'Unknown Office'));
     const toRoom = @json($toRoom->name ?? ($toRoom->room_name ?? 'Unknown Office'));
+    const toRoomType = @json($toRoom->room_type ?? 'regular');
 </script>
 
 @push('scripts')
@@ -114,46 +115,97 @@
         let hasPlayedStartInstruction = false;
 
         function speakInstruction(text) {
-            if (!('speechSynthesis' in window)) {
-                console.warn('Speech synthesis not supported.');
-                return;
-            }
+            return new Promise((resolve, reject) => {
+                if (!('speechSynthesis' in window) || typeof speechSynthesis.speak !== 'function') {
+                    console.warn('Speech synthesis is not supported on this browser.');
+                    reject(new Error('Speech synthesis not supported'));
+                    return;
+                }
 
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'en-US';
-            utterance.rate = 1;
-            utterance.pitch = 1;
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.95;
+                utterance.pitch = 1.1;
 
-            // Do NOT cancel here — it interrupts ongoing speech
-            speechSynthesis.speak(utterance);
+                utterance.onend = () => resolve();
+                utterance.onerror = (event) => {
+                    console.error('Speech synthesis error:', event);
+                    reject(event);
+                };
+
+                const speakWithVoice = () => {
+                    const voices = speechSynthesis.getVoices();
+                    if (voices.length > 0) {
+                        const preferredVoice = voices.find(voice =>
+                            voice.lang.startsWith('en') &&
+                            (voice.name.includes('Female') || voice.name.includes('Google'))
+                        );
+                        if (preferredVoice) {
+                            utterance.voice = preferredVoice;
+                        }
+                    }
+
+                    speechSynthesis.cancel();
+                    speechSynthesis.speak(utterance);
+                };
+
+                // Check if voices are already loaded
+                const voices = speechSynthesis.getVoices();
+                if (voices.length > 0) {
+                    speakWithVoice();
+                } else {
+                    // Wait for voices to load
+                    speechSynthesis.onvoiceschanged = () => {
+                        speakWithVoice();
+
+                        // Clear listener after first use
+                        speechSynthesis.onvoiceschanged = null;
+                    };
+                }
+            });
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            if (hasPlayedStartInstruction) return; // prevent re-triggering
-            hasPlayedStartInstruction = true;
+        // Usage with proper sequencing:
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check sessionStorage for speech permission
+            const enableSpeech = sessionStorage.getItem('enableNavigationSpeech');
+            const initiatedAt = parseInt(sessionStorage.getItem('speechInitiatedAt'));
 
-            // Reset any leftover speech from previous navigation
-            speechSynthesis.cancel();
+            // Clear the flags immediately
+            sessionStorage.removeItem('enableNavigationSpeech');
+            sessionStorage.removeItem('speechInitiatedAt');
 
-            // Delay a bit for smoother UX
-            setTimeout(() => {
-                const fromRoom = "{{ $fromRoom->name ?? 'Unknown Office' }}";
-                const toRoom = "{{ $toRoom->name ?? 'Unknown Office' }}";
-                const firstLine = `You are now navigating from ${fromRoom} to ${toRoom}.`;
-                speakInstruction(firstLine);
+            // Check if it's recent (within 10 seconds) and enabled
+            const isRecent = initiatedAt && (Date.now() - initiatedAt < 10000);
 
-                // Delay second line dynamically
-                const delay = firstLine.length * 80 + 1000;
-                setTimeout(() => {
-                    speakInstruction(
-                        "For better navigation experience, please switch to full screen mode.");
-                }, delay);
-            }, 1500);
+            if (!enableSpeech || !isRecent) {
+                console.log('Speech not enabled or expired');
+                // Don't return - let the rest of the page work normally
+                // Just skip the speech part
+            } else {
+                // Speech is enabled - play instructions
+                if (!hasPlayedStartInstruction) {
+                    hasPlayedStartInstruction = true;
+                    speechSynthesis.cancel();
 
-            // Generate a unique storage key based on the current path
+                    setTimeout(async () => {
+                        try {
+                            const firstLine =
+                                `You are now navigating from ${fromRoom} to ${toRoom}.`;
+                            await speakInstruction(firstLine);
+
+                            await speakInstruction(
+                                "For better navigation experience, please switch to full screen mode."
+                            );
+                        } catch (error) {
+                            console.error('Failed to play instructions:', error);
+                        }
+                    }, 500);
+                }
+            }
+
             const storageKey = `pathNavigation_${btoa('{{ $fromRoom->id }}-{{ $toRoom->id }}')}`;
 
-            // Function to save current state
             const saveNavigationState = (pathIndex, imageIndex) => {
                 const state = {
                     pathIndex,
@@ -163,16 +215,14 @@
                 localStorage.setItem(storageKey, JSON.stringify(state));
             };
 
-            // Function to load saved state (returns null if expired or invalid)
             const loadNavigationState = () => {
                 try {
                     const saved = localStorage.getItem(storageKey);
                     if (!saved) return null;
 
                     const state = JSON.parse(saved);
-                    const oneHour = 60 * 60 * 1000; // 1 hour expiration
+                    const oneHour = 60 * 60 * 1000;
 
-                    // Check if state is expired (older than 1 hour)
                     if (Date.now() - state.timestamp > oneHour) {
                         localStorage.removeItem(storageKey);
                         return null;
@@ -186,16 +236,17 @@
                 }
             };
 
-            // Load saved state once at the beginning
             const savedState = loadNavigationState();
-            let hasRestoredState = false;
-            let hasAnnouncedStart = false;
-            let hasAnnouncedEnd = false;
 
             document.querySelectorAll('.viewer').forEach((viewer, pathIndex) => {
                 const imageSet = JSON.parse(viewer.dataset.images || '[]');
                 let currentIndex = 0;
                 const preloadedImages = new Set();
+
+                // Move these flags inside the viewer loop
+                let hasRestoredState = false;
+                let hasAnnouncedEnd = false;
+                let hasNavigated = false; // Track if user has actually navigated
 
                 const [imgA, imgB] = viewer.querySelectorAll('.photo-layer');
                 const prevBtn = viewer.querySelector('.prev-btn');
@@ -205,10 +256,13 @@
                 let showingA = true;
                 let isFullscreen = false;
 
-                // Check if we have a saved state for this specific path
                 if (savedState && savedState.pathIndex === pathIndex) {
                     currentIndex = Math.min(savedState.imageIndex, imageSet.length - 1);
                     hasRestoredState = true;
+                    // If restored to last image, mark as already announced
+                    if (currentIndex === imageSet.length - 1) {
+                        hasAnnouncedEnd = true;
+                    }
                 }
 
                 const enterFullscreen = () => {
@@ -363,8 +417,9 @@
                 };
 
                 const updatePathTitle = () => {
-                    const pathTitle = viewer.closest('.bg-white, .dark\\:bg-gray-800').querySelector(
-                        '.path-title');
+                    const pathTitle = viewer.closest('.bg-white, .dark\\:bg-gray-800')
+                        .querySelector(
+                            '.path-title');
                     if (pathTitle && imageSet.length > 0) {
                         const baseName = pathTitle.textContent.split(' - ')[0];
                         pathTitle.textContent = `${baseName.replace(/\d+/, currentIndex + 1)}`;
@@ -397,29 +452,28 @@
                 const showImage = (newIndex, direction = 'forward') => {
                     if (!imageSet.length) return;
 
+                    hasNavigated = true; // Mark that user has navigated
+
                     const nextImg = showingA ? imgB : imgA;
                     const currImg = showingA ? imgA : imgB;
 
-                    // Clear classes first
                     nextImg.classList.remove('active', 'forward-new', 'forward-old', 'backward-new',
                         'backward-old');
                     currImg.classList.remove('active', 'forward-new', 'forward-old', 'backward-new',
                         'backward-old');
 
-                    // Load image if not already loaded
                     if (!preloadedImages.has(newIndex)) {
                         nextImg.src = '/storage/' + imageSet[newIndex];
                         preloadedImages.add(newIndex);
                     } else {
                         nextImg.src = '/storage/' + imageSet[newIndex];
-                        nextImg.onload = null; // Clear any existing handlers
+                        nextImg.onload = null;
                         nextImg.decode().catch(() => {});
                     }
 
                     nextImg.className =
                         `photo-layer ${direction === 'forward' ? 'forward-new' : 'backward-new'}`;
 
-                    // Use setTimeout to ensure DOM is ready
                     setTimeout(() => {
                         nextImg.classList.add('active');
                         currImg.classList.add(direction === 'forward' ? 'forward-old' :
@@ -433,14 +487,20 @@
                     updatePathTitle();
                     updateButtons();
 
-                    // Preload adjacent images for next navigation
                     setTimeout(preloadAdjacentImages, 100);
 
-                    if (!hasAnnouncedEnd && currentIndex === imageSet.length - 1) {
+                    // Only announce if: not announced yet, at last image, AND user actually navigated
+                    if (!hasAnnouncedEnd && currentIndex === imageSet.length - 1 && hasNavigated) {
                         hasAnnouncedEnd = true;
+
+                        // Handle the promise properly
                         speakInstruction(
-                            `You have reached ${toRoom}. You may now exit full screen mode. To learn more about ${toRoom}, please scan the QR code posted on the wall.`
-                        );
+                            toRoomType === 'regular' ?
+                            `You have reached ${toRoom}. You may now exit full screen mode. To learn more about ${toRoom}, please scan the QR code posted on the wall.` :
+                            `You have reached ${toRoom}. You may now exit full screen mode. Thanks for using MDC PathFinder! We hope it helped you find your way.`
+                        ).catch(error => {
+                            console.error('Failed to announce destination:', error);
+                        });
                     }
                 };
 

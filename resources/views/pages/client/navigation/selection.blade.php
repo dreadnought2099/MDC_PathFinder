@@ -117,6 +117,17 @@
 
 @push('scripts')
     <script>
+        // Add speech enablement when form is submitted
+        const form = document.querySelector('form[action="{{ route('paths.results') }}"]');
+
+        form.addEventListener('submit', function(e) {
+            // Set sessionStorage flag to enable speech on next page
+            sessionStorage.setItem('enableNavigationSpeech', 'true');
+            sessionStorage.setItem('speechInitiatedAt', Date.now());
+
+            // Form will submit normally after this
+        });
+
         function staffSearch() {
             return {
                 query: '',
