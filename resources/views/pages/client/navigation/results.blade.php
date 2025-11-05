@@ -145,7 +145,6 @@
                         }
                     }
 
-                    speechSynthesis.cancel();
                     speechSynthesis.speak(utterance);
                 };
 
