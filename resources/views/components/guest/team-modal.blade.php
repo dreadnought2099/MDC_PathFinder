@@ -63,7 +63,7 @@
                         class="group bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-2xl border-2 border-primary transition-all duration-300 p-6 flex flex-col items-center text-center shadow-primary-hover">
                         <img-reveal>
                             <span class="trigger-text relative mb-4">
-                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png"
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/Joshua.jpg"
                                     alt="Joshua A. Salabe"
                                     class="w-28 h-28 rounded-full object-cover group-hover:scale-105 transition-transform duration-300 shadow-primary-hover">
                             </span>
@@ -80,17 +80,11 @@
                         </p>
 
                         <div class="flex gap-3 mt-auto">
-                            <a href="https://www.instagram.com/skerm_art/"
+                            <a href="https://www.facebook.com/joshua.salabe.2025"
                                 class="hover:scale-120 transition-transform duration-300 p-2 rounded-md hover-underline"
                                 target="_blank" rel="noopener noreferrer">
-                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/instagram.png"
-                                    alt="Instagram" class="w-8 h-8">
-                            </a>
-                            <a href="https://letterboxd.com/RMAGALLANEZ/"
-                                class="hover:scale-120 transition-transform duration-300 p-2 rounded-md hover-underline"
-                                target="_blank" rel="noopener noreferrer">
-                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/letterboxd.png"
-                                    alt="Letterboxd" class="w-8 h-8">
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/facebook.png"
+                                    alt="Facebook" class="w-8 h-8">
                             </a>
                         </div>
                     </div>
@@ -100,7 +94,7 @@
                         class="group bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-2xl border-2 border-primary transition-all duration-300 p-6 flex flex-col items-center text-center shadow-primary-hover">
                         <img-reveal>
                             <span class="trigger-text relative mb-4">
-                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png"
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/Cris.jpg"
                                     alt="Chris Marie Calesa"
                                     class="w-28 h-28 rounded-full object-cover group-hover:scale-105 transition-transform duration-300 shadow-primary-hover">
                             </span>
@@ -117,17 +111,11 @@
                         </p>
 
                         <div class="flex gap-3 mt-auto">
-                            <a href="https://www.instagram.com/skerm_art/"
+                            <a href="https://www.facebook.com/chris.marie.19"
                                 class="hover:scale-120 transition-transform duration-300 p-2 rounded-md hover-underline"
                                 target="_blank" rel="noopener noreferrer">
-                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/instagram.png"
-                                    alt="Instagram" class="w-8 h-8">
-                            </a>
-                            <a href="https://letterboxd.com/RMAGALLANEZ/"
-                                class="hover:scale-120 transition-transform duration-300 p-2 rounded-md hover-underline"
-                                target="_blank" rel="noopener noreferrer">
-                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/letterboxd.png"
-                                    alt="Letterboxd" class="w-8 h-8">
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/facebook.png"
+                                    alt="Facebook" class="w-8 h-8">
                             </a>
                         </div>
                     </div>
@@ -138,7 +126,7 @@
 
                         <img-reveal>
                             <span class="trigger-text relative mb-4">
-                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png"
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/Joana.jpg"
                                     alt="Joana Jean Astacaan"
                                     class="w-28 h-28 rounded-full object-cover group-hover:scale-105 transition-transform duration-300 shadow-primary-hover">
                             </span>
@@ -155,17 +143,11 @@
                         </p>
 
                         <div class="flex gap-3 mt-auto">
-                            <a href="https://www.instagram.com/skerm_art/"
+                            <a href="https://www.facebook.com/joanajean.astacaan"
                                 class="hover:scale-120 transition-transform duration-300 p-2 rounded-md hover-underline"
                                 target="_blank" rel="noopener noreferrer">
-                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/instagram.png"
-                                    alt="Instagram" class="w-8 h-8">
-                            </a>
-                            <a href="https://letterboxd.com/RMAGALLANEZ/"
-                                class="hover:scale-120 transition-transform duration-300 p-2 rounded-md hover-underline"
-                                target="_blank" rel="noopener noreferrer">
-                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/letterboxd.png"
-                                    alt="Letterboxd" class="w-8 h-8">
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/facebook.png"
+                                    alt="Facebook" class="w-8 h-8">
                             </a>
                         </div>
                     </div>
