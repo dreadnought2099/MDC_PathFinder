@@ -19,7 +19,7 @@
             @foreach (['about' => 'What is <span class="text-primary">' . config('app.name') . '</span>?', 'overview' => '<span class="text-primary">Overview</span> of Content'] as $key => $title)
                 <div class="w-full max-w-3xl mx-auto md:px-8">
                     <h1
-                        class="text-3xl md:text-4xl font-bold text-dark leading-snug dark:text-gray-300 text-center md:text-left">
+                        class="text-3xl md:text-4xl font-bold leading-snug dark:text-gray-300 text-gray-800 text-center md:text-left">
                         {!! $title !!}
                     </h1>
                     <div class="mt-6 md:mt-8 space-y-6 text-lg text-gray-700 md:text-left text-center">
