@@ -105,6 +105,7 @@ class PathImageController extends Controller
      * - Max 5MB per file
      * - Max 3000x3000px dimensions (safety for direct uploads)
      * - Frontend typically compresses to 2000px before reaching here
+     * - Added sort image by chronological order based by METADATA(Image datetime)
      * 
      * ERROR HANDLING:
      * - Individual file failures don't stop entire upload
@@ -158,10 +159,35 @@ class PathImageController extends Controller
 
                 $nextOrder = PathImage::where('path_id', $path->id)->max('image_order') ?? 0;
 
+                // CHANGE: Extract EXIF data and sort files by datetime
+                $filesWithMetadata = [];
+                foreach ($files as $index => $file) {
+                    $datetime = $this->extractImageDateTime($file);
+                    $filesWithMetadata[] = [
+                        'file' => $file,
+                        'datetime' => $datetime,
+                        'original_index' => $index, // Keep original order as fallback
+                    ];
+                }
+
+                // Sort by datetime (oldest first), fallback to original order if no datetime
+                usort($filesWithMetadata, function ($a, $b) {
+                    // If both have datetime, sort by datetime
+                    if ($a['datetime'] && $b['datetime']) {
+                        return $a['datetime'] <=> $b['datetime'];
+                    }
+                    // If only one has datetime, prioritize it
+                    if ($a['datetime']) return -1;
+                    if ($b['datetime']) return 1;
+                    // If neither has datetime, maintain original order
+                    return $a['original_index'] <=> $b['original_index'];
+                });
+
                 $uploadedCount = 0;
                 $errors = [];
 
-                foreach ($files as $file) {
+                foreach ($filesWithMetadata as $fileData) {
+                    $file = $fileData['file'];
                     try {
                         $webpPath = $this->processAndSaveImage($file, $path->id);
 
@@ -186,6 +212,12 @@ class PathImageController extends Controller
                 }
 
                 $message = "{$uploadedCount} image(s) uploaded successfully.";
+
+                $sortedByExif = count(array_filter($filesWithMetadata, fn($f) => $f['datetime'] !== null));
+                if ($sortedByExif > 0) {
+                    $message .= " and sorted chronologically by capture date ({$sortedByExif} with valid dates)";
+                }
+                $message .= ".";
 
                 if (count($errors) > 0) {
                     $warningMessage = $message . ' However, ' . count($errors) . ' file(s) failed.';
@@ -723,5 +755,51 @@ class PathImageController extends Controller
             'remaining_slots' => $remaining,
             'is_full' => $remaining === 0,
         ]);
+    }
+
+    private function extractImageDateTime($file)
+    {
+        try {
+            $filename = $file->getClientOriginalName();
+            $path = $file->getRealPath();
+
+            // Try to extract datetime from filename pattern: IMG_YYYYMMDD_HHMMSS_XXX.jpg
+            if (preg_match('/IMG_(\d{8})_(\d{6})_\d+\.jpg/', $filename, $matches)) {
+                $date = $matches[1]; // YYYYMMDD
+                $time = $matches[2]; // HHMMSS
+
+                $datetimeString = substr($date, 0, 4) . '-' . substr($date, 4, 2) . '-' . substr($date, 6, 2) . ' ' .
+                    substr($time, 0, 2) . ':' . substr($time, 2, 2) . ':' . substr($time, 4, 2);
+
+                $datetime = \DateTime::createFromFormat('Y-m-d H:i:s', $datetimeString);
+                if ($datetime) {
+                    return $datetime;
+                }
+            }
+
+            // Fallback: Try to read EXIF data (in case some images have it)
+            if (function_exists('exif_read_data')) {
+                $exif = @exif_read_data($path, 0, true);
+
+                if ($exif && isset($exif['EXIF']['DateTimeOriginal'])) {
+                    $datetime = \DateTime::createFromFormat('Y:m:d H:i:s', $exif['EXIF']['DateTimeOriginal']);
+                    if ($datetime) {
+                        return $datetime;
+                    }
+                }
+            }
+
+            $timestamp = filemtime($path);
+            if ($timestamp) {
+                return (new \DateTime())->setTimestamp($timestamp);
+            }
+        } catch (\Exception $e) {
+            Log::error('Datetime extraction error', [
+                'file' => $file->getClientOriginalName(),
+                'error' => $e->getMessage()
+            ]);
+        }
+
+        return null;
     }
 }
