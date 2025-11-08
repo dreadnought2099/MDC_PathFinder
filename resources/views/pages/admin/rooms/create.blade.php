@@ -181,11 +181,6 @@
                         <!-- Setup Section -->
                         <div class="mb-4 p-5 border-2 border-primary rounded-lg dark:bg-gray-800 space-y-4">
                             <div class="flex items-center gap-2 mb-2">
-                                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                </svg>
                                 <h3 class="font-semibold text-gray-800 dark:text-gray-200">Configure Office Hours</h3>
                             </div>
 
@@ -273,11 +268,6 @@
                         <!-- Setup Section -->
                         <div class="mb-4 p-5 border-2 border-primary rounded-lg dark:bg-gray-800 space-y-4">
                             <div class="flex items-center gap-2 mb-2">
-                                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                </svg>
                                 <h3 class="font-semibold text-gray-800 dark:text-gray-200">Configure Consultation Times
                                 </h3>
                             </div>
