@@ -101,8 +101,8 @@ class PathImageController extends Controller
      * Store multiple path images with validation
      * 
      * VALIDATION:
-     * - Max 20 files per upload
-     * - Max 5MB per file
+     * - Max 25 files per upload
+     * - Max 10MB per file
      * - Max 3000x3000px dimensions (safety for direct uploads)
      * - Frontend typically compresses to 2000px before reaching here
      * - Added sort image by chronological order based by METADATA(Image datetime)
@@ -124,7 +124,7 @@ class PathImageController extends Controller
             'files.*' => [
                 'required',
                 'image',
-                'max:5120', // 5MB
+                'max:10240', // 10 MB
                 'dimensions:max_width=3000,max_height=3000'
             ],
         ]);
@@ -336,7 +336,7 @@ class PathImageController extends Controller
             'image_file'  => [
                 'nullable',
                 'image',
-                'max:5120',
+                'max:10240',
                 'dimensions:max_width=3000,max_height=3000'
             ],
         ]);
@@ -397,7 +397,7 @@ class PathImageController extends Controller
             if (isset($imageFiles['image_file'])) {
                 $filesValidation["images.{$index}.image_file"] = [
                     'image',
-                    'max:5120',
+                    'max:10240',
                     'dimensions:max_width=3000,max_height=3000'
                 ];
             }

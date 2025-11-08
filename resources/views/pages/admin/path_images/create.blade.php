@@ -762,48 +762,93 @@
             }
 
             async function compressImage(file) {
-                return new Promise((resolve) => {
+                return new Promise((resolve, reject) => {
+                    // Timeout to prevent hanging (15 seconds per image)
+                    const timeout = setTimeout(() => {
+                        reject(new Error(`Timeout: ${file.name}`));
+                    }, 15000);
+
                     const reader = new FileReader();
+
+                    reader.onerror = () => {
+                        clearTimeout(timeout);
+                        reject(new Error(`Read failed: ${file.name}`));
+                    };
+
                     reader.onload = (e) => {
                         const img = new Image();
-                        img.onload = () => {
-                            const canvas = document.createElement('canvas');
-                            let width = img.width;
-                            let height = img.height;
 
-                            if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
-                                if (width > height) {
-                                    height = Math.round((height * MAX_DIMENSION) / width);
-                                    width = MAX_DIMENSION;
-                                } else {
-                                    width = Math.round((width * MAX_DIMENSION) / height);
-                                    height = MAX_DIMENSION;
-                                }
-                            }
-
-                            canvas.width = width;
-                            canvas.height = height;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0, width, height);
-
-                            canvas.toBlob(
-                                (blob) => {
-                                    if (blob && blob.size < file.size) {
-                                        const compressedFile = new File([blob], file.name, {
-                                            type: 'image/jpeg',
-                                            lastModified: Date.now()
-                                        });
-                                        resolve(compressedFile);
-                                    } else {
-                                        resolve(file);
-                                    }
-                                },
-                                'image/jpeg',
-                                COMPRESSION_QUALITY
-                            );
+                        img.onerror = () => {
+                            clearTimeout(timeout);
+                            reject(new Error(`Load failed: ${file.name}`));
                         };
+
+                        img.onload = () => {
+                            try {
+                                const canvas = document.createElement('canvas');
+                                let width = img.width;
+                                let height = img.height;
+
+                                if (width === 0 || height === 0) {
+                                    clearTimeout(timeout);
+                                    reject(new Error(`Invalid dimensions: ${file.name}`));
+                                    return;
+                                }
+
+                                if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+                                    if (width > height) {
+                                        height = Math.round((height * MAX_DIMENSION) / width);
+                                        width = MAX_DIMENSION;
+                                    } else {
+                                        width = Math.round((width * MAX_DIMENSION) / height);
+                                        height = MAX_DIMENSION;
+                                    }
+                                }
+
+                                canvas.width = width;
+                                canvas.height = height;
+                                const ctx = canvas.getContext('2d');
+
+                                if (!ctx) {
+                                    clearTimeout(timeout);
+                                    reject(new Error(`Canvas failed: ${file.name}`));
+                                    return;
+                                }
+
+                                ctx.drawImage(img, 0, 0, width, height);
+
+                                canvas.toBlob(
+                                    (blob) => {
+                                        clearTimeout(timeout);
+
+                                        if (!blob) {
+                                            reject(new Error(`Blob failed: ${file.name}`));
+                                            return;
+                                        }
+
+                                        if (blob.size < file.size) {
+                                            const compressedFile = new File([blob], file
+                                                .name, {
+                                                    type: 'image/jpeg',
+                                                    lastModified: Date.now()
+                                                });
+                                            resolve(compressedFile);
+                                        } else {
+                                            resolve(file);
+                                        }
+                                    },
+                                    'image/jpeg',
+                                    COMPRESSION_QUALITY
+                                );
+                            } catch (error) {
+                                clearTimeout(timeout);
+                                reject(error);
+                            }
+                        };
+
                         img.src = e.target.result;
                     };
+
                     reader.readAsDataURL(file);
                 });
             }
@@ -811,40 +856,92 @@
             async function processFilesWithCompression(filesToProcess) {
                 const fileError = document.getElementById('fileError');
                 let compressionInfo = [];
+                let failedFiles = [];
 
-                fileError.innerHTML = '<div class="text-blue-600">⏳ Compressing images...</div>';
+                fileError.innerHTML =
+                    `<div class="text-blue-600">⏳ Compressing ${filesToProcess.length} images...</div>`;
                 fileError.classList.remove('hidden');
 
-                for (const file of filesToProcess) {
-                    try {
-                        const originalSize = file.size;
-                        const compressed = await compressImage(file);
+                // Process ALL files in parallel - never skip any
+                const results = await Promise.allSettled(
+                    filesToProcess.map(file => compressImage(file))
+                );
+
+                console.log(`📊 Compression complete: ${filesToProcess.length} files processed`);
+
+                results.forEach((result, index) => {
+                    const originalFile = filesToProcess[index];
+
+                    if (result.status === 'fulfilled') {
+                        const compressed = result.value;
+                        const originalSize = originalFile.size;
                         const savedBytes = originalSize - compressed.size;
 
                         if (savedBytes > 0) {
                             compressionInfo.push(
-                                `"${file.name}" compressed: ${formatFileSize(originalSize)} → ${formatFileSize(compressed.size)}`
+                                `"${originalFile.name}": ${formatFileSize(originalSize)} → ${formatFileSize(compressed.size)}`
                             );
                         }
+
                         window.files.push(compressed);
-                    } catch (error) {
-                        console.error('Compression failed for', file.name, error);
-                        window.files.push(file);
+                    } else {
+                        // Compression failed - only use original if within size limits
+                        console.warn(`⚠️ Compression failed for "${originalFile.name}":`, result
+                        .reason);
+
+                        if (originalFile.size <= MAX_FILE_SIZE) {
+                            // Original is small enough, use it
+                            console.log(`✓ Using original file (within limits): ${originalFile.name}`);
+                            window.files.push(originalFile);
+                            failedFiles.push({
+                                name: originalFile.name,
+                                skipped: false
+                            });
+                        } else {
+                            // Original is too large, skip it
+                            console.warn(
+                                `✗ Skipping oversized image: ${originalFile.name} (${formatFileSize(originalFile.size)})`
+                                );
+                            failedFiles.push({
+                                name: originalFile.name,
+                                skipped: true
+                            });
+                        }
                     }
-                }
+                });
+
+                console.log(
+                    `✅ Added ${window.files.length} files (${compressionInfo.length} compressed, ${failedFiles.length} failed)`
+                    );
 
                 fileError.classList.add('hidden');
 
+                // Show success for compressed files
                 if (compressionInfo.length > 0) {
                     const successDiv = document.createElement('div');
                     successDiv.className =
                         'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded p-3 text-sm text-green-800 dark:text-green-200 mt-2';
                     successDiv.innerHTML = `
-                    <div class="font-semibold mb-1">✓ Images optimized for upload:</div>
-                    ${compressionInfo.map(info => `<div class="text-xs">${info}</div>`).join('')}
-                `;
+                        <div class="font-semibold mb-1">✓ ${compressionInfo.length} images optimized:</div>
+                        ${compressionInfo.slice(0, 5).map(info => `<div class="text-xs">${info}</div>`).join('')}
+                        ${compressionInfo.length > 5 ? `<div class="text-xs mt-1">...and ${compressionInfo.length - 5} more</div>` : ''}
+                    `;
                     selectedFilesContainer.insertAdjacentElement('beforebegin', successDiv);
                     setTimeout(() => successDiv.remove(), 8000);
+                }
+
+                // Show warning for failed compressions
+                if (failedFiles.length > 0) {
+                    const warningDiv = document.createElement('div');
+                    warningDiv.className =
+                        'bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded p-3 text-sm text-yellow-800 dark:text-yellow-200 mt-2';
+                    warningDiv.innerHTML = `
+                        <div class="font-semibold mb-1">⚠ ${failedFiles.length} images couldn't be compressed (using originals):</div>
+                        ${failedFiles.slice(0, 5).map(name => `<div class="text-xs">${name}</div>`).join('')}
+                        ${failedFiles.length > 5 ? `<div class="text-xs mt-1">...and ${failedFiles.length - 5} more</div>` : ''}
+                    `;
+                    selectedFilesContainer.insertAdjacentElement('beforebegin', warningDiv);
+                    setTimeout(() => warningDiv.remove(), 10000);
                 }
 
                 renderPreviews();
