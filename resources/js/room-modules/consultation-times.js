@@ -13,10 +13,21 @@ export function initializeConsultationTimes() {
     setupBulkApplyButton();
     setupClearTimeButtons();
 
-    if (window.existingConsultationTimes)
-        loadExistingConsultationTimes(window.existingConsultationTimes);
-
-    renderConsultationTimes();
+    // FIX: Load existing consultation times if available
+    if (
+        typeof window.existingConsultationTimes !== "undefined" &&
+        window.existingConsultationTimes &&
+        Object.keys(window.existingConsultationTimes).length > 0
+    ) {
+        try {
+            loadExistingConsultationTimes(window.existingConsultationTimes);
+        } catch (err) {
+            console.error("Failed to load existing consultation times:", err);
+            renderConsultationTimes(); // Render empty if loading fails
+        }
+    } else {
+        renderConsultationTimes(); // Render empty display
+    }
 }
 
 // Quick select / clear buttons
@@ -245,8 +256,20 @@ export function loadExistingConsultationTimes(data) {
 
     consultationTimesData = {}; // reset before loading
 
-    // Convert object to array if necessary
-    if (Array.isArray(data)) {
+    // Handle object format (from controller)
+    if (typeof data === "object" && !Array.isArray(data)) {
+        // Data is already in the correct format: { Mon: [{start, end}], Tue: [...] }
+        Object.keys(data).forEach((day) => {
+            if (Array.isArray(data[day]) && data[day].length > 0) {
+                consultationTimesData[day] = data[day].map((range) => ({
+                    start: range.start,
+                    end: range.end,
+                }));
+            }
+        });
+    }
+    // Handle array format (legacy support)
+    else if (Array.isArray(data)) {
         data.forEach((hour) => {
             const dayKey = hour.day || hour.day_of_week;
             if (!dayKey) return;
@@ -254,16 +277,13 @@ export function loadExistingConsultationTimes(data) {
                 consultationTimesData[dayKey] = [];
             const start = hour.start_time
                 ? hour.start_time.substring(0, 5)
-                : hour.start_time;
+                : hour.start;
             const end = hour.end_time
                 ? hour.end_time.substring(0, 5)
-                : hour.end_time;
+                : hour.end;
             consultationTimesData[dayKey].push({ start, end });
         });
-    } else if (typeof data === "object") {
-        consultationTimesData = data;
     }
-
     renderConsultationTimes();
 }
 

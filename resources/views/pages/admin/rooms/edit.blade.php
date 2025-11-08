@@ -192,89 +192,223 @@
                     @enderror
                 </div>
 
+                <!-- Office Hours & Consultation Time -->
                 <div class="mb-6 conditional-field" id="office-hours-section">
-                    <label class="block font-semibold mb-3 text-lg dark:text-gray-300">Office Hours</label>
+                    <label class="block font-semibold mb-3 text-lg dark:text-gray-300">Schedule Management</label>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        Set your availability for office hours and consultation times. You can configure different schedules
+                        for each.
+                    </p>
 
-                    <!-- Setup Section -->
-                    <div class="mb-4 p-5 border-2 border-primary rounded-lg dark:bg-gray-800 space-y-4">
+                    <!-- Tab Navigation -->
+                    <nav class="mb-6 flex justify-center space-x-6">
+                        <button type="button"
+                            class="schedule-tab active px-4 py-2 text-sm font-medium transition-all duration-300 ease-in-out hover-underline cursor-pointer transform hover:scale-105 active:scale-95"
+                            data-tab="office-hours">
+                            <svg class="inline-block w-4 h-4 mr-1.5 -mt-0.5" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Office Hours
+                        </button>
+                        <button type="button"
+                            class="schedule-tab px-4 py-2 text-sm font-medium transition-all duration-300 ease-in-out hover-underline cursor-pointer transform hover:scale-105 active:scale-95"
+                            data-tab="consultation-times">
+                            <svg class="inline-block w-4 h-4 mr-1.5 -mt-0.5" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Consultation Times
+                        </button>
+                    </nav>
 
-                        <!-- Days Selection -->
-                        <div>
-                            <label class="block text-sm font-medium mb-2 dark:text-gray-300">Select Days</label>
-
-                            <div class="flex gap-2 mb-3 flex-wrap">
-                                <button type="button"
-                                    class="quick-select px-3 py-1.5 rounded text-sm bg-gray-500 hover:bg-white hover:text-gray-600 dark:bg-gray-600 dark:hover:bg-gray-800 dark:hover:text-white text-white border border-gray-600 transition-colors shadow-cancel-hover cursor-pointer"
-                                    data-days="Mon,Tue,Wed,Thu,Fri">Weekdays</button>
-                                <button type="button"
-                                    class="quick-select px-3 py-1.5 rounded text-sm bg-gray-500 hover:bg-white hover:text-gray-600 dark:bg-gray-600 dark:hover:bg-gray-800 dark:hover:text-white text-white border border-gray-600 transition-colors shadow-cancel-hover cursor-pointer"
-                                    data-days="Sat,Sun">Weekends</button>
-                                <button type="button"
-                                    class="quick-select px-3 py-1.5 rounded text-sm bg-gray-500 hover:bg-white hover:text-gray-600 dark:bg-gray-600 dark:hover:bg-gray-800 dark:hover:text-white text-white border border-gray-600 transition-colors shadow-cancel-hover cursor-pointer"
-                                    data-days="Mon,Tue,Wed,Thu,Fri,Sat,Sun">All Days</button>
-                                <button type="button"
-                                    class="clear-select px-3 py-1.5 rounded text-sm bg-secondary hover:bg-white hover:text-secondary border border-secondary dark:bg-gray-600 dark:hover:bg-gray-800 text-white transition-colors cursor-pointer shadow-secondary-hover">Clear
-                                    All</button>
+                    <!-- Office Hours Tab Content -->
+                    <div class="schedule-tab-content active" id="office-hours-tab">
+                        <!-- Setup Section -->
+                        <div class="mb-4 p-5 border-2 border-primary rounded-lg dark:bg-gray-800 space-y-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                                <h3 class="font-semibold text-gray-800 dark:text-gray-200">Configure Office Hours</h3>
                             </div>
 
-                            <div class="flex gap-2 flex-wrap">
-                                @php
-                                    $daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                                @endphp
-                                @foreach ($daysOfWeek as $day)
-                                    <label
-                                        class="flex items-center bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
-                                        <input type="checkbox"
-                                            class="bulk-day-checkbox mr-2 text-primary focus:ring-primary"
-                                            value="{{ $day }}">
-                                        <span class="text-sm text-gray-700 dark:text-gray-300">{{ $day }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
-                        </div>
+                            <!-- Days Selection -->
+                            <div>
+                                <label class="block text-sm font-medium mb-2 dark:text-gray-300">Select Days</label>
+                                <div class="flex gap-2 mb-3 flex-wrap">
+                                    <button type="button"
+                                        class="quick-select px-3 py-1.5 rounded text-sm bg-gray-500 hover:bg-white hover:text-gray-600 dark:bg-gray-600 dark:hover:bg-gray-800 dark:hover:text-white text-white border border-gray-600 transition-colors shadow-cancel-hover cursor-pointer"
+                                        data-days="Mon,Tue,Wed,Thu,Fri">Weekdays</button>
+                                    <button type="button"
+                                        class="quick-select px-3 py-1.5 rounded text-sm bg-gray-500 hover:bg-white hover:text-gray-600 dark:bg-gray-600 dark:hover:bg-gray-800 dark:hover:text-white text-white border border-gray-600 transition-colors shadow-cancel-hover cursor-pointer"
+                                        data-days="Sat,Sun">Weekends</button>
+                                    <button type="button"
+                                        class="quick-select px-3 py-1.5 rounded text-sm bg-gray-500 hover:bg-white hover:text-gray-600 dark:bg-gray-600 dark:hover:bg-gray-800 dark:hover:text-white text-white border border-gray-600 transition-colors shadow-cancel-hover cursor-pointer"
+                                        data-days="Mon,Tue,Wed,Thu,Fri,Sat,Sun">All Days</button>
+                                    <button type="button"
+                                        class="clear-select px-3 py-1.5 rounded text-sm bg-secondary hover:bg-white hover:text-secondary border border-secondary dark:bg-gray-600 dark:hover:bg-gray-800 text-white transition-colors cursor-pointer shadow-secondary-hover">
+                                        Clear All</button>
+                                </div>
 
-                        <!-- Time Range -->
-                        <div>
-                            <label class="block text-sm font-medium mb-2 dark:text-gray-300">Time Range</label>
-                            <div class="bulk-time-ranges">
-                                <div class="bulk-ranges-container">
-                                    <div
-                                        class="flex flex-col sm:flex-row gap-2 sm:gap-3 bulk-range-row max-w-full sm:max-w-md">
-                                        <div class="relative flex-1">
-                                            <input type="time"
-                                                class="custom-time-input bulk-start-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary">
-                                            <button type="button"
-                                                class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 text-xl"
-                                                title="Clear">&times;</button>
-                                        </div>
-                                        <div class="relative flex-1">
-                                            <input type="time"
-                                                class="custom-time-input bulk-end-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary">
-                                            <button type="button"
-                                                class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 text-xl"
-                                                title="Clear">&times;</button>
+                                <div class="flex gap-2 flex-wrap">
+                                    @foreach ($days as $day)
+                                        <label
+                                            class="flex items-center bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                                            <input type="checkbox"
+                                                class="bulk-day-checkbox mr-2 text-primary focus:ring-primary"
+                                                value="{{ $day }}">
+                                            <span
+                                                class="text-sm text-gray-700 dark:text-gray-300">{{ $day }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <!-- Time Range -->
+                            <div>
+                                <label class="block text-sm font-medium mb-2 dark:text-gray-300">Time Range</label>
+                                <div class="bulk-time-ranges">
+                                    <div class="bulk-ranges-container">
+                                        <div
+                                            class="flex flex-col sm:flex-row gap-2 sm:gap-3 bulk-range-row max-w-full sm:max-w-md">
+                                            <div class="relative flex-1">
+                                                <input type="time"
+                                                    class="custom-time-input bulk-start-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary">
+                                                <button type="button"
+                                                    class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 text-xl"
+                                                    title="Clear">&times;</button>
+                                            </div>
+                                            <div class="relative flex-1">
+                                                <input type="time"
+                                                    class="custom-time-input bulk-end-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary">
+                                                <button type="button"
+                                                    class="clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 text-xl"
+                                                    title="Clear">&times;</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Apply Button -->
+                            <button type="button"
+                                class="apply-bulk bg-primary text-white px-4 py-2 rounded-md hover:text-primary border-2 border-primary hover:bg-white dark:hover:bg-gray-800 duration-300 ease-in-out transition-all cursor-pointer shadow-primary-hover">
+                                Apply to Selected Days
+                            </button>
                         </div>
 
-                        <!-- Apply Button -->
-                        <button type="button"
-                            class="apply-bulk bg-primary text-white px-4 py-2 rounded-md hover:text-primary border-2 border-primary hover:bg-white dark:hover:bg-gray-800 duration-300 ease-in-out transition-all cursor-pointer shadow-primary-hover">
-                            Apply to Selected Days
-                        </button>
+                        <!-- Saved Hours Display -->
+                        <div class="p-5 border-2 border-primary rounded-lg dark:bg-gray-800">
+                            <div class="flex items-center justify-between mb-3">
+                                <p class="font-medium dark:text-gray-300">Saved Office Hours</p>
+                                <span class="text-xs text-gray-500 dark:text-gray-400">Edit or delete entries below</span>
+                            </div>
+                            <ul id="officeHoursDisplay" class="space-y-2 text-sm text-gray-700 dark:text-gray-300"></ul>
+                        </div>
+
+                        @error('office_hours')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
                     </div>
 
-                    <!-- Saved Hours Display -->
-                    <div class="p-5 border-2 border-primary rounded-lg dark:bg-gray-800">
-                        <p class="font-medium mb-3 dark:text-gray-300">Saved Office Hours</p>
-                        <ul id="officeHoursDisplay" class="space-y-2 text-sm text-gray-700 dark:text-gray-300"></ul>
-                    </div>
+                    <!-- Consultation Times Tab Content -->
+                    <div class="schedule-tab-content hidden" id="consultation-times-tab">
+                        <!-- Setup Section -->
+                        <div class="mb-4 p-5 border-2 border-primary rounded-lg dark:bg-gray-800 space-y-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                                <h3 class="font-semibold text-gray-800 dark:text-gray-200">Configure Consultation Times
+                                </h3>
+                            </div>
 
-                    @error('office_hours')
-                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
+                            <!-- Days Selection -->
+                            <div>
+                                <label class="block text-sm font-medium mb-2 dark:text-gray-300">Select Days</label>
+                                <div class="flex gap-2 mb-3 flex-wrap">
+                                    <button type="button"
+                                        class="consultation-quick-select px-3 py-1.5 rounded text-sm bg-gray-500 hover:bg-white hover:text-gray-600 dark:bg-gray-600 dark:hover:bg-gray-800 dark:hover:text-white text-white border border-gray-600 transition-colors shadow-cancel-hover cursor-pointer"
+                                        data-days="Mon,Tue,Wed,Thu,Fri">Weekdays</button>
+                                    <button type="button"
+                                        class="consultation-quick-select px-3 py-1.5 rounded text-sm bg-gray-500 hover:bg-white hover:text-gray-600 dark:bg-gray-600 dark:hover:bg-gray-800 dark:hover:text-white text-white border border-gray-600 transition-colors shadow-cancel-hover cursor-pointer"
+                                        data-days="Sat,Sun">Weekends</button>
+                                    <button type="button"
+                                        class="consultation-quick-select px-3 py-1.5 rounded text-sm bg-gray-500 hover:bg-white hover:text-gray-600 dark:bg-gray-600 dark:hover:bg-gray-800 dark:hover:text-white text-white border border-gray-600 transition-colors shadow-cancel-hover cursor-pointer"
+                                        data-days="Mon,Tue,Wed,Thu,Fri,Sat,Sun">All Days</button>
+                                    <button type="button"
+                                        class="consultation-clear-select px-3 py-1.5 rounded text-sm bg-secondary hover:bg-white hover:text-secondary border border-secondary dark:bg-gray-600 dark:hover:bg-gray-800 text-white transition-colors cursor-pointer shadow-secondary-hover">
+                                        Clear All</button>
+                                </div>
+
+                                <div class="flex gap-2 flex-wrap">
+                                    @foreach ($days as $day)
+                                        <label
+                                            class="flex items-center bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                                            <input type="checkbox"
+                                                class="consultation-day-checkbox mr-2 text-primary focus:ring-primary"
+                                                value="{{ $day }}">
+                                            <span
+                                                class="text-sm text-gray-700 dark:text-gray-300">{{ $day }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <!-- Time Range -->
+                            <div>
+                                <label class="block text-sm font-medium mb-2 dark:text-gray-300">Time Range</label>
+                                <div class="bulk-time-ranges">
+                                    <div class="bulk-ranges-container">
+                                        <div
+                                            class="flex flex-col sm:flex-row gap-2 sm:gap-3 consultation-bulk-range-row max-w-full sm:max-w-md">
+                                            <div class="relative flex-1">
+                                                <input type="time"
+                                                    class="custom-time-input consultation-bulk-start-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary">
+                                                <button type="button"
+                                                    class="consultation-clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 text-xl"
+                                                    title="Clear">&times;</button>
+                                            </div>
+                                            <div class="relative flex-1">
+                                                <input type="time"
+                                                    class="custom-time-input consultation-bulk-end-time border border-gray-300 dark:border-gray-600 rounded p-2 w-full pr-8 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary focus:border-primary">
+                                                <button type="button"
+                                                    class="consultation-clear-time absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 text-xl"
+                                                    title="Clear">&times;</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Apply Button -->
+                            <button type="button"
+                                class="consultation-apply-bulk bg-primary text-white px-4 py-2 rounded-md hover:text-primary border-2 border-primary hover:bg-white dark:hover:bg-gray-800 duration-300 ease-in-out transition-all cursor-pointer shadow-primary-hover">
+                                Apply to Selected Days
+                            </button>
+                        </div>
+
+                        <!-- Saved Hours Display -->
+                        <div class="p-5 border-2 border-primary rounded-lg dark:bg-gray-800">
+                            <div class="flex items-center justify-between mb-3">
+                                <p class="font-medium dark:text-gray-300">Saved Consultation Times</p>
+                                <span class="text-xs text-gray-500 dark:text-gray-400">Edit or delete entries below</span>
+                            </div>
+                            <ul id="consultationTimesDisplay" class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                            </ul>
+                        </div>
+
+                        @error('consultation_times')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
+                    </div>
                 </div>
 
                 <!-- Submit Button -->
@@ -290,9 +424,10 @@
 @endsection
 
 @push('scripts')
-    @if (isset($existingOfficeHours))
+    @if (isset($officeHours) || isset($consultationTimes))
         <script>
-            window.existingOfficeHours = @json($existingOfficeHours);
+            window.existingConsultationTimes = @json($consultationTimes);
+            window.existingOfficeHours = @json($officeHours);
         </script>
     @endif
 

@@ -306,7 +306,7 @@ class RoomController extends Controller
         }
         $days = Room::validDays();
 
-        return view('pages.admin.rooms.edit', compact('room', 'staffs', 'days', 'officeHours', 'existingOfficeHours', 'consultationTimes'));
+        return view('pages.admin.rooms.edit', compact('room', 'staffs', 'days', 'officeHours', 'consultationTimes'));
     }
 
     public function update(Request $request, Room $room)

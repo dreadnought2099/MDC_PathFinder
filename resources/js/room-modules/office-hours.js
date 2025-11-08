@@ -13,18 +13,20 @@ export function initializeOfficeHours() {
     setupBulkApplyButton();
     setupClearTimeButtons();
 
-    // FIX: Properly load existing office hours if available on window
+    // FIX: Load existing office hours if available
     if (
         typeof window.existingOfficeHours !== "undefined" &&
-        window.existingOfficeHours
+        window.existingOfficeHours &&
+        Object.keys(window.existingOfficeHours).length > 0
     ) {
         try {
             loadExistingOfficeHours(window.existingOfficeHours);
         } catch (err) {
             console.error("Failed to load existing office hours:", err);
+            renderOfficeHours(); // Render empty if loading fails
         }
     } else {
-        renderOfficeHours();
+        renderOfficeHours(); // Render empty display
     }
 }
 
@@ -261,7 +263,7 @@ function renderOfficeHours() {
                                   r.start
                               )} - ${formatTime12Hour(
                                   r.end
-                              )} <span class=\"text-gray-500 text-xs\">(${formatDuration(
+                              )} <span class="text-gray-500 text-xs">(${formatDuration(
                                   r.start,
                                   r.end
                               )})</span>`
@@ -341,7 +343,7 @@ function attachScheduleActionListeners() {
             const days = JSON.parse(this.dataset.days);
             const ranges = JSON.parse(this.dataset.ranges);
 
-            // FIX: properly populate all time rows if multiple ranges exist
+            // Populate all time rows if multiple ranges exist
             document
                 .querySelectorAll(".bulk-range-row")
                 .forEach((row, index) => {
@@ -387,22 +389,32 @@ export function loadExistingOfficeHours(data) {
 
     officeHoursData = {}; // reset before loading
 
-    if (Array.isArray(data)) {
+    // Handle object format (from controller)
+    if (typeof data === "object" && !Array.isArray(data)) {
+        // Data is already in the correct format: { Mon: [{start, end}], Tue: [...] }
+        Object.keys(data).forEach((day) => {
+            if (Array.isArray(data[day]) && data[day].length > 0) {
+                officeHoursData[day] = data[day].map((range) => ({
+                    start: range.start,
+                    end: range.end,
+                }));
+            }
+        });
+    }
+    // Handle array format (legacy support)
+    else if (Array.isArray(data)) {
         data.forEach((hour) => {
             const dayKey = hour.day || hour.day_of_week;
             if (!dayKey) return;
             if (!officeHoursData[dayKey]) officeHoursData[dayKey] = [];
             const start = hour.start_time
                 ? hour.start_time.substring(0, 5)
-                : hour.start_time;
+                : hour.start;
             const end = hour.end_time
                 ? hour.end_time.substring(0, 5)
-                : hour.end_time;
+                : hour.end;
             officeHoursData[dayKey].push({ start, end });
         });
-    } else if (typeof data === "object") {
-        officeHoursData = data;
     }
-
     renderOfficeHours();
 }
