@@ -117,28 +117,7 @@
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-
-                <!-- Contact Info -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-                    <div class="relative">
-                        <input type="email" name="email" id="email" placeholder="Email" class="{{ $inputClasses }}"
-                            value="{{ old('email', $staff->email) }}"
-                            data-check-email-url="{{ route('staff.checkEmail') }}"
-                            data-existing-email="{{ old('email', $staff->email ?? '') }}">
-                        <label for="email" class="{{ $labelClasses }}">Email</label>
-                        {{-- Error container, initially hidden --}}
-                        <p id="email_error" class="text-red-500 text-sm mt-1 invisible">
-                            The email has already been taken.
-                        </p>
-                    </div>
-                    <div class="relative">
-                        <input type="tel" name="phone_num" placeholder="Phone Number" class="{{ $inputClasses }}"
-                            value="{{ old('phone_num', $staff->phone_num) }}" pattern="[0-9]{11}" maxlength="11"
-                            oninput="this.value = this.value.replace(/\D/g,'').slice(0,11);">
-                        <label class="{{ $labelClasses }}">Phone Number</label>
-                    </div>
-                </div>
-
+                
                 <!-- Photo Upload -->
                 <div class="mb-8">
                     <label class="block mb-2 dark:text-gray-300">Staff Photo (optional, max 5MB)</label>

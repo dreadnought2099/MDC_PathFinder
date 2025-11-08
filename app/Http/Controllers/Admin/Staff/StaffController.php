@@ -110,8 +110,6 @@ class StaffController extends Controller
             'credentials' => 'nullable|string|max:255',
             'position' => 'nullable|string|max:255',
             'bio' => 'nullable|string',
-            'email' => 'nullable|email|max:255|unique:staff,email',
-            'phone_num' => 'nullable|string|max:20',
             'photo_path' => [
                 'nullable',
                 'image',
@@ -189,13 +187,6 @@ class StaffController extends Controller
             'credentials' => 'nullable|string|max:255',
             'position' => 'nullable|string|max:255',
             'bio' => 'nullable|string',
-            'email' => [
-                'nullable',
-                'email',
-                'max:255',
-                Rule::unique('staff', 'email')->ignore($staff->id),
-            ],
-            'phone_num' => 'nullable|string|max:20',
             'photo_path' => [
                 'nullable',
                 'image',
@@ -273,12 +264,6 @@ class StaffController extends Controller
 
         return redirect()->route('recycle-bin')
             ->with('success', "{$staff->full_name} permanently deleted.");
-    }
-
-    public function checkEmail(Request $request)
-    {
-        $exists = Staff::where('email', $request->query('email'))->exists();
-        return response()->json(['exists' => $exists]);
     }
 
     public function search(Request $request)

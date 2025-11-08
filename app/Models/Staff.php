@@ -19,8 +19,6 @@ class Staff extends Model
         'credentials',
         'position',
         'bio',
-        'email',
-        'phone_num',
         'photo_path',
     ];
 
@@ -58,14 +56,13 @@ class Staff extends Model
     }
 
     /**
-     * Scope: Search staff by name or email
+     * Scope: Search staff by fullname or postion
      */
     public function scopeSearch($query, ?string $term)
     {
         if (!empty($term)) {
             $query->where(function ($q) use ($term) {
                 $q->where('full_name', 'like', "%{$term}%")
-                    ->orWhere('email', 'like', "%{$term}%")
                     ->orWhere('position', 'like', "%{$term}%");
             });
         }
@@ -78,7 +75,7 @@ class Staff extends Model
      */
     public function scopeSortBy($query, ?string $column, string $direction = 'asc')
     {
-        $allowed = ['id', 'full_name', 'last_name', 'email', 'position', 'created_at', 'updated_at'];
+        $allowed = ['id', 'full_name', 'last_name', 'position', 'created_at', 'updated_at'];
 
         if (in_array($column, $allowed)) {
             return $query->orderBy($column, $direction);

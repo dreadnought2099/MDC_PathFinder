@@ -59,24 +59,6 @@
                             </div>
                         </div>
 
-                        <!-- Email -->
-                        <div
-                            class="border border-primary rounded-xl p-4 hover:scale-105 transition-all duration-250 ease-in-out">
-                            <div class="flex items-center space-x-3">
-                                <div class="bg-orange-100 p-2 rounded-lg">
-                                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/email.png"
-                                        alt="User" class="h-6 w-6">
-                                </div>
-                                <div class="min-w-0"> <!-- ensure flex item shrinks -->
-                                    <p class="font-semibold text-gray-800 dark:text-gray-300">Email</p>
-                                    <p
-                                        class="text-gray-600 dark:text-gray-300 break-words whitespace-normal">
-                                        {{ $staff->email ?? 'N/A' }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- Position -->
                         <div class="border border-primary rounded-xl p-4 transition-all hover:scale-105 duration-300">
                             <div class="flex items-center space-x-3">
@@ -91,22 +73,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Phone -->
-                        <div class="border border-primary rounded-xl p-4 transition-all hover:scale-105 duration-300">
-                            <div class="flex items-center space-x-3">
-                                <div class="bg-green-100 p-2 rounded-lg flex-shrink-0">
-                                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/phone.png"
-                                        alt="Phone" class="h-6 w-6">
-                                </div>
-                                <div>
-                                    <p class="font-semibold text-gray-800 dark:text-gray-300">Phone</p>
-                                    <p class="text-gray-600 dark:text-gray-300">
-                                        {{ $staff->phone_num ?? 'N/A' }}</p>
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
             </div>

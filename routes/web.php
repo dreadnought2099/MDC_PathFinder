@@ -127,7 +127,6 @@ Route::middleware(['auth', 'role:Admin|Office Manager', '2fa'])->prefix('admin')
 
     // Staff
     Route::prefix('staff')->name('staff.')->group(function () {
-        Route::get('/check-email', [StaffController::class, 'checkEmail'])->name('checkEmail');
         Route::get('/', [StaffController::class, 'index'])->middleware('permission:view staff')->name('index');
         Route::get('/create', [StaffController::class, 'create'])->middleware('permission:create staff')->name('create');
         Route::get('/{staff}', [StaffController::class, 'show'])->middleware('permission:view staff')->name('show');
