@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Services\EntrancePointService;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\View;
+use App\Models\Room;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,6 +22,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // View Composer for create/edit room views
+        View::composer(['pages.admin.rooms.create', 'pages.admin.rooms.edit'], function ($view) {
+            $view->with('days', Room::validDays());
+        });
     }
 }

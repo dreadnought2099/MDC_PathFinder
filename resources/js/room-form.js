@@ -2,12 +2,15 @@ import { initializeCoverImage } from "./room-modules/cover-image";
 import { initializeCarouselImages } from "./room-modules/carousel-images";
 import { initializeVideoUpload } from "./room-modules/video-upload";
 import { initializeOfficeHours } from "./room-modules/office-hours";
+import { initializeConsultationTimes } from "./room-modules/consultation-times";
+import { initializeScheduleTabs } from "./room-modules/schedule-tabs";
 import { initializeFormSubmission } from "./room-modules/form-submission";
 import { initializeConditionalFields } from "./room-modules/conditional-fields";
 import { initializeTextareaAutoResize } from "./room-modules/textarea-auto-resize";
 
 document.addEventListener("DOMContentLoaded", function () {
     window.existingOfficeHours = window.existingOfficeHours || {};
+    window.existingConsultationTimes = window.existingConsultationTimes || {};
     let isUploading = false;
 
     // Prevent accidental navigation during upload
@@ -22,7 +25,9 @@ document.addEventListener("DOMContentLoaded", function () {
     initializeCoverImage();
     initializeCarouselImages();
     initializeVideoUpload();
+    initializeScheduleTabs();
     initializeOfficeHours();
+    initializeConsultationTimes();
     initializeFormSubmission((uploading) => {
         isUploading = uploading;
     });

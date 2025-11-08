@@ -142,44 +142,86 @@
                 @endif
             </section>
 
-            {{-- Office Hours --}}
             <div class="mt-6 w-full">
                 <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 text-center">
-                    Office Hours
+                    Schedule
                 </h2>
 
-                <div
-                    class="bg-gray-50 dark:bg-gray-800 border-2 border-primary rounded-lg sm:rounded-xl p-4 sm:p-6 md:p-8 shadow-sm">
+                <!-- Tabs -->
+                <div class="flex gap-2 mb-4 border-b border-gray-200 dark:border-gray-700">
+                    <button class="schedule-tab active px-4 py-2 transition-all duration-200" data-tab="office">
+                        Office Hours
+                    </button>
+                    <button class="schedule-tab px-4 py-2 transition-all duration-200" data-tab="consultation">
+                        Consultation Hours
+                    </button>
+                </div>
 
-                    @if ($room->grouped_office_hours && count($room->grouped_office_hours) > 0)
-                        <div class="space-y-3 sm:space-y-4 md:space-y-5">
-                            @foreach ($room->grouped_office_hours as $timeRange => $days)
-                                <div class="flex flex-row justify-between items-center gap-2 sm:gap-4 md:gap-6">
-
-                                    <!-- Days -->
-                                    <div
-                                        class="font-medium text-xs sm:text-sm md:text-base text-gray-800 dark:text-gray-300 flex-1 text-left">
-                                        {{ $room->formatDaysGroup($days) }}
-                                    </div>
-
-                                    <!-- Time Range -->
-                                    <div class="text-xs sm:text-sm md:text-base text-right">
-                                        @if (strtolower($timeRange) === 'closed')
-                                            <span class="text-red-600 font-semibold">Closed</span>
-                                        @else
-                                            <span class="text-gray-600 dark:text-gray-300 font-medium">
-                                                {{ $timeRange }}
-                                            </span>
-                                        @endif
-                                    </div>
+                <!-- Content Container with min height -->
+                <div class="min-h-48">
+                    <!-- Office Hours Content -->
+                    <div class="schedule-tab-content" data-content="office">
+                        <div
+                            class="bg-gray-50 dark:bg-gray-800 border-2 border-primary rounded-lg sm:rounded-xl p-4 sm:p-6 md:p-8 shadow-sm">
+                            @if ($room->grouped_office_hours && count($room->grouped_office_hours) > 0)
+                                <div class="space-y-3 sm:space-y-4 md:space-y-5">
+                                    @foreach ($room->grouped_office_hours as $timeRange => $days)
+                                        <div class="flex flex-row justify-between items-center gap-2 sm:gap-4 md:gap-6">
+                                            <div
+                                                class="font-medium text-xs sm:text-sm md:text-base text-gray-800 dark:text-gray-300 flex-1 text-left">
+                                                {{ $room->formatDaysGroup($days) }}
+                                            </div>
+                                            <div class="text-xs sm:text-sm md:text-base text-right">
+                                                @if (strtolower($timeRange) === 'closed')
+                                                    <span class="text-red-600 font-semibold">Closed</span>
+                                                @else
+                                                    <span class="text-gray-600 dark:text-gray-300 font-medium">
+                                                        {{ $timeRange }}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endforeach
                                 </div>
-                            @endforeach
+                            @else
+                                <div class="text-center text-gray-500 dark:text-gray-400 italic text-sm sm:text-base">
+                                    No office hours specified
+                                </div>
+                            @endif
                         </div>
-                    @else
-                        <div class="text-center text-gray-500 dark:text-gray-400 italic text-sm sm:text-base">
-                            No office hours specified
+                    </div>
+
+                    <!-- Consultation Hours Content -->
+                    <div class="schedule-tab-content hidden" data-content="consultation">
+                        <div
+                            class="bg-gray-50 dark:bg-gray-800 border-2 border-primary rounded-lg sm:rounded-xl p-4 sm:p-6 md:p-8 shadow-sm">
+                            @if ($room->grouped_consultation_times && count($room->grouped_consultation_times) > 0)
+                                <div class="space-y-3 sm:space-y-4 md:space-y-5">
+                                    @foreach ($room->grouped_consultation_times as $timeRange => $days)
+                                        <div class="flex flex-row justify-between items-center gap-2 sm:gap-4 md:gap-6">
+                                            <div
+                                                class="font-medium text-xs sm:text-sm md:text-base text-gray-800 dark:text-gray-300 flex-1 text-left">
+                                                {{ $room->formatDaysGroup($days) }}
+                                            </div>
+                                            <div class="text-xs sm:text-sm md:text-base text-right">
+                                                @if (strtolower($timeRange) === 'closed')
+                                                    <span class="text-red-600 font-semibold">Closed</span>
+                                                @else
+                                                    <span class="text-gray-600 dark:text-gray-300 font-medium">
+                                                        {{ $timeRange }}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="text-center text-gray-500 dark:text-gray-400 italic text-sm sm:text-base">
+                                    No consultation hours specified
+                                </div>
+                            @endif
                         </div>
-                    @endif
+                    </div>
                 </div>
             </div>
 
@@ -320,6 +362,26 @@
             const downloadBtn = document.getElementById('downloadBtn');
             const desc = document.getElementById('roomDescription');
             const btn = document.getElementById('toggleDescriptionBtn');
+
+            document.querySelectorAll('.schedule-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const targetTab = this.dataset.tab;
+
+                    // Update active tab
+                    document.querySelectorAll('.schedule-tab').forEach(t => t.classList.remove(
+                        'active'));
+                    this.classList.add('active');
+
+                    // Show corresponding content
+                    document.querySelectorAll('.schedule-tab-content').forEach(content => {
+                        if (content.dataset.content === targetTab) {
+                            content.classList.remove('hidden');
+                        } else {
+                            content.classList.add('hidden');
+                        }
+                    });
+                });
+            });
 
             window.openModal = function(src) {
                 modalImage.src = src.trim();

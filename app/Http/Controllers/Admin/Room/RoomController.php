@@ -97,7 +97,9 @@ class RoomController extends Controller
 
     public function create()
     {
-        return view('pages.admin.rooms.create');
+        return view('pages.admin.rooms.create', [
+            'days' => Room::validDays(),
+        ]);
     }
 
     public function store(Request $request, EntrancePointService $entrancePointService)
@@ -129,6 +131,14 @@ class RoomController extends Controller
                 'dimensions:max_width=3000,max_height=3000' // NEW: Safety limit
             ],
             'office_hours' => 'nullable|array',
+            'office_hours.*' => 'array',
+            'office_hours.*.*.start' => 'nullable|date_format:H:i',
+            'office_hours.*.*.end'   => 'nullable|date_format:H:i',
+
+            'consultation_times' => 'nullable|array',
+            'consultation_times.*' => 'array',
+            'consultation_times.*.*.start' => 'nullable|date_format:H:i',
+            'consultation_times.*.*.end'   => 'nullable|date_format:H:i',
         ]);
 
         try {
@@ -140,20 +150,9 @@ class RoomController extends Controller
 
             $successMessage = "{$room->name} created and connected to {$connectionResult['rooms_connected']} office with {$connectionResult['paths_created']} paths.";
 
-            // Save office hours
-            if ($request->has('office_hours')) {
-                foreach ($request->office_hours as $day => $ranges) {
-                    foreach ($ranges as $range) {
-                        if (!empty($range['start']) && !empty($range['end'])) {
-                            $room->officeHours()->create([
-                                'day' => $day,
-                                'start_time' => $range['start'],
-                                'end_time' => $range['end'],
-                            ]);
-                        }
-                    }
-                }
-            }
+            // Save office hours and consultation times using helper
+            $this->saveTimeRanges($room, 'officeHours', $request->office_hours ?? null);
+            $this->saveTimeRanges($room, 'consultationTimes', $request->consultation_times ?? null);
 
             // FIXED: Process cover image with proper error handling
             if ($request->hasFile('image_path')) {
@@ -265,7 +264,8 @@ class RoomController extends Controller
                 $query->withTrashed();
             },
             'staff',
-            'officeHours'
+            'officeHours',
+            'consultationTimes'
         ]);
 
         if (!$room->qr_code_path || !Storage::disk('public')->exists($room->qr_code_path)) {
@@ -297,9 +297,16 @@ class RoomController extends Controller
             ];
         }
 
-        $existingOfficeHours = $officeHours;
+        $consultationTimes = [];
+        foreach ($room->consultationTimes as $time) {
+            $consultationTimes[$time->day][] = [
+                'start' => \Carbon\Carbon::parse($time->start_time)->format('H:i'),
+                'end' => \Carbon\Carbon::parse($time->end_time)->format('H:i'),
+            ];
+        }
+        $days = Room::validDays();
 
-        return view('pages.admin.rooms.edit', compact('room', 'staffs', 'officeHours', 'existingOfficeHours'));
+        return view('pages.admin.rooms.edit', compact('room', 'staffs', 'days', 'officeHours', 'existingOfficeHours', 'consultationTimes'));
     }
 
     public function update(Request $request, Room $room)
@@ -333,6 +340,14 @@ class RoomController extends Controller
                 'dimensions:max_width=3000,max_height=3000'
             ],
             'office_hours' => 'nullable|array',
+            'office_hours.*' => 'array',
+            'office_hours.*.*.start' => 'nullable|date_format:H:i',
+            'office_hours.*.*.end'   => 'nullable|date_format:H:i',
+
+            'consultation_times' => 'nullable|array',
+            'consultation_times.*' => 'array',
+            'consultation_times.*.*.start' => 'nullable|date_format:H:i',
+            'consultation_times.*.*.end'   => 'nullable|date_format:H:i',
         ]);
 
         try {
@@ -392,30 +407,9 @@ class RoomController extends Controller
                 }
             }
 
-            // -----------------------------
-            // Handle Office Hours
-            // -----------------------------
-            if ($oldType !== $room->room_type && $room->room_type === 'entrance_point') {
-                // Already deleted above
-            } else {
-                // Always clear old office hours first
-                $room->officeHours()->delete();
-
-                // Reinsert new ones only if provided
-                if ($request->filled('office_hours')) {
-                    foreach ($request->office_hours as $day => $ranges) {
-                        foreach ($ranges as $range) {
-                            if (!empty($range['start']) && !empty($range['end'])) {
-                                $room->officeHours()->create([
-                                    'day' => $day,
-                                    'start_time' => $range['start'],
-                                    'end_time' => $range['end'],
-                                ]);
-                            }
-                        }
-                    }
-                }
-            }
+            // Save office hours and consultation times using helper
+            $this->saveTimeRanges($room, 'officeHours', $request->office_hours ?? null);
+            $this->saveTimeRanges($room, 'consultationTimes', $request->consultation_times ?? null);
 
             // -----------------------------
             // Handle Cover Image removal
@@ -647,6 +641,37 @@ class RoomController extends Controller
     {
         $exists = Room::where('name', $request->name)->exists();
         return response()->json(['exists' => $exists]);
+    }
+
+    /**
+     * Save time ranges (office hours or consultation times) for a room.
+     *
+     * @param Room $room
+     * @param string $relation Relationship method name: 'officeHours' or 'consultationTimes'
+     * @param array|null $timeData Array of days and ranges from request
+     */
+    private function saveTimeRanges(Room $room, string $relation, ?array $timeData)
+    {
+        if (!method_exists($room, $relation)) {
+            throw new \Exception("Invalid relation {$relation} for Room");
+        }
+
+        // Clear old data
+        $room->{$relation}()->delete();
+
+        if (empty($timeData)) return;
+
+        foreach ($timeData as $day => $ranges) {
+            foreach ($ranges as $range) {
+                if (!empty($range['start']) && !empty($range['end'])) {
+                    $room->{$relation}()->create([
+                        'day' => $day,
+                        'start_time' => $range['start'],
+                        'end_time' => $range['end'],
+                    ]);
+                }
+            }
+        }
     }
 
     /**

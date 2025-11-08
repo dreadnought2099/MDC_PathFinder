@@ -1,0 +1,20 @@
+.schedule-tab {
+    @apply text-gray-600 dark:text-gray-400 bg-transparent border-transparent transition-all duration-200;
+}
+
+.schedule-tab.active {
+    @apply bg-gray-50 dark:bg-gray-800 border-b-2 font-medium;
+    border-color: var(--color-primary);
+}
+
+.schedule-tab:hover:not(.active) {
+    @apply text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-gray-700;
+}
+
+.schedule-tab-content {
+    @apply block transition-opacity duration-200;
+}
+
+.schedule-tab-content.hidden {
+    @apply hidden;
+}
