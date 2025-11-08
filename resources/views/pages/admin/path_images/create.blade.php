@@ -142,7 +142,7 @@
                         @if ($remainingSlots > 0)
                             <span class="text-gray-600 dark:text-gray-300 mb-2">Drop images here or click to browse</span>
                             <span class="text-xs text-gray-400">
-                                JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 10 MB each | max 20 per upload
+                                JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 10 MB each | max 25 per upload
                             </span>
                             <span class="text-xs text-primary font-medium mt-1">
                                 Path can accept {{ $remainingSlots }} more image(s)
@@ -353,7 +353,7 @@
                 dropzone.innerHTML = `
                 <span class="text-gray-600 dark:text-gray-300 mb-2">Drop images here or click to browse</span>
                 <span class="text-xs text-gray-400">
-                    JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 10 MB each | max 20 per upload
+                    JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 10 MB each | max 25 per upload
                 </span>
                 <span class="text-xs text-primary font-medium mt-1">
                     Path can accept ${remainingSlots} more image(s)
