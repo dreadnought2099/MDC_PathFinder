@@ -112,6 +112,7 @@ class RoomController extends Controller
                 Rule::unique('rooms')->whereNull('deleted_at'),
             ],
             'description' => 'nullable|string',
+            'tel_num' => 'nullable|string|max:20',
             'room_type' => 'required|in:regular,entrance_point',
             // FIXED: Added dimension validation
             'image_path' => [
@@ -320,6 +321,7 @@ class RoomController extends Controller
                 'max:255',
                 Rule::unique('rooms')->ignore($room->id)->whereNull('deleted_at'),
             ],
+            'tel_num' => 'nullable|string|max:20',
             'description' => 'nullable|string',
             'room_type' => 'required|in:regular,entrance_point',
             // FIXED: Added dimension validation

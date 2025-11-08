@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('token', 64)->unique(false);
             $table->string('name');
+            $table->string('tel_num')->nullable();
             $table->text('description')->nullable();
             $table->string('qr_code_path')->nullable();
             $table->string('marker_id')->unique()->nullable();

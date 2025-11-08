@@ -225,6 +225,40 @@
             </div>
         </div>
 
+        <!-- Telephone Number -->
+        @if ($room->tel_num)
+            <div class="mb-8">
+                <div
+                    class="bg-gradient-to-br from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl border-2 border-primary p-4 sm:p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <div class="flex items-center justify-between flex-wrap gap-3">
+                        <div class="flex items-center gap-3 sm:gap-4">
+                            <div
+                                class="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 border-2 border-primary rounded-md flex items-center justify-center shadow-md">
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/phone.png"
+                                    alt="Phone Icon" class="w-8 h-8 object-contain">
+                            </div>
+                            <div>
+                                <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-medium mb-0.5">
+                                    Contact Number</p>
+                                <a href="tel:{{ $room->tel_num }}"
+                                    class="text-base sm:text-lg md:text-xl font-bold text-gray-800 dark:text-gray-100 hover:text-primary hover-underline transition-colors duration-200">
+                                    {{ $room->tel_num }}
+                                </a>
+                            </div>
+                        </div>
+                        <a href="tel:{{ $room->tel_num }}"
+                            class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-white hover:text-primary text-white border border-primary dark:hover:bg-gray-800 rounded-md transition-colors duration-300 ease-in-out">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                            </svg>
+                            Call Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <!-- Fun Fact (if exists) -->
         @if (isset($fact) && $fact)
             <div class="mt-6 text-center">
@@ -358,7 +392,7 @@
                     });
                 });
             });
-            
+
             window.openModal = function(src) {
                 modalImage.src = src.trim();
                 modal.classList.remove('hidden');

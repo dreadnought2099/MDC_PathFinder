@@ -20,6 +20,7 @@ class Room extends Model
 
     protected $fillable = [
         'name',
+        'tel_num',
         'description',
         'qr_code_path',
         'marker_id',
