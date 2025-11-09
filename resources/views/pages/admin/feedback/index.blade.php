@@ -30,50 +30,107 @@
             </div>
         </div>
 
-        {{-- Advanced Filters (Collapsible) --}}
-        <div x-data="{ showFilters: {{ request()->hasAny(['type', 'status', 'rating', 'date_from', 'date_to', 'score_min', 'score_max', 'per_page']) ? 'true' : 'false' }} }">
-            {{-- Search and Sort Component --}}
-            <x-filter-header route="{{ route('feedback.index') }}" :fields="[
-                'created_at' => 'Date',
-                'rating' => 'Rating',
-                'recaptcha_score' => 'reCAPTCHA Score',
-                'status' => 'Status',
-                'feedback_type' => 'Type',
-            ]" :currentSort="request('sort', 'created_at')" :currentDirection="request('direction', 'desc')"
-                :currentSearch="request('search', '')" placeholder="feedback">
-                <button @click="showFilters = !showFilters" type="button"
-                    class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-all duration-300 whitespace-nowrap text-sm">
-                    <span x-text="showFilters ? 'Hide Filters' : 'Show Filters'"></span>
-                </button>
-            </x-filter-header>
+        {{-- Search, Sort & Filter Bar --}}
+        <div x-data="{ showFilters: {{ request()->hasAny(['type', 'status', 'rating', 'date_from', 'date_to', 'score_min', 'score_max', 'per_page']) ? 'true' : 'false' }} }" class="mb-6">
 
-            {{-- Filters Panel --}}
+            {{-- Top Bar: Search, Sort, and Filter Toggle --}}
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-4 mb-4">
+                <form id="search-sort-form" method="GET" action="{{ route('feedback.index') }}" class="space-y-4">
+                    {{-- Keep current filters --}}
+                    <input type="hidden" name="type" value="{{ request('type') }}">
+                    <input type="hidden" name="status" value="{{ request('status') }}">
+                    <input type="hidden" name="rating" value="{{ request('rating') }}">
+                    <input type="hidden" name="date_from" value="{{ request('date_from') }}">
+                    <input type="hidden" name="date_to" value="{{ request('date_to') }}">
+                    <input type="hidden" name="score_min" value="{{ request('score_min') }}">
+                    <input type="hidden" name="score_max" value="{{ request('score_max') }}">
+                    <input type="hidden" name="per_page" value="{{ request('per_page') }}">
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                        {{-- Search --}}
+                        <div class="lg:col-span-5">
+                            <label class="block text-sm font-medium mb-1 dark:text-gray-300">Search</label>
+                            <input type="text" name="search" id="search-input" value="{{ request('search', '') }}"
+                                placeholder="Search feedback..."
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+
+                        {{-- Sort By --}}
+                        <div class="lg:col-span-3">
+                            <label class="block text-sm font-medium mb-1 dark:text-gray-300">Sort By</label>
+                            <select name="sort" id="sort-select"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="created_at"
+                                    {{ request('sort', 'created_at') == 'created_at' ? 'selected' : '' }}>Date</option>
+                                <option value="rating" {{ request('sort') == 'rating' ? 'selected' : '' }}>Rating</option>
+                                <option value="recaptcha_score"
+                                    {{ request('sort') == 'recaptcha_score' ? 'selected' : '' }}>reCAPTCHA Score</option>
+                                <option value="status" {{ request('sort') == 'status' ? 'selected' : '' }}>Status</option>
+                                <option value="feedback_type" {{ request('sort') == 'feedback_type' ? 'selected' : '' }}>
+                                    Type</option>
+                            </select>
+                        </div>
+
+                        {{-- Sort Direction --}}
+                        <div class="lg:col-span-2">
+                            <label class="block text-sm font-medium mb-1 dark:text-gray-300">Order</label>
+                            <select name="direction" id="direction-select"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="desc" {{ request('direction', 'desc') == 'desc' ? 'selected' : '' }}>
+                                    Descending</option>
+                                <option value="asc" {{ request('direction') == 'asc' ? 'selected' : '' }}>Ascending
+                                </option>
+                            </select>
+                        </div>
+
+                        {{-- Action Buttons --}}
+                        <div class="lg:col-span-2 flex items-end gap-2">
+                            <button type="submit"
+                                class="flex-1 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors">
+                                Apply
+                            </button>
+                            <button @click="showFilters = !showFilters" type="button"
+                                class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors whitespace-nowrap">
+                                <span x-text="showFilters ? '▼' : '▶'"></span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            {{-- Advanced Filters Panel (Collapsible) --}}
             <div x-show="showFilters" x-transition:enter="transition ease-out duration-200"
                 x-transition:enter-start="opacity-0 transform -translate-y-2"
                 x-transition:enter-end="opacity-100 transform translate-y-0"
-                class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mb-6">
-                <form method="GET" action="{{ route('feedback.index') }}" class="space-y-4">
+                class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+                <form id="advanced-filters-form" method="GET" action="{{ route('feedback.index') }}" class="space-y-4">
                     {{-- Keep current search and sort --}}
                     <input type="hidden" name="search" value="{{ request('search') }}">
                     <input type="hidden" name="sort" value="{{ request('sort', 'created_at') }}">
                     <input type="hidden" name="direction" value="{{ request('direction', 'desc') }}">
 
-                    <h3 class="text-lg font-semibold mb-4 dark:text-white">Advanced Filters</h3>
+                    <h3 class="text-lg font-semibold mb-4 dark:text-white flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                        </svg>
+                        Advanced Filters
+                    </h3>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         {{-- Type Filter --}}
                         <div>
                             <label class="block text-sm font-medium mb-1 dark:text-gray-300">Type</label>
                             <select name="type"
-                                class="w-full px-3 py-2 border border-primary rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
                                 <option value="">All Types</option>
                                 <option value="general" {{ request('type') == 'general' ? 'selected' : '' }}>General
                                 </option>
                                 <option value="bug" {{ request('type') == 'bug' ? 'selected' : '' }}>Bug</option>
                                 <option value="feature" {{ request('type') == 'feature' ? 'selected' : '' }}>Feature
-                                </option>
-                                <option value="complaint" {{ request('type') == 'complaint' ? 'selected' : '' }}>Complaint
-                                </option>
+                                    Request</option>
+                                <option value="navigation" {{ request('type') == 'navigation' ? 'selected' : '' }}>
+                                    Navigation Issue</option>
                             </select>
                         </div>
 
@@ -81,7 +138,7 @@
                         <div>
                             <label class="block text-sm font-medium mb-1 dark:text-gray-300">Status</label>
                             <select name="status"
-                                class="w-full px-3 py-2 border border-primary rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
                                 <option value="">All Status</option>
                                 <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending
                                 </option>
@@ -98,7 +155,7 @@
                         <div>
                             <label class="block text-sm font-medium mb-1 dark:text-gray-300">Rating</label>
                             <select name="rating"
-                                class="w-full px-3 py-2 border border-primary rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
                                 <option value="">All Ratings</option>
                                 @for ($i = 1; $i <= 5; $i++)
                                     <option value="{{ $i }}" {{ request('rating') == $i ? 'selected' : '' }}>
@@ -110,9 +167,9 @@
 
                         {{-- Per Page --}}
                         <div>
-                            <label class="block text-sm font-medium mb-1 dark:text-gray-300">Per Page</label>
+                            <label class="block text-sm font-medium mb-1 dark:text-gray-300">Results Per Page</label>
                             <select name="per_page"
-                                class="w-full px-3 py-2 border border-primary rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
                                 <option value="20" {{ request('per_page') == 20 ? 'selected' : '' }}>20</option>
                                 <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
                                 <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
@@ -122,45 +179,43 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {{-- Date Range --}}
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-sm font-medium mb-1 dark:text-gray-300">From Date</label>
-                                <input type="date" name="date_from" value="{{ request('date_from') }}"
-                                    class="w-full px-3 py-2 border border-primary rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1 dark:text-gray-300">To Date</label>
-                                <input type="date" name="date_to" value="{{ request('date_to') }}"
-                                    class="w-full px-3 py-2 border border-primary rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        <div>
+                            <label class="block text-sm font-medium mb-2 dark:text-gray-300">Date Range</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="date" name="date_from" class="filter-input"
+                                    value="{{ request('date_from') }}" placeholder="From"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
+                                <input type="date" name="date_to" class="filter-input"
+                                    value="{{ request('date_to') }}" placeholder="To"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
                             </div>
                         </div>
 
                         {{-- Score Range --}}
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-sm font-medium mb-1 dark:text-gray-300">Min Score</label>
-                                <input type="number" name="score_min" value="{{ request('score_min') }}" step="0.1"
-                                    min="0" max="1" placeholder="0.0"
-                                    class="w-full px-3 py-2 border border-primary rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1 dark:text-gray-300">Max Score</label>
-                                <input type="number" name="score_max" value="{{ request('score_max') }}" step="0.1"
-                                    min="0" max="1" placeholder="1.0"
-                                    class="w-full px-3 py-2 border border-primary rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        <div>
+                            <label class="block text-sm font-medium mb-2 dark:text-gray-300">reCAPTCHA Score Range</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="number" name="score_min" class="filter-input"
+                                    value="{{ request('score_min') }}" step="0.1" min="0" max="1"
+                                    placeholder="Min (0.0)"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
+                                <input type="number" name="score_max" class="filter-input"
+                                    value="{{ request('score_max') }}" step="0.1" min="0" max="1"
+                                    placeholder="Max (1.0)"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
                             </div>
                         </div>
                     </div>
 
-                    <div class="flex gap-2">
+                    <div class="flex gap-2 pt-2">
                         <button type="submit"
-                            class="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors">
+                            class="px-6 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors">
                             Apply Filters
                         </button>
-                        <a href="{{ route('feedback.index', ['search' => request('search'), 'sort' => request('sort', 'created_at'), 'direction' => request('direction', 'desc')]) }}"
-                            class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition-colors">
+                        <button type="button" onclick="clearFilters()"
+                            class="px-6 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition-colors">
                             Clear Filters
-                        </a>
+                        </button>
                     </div>
                 </form>
             </div>
@@ -169,27 +224,29 @@
         {{-- Bulk Actions --}}
         <form id="bulk-form" method="POST" class="mb-4">
             @csrf
-            <div class="flex gap-2 items-center flex-wrap">
-                <select id="bulk-action"
-                    class="px-3 py-2 border border-primary rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                    <option value="">Bulk Actions</option>
-                    <option value="update-status">Update Status</option>
-                    <option value="delete">Delete</option>
-                </select>
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
+                <div class="flex gap-2 items-center flex-wrap">
+                    <select id="bulk-action"
+                        class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
+                        <option value="">Bulk Actions</option>
+                        <option value="update-status">Update Status</option>
+                        <option value="delete">Delete</option>
+                    </select>
 
-                <select id="bulk-status"
-                    class="px-3 py-2 border border-primary rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white hidden">
-                    <option value="pending">Pending</option>
-                    <option value="reviewed">Reviewed</option>
-                    <option value="resolved">Resolved</option>
-                    <option value="archived">Archived</option>
-                </select>
+                    <select id="bulk-status"
+                        class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white hidden">
+                        <option value="pending">Pending</option>
+                        <option value="reviewed">Reviewed</option>
+                        <option value="resolved">Resolved</option>
+                        <option value="archived">Archived</option>
+                    </select>
 
-                <button type="button" onclick="executeBulkAction()"
-                    class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors">
-                    Apply
-                </button>
-                <span id="selected-count" class="text-sm text-gray-600 dark:text-gray-400"></span>
+                    <button type="button" onclick="executeBulkAction()"
+                        class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors">
+                        Apply
+                    </button>
+                    <span id="selected-count" class="text-sm text-gray-600 dark:text-gray-400 font-medium"></span>
+                </div>
             </div>
         </form>
 
@@ -329,73 +386,185 @@
             </div>
         </div>
     </div>
+@endsection
 
-    @push('scripts')
-        <script>
-            function toggleSelectAll(checkbox) {
-                const checkboxes = document.querySelectorAll('.feedback-checkbox');
-                checkboxes.forEach(cb => cb.checked = checkbox.checked);
-                updateSelectedCount();
+@push('scripts')
+    <script>
+        // Debounce function for search
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Fetch and update table via AJAX
+        function fetchFeedback() {
+            const searchForm = document.getElementById('search-sort-form');
+            const advancedForm = document.getElementById('advanced-filters-form');
+            const formData = new FormData(searchForm);
+
+            // Add advanced filter data
+            const advancedData = new FormData(advancedForm);
+            for (let [key, value] of advancedData.entries()) {
+                if (value && !formData.has(key)) {
+                    formData.append(key, value);
+                }
             }
 
-            function updateSelectedCount() {
-                const checked = document.querySelectorAll('.feedback-checkbox:checked').length;
-                const countEl = document.getElementById('selected-count');
-                countEl.textContent = checked > 0 ? `${checked} item(s) selected` : '';
+            const params = new URLSearchParams(formData);
+            const url = `{{ route('feedback.index') }}?${params.toString()}`;
 
-                // Update select-all checkbox state
-                const selectAll = document.getElementById('select-all');
-                const allCheckboxes = document.querySelectorAll('.feedback-checkbox');
-                selectAll.checked = checked === allCheckboxes.length && checked > 0;
-            }
+            // Update URL without reload
+            window.history.pushState({}, '', url);
 
-            document.getElementById('bulk-action').addEventListener('change', function() {
-                const statusSelect = document.getElementById('bulk-status');
-                if (this.value === 'update-status') {
-                    statusSelect.classList.remove('hidden');
-                } else {
-                    statusSelect.classList.add('hidden');
+            // Show loading state
+            const tableContainer = document.getElementById('records-table');
+            tableContainer.style.opacity = '0.5';
+
+            fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.html) {
+                        tableContainer.innerHTML = data.html;
+                        tableContainer.style.opacity = '1';
+
+                        // Re-attach checkbox listeners
+                        updateSelectedCount();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching feedback:', error);
+                    tableContainer.style.opacity = '1';
+                });
+        }
+
+        // Search input with debounce
+        const searchInput = document.getElementById('search-input');
+        const debouncedSearch = debounce(() => {
+            fetchFeedback();
+        }, 500);
+
+        searchInput.addEventListener('input', debouncedSearch);
+
+        // Sort selects - instant update
+        document.getElementById('sort-select').addEventListener('change', fetchFeedback);
+        document.getElementById('direction-select').addEventListener('change', fetchFeedback);
+
+        // Advanced filters - instant update
+        document.querySelectorAll('.filter-input').forEach(input => {
+            input.addEventListener('change', fetchFeedback);
+        });
+
+        // Form submissions
+        document.getElementById('search-sort-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            fetchFeedback();
+        });
+
+        document.getElementById('advanced-filters-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            fetchFeedback();
+        });
+
+        // Clear filters function
+        function clearFilters() {
+            const searchInput = document.getElementById('search-input');
+            const sortSelect = document.getElementById('sort-select');
+            const directionSelect = document.getElementById('direction-select');
+
+            // Clear advanced filters
+            document.querySelectorAll('.filter-input').forEach(input => {
+                if (input.type === 'date' || input.type === 'number' || input.tagName === 'SELECT') {
+                    input.value = '';
                 }
             });
 
-            function executeBulkAction() {
-                const action = document.getElementById('bulk-action').value;
-                const checked = Array.from(document.querySelectorAll('.feedback-checkbox:checked'))
-                    .map(cb => cb.value);
+            // Update hidden fields
+            document.querySelectorAll(
+                'input[type="hidden"][name="type"], input[type="hidden"][name="status"], input[type="hidden"][name="rating"], input[type="hidden"][name="date_from"], input[type="hidden"][name="date_to"], input[type="hidden"][name="score_min"], input[type="hidden"][name="score_max"], input[type="hidden"][name="per_page"]'
+                ).forEach(input => {
+                input.value = '';
+            });
 
-                if (checked.length === 0) {
-                    alert('Please select at least one item');
-                    return;
-                }
+            fetchFeedback();
+        }
 
-                if (!action) {
-                    alert('Please select an action');
-                    return;
-                }
+        function toggleSelectAll(checkbox) {
+            const checkboxes = document.querySelectorAll('.feedback-checkbox');
+            checkboxes.forEach(cb => cb.checked = checkbox.checked);
+            updateSelectedCount();
+        }
 
-                const form = document.getElementById('bulk-form');
+        function updateSelectedCount() {
+            const checked = document.querySelectorAll('.feedback-checkbox:checked').length;
+            const countEl = document.getElementById('selected-count');
+            countEl.textContent = checked > 0 ? `${checked} item(s) selected` : '';
 
-                if (action === 'update-status') {
-                    const status = document.getElementById('bulk-status').value;
-                    form.action = '{{ route('feedback.bulkUpdateStatus') }}';
+            // Update select-all checkbox state
+            const selectAll = document.getElementById('select-all');
+            const allCheckboxes = document.querySelectorAll('.feedback-checkbox');
+            if (allCheckboxes.length > 0) {
+                selectAll.checked = checked === allCheckboxes.length && checked > 0;
+            }
+        }
+
+        document.getElementById('bulk-action').addEventListener('change', function() {
+            const statusSelect = document.getElementById('bulk-status');
+            if (this.value === 'update-status') {
+                statusSelect.classList.remove('hidden');
+            } else {
+                statusSelect.classList.add('hidden');
+            }
+        });
+
+        function executeBulkAction() {
+            const action = document.getElementById('bulk-action').value;
+            const checked = Array.from(document.querySelectorAll('.feedback-checkbox:checked'))
+                .map(cb => cb.value);
+
+            if (checked.length === 0) {
+                alert('Please select at least one item');
+                return;
+            }
+
+            if (!action) {
+                alert('Please select an action');
+                return;
+            }
+
+            const form = document.getElementById('bulk-form');
+
+            if (action === 'update-status') {
+                const status = document.getElementById('bulk-status').value;
+                form.action = '{{ route('feedback.bulkUpdateStatus') }}';
+                form.innerHTML = `
+                @csrf
+                ${checked.map(id => `<input type="hidden" name="feedback_ids[]" value="${id}">`).join('')}
+                <input type="hidden" name="status" value="${status}">
+            `;
+                form.submit();
+            } else if (action === 'delete') {
+                if (confirm(`Are you sure you want to delete ${checked.length} item(s)?`)) {
+                    form.action = '{{ route('feedback.bulkDelete') }}';
                     form.innerHTML = `
                     @csrf
+                    @method('DELETE')
                     ${checked.map(id => `<input type="hidden" name="feedback_ids[]" value="${id}">`).join('')}
-                    <input type="hidden" name="status" value="${status}">
                 `;
                     form.submit();
-                } else if (action === 'delete') {
-                    if (confirm(`Are you sure you want to delete ${checked.length} item(s)?`)) {
-                        form.action = '{{ route('feedback.bulkDelete') }}';
-                        form.innerHTML = `
-                        @csrf
-                        @method('DELETE')
-                        ${checked.map(id => `<input type="hidden" name="feedback_ids[]" value="${id}">`).join('')}
-                    `;
-                        form.submit();
-                    }
                 }
             }
-        </script>
-    @endpush
-@endsection
+        }
+    </script>
+@endpush
