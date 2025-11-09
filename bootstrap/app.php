@@ -21,6 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'feedback.rate' => \App\Http\Middleware\RateLimitFeedback::class,
         ]);
 
+        $middleware->append(\App\Http\Middleware\AddCSPHeaders::class);
+
         // Append AuthenticateSession globally
         $middleware->append(AuthenticateSession::class);
     })
