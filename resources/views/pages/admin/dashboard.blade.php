@@ -8,7 +8,8 @@
             <div class="text-center mb-8">
                 <h1 class="text-4xl lg:text-5xl font-bold text-gray-800 dark:text-gray-300 mb-3">
                     <img-reveal>
-                        <span class="trigger-text text-primary">{{ Auth::user()->room->name ?? Auth::user()->username }}</span>
+                        <span
+                            class="trigger-text text-primary">{{ Auth::user()->room->name ?? Auth::user()->username }}</span>
                         <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/pengu-admin.gif"
                             alt="GIF" class="reveal-img">
                     </img-reveal>
@@ -184,6 +185,28 @@
                                     Assign Staff
                                 </h3>
                                 <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Assign staff to office</p>
+                            </div>
+                        </div>
+                    </a>
+                @endif
+
+                <!-- User Feedback Card -->
+                @if (auth()->user()->hasRole('Admin'))
+                    <a href="{{ route('feedback.index') }}"
+                        class="group card-shadow-hover shadow-primary-hover p-5 border-2 border-primary bg-white dark:bg-gray-800 rounded-lg transition-all duration-300">
+                        <div class="flex flex-col items-center text-center space-y-3">
+                            <div class="bg-primary-10 hover:bg-primary-20 p-3 rounded-full transition-all duration-300">
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/customer-review.png"
+                                    alt="Recycle Bin"
+                                    class="h-10 w-10 object-contain group-hover:scale-120 transition-transform duration-300" />
+                            </div>
+                            <div>
+                                <h3
+                                    class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
+                                    Read Feedbacks
+                                </h3>
+                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Read Feedbacks
+                                </p>
                             </div>
                         </div>
                     </a>
