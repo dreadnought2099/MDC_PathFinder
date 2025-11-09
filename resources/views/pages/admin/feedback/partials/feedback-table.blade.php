@@ -1,5 +1,3 @@
-{{-- resources/views/pages/admin/feedback/partials/feedback-table.blade.php --}}
-
 <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
