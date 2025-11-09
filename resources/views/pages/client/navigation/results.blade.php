@@ -489,13 +489,12 @@
                     setTimeout(preloadAdjacentImages, 100);
 
                     // Only announce if: not announced yet, at last image, AND user actually navigated
-                    if (!hasAnnouncedEnd && currentIndex === imageSet.length - 1 && hasNavigated) {
+                    if (!hasAnnouncedEnd && currentIndex === imageSet.length - 1 && hasNavigated && toRoomType === 'regular') {
                         hasAnnouncedEnd = true;
 
                         // Handle the promise properly
                         speakInstruction(
-                            toRoomType === 'regular' ?
-                            `You have reached ${toRoom}. You may now exit full screen mode. To learn more about ${toRoom}, please scan the QR code posted on the wall.` :
+                            `You have reached ${toRoom}. You may now exit full screen mode. To learn more about ${toRoom}, please scan the QR code posted on the wall.`
                         ).catch(error => {
                             console.error('Failed to announce destination:', error);
                         });
