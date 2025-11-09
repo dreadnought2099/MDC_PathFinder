@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\Room\RoomAssignmentController;
 use App\Http\Controllers\Admin\Room\RoomController;
 use App\Http\Controllers\Admin\Room\RoomUserController;
 use App\Http\Controllers\Admin\Staff\StaffController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ScannerController;
 use App\Http\Controllers\TokenController;
@@ -36,6 +37,10 @@ Route::get('/navigation/select', [PathController::class, 'selection'])->name('pa
 Route::post('/navigation/results', [PathController::class, 'results'])->name('paths.results');
 Route::get('/navigation/return-to-results', [PathController::class, 'returnToResults'])->name('paths.return-to-results');
 
+// Public feedback routes
+Route::get('/feedback', [FeedbackController::class, 'create'])->name('feedback.create');
+Route::post('/feedback', [FeedbackController::class, 'store'])->middleware('feedback.rate')->name('feedback.store');
+
 // Admin login
 Route::get('/admin', [LogInController::class, 'showLoginForm'])->name('login');
 Route::post('/admin', [LogInController::class, 'login'])->middleware('throttle:3,1');
@@ -59,6 +64,8 @@ Route::middleware(['auth', 'role:Admin|Office Manager'])->group(function () {
 
 // Routes protected by auth + role + 2FA
 Route::middleware(['auth', 'role:Admin|Office Manager', '2fa'])->prefix('admin')->group(function () {
+     
+    Route::get('/feedback', [FeedbackController::class, 'index'])->name('feedback.index');
 
     // Logout
     Route::post('/logout', [LogInController::class, 'logout'])->name('logout');

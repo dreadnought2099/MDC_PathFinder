@@ -32,7 +32,11 @@
 
         <!-- Main Content - Centered -->
         <div class="flex-1 flex flex-col items-center justify-center px-6 sm:px-8 lg:px-12 py-12 relative z-10">
-
+            
+            <a href="{{ route('feedback.create') }}"
+                class="fixed bottom-4 right-4 bg-primary text-white px-4 py-2 rounded-full shadow-lg hover:bg-primary/90 transition z-50">
+                📝 Feedback
+            </a>
             <!-- Hero Section -->
             <div class="max-w-4xl mx-auto text-center space-y-8 lg:space-y-12">
                 <!-- Main Title -->
@@ -67,7 +71,7 @@
                                 text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible
                                 group-hover:opacity-100 group-hover:visible transition-all duration-300 
                                 whitespace-nowrap dark:bg-gray-700 pointer-events-none hidden lg:block font-sofia">
-                            Navigate MDC Campus
+                        Navigate MDC Campus
 
                         <div
                             class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 

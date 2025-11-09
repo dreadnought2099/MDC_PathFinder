@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             '2fa' => \App\Http\Middleware\TwoFactorMiddleware::class,
             'checkMethod' => \App\Http\Middleware\CheckHttpMethod::class,
+            'feedback.rate' => \App\Http\Middleware\RateLimitFeedback::class,
         ]);
 
         // Append AuthenticateSession globally

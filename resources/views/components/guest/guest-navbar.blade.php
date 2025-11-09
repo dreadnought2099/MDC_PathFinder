@@ -14,6 +14,7 @@
                 <x-dark-mode-toggle />
                 <x-guest.about-page />
                 <x-guest.team-modal />
+                <x-guest.feedback-modal />
             </div>
         </div>
     </div>
