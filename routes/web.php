@@ -64,8 +64,6 @@ Route::middleware(['auth', 'role:Admin|Office Manager'])->group(function () {
 
 // Routes protected by auth + role + 2FA
 Route::middleware(['auth', 'role:Admin|Office Manager', '2fa'])->prefix('admin')->group(function () {
-     
-    Route::get('/feedback', [FeedbackController::class, 'index'])->name('feedback.index');
 
     // Logout
     Route::post('/logout', [LogInController::class, 'logout'])->name('logout');
@@ -165,5 +163,15 @@ Route::middleware(['auth', 'role:Admin|Office Manager', '2fa'])->prefix('admin')
 
         Route::put('/{pathImage}', [PathImageController::class, 'updateSingle'])->name('update-single');
         Route::delete('/{pathImage}', [PathImageController::class, 'destroySingle'])->name('destroy-single');
+    });
+
+    Route::prefix('feedback')->name('feedback.')->group(function () {
+        Route::get('/', [FeedbackController::class, 'index'])->name('index');
+        Route::get('/export', [FeedbackController::class, 'export'])->name('export');
+        Route::get('/{feedback}', [FeedbackController::class, 'show'])->name('show');
+        Route::patch('/{feedback}/status', [FeedbackController::class, 'updateStatus'])->name('updateStatus');
+        Route::post('/bulk-update-status', [FeedbackController::class, 'bulkUpdateStatus'])->name('bulkUpdateStatus');
+        Route::delete('/bulk-delete', [FeedbackController::class, 'bulkDelete'])->name('bulkDelete');
+        Route::delete('/{feedback}', [FeedbackController::class, 'destroy'])->name('destroy');
     });
 });
