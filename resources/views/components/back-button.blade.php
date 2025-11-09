@@ -53,6 +53,8 @@
             $backUrl = route('path.index');
         } elseif ($currentRouteName === 'room-user.show') {
             $backUrl = route('room-user.index');
+        } elseif ($currentRouteName === 'feedback.show') {
+            $backUrl = route('feedback.index');
         }
     }
 

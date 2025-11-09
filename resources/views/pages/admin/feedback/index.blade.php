@@ -423,7 +423,10 @@
             // Update URL without reload
             window.history.pushState({}, '', url);
 
-            // Show loading state
+            // Show spinner and loading state
+            if (typeof window.showSpinner === 'function') {
+                window.showSpinner();
+            }
             const tableContainer = document.getElementById('records-table');
             tableContainer.style.opacity = '0.5';
 
@@ -446,6 +449,12 @@
                 .catch(error => {
                     console.error('Error fetching feedback:', error);
                     tableContainer.style.opacity = '1';
+                })
+                .finally(() => {
+                    // Hide spinner
+                    if (typeof window.hideSpinner === 'function') {
+                        window.hideSpinner();
+                    }
                 });
         }
 
@@ -493,7 +502,7 @@
             // Update hidden fields
             document.querySelectorAll(
                 'input[type="hidden"][name="type"], input[type="hidden"][name="status"], input[type="hidden"][name="rating"], input[type="hidden"][name="date_from"], input[type="hidden"][name="date_to"], input[type="hidden"][name="score_min"], input[type="hidden"][name="score_max"], input[type="hidden"][name="per_page"]'
-                ).forEach(input => {
+            ).forEach(input => {
                 input.value = '';
             });
 
