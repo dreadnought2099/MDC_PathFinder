@@ -13,6 +13,11 @@ export function initializeConsultationTimes() {
     setupBulkApplyButton();
     setupClearTimeButtons();
 
+    window.addEventListener("clear-consultation-times", () => {
+        consultationTimesData = {};
+        renderConsultationTimes();
+    });
+
     // FIX: Load existing consultation times if available
     if (
         typeof window.existingConsultationTimes !== "undefined" &&

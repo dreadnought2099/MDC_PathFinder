@@ -7,6 +7,27 @@ export function initializeConditionalFields() {
         const isEntrancePoint = roomTypeSelect.value === "entrance_point";
         conditionalFields.forEach((field) => {
             field.style.display = isEntrancePoint ? "none" : "";
+
+            // Disable all inputs when hiding to prevent submission
+            if (isEntrancePoint) {
+                field
+                    .querySelectorAll("input, select, textarea")
+                    .forEach((input) => {
+                        input.disabled = true;
+                    });
+
+                // Clear the data when switching TO entrance point
+                window.dispatchEvent(new CustomEvent("clear-office-hours"));
+                window.dispatchEvent(
+                    new CustomEvent("clear-consultation-times")
+                );
+            } else {
+                field
+                    .querySelectorAll("input, select, textarea")
+                    .forEach((input) => {
+                        input.disabled = false;
+                    });
+            }
         });
     }
 

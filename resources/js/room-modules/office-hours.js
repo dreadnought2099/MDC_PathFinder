@@ -13,6 +13,11 @@ export function initializeOfficeHours() {
     setupBulkApplyButton();
     setupClearTimeButtons();
 
+    window.addEventListener("clear-office-hours", () => {
+        officeHoursData = {};
+        renderOfficeHours();
+    });
+    
     // FIX: Load existing office hours if available
     if (
         typeof window.existingOfficeHours !== "undefined" &&
