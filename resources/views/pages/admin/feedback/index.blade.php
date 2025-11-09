@@ -1,45 +1,51 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="flex items-center mb-10">
-        <h1 class="flex-1 text-center text-gray-800 dark:text-gray-300 text-3xl font-bold">User
-            <span class="text-primary">Feedback</span>
+    {{-- Header with Title and Export --}}
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-gray-800 dark:text-gray-300 text-3xl font-bold">
+            User <span class="text-primary">Feedback</span>
         </h1>
         <a href="{{ route('feedback.export', request()->query()) }}"
             class="px-4 py-2 bg-green-600 text-white rounded hover:bg-white hover:text-green-600 border-2 border-green-600 dark:hover:bg-gray-800 transition-colors">
-            Export to CSV
+            <span class="hidden sm:inline">Export to CSV</span>
+            <span class="sm:hidden">Export</span>
         </a>
     </div>
 
     {{-- Analytics Cards --}}
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div class="bg-blue-50 dark:bg-blue-900/30 p-6 rounded-lg shadow border-2 border-primary dark:border-blue-800">
-            <div class="text-sm text-blue-600 dark:text-blue-400">Total Feedback</div>
-            <div class="text-2xl font-bold text-gray-800 dark:text-gray-300">{{ $analytics['total_count'] }}</div>
-        </div>
-        <div class="bg-green-50 dark:bg-green-900/30 p-6 rounded-lg shadow border-2 border-tertiary dark:border-green-800">
-            <div class="text-sm text-green-600 mb-1 dark:text-green-400">Average Rating</div>
-            <div class="text-2xl font-bold text-gray-800 dark:text-gray-300">{{ $analytics['average_rating'] ?? 'N/A' }}/5
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div
+            class="bg-blue-50 dark:bg-blue-900/30 p-4 lg:p-6 rounded-lg shadow border-2 border-primary dark:border-blue-800">
+            <div class="text-xs lg:text-sm text-blue-600 dark:text-blue-400">Total Feedback</div>
+            <div class="text-xl lg:text-2xl font-bold text-gray-800 dark:text-gray-300">{{ $analytics['total_count'] }}
             </div>
         </div>
-        <div class="dark:bg-purple-900/30 p-6 rounded-lg shadow border-2 border-purple dark:border-purple-800">
-            <div class="text-sm text-gray-600 dark:text-gray-300">Average Score</div>
-            <div class="text-2xl font-bold text-gray-800 dark:text-gray-300">{{ $analytics['average_score'] ?? 'N/A' }}
-            </div>
+        <div
+            class="bg-green-50 dark:bg-green-900/30 p-4 lg:p-6 rounded-lg shadow border-2 border-tertiary dark:border-green-800">
+            <div class="text-xs lg:text-sm text-green-600 mb-1 dark:text-green-400">Average Rating</div>
+            <div class="text-xl lg:text-2xl font-bold text-gray-800 dark:text-gray-300">
+                {{ $analytics['average_rating'] ?? 'N/A' }}/5</div>
         </div>
-        <div class="bg-orange-50 dark:bg-orange-900/30 p-6 rounded-lg shadow border-2 border-orange dark:border-orange-800">
-            <div class="text-sm text-gray-600 dark:text-gray-300">Pending Review</div>
-            <div class="text-2xl font-bold text-gray-800 dark:text-gray-300">{{ $analytics['by_status']['pending'] ?? 0 }}
-            </div>
+        <div class="dark:bg-purple-900/30 p-4 lg:p-6 rounded-lg shadow border-2 border-purple dark:border-purple-800">
+            <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Average Score</div>
+            <div class="text-xl lg:text-2xl font-bold text-gray-800 dark:text-gray-300">
+                {{ $analytics['average_score'] ?? 'N/A' }}</div>
+        </div>
+        <div
+            class="bg-orange-50 dark:bg-orange-900/30 p-4 lg:p-6 rounded-lg shadow border-2 border-orange dark:border-orange-800">
+            <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Pending Review</div>
+            <div class="text-xl lg:text-2xl font-bold text-gray-800 dark:text-gray-300">
+                {{ $analytics['by_status']['pending'] ?? 0 }}</div>
         </div>
     </div>
 
-    {{-- Search, Sort & Filter Bar --}}
-    <div x-data="{ showFilters: false }" class="mb-6">
+    {{-- Search and Actions Bar --}}
+    <div x-data="{ showFilters: false, showBulkActions: false }" class="space-y-4 mb-6">
 
-        {{-- Top Bar: Search, Sort, and Filter Toggle --}}
-        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-4 mb-4 border-2 border-primary">
-            <form id="search-sort-form" method="GET" action="{{ route('feedback.index') }}" class="space-y-4">
+        {{-- Main Search Bar --}}
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-4 border-2 border-primary">
+            <form id="search-sort-form" method="GET" action="{{ route('feedback.index') }}">
                 {{-- Keep current filters --}}
                 <input type="hidden" name="type" value="{{ request('type') }}">
                 <input type="hidden" name="status" value="{{ request('status') }}">
@@ -50,51 +56,49 @@
                 <input type="hidden" name="score_max" value="{{ request('score_max') }}">
                 <input type="hidden" name="per_page" value="{{ request('per_page') }}">
 
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-                    {{-- Search --}}
-                    <div class="lg:col-span-5">
-                        <label class="block text-sm font-medium mb-1 dark:text-gray-300">Search</label>
+                <div class="flex flex-col lg:flex-row gap-3">
+                    {{-- Search Input --}}
+                    <div class="flex-1">
                         <input type="text" name="search" id="search-input" value="{{ request('search', '') }}"
                             placeholder="Search feedback..."
                             class="w-full px-4 py-2 rounded-md border border-primary dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent">
                     </div>
 
-                    {{-- Sort By --}}
-                    <div class="lg:col-span-3">
-                        <label class="block text-sm font-medium mb-1 dark:text-gray-300">Sort By</label>
+                    {{-- Sort Controls --}}
+                    <div class="flex gap-2">
                         <select name="sort" id="sort-select"
-                            class="w-full px-4 py-2 rounded-md dark:bg-gray-700 border border-primary dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent">
+                            class="px-3 py-2 rounded-md dark:bg-gray-700 border border-primary dark:text-white focus:ring-2 focus:ring-primary">
                             <option value="created_at"
                                 {{ request('sort', 'created_at') == 'created_at' ? 'selected' : '' }}>Date</option>
                             <option value="rating" {{ request('sort') == 'rating' ? 'selected' : '' }}>Rating</option>
                             <option value="recaptcha_score" {{ request('sort') == 'recaptcha_score' ? 'selected' : '' }}>
-                                reCAPTCHA Score</option>
+                                Score</option>
                             <option value="status" {{ request('sort') == 'status' ? 'selected' : '' }}>Status</option>
                             <option value="feedback_type" {{ request('sort') == 'feedback_type' ? 'selected' : '' }}>Type
                             </option>
                         </select>
-                    </div>
 
-                    {{-- Sort Direction --}}
-                    <div class="lg:col-span-2">
-                        <label class="block text-sm font-medium mb-1 dark:text-gray-300">Order</label>
                         <select name="direction" id="direction-select"
-                            class="w-full px-4 py-2 border border-primary rounded-md dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent">
-                            <option value="desc" {{ request('direction', 'desc') == 'desc' ? 'selected' : '' }}>
-                                Descending</option>
-                            <option value="asc" {{ request('direction') == 'asc' ? 'selected' : '' }}>Ascending</option>
+                            class="px-3 py-2 border border-primary rounded-md dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary">
+                            <option value="desc" {{ request('direction', 'desc') == 'desc' ? 'selected' : '' }}>↓
+                            </option>
+                            <option value="asc" {{ request('direction') == 'asc' ? 'selected' : '' }}>↑</option>
                         </select>
                     </div>
 
-                    {{-- Action Buttons --}}
-                    <div class="lg:col-span-2 flex items-end gap-2">
+                    {{-- Action Buttons Group --}}
+                    <div class="flex gap-2">
                         <button type="submit"
-                            class="flex-1 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors">
-                            Apply
+                            class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors whitespace-nowrap">
+                            Search
                         </button>
                         <button @click.prevent="showFilters = !showFilters" type="button"
-                            class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors whitespace-nowrap">
-                            <span x-text="showFilters ? '▼' : '▶'"></span>
+                            class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+                            <span x-text="showFilters ? 'Hide Filters' : 'Filters'"></span>
+                        </button>
+                        <button @click.prevent="showBulkActions = !showBulkActions" type="button"
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors whitespace-nowrap">
+                            <span x-text="showBulkActions ? 'Hide Bulk' : 'Bulk'"></span>
                         </button>
                     </div>
                 </div>
@@ -105,14 +109,27 @@
         <div x-show="showFilters" x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0 transform -translate-y-2"
             x-transition:enter-end="opacity-100 transform translate-y-0"
-            class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100 transform translate-y-0"
+            x-transition:leave-end="opacity-0 transform -translate-y-2"
+            class="bg-white dark:bg-gray-800 shadow rounded-lg p-4 lg:p-6 border border-gray-200 dark:border-gray-700">
+
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Advanced Filters</h3>
+                <button @click="showFilters = false"
+                    class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+
             <form id="advanced-filters-form" method="GET" action="{{ route('feedback.index') }}" class="space-y-4">
-                {{-- Keep current search and sort --}}
                 <input type="hidden" name="search" value="{{ request('search') }}">
                 <input type="hidden" name="sort" value="{{ request('sort', 'created_at') }}">
                 <input type="hidden" name="direction" value="{{ request('direction', 'desc') }}">
 
-                {{-- Your advanced filter fields (Type, Status, Rating, Date Range, etc.) --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {{-- Type Filter --}}
                     <div>
@@ -161,7 +178,7 @@
 
                     {{-- Results Per Page --}}
                     <div>
-                        <label class="block text-sm font-medium mb-1 dark:text-gray-300">Results Per Page</label>
+                        <label class="block text-sm font-medium mb-1 dark:text-gray-300">Per Page</label>
                         <select name="per_page"
                             class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
                             <option value="20" {{ request('per_page') == 20 ? 'selected' : '' }}>20</option>
@@ -173,7 +190,6 @@
 
                 {{-- Date & Score Range --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {{-- Date Range --}}
                     <div>
                         <label class="block text-sm font-medium mb-2 dark:text-gray-300">Date Range</label>
                         <div class="grid grid-cols-2 gap-2">
@@ -186,7 +202,6 @@
                         </div>
                     </div>
 
-                    {{-- reCAPTCHA Score Range --}}
                     <div>
                         <label class="block text-sm font-medium mb-2 dark:text-gray-300">reCAPTCHA Score Range</label>
                         <div class="grid grid-cols-2 gap-2">
@@ -210,41 +225,60 @@
                     </button>
                     <button type="button" onclick="clearFilters()"
                         class="px-6 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition-colors">
-                        Clear Filters
+                        Clear All
                     </button>
                 </div>
             </form>
         </div>
-    </div>
 
-    {{-- Bulk Actions --}}
-    <form id="bulk-form" method="POST" class="mb-4">
-        @csrf
-        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
-            <div class="flex gap-2 items-center flex-wrap">
-                <select id="bulk-action"
-                    class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
-                    <option value="">Bulk Actions</option>
-                    <option value="update-status">Update Status</option>
-                    <option value="delete">Delete</option>
-                </select>
+        {{-- Bulk Actions Panel (Collapsible) --}}
+        <div x-show="showBulkActions" x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 transform -translate-y-2"
+            x-transition:enter-end="opacity-100 transform translate-y-0"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100 transform translate-y-0"
+            x-transition:leave-end="opacity-0 transform -translate-y-2"
+            class="bg-white dark:bg-gray-800 shadow rounded-lg p-4 border border-gray-200 dark:border-gray-700">
 
-                <select id="bulk-status"
-                    class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white hidden">
-                    <option value="pending">Pending</option>
-                    <option value="reviewed">Reviewed</option>
-                    <option value="resolved">Resolved</option>
-                    <option value="archived">Archived</option>
-                </select>
-
-                <button type="button" onclick="executeBulkAction()"
-                    class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors">
-                    Apply
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Bulk Actions</h3>
+                <button @click="showBulkActions = false"
+                    class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
                 </button>
-                <span id="selected-count" class="text-sm text-gray-600 dark:text-gray-400 font-medium"></span>
             </div>
+
+            <form id="bulk-form" method="POST">
+                @csrf
+                <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                    <select id="bulk-action"
+                        class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
+                        <option value="">Select Action</option>
+                        <option value="update-status">Update Status</option>
+                        <option value="delete">Delete Selected</option>
+                    </select>
+
+                    <select id="bulk-status"
+                        class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white hidden">
+                        <option value="pending">Pending</option>
+                        <option value="reviewed">Reviewed</option>
+                        <option value="resolved">Resolved</option>
+                        <option value="archived">Archived</option>
+                    </select>
+
+                    <button type="button" onclick="executeBulkAction()"
+                        class="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors whitespace-nowrap">
+                        Apply Action
+                    </button>
+
+                    <span id="selected-count" class="text-sm text-gray-600 dark:text-gray-400 font-medium"></span>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 
     {{-- Table --}}
     <div id="records-table">
@@ -258,26 +292,19 @@
                                     class="rounded border-gray-300 text-primary focus:ring-primary">
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
-                                Date
-                            </th>
+                                Date</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
-                                Type
-                            </th>
+                                Type</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
-                                Rating
-                            </th>
+                                Rating</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
-                                Message
-                            </th>
+                                Message</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
-                                Score
-                            </th>
+                                Score</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
-                                Status
-                            </th>
+                                Status</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
-                                Actions
-                            </th>
+                                Actions</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800">
@@ -375,12 +402,10 @@
             {{ $feedback->appends(request()->query())->links() }}
         </div>
     </div>
-    </div>
 @endsection
 
 @push('scripts')
     <script>
-        // Debounce function for search
         function debounce(func, wait) {
             let timeout;
             return function executedFunction(...args) {
@@ -393,13 +418,11 @@
             };
         }
 
-        // Fetch and update table via AJAX
         function fetchFeedback() {
             const searchForm = document.getElementById('search-sort-form');
             const advancedForm = document.getElementById('advanced-filters-form');
             const formData = new FormData(searchForm);
 
-            // Add advanced filter data
             const advancedData = new FormData(advancedForm);
             for (let [key, value] of advancedData.entries()) {
                 if (value && !formData.has(key)) {
@@ -410,10 +433,8 @@
             const params = new URLSearchParams(formData);
             const url = `{{ route('feedback.index') }}?${params.toString()}`;
 
-            // Update URL without reload
             window.history.pushState({}, '', url);
 
-            // Show spinner and loading state
             if (typeof window.showSpinner === 'function') {
                 window.showSpinner();
             }
@@ -431,8 +452,6 @@
                     if (data.html) {
                         tableContainer.innerHTML = data.html;
                         tableContainer.style.opacity = '1';
-
-                        // Re-attach checkbox listeners
                         updateSelectedCount();
                     }
                 })
@@ -441,31 +460,25 @@
                     tableContainer.style.opacity = '1';
                 })
                 .finally(() => {
-                    // Hide spinner
                     if (typeof window.hideSpinner === 'function') {
                         window.hideSpinner();
                     }
                 });
         }
 
-        // Search input with debounce
         const searchInput = document.getElementById('search-input');
         const debouncedSearch = debounce(() => {
             fetchFeedback();
         }, 500);
 
         searchInput.addEventListener('input', debouncedSearch);
-
-        // Sort selects - instant update
         document.getElementById('sort-select').addEventListener('change', fetchFeedback);
         document.getElementById('direction-select').addEventListener('change', fetchFeedback);
 
-        // Advanced filters - instant update
         document.querySelectorAll('.filter-input').forEach(input => {
             input.addEventListener('change', fetchFeedback);
         });
 
-        // Form submissions
         document.getElementById('search-sort-form').addEventListener('submit', (e) => {
             e.preventDefault();
             fetchFeedback();
@@ -476,20 +489,17 @@
             fetchFeedback();
         });
 
-        // Clear filters function
         function clearFilters() {
             const searchInput = document.getElementById('search-input');
             const sortSelect = document.getElementById('sort-select');
             const directionSelect = document.getElementById('direction-select');
 
-            // Clear advanced filters
             document.querySelectorAll('.filter-input').forEach(input => {
                 if (input.type === 'date' || input.type === 'number' || input.tagName === 'SELECT') {
                     input.value = '';
                 }
             });
 
-            // Update hidden fields
             document.querySelectorAll(
                 'input[type="hidden"][name="type"], input[type="hidden"][name="status"], input[type="hidden"][name="rating"], input[type="hidden"][name="date_from"], input[type="hidden"][name="date_to"], input[type="hidden"][name="score_min"], input[type="hidden"][name="score_max"], input[type="hidden"][name="per_page"]'
             ).forEach(input => {
@@ -510,7 +520,6 @@
             const countEl = document.getElementById('selected-count');
             countEl.textContent = checked > 0 ? `${checked} item(s) selected` : '';
 
-            // Update select-all checkbox state
             const selectAll = document.getElementById('select-all');
             const allCheckboxes = document.querySelectorAll('.feedback-checkbox');
             if (allCheckboxes.length > 0) {
