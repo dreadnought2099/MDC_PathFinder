@@ -35,7 +35,7 @@
     </div>
 
     {{-- Search, Sort & Filter Bar --}}
-    <div x-data="{ showFilters: {{ request()->hasAny(['type', 'status', 'rating', 'date_from', 'date_to', 'score_min', 'score_max', 'per_page']) ? 'true' : 'false' }} }" class="mb-6">
+    <div x-data="{ showFilters: false }" class="mb-6">
 
         {{-- Top Bar: Search, Sort, and Filter Toggle --}}
         <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-4 mb-4 border-2 border-primary">
@@ -70,8 +70,8 @@
                             <option value="recaptcha_score" {{ request('sort') == 'recaptcha_score' ? 'selected' : '' }}>
                                 reCAPTCHA Score</option>
                             <option value="status" {{ request('sort') == 'status' ? 'selected' : '' }}>Status</option>
-                            <option value="feedback_type" {{ request('sort') == 'feedback_type' ? 'selected' : '' }}>
-                                Type</option>
+                            <option value="feedback_type" {{ request('sort') == 'feedback_type' ? 'selected' : '' }}>Type
+                            </option>
                         </select>
                     </div>
 
@@ -82,8 +82,7 @@
                             class="w-full px-4 py-2 border border-primary rounded-md dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent">
                             <option value="desc" {{ request('direction', 'desc') == 'desc' ? 'selected' : '' }}>
                                 Descending</option>
-                            <option value="asc" {{ request('direction') == 'asc' ? 'selected' : '' }}>Ascending
-                            </option>
+                            <option value="asc" {{ request('direction') == 'asc' ? 'selected' : '' }}>Ascending</option>
                         </select>
                     </div>
 
@@ -93,7 +92,7 @@
                             class="flex-1 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors">
                             Apply
                         </button>
-                        <button @click="showFilters = !showFilters" type="button"
+                        <button @click.prevent="showFilters = !showFilters" type="button"
                             class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors whitespace-nowrap">
                             <span x-text="showFilters ? '▼' : '▶'"></span>
                         </button>
@@ -113,14 +112,7 @@
                 <input type="hidden" name="sort" value="{{ request('sort', 'created_at') }}">
                 <input type="hidden" name="direction" value="{{ request('direction', 'desc') }}">
 
-                <h3 class="text-lg font-semibold mb-4 dark:text-white flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                    </svg>
-                    Advanced Filters
-                </h3>
-
+                {{-- Your advanced filter fields (Type, Status, Rating, Date Range, etc.) --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {{-- Type Filter --}}
                     <div>
@@ -128,13 +120,12 @@
                         <select name="type"
                             class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
                             <option value="">All Types</option>
-                            <option value="general" {{ request('type') == 'general' ? 'selected' : '' }}>General
-                            </option>
+                            <option value="general" {{ request('type') == 'general' ? 'selected' : '' }}>General</option>
                             <option value="bug" {{ request('type') == 'bug' ? 'selected' : '' }}>Bug</option>
-                            <option value="feature" {{ request('type') == 'feature' ? 'selected' : '' }}>Feature
-                                Request</option>
-                            <option value="navigation" {{ request('type') == 'navigation' ? 'selected' : '' }}>
-                                Navigation Issue</option>
+                            <option value="feature" {{ request('type') == 'feature' ? 'selected' : '' }}>Feature Request
+                            </option>
+                            <option value="navigation" {{ request('type') == 'navigation' ? 'selected' : '' }}>Navigation
+                                Issue</option>
                         </select>
                     </div>
 
@@ -163,13 +154,12 @@
                             <option value="">All Ratings</option>
                             @for ($i = 1; $i <= 5; $i++)
                                 <option value="{{ $i }}" {{ request('rating') == $i ? 'selected' : '' }}>
-                                    {{ $i }} Star{{ $i > 1 ? 's' : '' }}
-                                </option>
+                                    {{ $i }} Star{{ $i > 1 ? 's' : '' }}</option>
                             @endfor
                         </select>
                     </div>
 
-                    {{-- Per Page --}}
+                    {{-- Results Per Page --}}
                     <div>
                         <label class="block text-sm font-medium mb-1 dark:text-gray-300">Results Per Page</label>
                         <select name="per_page"
@@ -181,36 +171,38 @@
                     </div>
                 </div>
 
+                {{-- Date & Score Range --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {{-- Date Range --}}
                     <div>
                         <label class="block text-sm font-medium mb-2 dark:text-gray-300">Date Range</label>
                         <div class="grid grid-cols-2 gap-2">
-                            <input type="date" name="date_from" class="filter-input"
-                                value="{{ request('date_from') }}" placeholder="From"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
-                            <input type="date" name="date_to" class="filter-input" value="{{ request('date_to') }}"
-                                placeholder="To"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
+                            <input type="date" name="date_from"
+                                class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
+                                value="{{ request('date_from') }}">
+                            <input type="date" name="date_to"
+                                class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
+                                value="{{ request('date_to') }}">
                         </div>
                     </div>
 
-                    {{-- Score Range --}}
+                    {{-- reCAPTCHA Score Range --}}
                     <div>
                         <label class="block text-sm font-medium mb-2 dark:text-gray-300">reCAPTCHA Score Range</label>
                         <div class="grid grid-cols-2 gap-2">
-                            <input type="number" name="score_min" class="filter-input"
+                            <input type="number" name="score_min"
+                                class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
                                 value="{{ request('score_min') }}" step="0.1" min="0" max="1"
-                                placeholder="Min (0.0)"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
-                            <input type="number" name="score_max" class="filter-input"
+                                placeholder="Min (0.0)">
+                            <input type="number" name="score_max"
+                                class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
                                 value="{{ request('score_max') }}" step="0.1" min="0" max="1"
-                                placeholder="Max (1.0)"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
+                                placeholder="Max (1.0)">
                         </div>
                     </div>
                 </div>
 
+                {{-- Apply & Clear --}}
                 <div class="flex gap-2 pt-2">
                     <button type="submit"
                         class="px-6 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors">
@@ -256,7 +248,7 @@
 
     {{-- Table --}}
     <div id="records-table">
-        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+        <div class="bg-white dark:bg-gray-800 border-2 border-primary shadow-lg rounded-lg overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50 dark:bg-gray-700">
