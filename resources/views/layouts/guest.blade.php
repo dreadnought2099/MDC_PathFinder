@@ -111,7 +111,7 @@
                     'name' => 'MDC Campus',
                     'image' => asset('images/mdc.png'),
                     'url' => url('/'),
-                    'telephone' => '+63 38 123 4567',
+                    'telephone' => '+63 38 508 8106',
                     'address' => [
                         '@type' => 'PostalAddress',
                         'streetAddress' => 'Cabulijan',
