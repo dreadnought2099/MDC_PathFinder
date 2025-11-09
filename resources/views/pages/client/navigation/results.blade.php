@@ -496,7 +496,6 @@
                         speakInstruction(
                             toRoomType === 'regular' ?
                             `You have reached ${toRoom}. You may now exit full screen mode. To learn more about ${toRoom}, please scan the QR code posted on the wall.` :
-                            `You have reached ${toRoom}. You may now exit full screen mode. Thanks for using MDC PathFinder! We hope it helped you find your way.`
                         ).catch(error => {
                             console.error('Failed to announce destination:', error);
                         });
