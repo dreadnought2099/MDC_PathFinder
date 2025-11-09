@@ -23,22 +23,23 @@
 
         <!-- Main content -->
         <div class="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8">
-            <div class="w-full max-w-lg text-gray-800 bg-white border-2 border-primary dark:bg-gray-800 shadow-lg rounded-md p-6">
+            <div
+                class="w-full max-w-lg text-gray-800 bg-white border-2 border-primary dark:bg-gray-800 shadow-lg rounded-md p-6">
                 <h2 class="text-2xl mb-6 text-center dark:text-gray-200">
                     Select Starting Point & Destination
                 </h2>
                 <form action="{{ route('paths.results') }}" method="POST">
                     @csrf
 
-                    <!-- From Room Combobox -->
+                    <!-- From Room Combobox (ENTRANCE POINTS ONLY) -->
                     <div class="mb-4">
                         <label for="from_room_search" class="block text-sm font-medium mb-2 dark:text-gray-300">
-                            Starting Point
+                            Starting Point (Entrance)
                         </label>
 
                         <div class="font-sofia relative">
                             <input type="text" id="from_room_search" autocomplete="off"
-                                placeholder="Search or select an office"
+                                placeholder="Search or select an entrance point"
                                 class="w-full border border-primary focus:ring-2 focus:border-primary focus:ring-primary focus:outline-none rounded-lg p-2 pr-8 dark:bg-gray-700 dark:text-gray-200 transition-all duration-200">
                             <svg class="absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,31 +51,39 @@
                             <div id="from_room_dropdown"
                                 class="hidden absolute z-10 w-full mt-1 dark:text-gray-300 bg-white dark:bg-gray-700 border border-primary rounded-lg shadow-lg max-h-60 overflow-y-auto">
                                 <div id="from_room_options" class="py-1">
-                                    @foreach ($rooms as $room)
+                                    @forelse ($entrancePoints as $entrance)
                                         <div class="from-room-option px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
-                                            data-value="{{ $room->id }}" data-label="{{ $room->name }}">
-                                            {{ $room->name }}
+                                            data-value="{{ $entrance->id }}" data-label="{{ $entrance->name }}">
+                                            {{ $entrance->name }}
                                         </div>
-                                    @endforeach
+                                    @empty
+                                        <div class="px-4 py-2 text-gray-500 dark:text-gray-400 text-sm">
+                                            No entrance points available
+                                        </div>
+                                    @endforelse
                                 </div>
 
                                 <div id="from_room_no_results"
                                     class="hidden px-4 py-2 text-gray-500 dark:text-gray-400 text-sm">
-                                    No office found
+                                    No entrance point found
                                 </div>
                             </div>
                         </div>
+
+                        @error('from_room')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
                     </div>
 
-                    <!-- To Room Combobox -->
+                    <!-- To Room Combobox (REGULAR ROOMS ONLY) -->
                     <div class="mb-6">
                         <label for="to_room_search" class="block text-sm font-medium mb-2 dark:text-gray-300">
-                            Destination
+                            Destination (Office/Room)
                         </label>
 
                         <div class="font-sofia relative">
                             <input type="text" id="to_room_search" autocomplete="off"
-                                placeholder="Search or select an office"
+                                placeholder="Search or select a destination"
                                 class="w-full border border-primary focus:ring-2 focus:border-primary focus:ring-primary focus:outline-none rounded-lg p-2 pr-8 dark:bg-gray-700 dark:text-gray-200 transition-all duration-200">
                             <svg class="absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -86,20 +95,28 @@
                             <div id="to_room_dropdown"
                                 class="hidden absolute z-10 w-full mt-1 dark:text-gray-300 bg-white dark:bg-gray-700 border border-primary rounded-lg shadow-lg max-h-60 overflow-y-auto">
                                 <div id="to_room_options" class="py-1">
-                                    @foreach ($rooms as $room)
+                                    @forelse ($regularRooms as $room)
                                         <div class="to-room-option px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
                                             data-value="{{ $room->id }}" data-label="{{ $room->name }}">
                                             {{ $room->name }}
                                         </div>
-                                    @endforeach
+                                    @empty
+                                        <div class="px-4 py-2 text-gray-500 dark:text-gray-400 text-sm">
+                                            No rooms available
+                                        </div>
+                                    @endforelse
                                 </div>
 
                                 <div id="to_room_no_results"
                                     class="hidden px-4 py-2 text-gray-500 dark:text-gray-400 text-sm">
-                                    No office found
+                                    No room found
                                 </div>
                             </div>
                         </div>
+
+                        @error('to_room')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div class="flex justify-center">
@@ -140,22 +157,26 @@
                     fetch(`/staff/search?q=${encodeURIComponent(this.query)}`)
                         .then(res => res.json())
                         .then(data => {
-                            // Filter out staff whose rooms are already selected
-                            const fromValue = fromCombobox.getValue();
+                            // Filter staff: only show those in regular rooms (destinations)
                             const toValue = toCombobox.getValue();
 
                             this.results = data.filter(staff => {
-                                if (!staff.room) return true;
-                                return staff.room.id != fromValue && staff.room.id != toValue;
+                                if (!staff.room) return false; // Hide staff without rooms
+                                if (staff.room.room_type !== 'regular') return false; // Only regular rooms
+                                return staff.room.id != toValue; // Skip already selected destination
                             });
+                        })
+                        .catch(error => {
+                            console.error('Staff search error:', error);
+                            this.results = [];
                         });
                 },
                 selectStaff(staff) {
                     this.query = staff.name;
                     this.results = [];
 
-                    if (staff.room) {
-                        // Use the combobox's selectOption method to properly update everything
+                    if (staff.room && staff.room.room_type === 'regular') {
+                        // Auto-select the staff's room as destination
                         toCombobox.selectOption(staff.room.id.toString(), staff.room.name);
                     }
                 }
@@ -305,19 +326,9 @@
             const fromValue = fromCombobox.getValue();
             const toValue = toCombobox.getValue();
 
-            // Enable all options first
-            fromCombobox.enableAllOptions();
-            toCombobox.enableAllOptions();
-
-            // Disable the selected destination in starting point combobox
-            if (toValue) {
-                fromCombobox.disableOption(toValue);
-            }
-
-            // Disable the selected starting point in destination combobox
-            if (fromValue) {
-                toCombobox.disableOption(fromValue);
-            }
+            // Note: Since entrance points and regular rooms are separate lists,
+            // we don't need to disable options across dropdowns
+            // Users can't select the same room because they're from different lists
 
             // Enable/disable start button
             startBtn.disabled = !(fromValue && toValue);
@@ -326,7 +337,7 @@
         fromHidden.addEventListener('change', updateDisabledOptions);
         toHidden.addEventListener('change', updateDisabledOptions);
 
-        // Preselect from_room if provided
+        // Preselect from_room if provided (only if it's a valid entrance point)
         @if (isset($preselectedFromRoom) && $preselectedFromRoom)
             const preselectedRoomId = '{{ $preselectedFromRoom }}';
             const preselectedOption = document.querySelector(`.from-room-option[data-value="${preselectedRoomId}"]`);

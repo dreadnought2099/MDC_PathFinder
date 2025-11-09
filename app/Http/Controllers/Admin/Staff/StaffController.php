@@ -274,7 +274,7 @@ class StaffController extends Controller
             return response()->json([]);
         }
 
-        $staffs = Staff::with('room')
+        $staffs = Staff::with('room:id,name,room_type') // Add room_type to the select
             ->select('id', 'first_name', 'middle_name', 'last_name', 'suffix', 'room_id', 'full_name')
             ->when(strlen($query) >= 3, function ($q) use ($query) {
                 $q->whereRaw("MATCH(first_name, middle_name, last_name, suffix, full_name) AGAINST(? IN BOOLEAN MODE)", [$query])
@@ -296,7 +296,11 @@ class StaffController extends Controller
         $results = $staffs->map(fn($s) => [
             'id' => $s->id,
             'name' => $s->full_name,
-            'room' => $s->room ? ['id' => $s->room->id, 'name' => $s->room->name] : null,
+            'room' => $s->room ? [
+                'id' => $s->room->id,
+                'name' => $s->room->name,
+                'room_type' => $s->room->room_type // Add room_type to response
+            ] : null,
         ]);
 
         return response()->json($results);

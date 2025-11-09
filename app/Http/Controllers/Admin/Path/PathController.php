@@ -14,6 +14,7 @@ class PathController extends Controller
     {
         $this->middleware(['auth', 'role:Admin'])->only(['index', 'show']);
     }
+
     // Show all paths with their images
     public function index(Request $request)
     {
@@ -91,16 +92,31 @@ class PathController extends Controller
     // Client-side path selection page
     public function selection(Request $request)
     {
-        $rooms = Room::orderBy('name')->get();
-        $preselectedFromRoom = $request->query('from');
+        // CHANGED: Only get entrance points for "from" dropdown
+        $entrancePoints = Room::where('room_type', 'entrance_point')
+            ->orderBy('name')
+            ->get();
 
-        return view('pages.client.navigation.selection', compact('rooms', 'preselectedFromRoom'));
+        // CHANGED: Get all regular rooms for "to" dropdown
+        $regularRooms = Room::where('room_type', 'regular')
+            ->orderBy('name')
+            ->get();
+
+        // CHANGED: Validate preselected entrance point
+        $preselectedFromRoom = $request->query('from');
+        if ($preselectedFromRoom) {
+            $preselectedRoom = Room::find($preselectedFromRoom);
+            if (!$preselectedRoom || $preselectedRoom->room_type !== 'entrance_point') {
+                $preselectedFromRoom = null; // Invalid entrance point
+            }
+        }
+
+        return view('pages.client.navigation.selection', compact('entrancePoints', 'regularRooms', 'preselectedFromRoom'));
     }
 
     // Client-side navigation results page
     public function navigationShow(Request $request)
     {
-
         $fromRoomId = $request->get('from_room');
         $toRoomId = $request->get('to_room');
 
@@ -114,6 +130,16 @@ class PathController extends Controller
 
         if (!$fromRoom || !$toRoom) {
             return redirect()->route('paths.select')->with('error', 'Invalid office selection.');
+        }
+
+        // ADDED: Validate that starting point is an entrance
+        if ($fromRoom->room_type !== 'entrance_point') {
+            return redirect()->route('paths.select')->with('error', 'Starting point must be an entrance point.');
+        }
+
+        // ADDED: Validate that destination is a regular room
+        if ($toRoom->room_type !== 'regular') {
+            return redirect()->route('paths.select')->with('error', 'Destination must be a regular office/room.');
         }
 
         if ($fromRoomId == $toRoomId) {
@@ -133,12 +159,23 @@ class PathController extends Controller
 
     public function results(Request $request)
     {
-
-        // Validate the request
+        // CHANGED: Enhanced validation
         $request->validate([
             'from_room' => 'required|exists:rooms,id',
             'to_room' => 'required|exists:rooms,id|different:from_room',
         ]);
+
+        $fromRoom = Room::find($request->from_room);
+        $toRoom = Room::find($request->to_room);
+
+        // ADDED: Validate room types
+        if ($fromRoom->room_type !== 'entrance_point') {
+            return back()->withErrors(['from_room' => 'Starting point must be an entrance point.'])->withInput();
+        }
+
+        if ($toRoom->room_type !== 'regular') {
+            return back()->withErrors(['to_room' => 'Destination must be a regular office/room.'])->withInput();
+        }
 
         // Store the form data in session for potential return navigation
         $sessionData = [
@@ -147,11 +184,6 @@ class PathController extends Controller
         ];
 
         session(['last_path_search' => $sessionData]);
-
-
-        $fromRoom = Room::find($request->from_room);
-        $toRoom = Room::find($request->to_room);
-
 
         // Find paths directly - simple approach
         $paths = Path::with(['images' => function ($query) {
@@ -196,6 +228,12 @@ class PathController extends Controller
         if (!$fromRoom || !$toRoom) {
             return redirect()->route('paths.select')
                 ->with('error', 'Previous search offices no longer exist. Please make a new search.');
+        }
+
+        // ADDED: Validate room types for stored session
+        if ($fromRoom->room_type !== 'entrance_point' || $toRoom->room_type !== 'regular') {
+            return redirect()->route('paths.select')
+                ->with('error', 'Previous search is invalid. Please make a new search.');
         }
 
         // Find paths directly - same logic as results() method
