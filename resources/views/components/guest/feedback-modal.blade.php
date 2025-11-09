@@ -1,4 +1,12 @@
-<div x-data="{ open: false }" @keydown.escape.window="open = false" class="relative group">
+<div x-data="{
+    open: false,
+    clearFeedbackMessage() {
+        document.getElementById('flash-message')?.remove();
+        document.getElementById('temp-message')?.remove();
+    }
+}" @keydown.escape.window="open = false" class="relative group"
+    @close-modal.window="open = false; clearFeedbackMessage()">
+
     <!-- Trigger Button -->
     <button @click="open = true"
         class="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 cursor-pointer">
@@ -26,7 +34,7 @@
         x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
         class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-        @click="open = false" style="display: none;">
+        @click="open = false; $nextTick(() => { clearFeedbackMessage() })" style="display: none;">
 
         <!-- Modal Content -->
         <div @click.stop x-transition:enter="transition ease-out duration-300"
@@ -53,22 +61,24 @@
             <!-- Body -->
             <div class="p-6">
                 @if (session('success'))
-                    <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+                    <div class="mb-4 p-4 bg-green-100 border border-tertiary text-tertiary rounded-lg">
                         <strong>{{ session('success') }}</strong>
                     </div>
                 @endif
 
                 @if (session('error'))
-                    <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                    <div class="mb-4 p-4 bg-red-100 border border-secondary text-secondary rounded-lg">
                         <strong>{{ session('error') }}</strong>
                     </div>
                 @endif
 
-                <form action="{{ route('feedback.store') }}" method="POST" id="feedbackForm" x-data="{ message: '{{ old('message') }}', canSubmit: false, rating: null }"
+                <!-- Form -->
+                <form action="{{ route('feedback.store') }}" method="POST" id="feedbackForm" x-data="{ message: '{{ old('message') }}', canSubmit: false, rating: null, hover: null }"
                     @submit.prevent="submitForm">
                     @csrf
                     <input type="hidden" name="page_url" value="{{ url()->current() }}">
                     <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
+                    <input type="hidden" name="rating" :value="rating">
 
                     <!-- Feedback Type -->
                     <div class="mb-5">
@@ -92,18 +102,23 @@
                         </label>
                         <div class="flex gap-2">
                             @for ($i = 1; $i <= 5; $i++)
-                                <label class="cursor-pointer"
-                                    :class="rating >= {{ $i }} ? 'text-yellow-400' : 'text-gray-300'"
-                                    @click="rating = {{ $i }}">
-                                    <input type="radio" name="rating" value="{{ $i }}" class="hidden"
-                                        x-model="rating">
-                                    <svg class="w-8 h-8 transition-colors" fill="currentColor" viewBox="0 0 20 20">
-                                        <path
-                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                <span class="cursor-pointer" @mouseover="hover = {{ $i }}"
+                                    @mouseleave="hover = null" @click="rating = {{ $i }}">
+                                    <svg class="w-8 h-8 transition-colors" fill="currentColor" viewBox="0 0 20 20"
+                                        :class="(hover >= {{ $i }} || rating >= {{ $i }}) ?
+                                        'text-yellow-400' : 'text-gray-300'">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07
+                                            3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588
+                                            1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755
+                                            1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8
+                                            2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1
+                                            1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1
+                                            1 0 00.951-.69l1.07-3.292z" />
                                     </svg>
-                                </label>
+                                </span>
                             @endfor
                         </div>
+
                         <p class="text-xs text-gray-500 mt-2"
                             x-text="rating ? 'You rated: ' + rating : 'Click to rate'"></p>
                     </div>
@@ -127,11 +142,11 @@
                     <!-- Submit -->
                     <div class="flex justify-end gap-3">
                         <button type="button" @click="$dispatch('close-modal')"
-                            class="px-6 py-2.5 border border-gray-300 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                            class="w-full sm:w-auto px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover">
                             Cancel
                         </button>
                         <button type="submit" :disabled="!canSubmit"
-                            class="px-6 py-2.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                            class="bg-primary text-white text-sm font-medium px-4 py-2 bg-primary rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover disabled:opacity-50 disabled:cursor-not-allowed">
                             Submit Feedback
                         </button>
                     </div>
@@ -144,81 +159,27 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-
-            // --- Character counter ---
-            const messageField = document.getElementById('message');
-            const charCount = document.getElementById('charCount');
-            if (messageField && charCount) {
-                charCount.textContent = messageField.value.length;
-                messageField.addEventListener('input', () => charCount.textContent = messageField.value.length);
-            }
-
-            // --- Star rating ---
-            const starLabels = document.querySelectorAll('#starRating label');
-            starLabels.forEach(label => {
-                const rating = parseInt(label.dataset.rating);
-                const stars = label.parentElement.querySelectorAll('.star-icon');
-
-                label.addEventListener('click', () => {
-                    label.parentElement.querySelector(`input[value="${rating}"]`).checked = true;
-                    stars.forEach((star, idx) => {
-                        star.classList.toggle('text-yellow-400', idx < rating);
-                        star.classList.toggle('text-gray-300', idx >= rating);
-                    });
-                });
-
-                label.addEventListener('mouseover', () => {
-                    stars.forEach((star, idx) => star.classList.toggle('text-yellow-400', idx <
-                        rating));
-                });
-
-                label.addEventListener('mouseout', () => {
-                    const checkedRating = parseInt(label.parentElement.querySelector(
-                        'input:checked')?.value || 0);
-                    stars.forEach((star, idx) => {
-                        star.classList.toggle('text-yellow-400', idx < checkedRating);
-                        star.classList.toggle('text-gray-300', idx >= checkedRating);
-                    });
-                });
-            });
-
-            // --- reCAPTCHA v3 on submit ---
             const form = document.getElementById('feedbackForm');
-            if (form) {
-                let lastSubmit = 0;
-                form.addEventListener('submit', function(event) {
-                    event.preventDefault();
-                    const now = Date.now();
-                    if (now - lastSubmit < 5000) { // 5 second cooldown
-                        alert('Please wait a few seconds before submitting again.');
-                        return;
-                    }
-                    lastSubmit = now;
+            if (!form) return;
 
-                    grecaptcha.ready(function() {
-                        grecaptcha.execute('{{ config('services.recaptcha.site_key') }}', {
-                                action: 'feedback'
-                            })
-                            .then(function(token) {
-                                document.getElementById('g-recaptcha-response').value = token;
-                                form.submit();
-                            });
-                    });
-                });
-            }
+            let lastSubmit = 0;
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const now = Date.now();
+                if (now - lastSubmit < 5000) return alert(
+                    'Please wait a few seconds before submitting again.');
+                lastSubmit = now;
 
-            function submitForm(event) {
-                const form = event.target;
-                grecaptcha.ready(function() {
+                grecaptcha.ready(() => {
                     grecaptcha.execute('{{ config('services.recaptcha.site_key') }}', {
                             action: 'feedback'
                         })
-                        .then(function(token) {
+                        .then(token => {
                             document.getElementById('g-recaptcha-response').value = token;
                             form.submit();
                         });
                 });
-            }
+            });
         });
     </script>
 @endpush
