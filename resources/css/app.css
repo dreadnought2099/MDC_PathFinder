@@ -3,7 +3,8 @@
 @import "./landing.css";
 @import "./path-results.css";
 @import "./schedule-tabs.css";
-/* @import "./tanker.css"; */
+@import "./tanker.css";
+@import "./excon.css";
 @source "../views";
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -63,7 +64,7 @@
     }
 
     body {
-        font-family: "Cubano", Verdana, sans-serif;
+        font-family: "Excon-Black", Verdana, sans-serif;
         cursor: auto;
     }
 

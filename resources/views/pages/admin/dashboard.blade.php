@@ -6,7 +6,7 @@
 
             <!-- Header Section -->
             <div class="text-center mb-8">
-                <h1 class="text-4xl lg:text-5xl font-bold text-gray-800 dark:text-white mb-3">
+                <h1 class="text-4xl lg:text-5xl font-bold text-gray-800 dark:text-gray-300 mb-3">
                     <img-reveal>
                         <span class="trigger-text text-primary">{{ Auth::user()->room->name ?? Auth::user()->username }}</span>
                         <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/pengu-admin.gif"
@@ -20,7 +20,7 @@
 
             <!-- Quick Stats Section -->
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-2 border-primary mb-8">
-                <h2 class="text-xl font-semibold text-primary mb-6 text-center">Quick Overview</h2>
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-300 mb-6 text-center">Quick Overview</h2>
                 <div
                     class="grid gap-4 @if (auth()->user()->hasRole('Admin')) grid-cols-2 lg:grid-cols-4 @else grid-cols-1 sm:grid-cols-3 @endif">
 
