@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('page_url')->nullable(); // Where feedback was submitted
             $table->string('ip_hash'); // Hashed IP for rate limiting
             $table->float('recaptcha_score')->nullable(); // reCAPTCHA v3 score (0-1)
-            $table->enum('status', ['pending', 'reviewed', 'resolved'])->default('pending');
+            $table->enum('status', ['pending', 'reviewed', 'resolved', 'archived'])->default('pending');
             $table->timestamps();
         });
     }
