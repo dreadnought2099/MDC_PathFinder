@@ -2,24 +2,24 @@
 
 @section('content')
     <div class="container mx-auto px-4 py-8">
-        {{-- Header --}}
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold mt-2">Feedback Details</h1>
+        <div class="mb-6">
+            <h1 class="text-3xl font-bold mt-2 text-gray-800 dark:text-gray-300 text-center">Feedback
+                <span class="text-primary">
+                    Details
+                </span>
+            </h1>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {{-- Main Content --}}
             <div class="lg:col-span-2 space-y-6">
-                {{-- Feedback Message --}}
-                <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
+                <div class="bg-white dark:bg-gray-800 border-2 border-primary shadow-lg rounded-lg p-6">
                     <h2 class="text-xl font-semibold mb-4 dark:text-white">Message</h2>
                     <div class="prose dark:prose-invert max-w-none">
                         <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $feedback->message }}</p>
                     </div>
                 </div>
 
-                {{-- Timeline / Activity Log --}}
-                <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
+                <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 border-2 border-primary">
                     <h2 class="text-xl font-semibold mb-4 dark:text-white">Timeline</h2>
                     <div class="space-y-4">
                         <div class="flex items-start">
@@ -71,10 +71,8 @@
                 </div>
             </div>
 
-            {{-- Sidebar --}}
             <div class="lg:col-span-1 space-y-6">
-                {{-- Status Card --}}
-                <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
+                <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 border-2 border-primary">
                     <h2 class="text-lg font-semibold mb-4 dark:text-white">Status</h2>
                     <form method="POST" action="{{ route('feedback.updateStatus', $feedback) }}">
                         @csrf
@@ -90,31 +88,17 @@
                             </option>
                         </select>
                     </form>
-
-                    <div class="mt-3">
-                        <span
-                            class="inline-block px-3 py-1 rounded-full text-sm font-medium
-                            {{ $feedback->status == 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : '' }}
-                            {{ $feedback->status == 'reviewed' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : '' }}
-                            {{ $feedback->status == 'resolved' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : '' }}
-                            {{ $feedback->status == 'archived' ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' : '' }}">
-                            {{ ucfirst($feedback->status) }}
-                        </span>
-                    </div>
                 </div>
 
-                {{-- Details Card --}}
-                <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
+                <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 border-2 border-primary">
                     <h2 class="text-lg font-semibold mb-4 dark:text-white">Details</h2>
 
                     <div class="space-y-4">
-                        {{-- ID --}}
                         <div>
                             <p class="text-sm text-gray-500 dark:text-gray-400">ID</p>
                             <p class="font-medium dark:text-white">#{{ $feedback->id }}</p>
                         </div>
 
-                        {{-- Type --}}
                         <div>
                             <p class="text-sm text-gray-500 dark:text-gray-400">Type</p>
                             <span
@@ -123,7 +107,6 @@
                             </span>
                         </div>
 
-                        {{-- Rating --}}
                         @if ($feedback->rating)
                             <div>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Rating</p>
