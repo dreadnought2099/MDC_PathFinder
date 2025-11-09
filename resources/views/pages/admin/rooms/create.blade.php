@@ -48,14 +48,16 @@
                 </div>
 
                 <!-- Telephone Number -->
-                <div class="relative mb-6">
-                    <input type="text" name="tel_num" id="tel_num" placeholder="Telephone Number"
-                        class="{{ $inputClasses }}" value="{{ old('tel_num', $room->tel_num ?? '') }}">
-                    <label class="{{ $labelClasses }}">Telephone Number</label>
-                    <span id="telephone-number-feedback" class="text-red-500 text-sm"></span>
-                    @error('tel_num')
-                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
+                <div class="conditional-field">
+                    <div class="relative mb-6">
+                        <input type="text" name="tel_num" id="tel_num" placeholder="Telephone Number"
+                            class="{{ $inputClasses }}" value="{{ old('tel_num', $room->tel_num ?? '') }}">
+                        <label class="{{ $labelClasses }}">Telephone Number</label>
+                        <span id="telephone-number-feedback" class="text-red-500 text-sm"></span>
+                        @error('tel_num')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
+                    </div>
                 </div>
 
                 <!-- Description (Full Width) -->
