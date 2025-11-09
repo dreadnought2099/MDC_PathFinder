@@ -109,10 +109,6 @@
 
                     {{-- Action Buttons Group --}}
                     <div class="flex gap-2">
-                        <button type="submit"
-                            class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors whitespace-nowrap">
-                            Search
-                        </button>
                         <button @click.prevent="showFilters = !showFilters" type="button"
                             class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
                             <span x-text="showFilters ? 'Hide Filters' : 'Filters'"></span>
