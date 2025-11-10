@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container mx-auto px-4 py-8">
-        <div class="mb-6">
-            <h1 class="text-3xl font-bold mt-2 text-gray-800 dark:text-gray-300 text-center">Feedback
+    <div class="container mt-4 mx-auto max-w-6xl overflow-y-auto h-[80vh]">
+        <div class="bg-white dark:bg-gray-900 mb-6 text-center sticky top-0 z-48 px-4 sm:px-6 lg:px-8">
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-1 dark:text-gray-100">Feedback
                 <span class="text-primary">
                     Details
                 </span>

@@ -2,7 +2,6 @@
 
 @section('content')
     <div class="container mt-4 mx-auto max-w-6xl overflow-y-auto h-[80vh]">
-        
         <div class="bg-white dark:bg-gray-900 mb-6 text-center sticky top-0 z-48 px-4 sm:px-6 lg:px-8">
             <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-1 dark:text-gray-100">
                 User <span class="text-primary">Feedback</span>
