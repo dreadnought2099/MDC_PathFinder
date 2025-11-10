@@ -84,11 +84,21 @@
                              </form>
                          </td>
                          <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
-                             <a href="{{ route('feedback.show', $item) }}"
-                                 class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover-underline hover:scale-125 ease-in-out transition-all duration-300">
-                                 <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/view.png"
-                                     alt="View Icon" class="w-8 h-8 object-contain">
-                             </a>
+                             <div class="relative inline-block group">
+                                 <a href="{{ route('feedback.show', $item) }}"
+                                     class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover-underline hover:scale-125 ease-in-out transition-all duration-300">
+                                     <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/view.png"
+                                         alt="View Icon" class="w-8 h-8 object-contain">
+                                 </a>
+                                 <div
+                                     class="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-xs opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 whitespace-nowrap pointer-events-none hidden lg:block">
+                                     View Feedback
+                                     <div
+                                         class="absolute left-full top-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-l-gray-900 border-t-4 border-t-transparent border-b-4 border-b-transparent">
+                                     </div>
+                                 </div>
+                             </div>
+
                              <form method="POST" action="{{ route('feedback.destroy', $item) }}" class="inline"
                                  onsubmit="return confirm('Are you sure you want to delete this feedback?')">
                                  @csrf
