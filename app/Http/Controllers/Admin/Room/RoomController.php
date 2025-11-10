@@ -147,9 +147,17 @@ class RoomController extends Controller
 
             $room = Room::create(collect($validated)->except('office_hours')->toArray());
 
-            $connectionResult = $entrancePointService->connectNewRoomToAllRooms($room);
 
-            $successMessage = "{$room->name} created and connected to {$connectionResult['rooms_connected']} office with {$connectionResult['paths_created']} paths.";
+            // UPDATED: Clear method names based on room type
+            if ($room->room_type === 'entrance_point') {
+                // New entrance point: Connect it TO all regular rooms
+                $pathsCreated = $entrancePointService->connectEntranceToAllRooms($room);
+                $successMessage = "{$room->name} created and connected to all offices with {$pathsCreated} paths.";
+            } else {
+                // New regular room: Connect all entrance points TO it
+                $connectionResult = $entrancePointService->connectAllEntrancesToRoom($room);
+                $successMessage = "{$room->name} created and connected to {$connectionResult['rooms_connected']} entrance point(s) with {$connectionResult['paths_created']} paths.";
+            }
 
             // Save office hours and consultation times using helper
             $this->saveTimeRanges($room, 'officeHours', $request->office_hours ?? null);
@@ -401,11 +409,15 @@ class RoomController extends Controller
                     $room->save();
                 }
 
+
+                // UPDATED: Reconnect with clear method names
                 $entranceService = app(EntrancePointService::class);
                 if ($room->room_type === 'entrance_point') {
-                    $entranceService->reconnectEntrancePoint($room);
+                    // Changed TO entrance: Connect this entrance TO all rooms
+                    $entranceService->connectEntranceToAllRooms($room);
                 } else {
-                    $entranceService->connectNewRoomToAllRooms($room);
+                    // Changed TO regular: Connect all entrances TO this room
+                    $entranceService->connectAllEntrancesToRoom($room);
                 }
             }
 
@@ -590,10 +602,13 @@ class RoomController extends Controller
             ]);
         }
 
+        // UPDATED: Clear method names based on room type
         if ($room->room_type === 'entrance_point') {
-            $entrancePointService->reconnectEntrancePoint($room);
+            // Entrance point: Connect it TO all regular rooms
+            $entrancePointService->connectEntranceToAllRooms($room);
         } else {
-            $entrancePointService->connectNewRoomToAllRooms($room);
+            // Regular room: Connect all entrances TO this room
+            $entrancePointService->connectAllEntrancesToRoom($room);
         }
 
         return redirect()->route('recycle-bin')

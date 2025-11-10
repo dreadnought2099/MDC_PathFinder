@@ -14,8 +14,7 @@ class EntrancePointService
      * Called when creating a brand-new ENTRANCE POINT (via create form).
      *
      * Behavior:
-     * - Creates a new Room with type = 'entrance_point'
-     * - Automatically connects it to ALL existing regular rooms (ONE-WAY ONLY)
+     * - Creates paths FROM entrance_point TO all existing regular rooms (ONE-WAY)
      * - Path direction: entrance_point -> regular_room
      * - Skips connecting to other entrances
      * - Uses firstOrCreate to avoid duplicate paths
@@ -54,6 +53,8 @@ class EntrancePointService
     }
 
     /**
+     * RENAMED: connectAllEntrancesToRoom (was connectNewRoomToAllRooms)
+     * 
      * Scenario:
      * Called when creating a brand-new REGULAR ROOM.
      *
@@ -63,7 +64,7 @@ class EntrancePointService
      * - Does NOT create paths between regular rooms
      * - Uses firstOrCreate so restored/old paths are reused, no duplicates
      */
-    public function connectNewRoomToAllRooms(Room $newRoom)
+    public function connectAllEntrancesToRoom(Room $newRoom)
     {
         // Only connect entrance points to this new regular room
         $entrancePoints = Room::where('room_type', 'entrance_point')
@@ -107,19 +108,22 @@ class EntrancePointService
     }
 
     /**
+     * RENAMED: connectEntranceToAllRooms (was reconnectEntrancePoint)
+     * 
      * Scenario:
-     * Called when converting a REGULAR ROOM into an ENTRANCE (via update/restore).
+     * Called when converting a REGULAR ROOM into an ENTRANCE (via update/restore)
+     * OR when creating a NEW entrance point.
      *
      * Behavior:
      * - Connects the entrance to ALL regular rooms (ONE-WAY ONLY)
-     * - Path direction: new_entrance -> regular_room
+     * - Path direction: entrance -> regular_room
      * - Uses firstOrCreate so old/restored paths are reused, missing ones get added
      */
-    public function reconnectEntrancePoint(Room $room)
+    public function connectEntranceToAllRooms(Room $entrancePoint)
     {
         // Only connect to regular rooms
         $regularRooms = Room::where('room_type', 'regular')
-            ->where('id', '!=', $room->id)
+            ->where('id', '!=', $entrancePoint->id)
             ->get();
 
         $pathsCreated = 0;
@@ -127,7 +131,7 @@ class EntrancePointService
         foreach ($regularRooms as $regularRoom) {
             // Only create ONE-WAY path: entrance -> regular room
             $path = Path::firstOrCreate([
-                'from_room_id' => $room->id,
+                'from_room_id' => $entrancePoint->id,
                 'to_room_id'   => $regularRoom->id,
             ]);
 

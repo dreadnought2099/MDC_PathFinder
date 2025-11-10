@@ -1,304 +1,316 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="mb-8">
-        <h1 class="text-center text-gray-800 dark:text-gray-300 text-3xl font-bold">
-            User <span class="text-primary">Feedback</span>
-        </h1>
-    </div>
-
-    <a href="{{ route('feedback.export', request()->query()) }}" class="fixed right-0 top-32 z-50 group" title="Export to CSV">
-        <div
-            class="flex flex-col items-center justify-center px-3 py-6 bg-green-600 text-white rounded-l-full shadow-xl transition-all duration-300 group-hover:bg-green-700">
-            <svg class="w-6 h-6 mb-2 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                </path>
-            </svg>
-            <span class="text-xs font-bold tracking-wider transform whitespace-nowrap">EXPORT</span>
+    <div class="container mt-4 mx-auto max-w-6xl overflow-y-auto h-[80vh]">
+        
+        <div class="bg-white dark:bg-gray-900 mb-6 text-center sticky top-0 z-48 px-4 sm:px-6 lg:px-8">
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-1 dark:text-gray-100">
+                User <span class="text-primary">Feedback</span>
+            </h1>
         </div>
 
-        <div
-            class="absolute right-full top-1/2 -translate-y-1/2 mr-2 px-4 py-3 bg-green-600 text-white rounded-lg shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:mr-3 transition-all duration-300 whitespace-nowrap">
-            <div class="flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <a href="{{ route('feedback.export', request()->query()) }}" class="fixed right-0 top-32 z-50 group"
+            title="Export to CSV">
+            <div
+                class="flex flex-col items-center justify-center px-3 py-6 bg-green-600 text-white rounded-l-full shadow-xl transition-all duration-300 group-hover:bg-green-700">
+                <svg class="w-6 h-6 mb-2 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                     </path>
                 </svg>
-                <span class="font-semibold">Export Feedback to CSV</span>
+                <span class="text-xs font-bold tracking-wider transform whitespace-nowrap">EXPORT</span>
+            </div>
+
+            <div
+                class="absolute right-full top-1/2 -translate-y-1/2 mr-2 px-4 py-3 bg-green-600 text-white rounded-lg shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:mr-3 transition-all duration-300 whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
+                    </svg>
+                    <span class="font-semibold">Export Feedback to CSV</span>
+                </div>
+                <div
+                    class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-l-8 border-l-green-600">
+                </div>
+            </div>
+        </a>
+
+        {{-- Analytics Cards --}}
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div
+                class="bg-blue-50 dark:bg-blue-900/30 p-4 lg:p-6 rounded-lg shadow border-2 border-primary dark:border-blue-800">
+                <div class="text-xs lg:text-sm text-blue-600 dark:text-blue-400">Total Feedback</div>
+                <div class="text-xl lg:text-2xl font-bold text-gray-800 dark:text-gray-300">{{ $analytics['total_count'] }}
+                </div>
             </div>
             <div
-                class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-l-8 border-l-green-600">
+                class="bg-green-50 dark:bg-green-900/30 p-4 lg:p-6 rounded-lg shadow border-2 border-tertiary dark:border-green-800">
+                <div class="text-xs lg:text-sm text-green-600 mb-1 dark:text-green-400">Average Rating</div>
+                <div class="text-xl lg:text-2xl font-bold text-gray-800 dark:text-gray-300">
+                    {{ $analytics['average_rating'] ?? 'N/A' }}/5</div>
+            </div>
+            <div class="dark:bg-purple-900/30 p-4 lg:p-6 rounded-lg shadow border-2 border-purple dark:border-purple-800">
+                <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Average Score</div>
+                <div class="text-xl lg:text-2xl font-bold text-gray-800 dark:text-gray-300">
+                    {{ $analytics['average_score'] ?? 'N/A' }}</div>
+            </div>
+            <div
+                class="bg-orange-50 dark:bg-orange-900/30 p-4 lg:p-6 rounded-lg shadow border-2 border-orange dark:border-orange-800">
+                <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Pending Review</div>
+                <div class="text-xl lg:text-2xl font-bold text-gray-800 dark:text-gray-300">
+                    {{ $analytics['by_status']['pending'] ?? 0 }}</div>
             </div>
         </div>
-    </a>
 
-    {{-- Analytics Cards --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div
-            class="bg-blue-50 dark:bg-blue-900/30 p-4 lg:p-6 rounded-lg shadow border-2 border-primary dark:border-blue-800">
-            <div class="text-xs lg:text-sm text-blue-600 dark:text-blue-400">Total Feedback</div>
-            <div class="text-xl lg:text-2xl font-bold text-gray-800 dark:text-gray-300">{{ $analytics['total_count'] }}
-            </div>
-        </div>
-        <div
-            class="bg-green-50 dark:bg-green-900/30 p-4 lg:p-6 rounded-lg shadow border-2 border-tertiary dark:border-green-800">
-            <div class="text-xs lg:text-sm text-green-600 mb-1 dark:text-green-400">Average Rating</div>
-            <div class="text-xl lg:text-2xl font-bold text-gray-800 dark:text-gray-300">
-                {{ $analytics['average_rating'] ?? 'N/A' }}/5</div>
-        </div>
-        <div class="dark:bg-purple-900/30 p-4 lg:p-6 rounded-lg shadow border-2 border-purple dark:border-purple-800">
-            <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Average Score</div>
-            <div class="text-xl lg:text-2xl font-bold text-gray-800 dark:text-gray-300">
-                {{ $analytics['average_score'] ?? 'N/A' }}</div>
-        </div>
-        <div
-            class="bg-orange-50 dark:bg-orange-900/30 p-4 lg:p-6 rounded-lg shadow border-2 border-orange dark:border-orange-800">
-            <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Pending Review</div>
-            <div class="text-xl lg:text-2xl font-bold text-gray-800 dark:text-gray-300">
-                {{ $analytics['by_status']['pending'] ?? 0 }}</div>
-        </div>
-    </div>
+        {{-- Search and Actions Bar --}}
+        <div x-data="{ showFilters: false, showBulkActions: false }" class="space-y-4 mb-6">
 
-    {{-- Search and Actions Bar --}}
-    <div x-data="{ showFilters: false, showBulkActions: false }" class="space-y-4 mb-6">
+            {{-- Main Search Bar --}}
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-4 border-2 border-primary">
+                <form id="search-sort-form" method="GET" action="{{ route('feedback.index') }}">
+                    {{-- Keep current filters --}}
+                    <input type="hidden" name="type" value="{{ request('type') }}">
+                    <input type="hidden" name="status" value="{{ request('status') }}">
+                    <input type="hidden" name="rating" value="{{ request('rating') }}">
+                    <input type="hidden" name="date_from" value="{{ request('date_from') }}">
+                    <input type="hidden" name="date_to" value="{{ request('date_to') }}">
+                    <input type="hidden" name="score_min" value="{{ request('score_min') }}">
+                    <input type="hidden" name="score_max" value="{{ request('score_max') }}">
+                    <input type="hidden" name="per_page" value="{{ request('per_page') }}">
 
-        {{-- Main Search Bar --}}
-        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-4 border-2 border-primary">
-            <form id="search-sort-form" method="GET" action="{{ route('feedback.index') }}">
-                {{-- Keep current filters --}}
-                <input type="hidden" name="type" value="{{ request('type') }}">
-                <input type="hidden" name="status" value="{{ request('status') }}">
-                <input type="hidden" name="rating" value="{{ request('rating') }}">
-                <input type="hidden" name="date_from" value="{{ request('date_from') }}">
-                <input type="hidden" name="date_to" value="{{ request('date_to') }}">
-                <input type="hidden" name="score_min" value="{{ request('score_min') }}">
-                <input type="hidden" name="score_max" value="{{ request('score_max') }}">
-                <input type="hidden" name="per_page" value="{{ request('per_page') }}">
+                    <div class="flex flex-col lg:flex-row gap-3">
+                        {{-- Search Input --}}
+                        <div class="flex-1">
+                            <input type="text" name="search" id="search-input" value="{{ request('search', '') }}"
+                                placeholder="Search feedback..."
+                                class="w-full px-4 py-2 rounded-md border border-primary dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
 
-                <div class="flex flex-col lg:flex-row gap-3">
-                    {{-- Search Input --}}
-                    <div class="flex-1">
-                        <input type="text" name="search" id="search-input" value="{{ request('search', '') }}"
-                            placeholder="Search feedback..."
-                            class="w-full px-4 py-2 rounded-md border border-primary dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent">
+                        {{-- Sort Controls --}}
+                        <div class="flex gap-2">
+                            <select name="sort" id="sort-select"
+                                class="px-3 py-2 rounded-md dark:bg-gray-700 border border-primary dark:text-white focus:ring-2 focus:ring-primary">
+                                <option value="created_at"
+                                    {{ request('sort', 'created_at') == 'created_at' ? 'selected' : '' }}>Date</option>
+                                <option value="rating" {{ request('sort') == 'rating' ? 'selected' : '' }}>Rating</option>
+                                <option value="recaptcha_score"
+                                    {{ request('sort') == 'recaptcha_score' ? 'selected' : '' }}>
+                                    Score</option>
+                                <option value="status" {{ request('sort') == 'status' ? 'selected' : '' }}>Status</option>
+                                <option value="feedback_type" {{ request('sort') == 'feedback_type' ? 'selected' : '' }}>
+                                    Type
+                                </option>
+                            </select>
+
+                            <select name="direction" id="direction-select"
+                                class="px-3 py-2 border border-primary rounded-md dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary">
+                                <option value="desc" {{ request('direction', 'desc') == 'desc' ? 'selected' : '' }}>↓
+                                </option>
+                                <option value="asc" {{ request('direction') == 'asc' ? 'selected' : '' }}>↑</option>
+                            </select>
+                        </div>
+
+                        {{-- Action Buttons Group --}}
+                        <div class="flex gap-2">
+                            <button @click.prevent="showFilters = !showFilters" type="button"
+                                class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+                                <span x-text="showFilters ? 'Hide Filters' : 'Filters'"></span>
+                            </button>
+                            <button @click.prevent="showBulkActions = !showBulkActions" type="button"
+                                class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors whitespace-nowrap">
+                                <span x-text="showBulkActions ? 'Hide Bulk' : 'Bulk'"></span>
+                            </button>
+                        </div>
                     </div>
-
-                    {{-- Sort Controls --}}
-                    <div class="flex gap-2">
-                        <select name="sort" id="sort-select"
-                            class="px-3 py-2 rounded-md dark:bg-gray-700 border border-primary dark:text-white focus:ring-2 focus:ring-primary">
-                            <option value="created_at"
-                                {{ request('sort', 'created_at') == 'created_at' ? 'selected' : '' }}>Date</option>
-                            <option value="rating" {{ request('sort') == 'rating' ? 'selected' : '' }}>Rating</option>
-                            <option value="recaptcha_score" {{ request('sort') == 'recaptcha_score' ? 'selected' : '' }}>
-                                Score</option>
-                            <option value="status" {{ request('sort') == 'status' ? 'selected' : '' }}>Status</option>
-                            <option value="feedback_type" {{ request('sort') == 'feedback_type' ? 'selected' : '' }}>Type
-                            </option>
-                        </select>
-
-                        <select name="direction" id="direction-select"
-                            class="px-3 py-2 border border-primary rounded-md dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary">
-                            <option value="desc" {{ request('direction', 'desc') == 'desc' ? 'selected' : '' }}>↓
-                            </option>
-                            <option value="asc" {{ request('direction') == 'asc' ? 'selected' : '' }}>↑</option>
-                        </select>
-                    </div>
-
-                    {{-- Action Buttons Group --}}
-                    <div class="flex gap-2">
-                        <button @click.prevent="showFilters = !showFilters" type="button"
-                            class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
-                            <span x-text="showFilters ? 'Hide Filters' : 'Filters'"></span>
-                        </button>
-                        <button @click.prevent="showBulkActions = !showBulkActions" type="button"
-                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors whitespace-nowrap">
-                            <span x-text="showBulkActions ? 'Hide Bulk' : 'Bulk'"></span>
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-
-        {{-- Advanced Filters Panel (Collapsible) --}}
-        <div x-show="showFilters" x-transition:enter="transition ease-out duration-200"
-            x-transition:enter-start="opacity-0 transform -translate-y-2"
-            x-transition:enter-end="opacity-100 transform translate-y-0"
-            x-transition:leave="transition ease-in duration-150"
-            x-transition:leave-start="opacity-100 transform translate-y-0"
-            x-transition:leave-end="opacity-0 transform -translate-y-2"
-            class="bg-white dark:bg-gray-800 shadow rounded-lg p-4 lg:p-6 border border-gray-200 dark:border-gray-700">
-
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Advanced Filters</h3>
-                <button @click="showFilters = false"
-                    class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                        </path>
-                    </svg>
-                </button>
+                </form>
             </div>
 
-            <form id="advanced-filters-form" method="GET" action="{{ route('feedback.index') }}" class="space-y-4">
-                <input type="hidden" name="search" value="{{ request('search') }}">
-                <input type="hidden" name="sort" value="{{ request('sort', 'created_at') }}">
-                <input type="hidden" name="direction" value="{{ request('direction', 'desc') }}">
+            {{-- Advanced Filters Panel (Collapsible) --}}
+            <div x-show="showFilters" x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 transform -translate-y-2"
+                x-transition:enter-end="opacity-100 transform translate-y-0"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100 transform translate-y-0"
+                x-transition:leave-end="opacity-0 transform -translate-y-2"
+                class="bg-white dark:bg-gray-800 shadow rounded-lg p-4 lg:p-6 border border-gray-200 dark:border-gray-700">
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {{-- Type Filter --}}
-                    <div>
-                        <label class="block text-sm font-medium mb-1 dark:text-gray-300">Type</label>
-                        <select name="type"
-                            class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
-                            <option value="">All Types</option>
-                            <option value="general" {{ request('type') == 'general' ? 'selected' : '' }}>General</option>
-                            <option value="bug" {{ request('type') == 'bug' ? 'selected' : '' }}>Bug</option>
-                            <option value="feature" {{ request('type') == 'feature' ? 'selected' : '' }}>Feature Request
-                            </option>
-                            <option value="navigation" {{ request('type') == 'navigation' ? 'selected' : '' }}>Navigation
-                                Issue</option>
-                        </select>
-                    </div>
-
-                    {{-- Status Filter --}}
-                    <div>
-                        <label class="block text-sm font-medium mb-1 dark:text-gray-300">Status</label>
-                        <select name="status"
-                            class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
-                            <option value="">All Status</option>
-                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending
-                            </option>
-                            <option value="reviewed" {{ request('status') == 'reviewed' ? 'selected' : '' }}>Reviewed
-                            </option>
-                            <option value="resolved" {{ request('status') == 'resolved' ? 'selected' : '' }}>Resolved
-                            </option>
-                            <option value="archived" {{ request('status') == 'archived' ? 'selected' : '' }}>Archived
-                            </option>
-                        </select>
-                    </div>
-
-                    {{-- Rating Filter --}}
-                    <div>
-                        <label class="block text-sm font-medium mb-1 dark:text-gray-300">Rating</label>
-                        <select name="rating"
-                            class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
-                            <option value="">All Ratings</option>
-                            @for ($i = 1; $i <= 5; $i++)
-                                <option value="{{ $i }}" {{ request('rating') == $i ? 'selected' : '' }}>
-                                    {{ $i }} Star{{ $i > 1 ? 's' : '' }}</option>
-                            @endfor
-                        </select>
-                    </div>
-
-                    {{-- Results Per Page --}}
-                    <div>
-                        <label class="block text-sm font-medium mb-1 dark:text-gray-300">Per Page</label>
-                        <select name="per_page"
-                            class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
-                            <option value="20" {{ request('per_page') == 20 ? 'selected' : '' }}>20</option>
-                            <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
-                            <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
-                        </select>
-                    </div>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Advanced Filters</h3>
+                    <button @click="showFilters = false"
+                        class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12">
+                            </path>
+                        </svg>
+                    </button>
                 </div>
 
-                {{-- Date & Score Range --}}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-2 dark:text-gray-300">Date Range</label>
-                        <div class="grid grid-cols-2 gap-2">
-                            <input type="date" name="date_from"
-                                class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
-                                value="{{ request('date_from') }}">
-                            <input type="date" name="date_to"
-                                class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
-                                value="{{ request('date_to') }}">
+                <form id="advanced-filters-form" method="GET" action="{{ route('feedback.index') }}"
+                    class="space-y-4">
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+                    <input type="hidden" name="sort" value="{{ request('sort', 'created_at') }}">
+                    <input type="hidden" name="direction" value="{{ request('direction', 'desc') }}">
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {{-- Type Filter --}}
+                        <div>
+                            <label class="block text-sm font-medium mb-1 dark:text-gray-300">Type</label>
+                            <select name="type"
+                                class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
+                                <option value="">All Types</option>
+                                <option value="general" {{ request('type') == 'general' ? 'selected' : '' }}>General
+                                </option>
+                                <option value="bug" {{ request('type') == 'bug' ? 'selected' : '' }}>Bug</option>
+                                <option value="feature" {{ request('type') == 'feature' ? 'selected' : '' }}>Feature
+                                    Request
+                                </option>
+                                <option value="navigation" {{ request('type') == 'navigation' ? 'selected' : '' }}>
+                                    Navigation
+                                    Issue</option>
+                            </select>
+                        </div>
+
+                        {{-- Status Filter --}}
+                        <div>
+                            <label class="block text-sm font-medium mb-1 dark:text-gray-300">Status</label>
+                            <select name="status"
+                                class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
+                                <option value="">All Status</option>
+                                <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending
+                                </option>
+                                <option value="reviewed" {{ request('status') == 'reviewed' ? 'selected' : '' }}>Reviewed
+                                </option>
+                                <option value="resolved" {{ request('status') == 'resolved' ? 'selected' : '' }}>Resolved
+                                </option>
+                                <option value="archived" {{ request('status') == 'archived' ? 'selected' : '' }}>Archived
+                                </option>
+                            </select>
+                        </div>
+
+                        {{-- Rating Filter --}}
+                        <div>
+                            <label class="block text-sm font-medium mb-1 dark:text-gray-300">Rating</label>
+                            <select name="rating"
+                                class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
+                                <option value="">All Ratings</option>
+                                @for ($i = 1; $i <= 5; $i++)
+                                    <option value="{{ $i }}" {{ request('rating') == $i ? 'selected' : '' }}>
+                                        {{ $i }} Star{{ $i > 1 ? 's' : '' }}</option>
+                                @endfor
+                            </select>
+                        </div>
+
+                        {{-- Results Per Page --}}
+                        <div>
+                            <label class="block text-sm font-medium mb-1 dark:text-gray-300">Per Page</label>
+                            <select name="per_page"
+                                class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
+                                <option value="20" {{ request('per_page') == 20 ? 'selected' : '' }}>20</option>
+                                <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                                <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
+                            </select>
                         </div>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium mb-2 dark:text-gray-300">reCAPTCHA Score Range</label>
-                        <div class="grid grid-cols-2 gap-2">
-                            <input type="number" name="score_min"
-                                class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
-                                value="{{ request('score_min') }}" step="0.1" min="0" max="1"
-                                placeholder="Min (0.0)">
-                            <input type="number" name="score_max"
-                                class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
-                                value="{{ request('score_max') }}" step="0.1" min="0" max="1"
-                                placeholder="Max (1.0)">
+                    {{-- Date & Score Range --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2 dark:text-gray-300">Date Range</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="date" name="date_from"
+                                    class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
+                                    value="{{ request('date_from') }}">
+                                <input type="date" name="date_to"
+                                    class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
+                                    value="{{ request('date_to') }}">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-2 dark:text-gray-300">reCAPTCHA Score Range</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="number" name="score_min"
+                                    class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
+                                    value="{{ request('score_min') }}" step="0.1" min="0" max="1"
+                                    placeholder="Min (0.0)">
+                                <input type="number" name="score_max"
+                                    class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
+                                    value="{{ request('score_max') }}" step="0.1" min="0" max="1"
+                                    placeholder="Max (1.0)">
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                {{-- Apply & Clear --}}
-                <div class="flex gap-2 pt-2">
-                    <button type="submit"
-                        class="px-6 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors">
-                        Apply Filters
-                    </button>
-                    <button type="button" onclick="clearFilters()"
-                        class="px-6 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition-colors">
-                        Clear All
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        {{-- Bulk Actions Panel (Collapsible) --}}
-        <div x-show="showBulkActions" x-transition:enter="transition ease-out duration-200"
-            x-transition:enter-start="opacity-0 transform -translate-y-2"
-            x-transition:enter-end="opacity-100 transform translate-y-0"
-            x-transition:leave="transition ease-in duration-150"
-            x-transition:leave-start="opacity-100 transform translate-y-0"
-            x-transition:leave-end="opacity-0 transform -translate-y-2"
-            class="bg-white dark:bg-gray-800 shadow rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Bulk Actions</h3>
-                <button @click="showBulkActions = false"
-                    class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                        </path>
-                    </svg>
-                </button>
+                    {{-- Apply & Clear --}}
+                    <div class="flex gap-2 pt-2">
+                        <button type="submit"
+                            class="px-6 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors">
+                            Apply Filters
+                        </button>
+                        <button type="button" onclick="clearFilters()"
+                            class="px-6 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition-colors">
+                            Clear All
+                        </button>
+                    </div>
+                </form>
             </div>
 
-            <form id="bulk-form" method="POST">
-                @csrf
-                <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-                    <select id="bulk-action"
-                        class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
-                        <option value="">Select Action</option>
-                        <option value="update-status">Update Status</option>
-                        <option value="delete">Delete Selected</option>
-                    </select>
+            {{-- Bulk Actions Panel (Collapsible) --}}
+            <div x-show="showBulkActions" x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 transform -translate-y-2"
+                x-transition:enter-end="opacity-100 transform translate-y-0"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100 transform translate-y-0"
+                x-transition:leave-end="opacity-0 transform -translate-y-2"
+                class="bg-white dark:bg-gray-800 shadow rounded-lg p-4 border border-gray-200 dark:border-gray-700">
 
-                    <select id="bulk-status"
-                        class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white hidden">
-                        <option value="pending">Pending</option>
-                        <option value="reviewed">Reviewed</option>
-                        <option value="resolved">Resolved</option>
-                        <option value="archived">Archived</option>
-                    </select>
-
-                    <button type="button" onclick="executeBulkAction()"
-                        class="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors whitespace-nowrap">
-                        Apply Action
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Bulk Actions</h3>
+                    <button @click="showBulkActions = false"
+                        class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12">
+                            </path>
+                        </svg>
                     </button>
-
-                    <span id="selected-count" class="text-sm text-gray-600 dark:text-gray-400 font-medium"></span>
                 </div>
-            </form>
-        </div>
-    </div>
 
-    <div id="records-table">
-       @include('pages.admin.feedback.partials.feedback-table', ['feedback' => $feedback])
+                <form id="bulk-form" method="POST">
+                    @csrf
+                    <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                        <select id="bulk-action"
+                            class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
+                            <option value="">Select Action</option>
+                            <option value="update-status">Update Status</option>
+                            <option value="delete">Delete Selected</option>
+                        </select>
+
+                        <select id="bulk-status"
+                            class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white hidden">
+                            <option value="pending">Pending</option>
+                            <option value="reviewed">Reviewed</option>
+                            <option value="resolved">Resolved</option>
+                            <option value="archived">Archived</option>
+                        </select>
+
+                        <button type="button" onclick="executeBulkAction()"
+                            class="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors whitespace-nowrap">
+                            Apply Action
+                        </button>
+
+                        <span id="selected-count" class="text-sm text-gray-600 dark:text-gray-400 font-medium"></span>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="records-table">
+            @include('pages.admin.feedback.partials.feedback-table', ['feedback' => $feedback])
+        </div>
     </div>
 @endsection
 
