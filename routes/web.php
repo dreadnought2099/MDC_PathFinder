@@ -12,7 +12,7 @@ use App\Http\Controllers\Admin\Room\RoomAssignmentController;
 use App\Http\Controllers\Admin\Room\RoomController;
 use App\Http\Controllers\Admin\Room\RoomUserController;
 use App\Http\Controllers\Admin\Staff\StaffController;
-use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\Admin\FeedbackController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ScannerController;
 use App\Http\Controllers\TokenController;
