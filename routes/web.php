@@ -38,7 +38,6 @@ Route::post('/navigation/results', [PathController::class, 'results'])->name('pa
 Route::get('/navigation/return-to-results', [PathController::class, 'returnToResults'])->name('paths.return-to-results');
 
 // Public feedback routes
-Route::get('/feedback', [FeedbackController::class, 'create'])->name('feedback.create');
 Route::post('/feedback', [FeedbackController::class, 'store'])->middleware('feedback.rate')->name('feedback.store');
 
 // Admin login

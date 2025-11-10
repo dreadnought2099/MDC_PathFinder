@@ -48,7 +48,7 @@
             <!-- Header -->
             <div
                 class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
-                <h2 class="text-2xl font-bold text-primary text-center flex-1">We’d Love Your Feedback</h2>
+                <h2 class="text-2xl font-bold text-primary text-center flex-1">We'd Love Your Feedback</h2>
                 <button @click="open = false"
                     class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -73,8 +73,48 @@
                 @endif
 
                 <!-- Form -->
-                <form action="{{ route('feedback.store') }}" method="POST" id="feedbackForm" x-data="{ message: '{{ old('message') }}', canSubmit: false, rating: null, hover: null }"
-                    @submit.prevent="submitForm">
+                <form action="{{ route('feedback.store') }}" method="POST" id="feedbackForm" x-data="{
+                    message: '{{ old('message') }}',
+                    canSubmit: false,
+                    rating: null,
+                    hover: null,
+                    isSubmitting: false,
+                    lastSubmit: 0,
+                    submitForm(event) {
+                        const now = Date.now();
+                        if (now - this.lastSubmit < 5000) {
+                            alert('Please wait a few seconds before submitting again.');
+                            return;
+                        }
+                
+                        if (!this.canSubmit) {
+                            alert('Please enter at least 10 characters in your feedback.');
+                            return;
+                        }
+                
+                        this.isSubmitting = true;
+                        this.lastSubmit = now;
+                
+                        if (typeof grecaptcha !== 'undefined') {
+                            grecaptcha.ready(() => {
+                                grecaptcha.execute('{{ config('services.recaptcha.site_key') }}', {
+                                    action: 'feedback'
+                                }).then(token => {
+                                    document.getElementById('g-recaptcha-response').value = token;
+                                    event.target.submit();
+                                }).catch(err => {
+                                    console.error('reCAPTCHA error:', err);
+                                    this.isSubmitting = false;
+                                    alert('Security verification failed. Please try again.');
+                                });
+                            });
+                        } else {
+                            // If reCAPTCHA is not loaded, submit anyway
+                            event.target.submit();
+                        }
+                    }
+                }"
+                    @submit.prevent="submitForm($event)">
                     @csrf
                     <input type="hidden" name="page_url" value="{{ url()->current() }}">
                     <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
@@ -120,7 +160,8 @@
                         </div>
 
                         <p class="text-xs text-gray-500 mt-2"
-                            x-text="rating ? 'You rated: ' + rating : 'Click to rate'"></p>
+                            x-text="rating ? 'You rated: ' + rating + ' star' + (rating > 1 ? 's' : '') : 'Click to rate'">
+                        </p>
                     </div>
 
                     <!-- Message -->
@@ -128,13 +169,16 @@
                         <label for="message" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Your Feedback <span class="text-red-500">*</span>
                         </label>
-                        <textarea name="message" id="message" rows="5" x-model="message" x-on:input="canSubmit = message.length >= 10"
-                            required
+                        <textarea name="message" id="message" rows="5" x-model="message"
+                            x-on:input="canSubmit = message.trim().length >= 10" required
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white resize-none transition"
                             placeholder="Tell us what you think..." minlength="10" maxlength="1000"></textarea>
                         <p class="text-xs mt-1">
-                            <span :class="message.length >= 10 ? 'text-green-500 font-bold' : 'text-red-500'">
+                            <span :class="message.trim().length >= 10 ? 'text-green-500 font-bold' : 'text-red-500'">
                                 <span x-text="message.length"></span> / 1000 characters
+                                <span x-show="message.trim().length < 10 && message.length > 0" class="ml-2">
+                                    (minimum 10 characters)
+                                </span>
                             </span>
                         </p>
                     </div>
@@ -145,9 +189,10 @@
                             class="w-full sm:w-auto px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover">
                             Cancel
                         </button>
-                        <button type="submit" :disabled="!canSubmit"
-                            class="bg-primary text-white text-sm font-medium px-4 py-2 bg-primary rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover disabled:opacity-50 disabled:cursor-not-allowed">
-                            Submit Feedback
+                        <button type="submit" :disabled="!canSubmit || isSubmitting"
+                            class="bg-primary text-white text-sm font-medium px-4 py-2 rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover disabled:opacity-50 disabled:cursor-not-allowed">
+                            <span x-show="!isSubmitting">Submit Feedback</span>
+                            <span x-show="isSubmitting">Submitting...</span>
                         </button>
                     </div>
                 </form>
@@ -155,31 +200,3 @@
         </div>
     </div>
 </div>
-
-@push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const form = document.getElementById('feedbackForm');
-            if (!form) return;
-
-            let lastSubmit = 0;
-            form.addEventListener('submit', function(event) {
-                event.preventDefault();
-                const now = Date.now();
-                if (now - lastSubmit < 5000) return alert(
-                    'Please wait a few seconds before submitting again.');
-                lastSubmit = now;
-
-                grecaptcha.ready(() => {
-                    grecaptcha.execute('{{ config('services.recaptcha.site_key') }}', {
-                            action: 'feedback'
-                        })
-                        .then(token => {
-                            document.getElementById('g-recaptcha-response').value = token;
-                            form.submit();
-                        });
-                });
-            });
-        });
-    </script>
-@endpush

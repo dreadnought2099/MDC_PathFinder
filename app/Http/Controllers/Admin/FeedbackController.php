@@ -20,14 +20,7 @@ class FeedbackController extends Controller
         // Require authentication for admin methods (policy will check roles)
         $this->middleware('auth')->except(['create', 'store']);
     }
-    /**
-     * Show the feedback form
-     */
-    public function create()
-    {
-        return view('pages.client.feedback.create');
-    }
-
+   
     /**
      * Store feedback with reCAPTCHA verification
      */
