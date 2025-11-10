@@ -3,11 +3,14 @@
 @section('content')
     <div class="container mt-4 mx-auto max-w-6xl overflow-y-auto h-[80vh]">
         <div class="bg-white dark:bg-gray-900 mb-6 text-center sticky top-0 z-48 px-4 sm:px-6 lg:px-8">
-            <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-1 dark:text-gray-100">
-                User <span class="text-primary">Feedback</span>
-            </h1>
-             <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300">
-               Monitor user feedback and suggestions.
+            <img-reveal>
+                <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-1 dark:text-gray-100">
+                    User <span class="trigger-text text-primary">Feedback</span>
+                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/feedback.gif" alt="Feedback Gif" class="reveal-img">
+                </h1>
+            </img-reveal>
+            <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300">
+                Monitor user feedback and suggestions.
             </p>
         </div>
 
@@ -15,7 +18,8 @@
             title="Export to CSV">
             <div
                 class="flex flex-col items-center justify-center px-3 py-6 bg-green-600 text-white rounded-l-full shadow-xl transition-all duration-300 group-hover:bg-green-700">
-                <svg class="w-6 h-6 mb-2 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-6 h-6 mb-2 group-hover:animate-bounce" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                     </path>
