@@ -12,6 +12,14 @@ use Illuminate\Support\Facades\Log;
 
 class FeedbackController extends Controller
 {
+    public function __construct()
+    {
+        // Public access for sending feedbacks in landing page
+        $this->middleware('guest')->only(['create', 'store']);
+
+        // Require authentication for admin methods (policy will check roles)
+        $this->middleware('auth')->except(['create', 'store']);
+    }
     /**
      * Show the feedback form
      */
@@ -110,6 +118,9 @@ class FeedbackController extends Controller
      */
     public function index(Request $request)
     {
+        // Policy authorization
+        $this->authorize('viewAny', Feedback::class);
+
         $query = Feedback::query();
 
         // Search (compatible with search-sort component)
@@ -218,6 +229,9 @@ class FeedbackController extends Controller
      */
     public function show(Feedback $feedback)
     {
+        // Policy authorization
+        $this->authorize('view', $feedback);
+
         return view('pages.admin.feedback.show', compact('feedback'));
     }
 
@@ -226,6 +240,9 @@ class FeedbackController extends Controller
      */
     public function updateStatus(Request $request, Feedback $feedback)
     {
+        // Policy authorization
+        $this->authorize('update', $feedback);
+
         $request->validate([
             'status' => 'required|in:pending,reviewed,resolved,archived',
         ]);
@@ -242,6 +259,9 @@ class FeedbackController extends Controller
      */
     public function bulkUpdateStatus(Request $request)
     {
+        // Policy authorization - check if user can update ANY feedback
+        $this->authorize('viewAny', Feedback::class);
+
         $request->validate([
             'feedback_ids' => 'required|array',
             'feedback_ids.*' => 'exists:feedback,id',
@@ -259,6 +279,9 @@ class FeedbackController extends Controller
      */
     public function bulkDelete(Request $request)
     {
+        // Policy authorization - check if user can delete ANY feedback
+        $this->authorize('viewAny', Feedback::class);
+
         $request->validate([
             'feedback_ids' => 'required|array',
             'feedback_ids.*' => 'exists:feedback,id',
@@ -274,6 +297,9 @@ class FeedbackController extends Controller
      */
     public function destroy(Feedback $feedback)
     {
+        // Policy authorization
+        $this->authorize('delete', $feedback);
+
         $feedback->delete();
         return back()->with('success', 'Feedback deleted successfully.');
     }
@@ -283,13 +309,18 @@ class FeedbackController extends Controller
      */
     public function export(Request $request)
     {
+        // Policy authorization
+        $this->authorize('viewAny', Feedback::class);
+
         $query = Feedback::query();
 
         // Apply filters
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where('message', 'like', "%{$search}%")
-                ->orWhere('page_url', 'like', "%{$search}%");
+            $query->where(function ($q) use ($search) {
+                $q->where('message', 'like', "%{$search}%")
+                    ->orWhere('page_url', 'like', "%{$search}%");
+            });
         }
         if ($request->filled('type')) {
             $query->where('feedback_type', $request->type);
