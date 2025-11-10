@@ -7,6 +7,9 @@
                 <span class="text-primary">
                     Details
                 </span>
+                <p class="text-sm sm:text-base lg:text-base text-gray-600 dark:text-gray-300 mt-1 sm:mt-2">
+                    Detailed feedback submission.
+                </p>
             </h1>
         </div>
 

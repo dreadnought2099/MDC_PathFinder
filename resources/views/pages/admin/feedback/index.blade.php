@@ -6,6 +6,9 @@
             <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-1 dark:text-gray-100">
                 User <span class="text-primary">Feedback</span>
             </h1>
+             <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300">
+               Monitor user feedback and suggestions.
+            </p>
         </div>
 
         <a href="{{ route('feedback.export', request()->query()) }}" class="fixed right-0 top-32 z-50 group"

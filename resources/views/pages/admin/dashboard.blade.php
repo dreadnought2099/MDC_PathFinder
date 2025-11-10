@@ -203,9 +203,9 @@
                             <div>
                                 <h3
                                     class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
-                                    Read Feedbacks
+                                    Manage Feedbacks
                                 </h3>
-                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Read Feedbacks
+                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Manage User Feedbacks
                                 </p>
                             </div>
                         </div>
