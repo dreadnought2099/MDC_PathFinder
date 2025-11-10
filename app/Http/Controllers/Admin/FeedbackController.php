@@ -309,6 +309,8 @@ class FeedbackController extends Controller
      */
     public function export(Request $request)
     {
+        ob_end_clean(); // Prevent stray output
+
         // Policy authorization
         $this->authorize('viewAny', Feedback::class);
 
@@ -340,12 +342,14 @@ class FeedbackController extends Controller
         $filename = 'feedback_export_' . now()->format('Y-m-d_His') . '.csv';
 
         $headers = [
-            'Content-Type' => 'text/csv',
+            'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
         ];
 
         $callback = function () use ($feedback) {
             $file = fopen('php://output', 'w');
+
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
             // Header row
             fputcsv($file, [
@@ -375,6 +379,10 @@ class FeedbackController extends Controller
 
             fclose($file);
         };
+        
+        if ($feedback->isEmpty()) {
+            return back()->with('error', 'No feedback data found to export.');
+        }
 
         return response()->stream($callback, 200, $headers);
     }
