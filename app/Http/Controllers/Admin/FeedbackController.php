@@ -20,7 +20,7 @@ class FeedbackController extends Controller
         // Require authentication for admin methods (policy will check roles)
         $this->middleware('auth')->except(['create', 'store']);
     }
-   
+
     /**
      * Store feedback with reCAPTCHA verification
      */
@@ -161,8 +161,8 @@ class FeedbackController extends Controller
         $sortOrder = $request->get('direction', $request->get('sort_order', 'desc'));
         $query->orderBy($sortBy, $sortOrder);
 
-        // Paginate
-        $perPage = $request->get('per_page', 20);
+        // Paginate - added 10 as an option
+        $perPage = $request->get('per_page', 10);
         $feedback = $query->paginate($perPage)->withQueryString();
 
         // Analytics (only for full page load, not AJAX)
@@ -372,7 +372,7 @@ class FeedbackController extends Controller
 
             fclose($file);
         };
-        
+
         if ($feedback->isEmpty()) {
             return back()->with('error', 'No feedback data found to export.');
         }

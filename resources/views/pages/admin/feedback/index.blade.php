@@ -214,7 +214,8 @@
                             <label class="block text-sm font-medium mb-1 dark:text-gray-300">Per Page</label>
                             <select name="per_page"
                                 class="filter-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white">
-                                <option value="20" {{ request('per_page') == 20 ? 'selected' : '' }}>20</option>
+                                <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
+                                <option value="20" {{ request('per_page', 20) == 20 ? 'selected' : '' }}>20</option>
                                 <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
                                 <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
                             </select>
@@ -334,7 +335,7 @@
             };
         }
 
-        function fetchFeedback() {
+        function fetchFeedback(url = null) {
             const searchForm = document.getElementById('search-sort-form');
             const advancedForm = document.getElementById('advanced-filters-form');
             const formData = new FormData(searchForm);
@@ -347,9 +348,9 @@
             }
 
             const params = new URLSearchParams(formData);
-            const url = `{{ route('feedback.index') }}?${params.toString()}`;
+            const fetchUrl = url || `{{ route('feedback.index') }}?${params.toString()}`;
 
-            window.history.pushState({}, '', url);
+            window.history.pushState({}, '', fetchUrl);
 
             if (typeof window.showSpinner === 'function') {
                 window.showSpinner();
@@ -357,7 +358,7 @@
             const tableContainer = document.getElementById('records-table');
             tableContainer.style.opacity = '0.5';
 
-            fetch(url, {
+            fetch(fetchUrl, {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
                         'Accept': 'application/json'
@@ -369,6 +370,7 @@
                         tableContainer.innerHTML = data.html;
                         tableContainer.style.opacity = '1';
                         updateSelectedCount();
+                        initializePaginationLinks();
                     }
                 })
                 .catch(error => {
@@ -382,27 +384,44 @@
                 });
         }
 
-        const searchInput = document.getElementById('search-input');
-        const debouncedSearch = debounce(() => {
-            fetchFeedback();
-        }, 500);
+        function initializePaginationLinks() {
+            document.querySelectorAll('#records-table a[href*="page="]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const url = this.getAttribute('href');
+                    if (url) {
+                        fetchFeedback(url);
+                    }
+                });
+            });
+        }
 
-        searchInput.addEventListener('input', debouncedSearch);
-        document.getElementById('sort-select').addEventListener('change', fetchFeedback);
-        document.getElementById('direction-select').addEventListener('change', fetchFeedback);
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePaginationLinks();
 
-        document.querySelectorAll('.filter-input').forEach(input => {
-            input.addEventListener('change', fetchFeedback);
-        });
+            const searchInput = document.getElementById('search-input');
+            const debouncedSearch = debounce(() => {
+                fetchFeedback();
+            }, 500);
 
-        document.getElementById('search-sort-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            fetchFeedback();
-        });
+            searchInput.addEventListener('input', debouncedSearch);
+            document.getElementById('sort-select').addEventListener('change', fetchFeedback);
+            document.getElementById('direction-select').addEventListener('change', fetchFeedback);
 
-        document.getElementById('advanced-filters-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            fetchFeedback();
+            document.querySelectorAll('.filter-input').forEach(input => {
+                input.addEventListener('change', fetchFeedback);
+            });
+
+            document.getElementById('search-sort-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                fetchFeedback();
+            });
+
+            document.getElementById('advanced-filters-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                fetchFeedback();
+            });
         });
 
         function clearFilters() {
