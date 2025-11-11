@@ -318,6 +318,68 @@
         <div id="records-table">
             @include('pages.admin.feedback.partials.feedback-table', ['feedback' => $feedback])
         </div>
+
+        <!-- Feedback Delete Modal -->
+        <div id="feedbackDeleteModal"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden transition-all duration-300 opacity-0"
+            onclick="closeFeedbackModal()">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 sm:mx-6 transform transition-all duration-300 scale-95 dark:bg-gray-800 border border-secondary"
+                onclick="event.stopPropagation()">
+
+                <!-- Header -->
+                <div class="px-4 sm:px-6 py-4 border-b border-secondary">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-lg sm:text-xl text-gray-900 dark:text-gray-300">
+                            Confirm <span class="text-secondary">Deletion</span>
+                        </h2>
+                        <button onclick="closeFeedbackModal()"
+                            class="text-gray-400 hover:text-red-600 transition-colors duration-200 cursor-pointer">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12">
+                                </path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="px-4 sm:px-6 py-4">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/warning-red.png"
+                                    class="w-8 h-8" alt="Warning">
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-gray-700 text-sm leading-relaxed dark:text-gray-300">
+                                Are you sure you want to delete this feedback from <span id="feedbackUser"
+                                    class="text-secondary font-semibold"></span>?
+                                This action cannot be undone.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="px-4 sm:px-6 py-4 bg-gray-50 rounded-b-2xl dark:bg-gray-800">
+                    <form id="feedbackDeleteForm" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <div class="flex flex-col sm:flex-row sm:justify-end gap-3">
+                            <button type="button" onclick="closeFeedbackModal()"
+                                class="w-full sm:w-auto px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover">
+                                Cancel
+                            </button>
+                            <button type="submit"
+                                class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-secondary rounded-md hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover">
+                                Delete
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -509,5 +571,42 @@
                 }
             }
         }
+
+        function openFeedbackModal(id, feedbackType) {
+            const modal = document.getElementById('feedbackDeleteModal');
+            const userSpan = document.getElementById('feedbackUser');
+            const form = document.getElementById('feedbackDeleteForm');
+
+            userSpan.textContent = feedbackType || 'user';
+            form.action = `/admin/feedback/${id}`;
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('.bg-white, .dark\\:bg-gray-800').classList.remove('scale-95');
+                modal.querySelector('.bg-white, .dark\\:bg-gray-800').classList.add('scale-100');
+            }, 10);
+
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeFeedbackModal() {
+            const modal = document.getElementById('feedbackDeleteModal');
+            const modalContent = modal.querySelector('.bg-white, .dark\\:bg-gray-800');
+
+            modal.classList.add('opacity-0');
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeFeedbackModal();
+        });
     </script>
 @endpush
