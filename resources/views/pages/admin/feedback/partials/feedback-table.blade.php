@@ -55,8 +55,10 @@
                                  <span class="text-gray-400 dark:text-gray-500">N/A</span>
                              @endif
                          </td>
-                         <td class="px-6 py-4 text-sm max-w-md dark:text-gray-300">
-                             {{ Str::limit($item->message, 100) }}
+                         <td class="px-6 py-4 text-sm dark:text-gray-300" style="max-width: 300px;">
+                             <div class="truncate" title="{{ $item->message }}">
+                                 {{ $item->message }}
+                             </div>
                          </td>
                          <td class="px-6 py-4 whitespace-nowrap text-sm">
                              @if ($item->recaptcha_score)
