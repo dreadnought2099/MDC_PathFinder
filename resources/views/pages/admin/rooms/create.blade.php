@@ -161,7 +161,7 @@
                 <div class="mb-6 conditional-field" id="office-hours-section">
                     <label class="block font-semibold mb-3 text-lg dark:text-gray-300">Schedule Management</label>
                     <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                        Set your availability for office hours and consultation times. You can configure different schedules
+                        Set your availability for office hours and consultation hours. You can configure different schedules
                         for each.
                     </p>
 
@@ -281,7 +281,7 @@
                         <!-- Setup Section -->
                         <div class="mb-4 p-5 border-2 border-primary rounded-lg dark:bg-gray-800 space-y-4">
                             <div class="flex items-center gap-2 mb-2">
-                                <h3 class="font-semibold text-gray-800 dark:text-gray-200">Configure Consultation Times
+                                <h3 class="font-semibold text-gray-800 dark:text-gray-200">Configure Consultation Hours
                                 </h3>
                             </div>
 
@@ -353,7 +353,7 @@
                         <!-- Saved Hours Display -->
                         <div class="p-5 border-2 border-primary rounded-lg dark:bg-gray-800">
                             <div class="flex items-center justify-between mb-3">
-                                <p class="font-medium dark:text-gray-300">Saved Consultation Times</p>
+                                <p class="font-medium dark:text-gray-300">Saved Consultation Hours</p>
                                 <span class="text-xs text-gray-500 dark:text-gray-400">Edit or delete entries below</span>
                             </div>
                             <ul id="consultationTimesDisplay" class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
