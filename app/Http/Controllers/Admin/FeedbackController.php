@@ -30,9 +30,13 @@ class FeedbackController extends Controller
         $recaptchaVerified = $this->verifyRecaptcha($request->input('g-recaptcha-response'));
 
         if (!$recaptchaVerified['success']) {
-            return back()
-                ->withInput()
-                ->with('error', 'reCAPTCHA verification failed. Please try again.');
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'reCAPTCHA verification failed. Please try again.'
+                ], 422);
+            }
+            return back()->withInput()->with('error', 'reCAPTCHA verification failed. Please try again.');
         }
 
         // Check reCAPTCHA score (v3 only)
@@ -45,9 +49,14 @@ class FeedbackController extends Controller
                 'ip' => $request->ip(),
             ]);
 
-            return back()
-                ->withInput()
-                ->with('error', 'Suspicious activity detected. Please try again.');
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Suspicious activity detected. Please try again.'
+                ], 422);
+            }
+
+            return back()->withInput()->with('error', 'Suspicious activity detected. Please try again.');
         }
 
         // Store feedback
@@ -57,23 +66,33 @@ class FeedbackController extends Controller
                 'rating' => $request->input('rating'),
                 'feedback_type' => $request->input('feedback_type', 'general'),
                 'page_url' => $request->input('page_url') ?? url()->previous(),
-                'ip_hash' => hash('sha256', $request->ip()),
+                'ip_hash' => hash('sha256', config('app.key') . $request->ip()),
                 'recaptcha_score' => $score,
                 'status' => 'pending',
             ]);
 
-            return redirect()
-                ->back()
-                ->with('success', 'Thank you for your feedback! We appreciate your input.');
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Thank you for your feedback! We appreciate your input.'
+                ]);
+            }
+
+            return back()->with('success', 'Thank you for your feedback! We appreciate your input.');
         } catch (\Exception $e) {
             Log::error('Failed to store feedback', [
                 'error' => $e->getMessage(),
                 'ip' => $request->ip(),
             ]);
 
-            return back()
-                ->withInput()
-                ->with('error', 'Failed to submit feedback. Please try again.');
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to submit feedback. Please try again.'
+                ], 500);
+            }
+
+            return back()->withInput()->with('error', 'Failed to submit feedback. Please try again.');
         }
     }
 

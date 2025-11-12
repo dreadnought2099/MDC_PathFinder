@@ -60,65 +60,20 @@
 
             <!-- Body -->
             <div class="p-6">
-                @if (session('success'))
-                    <div class="mb-4 p-4 bg-green-100 border border-tertiary text-tertiary rounded-lg">
-                        <strong>{{ session('success') }}</strong>
-                    </div>
-                @endif
-
-                @if (session('error'))
-                    <div class="mb-4 p-4 bg-red-100 border border-secondary text-secondary rounded-lg">
-                        <strong>{{ session('error') }}</strong>
-                    </div>
-                @endif
-
                 <!-- Form -->
-                <form action="{{ route('feedback.store') }}" method="POST" id="feedbackForm" x-data="{
-                    message: '{{ old('message') }}',
-                    canSubmit: false,
-                    rating: null,
-                    hover: null,
-                    isSubmitting: false,
-                    lastSubmit: 0,
-                    submitForm(event) {
-                        const now = Date.now();
-                        if (now - this.lastSubmit < 5000) {
-                            alert('Please wait a few seconds before submitting again.');
-                            return;
-                        }
-                
-                        if (!this.canSubmit) {
-                            alert('Please enter at least 10 characters in your feedback.');
-                            return;
-                        }
-                
-                        this.isSubmitting = true;
-                        this.lastSubmit = now;
-                
-                        if (typeof grecaptcha !== 'undefined') {
-                            grecaptcha.ready(() => {
-                                grecaptcha.execute('{{ config('services.recaptcha.site_key') }}', {
-                                    action: 'feedback'
-                                }).then(token => {
-                                    document.getElementById('g-recaptcha-response').value = token;
-                                    event.target.submit();
-                                }).catch(err => {
-                                    console.error('reCAPTCHA error:', err);
-                                    this.isSubmitting = false;
-                                    alert('Security verification failed. Please try again.');
-                                });
-                            });
-                        } else {
-                            // If reCAPTCHA is not loaded, submit anyway
-                            event.target.submit();
-                        }
-                    }
-                }"
-                    @submit.prevent="submitForm($event)">
+                <form action="{{ route('feedback.store') }}" method="POST" id="feedbackForm" x-data="feedbackForm()"
+                    @submit.prevent="submit">
                     @csrf
                     <input type="hidden" name="page_url" value="{{ url()->current() }}">
                     <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
                     <input type="hidden" name="rating" :value="rating">
+
+                    <!-- Flash Message -->
+                    <template x-if="flashMessage">
+                        <div x-show="flashMessage" x-transition.opacity.duration.500 class="mt-4 p-4 rounded-lg"
+                            :class="flashClass" x-text="flashMessage" x-init="setTimeout(() => { flashMessage = '' }, 4000)">
+                        </div>
+                    </template>
 
                     <!-- Feedback Type -->
                     <div class="mb-5">
@@ -126,7 +81,7 @@
                             Feedback Type
                         </label>
                         <select name="feedback_type" required
-                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white transition">
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                             <option value="general">General Feedback</option>
                             <option value="bug">Bug Report</option>
                             <option value="feature">Feature Request</option>
@@ -147,8 +102,7 @@
                                     <svg class="w-8 h-8 transition-colors" fill="currentColor" viewBox="0 0 20 20"
                                         :class="(hover >= {{ $i }} || rating >= {{ $i }}) ?
                                         'text-yellow-400' : 'text-gray-300'">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07
-                                            3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588
                                             1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755
                                             1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8
                                             2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1
@@ -158,7 +112,6 @@
                                 </span>
                             @endfor
                         </div>
-
                         <p class="text-xs text-gray-500 mt-2"
                             x-text="rating ? 'You rated: ' + rating + ' star' + (rating > 1 ? 's' : '') : 'Click to rate'">
                         </p>
@@ -171,7 +124,7 @@
                         </label>
                         <textarea name="message" id="message" rows="5" x-model="message"
                             x-on:input="canSubmit = message.trim().length >= 10" required
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white resize-none transition"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white resize-none"
                             placeholder="Tell us what you think..." minlength="10" maxlength="1000"></textarea>
                         <p class="text-xs mt-1">
                             <span :class="message.trim().length >= 10 ? 'text-green-500 font-bold' : 'text-red-500'">
@@ -185,7 +138,7 @@
 
                     <!-- Submit -->
                     <div class="flex justify-end gap-3">
-                        <button type="button" @click="$dispatch('close-modal')"
+                         <button type="button" @click="$dispatch('close-modal')"
                             class="w-full sm:w-auto px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover">
                             Cancel
                         </button>
@@ -200,3 +153,90 @@
         </div>
     </div>
 </div>
+
+<script>
+    function feedbackForm() {
+        return {
+            message: '{{ old('message') }}',
+            rating: null,
+            hover: null,
+            canSubmit: false,
+            isSubmitting: false,
+            flashMessage: '',
+            flashClass: '',
+            lastSubmit: 0,
+
+            async submit(event) {
+                const now = Date.now();
+                if (now - this.lastSubmit < 5000) {
+                    alert('Please wait a few seconds before submitting again.');
+                    return;
+                }
+                if (!this.canSubmit) {
+                    alert('Please enter at least 10 characters in your feedback.');
+                    return;
+                }
+
+                this.isSubmitting = true;
+                this.lastSubmit = now;
+
+                try {
+                    let token = '';
+                    if (typeof grecaptcha !== 'undefined') {
+                        token = await grecaptcha.execute('{{ config('services.recaptcha.site_key') }}', {
+                            action: 'feedback'
+                        });
+                        document.getElementById('g-recaptcha-response').value = token;
+                    }
+
+                    const formData = new FormData(event.target);
+
+                    const response = await fetch('{{ route('feedback.store') }}', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.flashClass = 'bg-green-100 text-green-700 border border-green-500';
+                        this.message = '';
+                        this.rating = null;
+                        this.launchConfetti(); // Trigger confetti
+                    } else {
+                        this.flashClass = 'bg-red-100 text-red-700 border border-red-500';
+                    }
+
+                    this.flashMessage = data.message || 'An error occurred.';
+                    setTimeout(() => {
+                        this.flashMessage = ''
+                    }, 4000);
+
+                } catch (err) {
+                    console.error(err);
+                    this.flashClass = 'bg-red-100 text-red-700 border border-red-500';
+                    this.flashMessage = 'Submission failed. Please try again.';
+                    setTimeout(() => {
+                        this.flashMessage = ''
+                    }, 4000);
+                } finally {
+                    this.isSubmitting = false;
+                }
+            },
+
+            launchConfetti() {
+                confetti({
+                    particleCount: 50,
+                    spread: 70,
+                    origin: {
+                        y: 0.6
+                    },
+                    colors: ['#4ade80', '#22d3ee', '#facc15', '#f472b6'],
+                });
+            }
+        }
+    }
+</script>

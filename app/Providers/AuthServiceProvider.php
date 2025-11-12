@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\Feedback;
 use App\Models\Room;
 use App\Models\Staff;
 use App\Models\User;
+use App\Policies\FeedbackPolicy;
 use App\Policies\RoomPolicy;
 use App\Policies\StaffPolicy;
 use App\Policies\UserPolicy;
@@ -16,6 +18,7 @@ class AuthServiceProvider extends ServiceProvider
         User::class => UserPolicy::class,
         Room::class => RoomPolicy::class,
         Staff::class => StaffPolicy::class,
+        Feedback::class => FeedbackPolicy::class,
     ];
 
     /**

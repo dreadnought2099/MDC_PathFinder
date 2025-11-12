@@ -14,13 +14,19 @@ return new class extends Migration
         Schema::create('feedback', function (Blueprint $table) {
             $table->id();
             $table->text('message');
-            $table->integer('rating')->nullable(); // 1-5 stars rating
-            $table->string('feedback_type')->default('general'); // general, bug, feature, etc.
-            $table->string('page_url')->nullable(); // Where feedback was submitted
-            $table->string('ip_hash'); // Hashed IP for rate limiting
-            $table->float('recaptcha_score')->nullable(); // reCAPTCHA v3 score (0-1)
+            $table->unsignedTinyInteger('rating')->nullable(); // 1-5 stars rating (changed to tinyint)
+            $table->string('feedback_type', 50)->default('general'); // general, bug, feature, navigation, other
+            $table->string('page_url', 500)->nullable(); // Where feedback was submitted
+            $table->string('ip_hash', 64); // Hashed IP for rate limiting (SHA-256)
+            $table->decimal('recaptcha_score', 3, 2)->nullable(); // reCAPTCHA v3 score (0.00-1.00)
             $table->enum('status', ['pending', 'reviewed', 'resolved', 'archived'])->default('pending');
             $table->timestamps();
+
+            // Indexes for better query performance
+            $table->index('status');
+            $table->index('feedback_type');
+            $table->index('created_at');
+            $table->index(['status', 'created_at']); // Composite index for filtered queries
         });
     }
 
