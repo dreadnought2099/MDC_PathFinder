@@ -70,8 +70,7 @@
                 class="w-full md:w-1/2 bg-gradient-to-tr from-blue-400 to-white text-white p-6 sm:p-8 flex flex-col items-center justify-center">
                 <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png"
                     class="w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full" alt="MDC Logo" />
-                <h3 class="text-base sm:text-lg text-center mt-3 sm:mt-4 px-4">{{ config('app.name') }} <br>Management
-                    System</h3>
+                <h3 class="text-base sm:text-lg text-center mt-3 sm:mt-4 px-4">Welcome to<br>{{ config('app.name') }}</h3>
             </div>
         </div>
     </div>
