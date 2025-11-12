@@ -138,7 +138,7 @@
 
                     <!-- Submit -->
                     <div class="flex justify-end gap-3">
-                         <button type="button" @click="$dispatch('close-modal')"
+                        <button type="button" @click="$dispatch('close-modal')"
                             class="w-full sm:w-auto px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover">
                             Cancel
                         </button>
@@ -195,11 +195,32 @@
                         method: 'POST',
                         body: formData,
                         headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
                         },
                     });
 
-                    const data = await response.json();
+                    const text = await response.text();
+
+                    let data;
+                    try {
+                        data = JSON.parse(text);
+                    } catch (e) {
+                        console.error('Server returned non-JSON:', text);
+                        this.flashClass = 'bg-red-100 text-red-700 border border-red-500';
+                        this.flashMessage = 'Unexpected server response. Please try again.';
+                        this.isSubmitting = false;
+                        return;
+                    }
+
+                    if (data.errors) {
+                        const firstError = Object.values(data.errors)[0][0];
+                        this.flashClass = 'bg-red-100 text-red-700 border border-red-500';
+                        this.flashMessage = firstError;
+                        this.isSubmitting = false;
+                        return;
+                    }
 
                     if (data.success) {
                         this.flashClass = 'bg-green-100 text-green-700 border border-green-500';
