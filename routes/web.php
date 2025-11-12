@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\Room\RoomUserController;
 use App\Http\Controllers\Admin\Staff\StaffController;
 use App\Http\Controllers\Admin\FeedbackController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PublicFeedbackController;
 use App\Http\Controllers\ScannerController;
 use App\Http\Controllers\TokenController;
 use Illuminate\Support\Facades\Route;
@@ -38,7 +39,7 @@ Route::post('/navigation/results', [PathController::class, 'results'])->name('pa
 Route::get('/navigation/return-to-results', [PathController::class, 'returnToResults'])->name('paths.return-to-results');
 
 // Public feedback routes
-Route::post('/feedback', [FeedbackController::class, 'store'])->middleware('feedback.rate')->name('feedback.store');
+Route::post('/feedback', [PublicFeedbackController::class, 'store'])->middleware('feedback.rate')->name('feedback.store');
 
 // Admin login
 Route::get('/admin', [LogInController::class, 'showLoginForm'])->name('login');
