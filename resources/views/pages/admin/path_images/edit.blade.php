@@ -61,6 +61,66 @@
 
             <!-- Spacer -->
             <div class="h-28 sm:h-24"></div>
+
+            <!-- Delete Confirmation Modal -->
+            <div id="pathImageDeleteModal"
+                class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden transition-all duration-300 opacity-0"
+                onclick="closeDeleteModal()">
+                <div id="modalContent"
+                    class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md mx-4 sm:mx-6 transform transition-all duration-300 scale-95 border border-secondary"
+                    onclick="event.stopPropagation()">
+
+                    <!-- Header -->
+                    <div class="px-4 sm:px-6 py-4 border-b border-secondary">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-lg sm:text-xl text-gray-900 dark:text-gray-300">
+                                Confirm <span class="text-secondary">Deletion</span>
+                            </h2>
+                            <button onclick="closeDeleteModal()"
+                                class="text-gray-400 hover:text-red-600 transition-colors duration-200 cursor-pointer">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12">
+                                    </path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="px-4 sm:px-6 py-4">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="flex-shrink-0">
+                                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                                    <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/warning-red.png"
+                                        class="w-8 h-8" alt="Warning">
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-gray-700 text-sm leading-relaxed dark:text-gray-300">
+                                    Are you sure you want to delete <span id="deleteCount"
+                                        class="text-secondary font-semibold"></span>?
+                                    This action cannot be undone.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="px-4 sm:px-6 py-4 bg-gray-50 dark:bg-gray-800 rounded-b-2xl">
+                        <div class="flex flex-col sm:flex-row sm:justify-end gap-3">
+                            <button type="button" onclick="closeDeleteModal()"
+                                class="w-full sm:w-auto px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover">
+                                Cancel
+                            </button>
+                            <button type="button" id="confirmDeleteButton"
+                                class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-secondary rounded-md hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </form>
 
         <!-- Actions - Fixed at bottom -->
@@ -103,6 +163,61 @@
             files: {},
             compressedFiles: {}
         };
+
+        // ===== MODAL FUNCTIONS =====
+        let deleteConfirmCallback = null;
+
+        function openDeleteModal(count, callback) {
+            const modal = document.getElementById('pathImageDeleteModal');
+            const modalContent = document.getElementById('modalContent'); // ← Use getElementById instead
+            const deleteCountSpan = document.getElementById('deleteCount');
+            const confirmButton = document.getElementById('confirmDeleteButton');
+
+            deleteCountSpan.textContent = count === 1 ? '1 image' : `${count} images`;
+            deleteConfirmCallback = callback;
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modalContent.classList.remove('scale-95'); // ← Use modalContent variable
+                modalContent.classList.add('scale-100');
+            }, 10);
+
+            document.body.style.overflow = 'hidden';
+
+            // Handle confirm button click
+            confirmButton.onclick = function() {
+                if (deleteConfirmCallback) {
+                    deleteConfirmCallback();
+                }
+                closeDeleteModal();
+            };
+        }
+
+        function closeDeleteModal() {
+            const modal = document.getElementById('pathImageDeleteModal');
+            const modalContent = document.getElementById('modalContent'); // ← Use getElementById instead
+
+            modal.classList.add('opacity-0');
+            modalContent.classList.remove('scale-100'); // ← Use modalContent variable
+            modalContent.classList.add('scale-95');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+                deleteConfirmCallback = null;
+            }, 300);
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('pathImageDeleteModal');
+                if (!modal.classList.contains('hidden')) {
+                    closeDeleteModal();
+                }
+            }
+        });
 
         function initializeHandlers() {
             // Order input changes
@@ -461,11 +576,19 @@
 
             // Count total deletes from formState (not just visible checkboxes)
             if (formState.deletes.size > 0) {
-                if (!confirm(`Delete ${formState.deletes.size} image(s)? This cannot be undone.`)) {
-                    return;
-                }
+                // Show modal instead of alert
+                openDeleteModal(formState.deletes.size, function() {
+                    // This callback will be executed when user confirms
+                    proceedWithSubmit();
+                });
+                return;
             }
 
+            // If no deletes, proceed directly
+            proceedWithSubmit();
+        });
+
+        async function proceedWithSubmit() {
             const formData = new FormData(form);
             const newFormData = new FormData();
 
@@ -563,7 +686,7 @@
             submitButton.textContent = 'Saving...';
 
             xhr.send(newFormData);
-        });
+        }
 
         // Initialize
         initializeHandlers();
