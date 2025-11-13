@@ -372,7 +372,8 @@
                         })
                         .catch(error => {
                             console.error('Error loading page:', error);
-                            alert('Failed to load images. Please try again.');
+                            window.showTemporaryMessage('Failed to load images. Please try again.',
+                                'error');
                         })
                         .finally(() => {
                             // Hide spinner
@@ -570,7 +571,7 @@
 
             const isValid = await validateAllFileSizes();
             if (!isValid) {
-                alert('Please fix the file size errors before submitting.');
+                window.showTemporaryMessage('Please fix the file size errors before submitting.', 'error');
                 return;
             }
 
@@ -664,16 +665,17 @@
 
             xhr.addEventListener('load', function() {
                 if (xhr.status >= 200 && xhr.status < 400) {
-                    window.location.reload();
+                    window.showTemporaryMessage('Changes saved successfully!', 'success');
+                    setTimeout(() => window.location.reload(), 1000);
                 } else {
-                    alert('Upload failed. Please try again.');
+                    window.showTemporaryMessage('Upload failed. Please try again.', 'error');
                     submitButton.disabled = false;
                     submitButton.textContent = 'Save Changes';
                 }
             });
 
             xhr.addEventListener('error', function() {
-                alert('Network error. Please check your connection and try again.');
+                window.showTemporaryMessage('Network error. Please check your connection and try again.', 'error');
                 submitButton.disabled = false;
                 submitButton.textContent = 'Save Changes';
             });
