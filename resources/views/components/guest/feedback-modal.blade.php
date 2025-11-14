@@ -4,8 +4,8 @@
         document.getElementById('flash-message')?.remove();
         document.getElementById('temp-message')?.remove();
     }
-}" @keydown.escape.window="open = false" class="relative group"
-    @close-modal.window="open = false; clearFeedbackMessage()">
+    }" @keydown.escape.window="open = false" class="relative group"
+        @close-modal.window="open = false; clearFeedbackMessage()">
 
     <!-- Trigger Button -->
     <button @click="open = true"
@@ -48,7 +48,7 @@
             <!-- Header -->
             <div
                 class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
-                <h2 class="text-2xl font-bold text-primary text-center flex-1">We'd Love Your Feedback</h2>
+                <h2 class="text-2xl font-bold text-primary dark:!text-gray-300 text-center flex-1">We'd Love Your Feedback</h2>
                 <button @click="open = false"
                     class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,7 +81,7 @@
                             Feedback Type
                         </label>
                         <select name="feedback_type" required
-                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                             <option value="general">General Feedback</option>
                             <option value="bug">Bug Report</option>
                             <option value="feature">Feature Request</option>
@@ -124,7 +124,7 @@
                         </label>
                         <textarea name="message" id="message" rows="5" x-model="message"
                             x-on:input="canSubmit = message.trim().length >= 10" required
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white resize-none"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white resize-none"
                             placeholder="Tell us what you think..." minlength="10" maxlength="1000"></textarea>
                         <p class="text-xs mt-1">
                             <span :class="message.trim().length >= 10 ? 'text-green-500 font-bold' : 'text-red-500'">
