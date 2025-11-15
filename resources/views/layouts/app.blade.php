@@ -41,7 +41,7 @@
     @stack('styles')
 </head>
 
-<body class="flex flex-col min-h-screen">
+<body class="flex flex-col min-h-screen relative">
     <!-- Flash Messages -->
     <div id="success-message-container" class="fixed top-4 right-4 z-[9999] max-w-md">
         @if (session('success') || session('error') || session('info') || session('warning') || $errors->any())
@@ -144,7 +144,7 @@
     @include('components.navbar')
 
     <!-- Main Content -->
-    <main class="flex-grow container mx-auto px-4 pt-20">
+    <main class="flex-grow container mx-auto px-4 pt-20 pb-24">
         @yield('content')
     </main>
 
@@ -404,6 +404,20 @@
             }, 5000);
         }
     </script>
+
+    <div class="relative mt-auto">
+        <footer class="font-sofia text-gray-600 dark:text-gray-300 text-xs sm:text-sm text-center py-4 px-4">
+            &copy; {{ date('Y') }} Mater Dei College Tubigon, Bohol. All rights reserved.
+        </footer>
+
+        <!-- Bottom Decoration -->
+        <div
+            class="absolute bottom-0 left-0 right-0 h-0.5 sm:h-1 bg-gradient-to-r from-primary via-purple-500 to-primary opacity-50 animate-pulse">
+        </div>
+        <div
+            class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-30">
+        </div>
+    </div>
 
     <div class="cursor-dot fixed pointer-events-none rounded-full z-[9999]"></div>
     <div class="cursor-outline fixed pointer-events-none rounded-full z-[9999]"></div>

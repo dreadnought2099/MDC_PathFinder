@@ -185,7 +185,7 @@
     @unless (request()->is('admin*'))
         <x-guest.guest-navbar :show-back-button="$showBackButton" />
     @endunless
-    
+
     <div id="success-message-container" class="fixed top-4 right-4 z-[9999] max-w-md">
         @if (session('success') || session('error') || session('info') || session('warning') || $errors->any())
             @php
@@ -285,6 +285,18 @@
 
     <main class="pt-16">
         @yield('content')
+
+        <footer class="font-sofia text-gray-600 dark:text-gray-300 text-xs sm:text-sm text-center py-4 px-4">
+            &copy; {{ date('Y') }} Mater Dei College Tubigon, Bohol. All rights reserved.
+        </footer>
+
+        <!-- Bottom Decoration -->
+        <div
+            class="absolute bottom-0 left-0 right-0 h-0.5 sm:h-1 bg-gradient-to-r from-primary via-purple-500 to-primary opacity-50 animate-pulse">
+        </div>
+        <div
+            class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-30">
+        </div>
     </main>
 
     {{-- Google Recaptcha --}}

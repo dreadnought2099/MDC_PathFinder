@@ -78,10 +78,5 @@
                 </div>
             </div>
         </div>
-
-        <!-- Bottom Decoration -->
-        <div
-            class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-purple-500 to-primary opacity-50">
-        </div>
     </div>
 @endsection
