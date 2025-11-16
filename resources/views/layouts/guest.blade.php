@@ -283,10 +283,10 @@
         @endif
     </div>
 
-    <main class="pt-16">
+    <main class="pt-16 min-h-screen flex flex-col relative">
         @yield('content')
 
-        <footer class="font-sofia text-gray-600 dark:text-gray-300 text-xs sm:text-sm text-center py-4 px-4">
+        <footer class="font-sofia text-gray-600 dark:text-gray-300 text-xs sm:text-sm text-center py-4 px-4 mt-auto">
             &copy; {{ date('Y') }} Mater Dei College Tubigon, Bohol. All rights reserved.
         </footer>
 
@@ -298,7 +298,7 @@
             class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-30">
         </div>
     </main>
-
+    
     {{-- Google Recaptcha --}}
     <script src="https://www.google.com/recaptcha/api.js?render={{ config('services.recaptcha.site_key') }}"></script>
 

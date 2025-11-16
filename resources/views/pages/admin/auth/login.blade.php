@@ -4,7 +4,7 @@
 @section('body-class', 'bg-gradient-to-tr from-blue-400 to-white')
 
 @section('content')
-    <div class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8">
         <div
             class="w-full max-w-4xl flex flex-col md:flex-row rounded-xl shadow-lg overflow-hidden bg-white shadow-primary-hover">
 
