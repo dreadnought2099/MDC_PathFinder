@@ -50,7 +50,10 @@ class ResetPasswordController extends Controller
         );
 
         // Generate reset link using named route
-        $resetLink = route('password.reset', ['token' => $token]);
+        $resetLink = route('password.reset', [
+            'token' => $token,
+            'email' => $user->email
+        ]);
 
         // Send the email
         Mail::send('pages.admin.auth.reset-email', [
