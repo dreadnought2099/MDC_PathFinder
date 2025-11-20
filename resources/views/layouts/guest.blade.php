@@ -42,7 +42,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Alpine.js & HTML5 QR Code -->
-    <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/alpinejs@3.15.0/dist/cdn.min.js" defer></script>
     <script defer src="https://unpkg.com/html5-qrcode@2.3.8"></script>
 
     <!-- Dark mode initialization -->
@@ -305,6 +305,7 @@
     <!-- GLightbox -->
     <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
 
+    {{-- Confetti for Feedback --}}
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     @stack('scripts')
