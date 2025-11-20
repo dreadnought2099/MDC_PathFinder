@@ -26,7 +26,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="icon" href="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/images/mdc.png">
 
-    <!-- Alpine.js (pinned v3.14.1) -->
+    <!-- Alpine.js -->
     <script src="https://unpkg.com/alpinejs@3.15.0/dist/cdn.min.js" defer></script>
 
     <!-- FilePond CSS -->
