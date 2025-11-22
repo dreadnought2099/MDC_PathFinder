@@ -51,7 +51,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'name' => 'Administrator',           // optional but nice to have
                 'username' => 'Admin',                  // admin doesn't need username
                 'email_verified_at' => Carbon::now(),
-                'password' => 'iamp@thfinderadmin',
+                'password' => 'admin123',
             ]
         );
         $admin->assignRole($adminRole);
