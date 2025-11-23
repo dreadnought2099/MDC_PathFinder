@@ -36,7 +36,7 @@ class PathImageController extends Controller
     private ImageManager $manager;
 
     // Configuration constant for per-path limit
-    private const MAX_IMAGES_PER_PATH = 25;
+    private const MAX_IMAGES_PER_PATH = 50;
 
     public function __construct()
     {
@@ -101,7 +101,7 @@ class PathImageController extends Controller
      * Store multiple path images with validation
      * 
      * VALIDATION:
-     * - Max 25 files per upload
+     * - Max 50 files per upload
      * - Max 10MB per file
      * - Max 3000x3000px dimensions (safety for direct uploads)
      * - Frontend typically compresses to 2000px before reaching here
@@ -113,14 +113,14 @@ class PathImageController extends Controller
      * - Partial success supported
      */
     public function store(Request $request)
-    {
+    {   
         if (!$request->hasFile('files') || count($request->file('files')) === 0) {
             return back()->withErrors(['files' => 'Please select at least one image file.']);
         }
 
         $request->validate([
             'path_id' => 'required|exists:paths,id',
-            'files'   => 'required|array|min:1|max:25',
+            'files'   => 'required|array|min:1|max:50',
             'files.*' => [
                 'required',
                 'image',

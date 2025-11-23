@@ -87,7 +87,7 @@
                     <div id="pathLimitDisplay"
                         class="mb-4 p-3 rounded-lg border border-primary bg-blue-50 dark:bg-blue-800/5">
                         @php
-                            $percentage = $maxImagesPerPath > 0 ? ($currentImageCount / $maxImagesPerPath) * 25 : 0;
+                            $percentage = $maxImagesPerPath > 0 ? ($currentImageCount / $maxImagesPerPath) * 50 : 0;
                             $colorClass = 'text-green-600 dark:text-green-400';
                             if ($percentage >= 90) {
                                 $colorClass = 'text-red-600 dark:text-red-400';
@@ -142,7 +142,7 @@
                         @if ($remainingSlots > 0)
                             <span class="text-gray-600 dark:text-gray-300 mb-2">Drop images here or click to browse</span>
                             <span class="text-xs text-gray-400">
-                                JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 10 MB each | max 25 per upload
+                                JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 10 MB each | max 50 per upload
                             </span>
                             <span class="text-xs text-primary font-medium mt-1">
                                 Path can accept {{ $remainingSlots }} more image(s)
@@ -181,9 +181,9 @@
         // ====================================================================
 
         // Path limit tracking - make these global
-        const MAX_IMAGES_PER_PATH = {{ $maxImagesPerPath ?? 25 }};
+        const MAX_IMAGES_PER_PATH = {{ $maxImagesPerPath ?? 50 }};
         let currentPathImageCount = {{ $currentImageCount ?? 0 }};
-        let remainingSlots = {{ $remainingSlots ?? 25 }};
+        let remainingSlots = {{ $remainingSlots ?? 50 }};
 
         // ====================================================================
         // FETCH PATH IMAGE COUNT (WITH GLOBAL SPINNER)
@@ -353,7 +353,7 @@
                 dropzone.innerHTML = `
                 <span class="text-gray-600 dark:text-gray-300 mb-2">Drop images here or click to browse</span>
                 <span class="text-xs text-gray-400">
-                    JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 10 MB each | max 25 per upload
+                    JPG, JPEG, PNG, GIF, BMP, SVG, WEBP | max 10 MB each | max 50 per upload
                 </span>
                 <span class="text-xs text-primary font-medium mt-1">
                     Path can accept ${remainingSlots} more image(s)
@@ -528,9 +528,9 @@
             let isSubmitting = false;
 
             // ===== CONFIGURATION =====
-            const MAX_FILES = 25;
+            const MAX_FILES = 50;
             const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
-            const MAX_TOTAL_SIZE = 250 * 1024 * 1024; // 100 MB
+            const MAX_TOTAL_SIZE = 350 * 1024 * 1024; // 350 MB
             const ALLOWED_TYPES = [
                 'image/jpeg', 'image/jpg', 'image/png', 'image/gif',
                 'image/bmp', 'image/svg+xml', 'image/webp'
@@ -669,20 +669,11 @@
                 const currentCount = window.files.length;
                 const potentialTotal = currentCount + newFiles.length;
 
-                if (potentialTotal > MAX_FILES) {
-                    errors.push(
-                        `Maximum ${MAX_FILES} files per upload. Currently selected: ${currentCount}, trying to add: ${newFiles.length}`
-                    );
-                    return {
-                        valid: false,
-                        errors,
-                        validFiles: []
-                    };
-                }
-
                 const totalImagesAfterUpload = currentPathImageCount + potentialTotal;
+
                 if (totalImagesAfterUpload > MAX_IMAGES_PER_PATH) {
-                    const allowedToAdd = Math.max(0, remainingSlots - currentCount);
+                    const allowedToAdd = Math.max(0, remainingSlots);
+
                     if (allowedToAdd === 0) {
                         errors.push(
                             `This path has reached the maximum limit of ${MAX_IMAGES_PER_PATH} images. Please delete some images first.`
@@ -886,8 +877,7 @@
                         window.files.push(compressed);
                     } else {
                         // Compression failed - only use original if within size limits
-                        console.warn(`⚠️ Compression failed for "${originalFile.name}":`, result
-                        .reason);
+                        console.warn(`⚠️ Compression failed for "${originalFile.name}":`, result.reason);
 
                         if (originalFile.size <= MAX_FILE_SIZE) {
                             // Original is small enough, use it
@@ -901,7 +891,7 @@
                             // Original is too large, skip it
                             console.warn(
                                 `✗ Skipping oversized image: ${originalFile.name} (${formatFileSize(originalFile.size)})`
-                                );
+                            );
                             failedFiles.push({
                                 name: originalFile.name,
                                 skipped: true
@@ -912,7 +902,7 @@
 
                 console.log(
                     `✅ Added ${window.files.length} files (${compressionInfo.length} compressed, ${failedFiles.length} failed)`
-                    );
+                );
 
                 fileError.classList.add('hidden');
 
