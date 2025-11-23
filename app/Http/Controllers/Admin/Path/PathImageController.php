@@ -113,7 +113,7 @@ class PathImageController extends Controller
      * - Partial success supported
      */
     public function store(Request $request)
-    {   
+    {
         if (!$request->hasFile('files') || count($request->file('files')) === 0) {
             return back()->withErrors(['files' => 'Please select at least one image file.']);
         }
@@ -762,6 +762,19 @@ class PathImageController extends Controller
         try {
             $filename = $file->getClientOriginalName();
             $path = $file->getRealPath();
+
+            // NEW: Extract numeric value from filename for chronological ordering
+            // Supports formats like: 1.jpg, 001.jpg, image_5.jpg, photo-123.png, etc.
+            if (preg_match('/(\d+)\.(jpg|jpeg|png|gif|webp)/i', $filename, $matches)) {
+                $number = intval($matches[1]);
+
+                // Use the number as seconds offset from a base date
+                // This ensures proper chronological ordering
+                $baseDate = new \DateTime('2000-01-01 00:00:00');
+                $baseDate->modify("+{$number} seconds");
+
+                return $baseDate;
+            }
 
             // Try to extract datetime from filename pattern: IMG_YYYYMMDD_HHMMSS_XXX.jpg
             if (preg_match('/IMG_(\d{8})_(\d{6})_\d+\.jpg/', $filename, $matches)) {
