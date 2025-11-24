@@ -539,12 +539,12 @@
                 .map(cb => cb.value);
 
             if (checked.length === 0) {
-                alert('Please select at least one item');
+                window.showTemporaryMessage('Please select at least one item', 'warning');
                 return;
             }
 
             if (!action) {
-                alert('Please select an action');
+                window.showTemporaryMessage('Please select an action', 'warning');
                 return;
             }
 
