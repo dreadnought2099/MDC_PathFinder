@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('ip_hash', 64); // Hashed IP for rate limiting (SHA-256)
             $table->decimal('recaptcha_score', 3, 2)->nullable(); // reCAPTCHA v3 score (0.00-1.00)
             $table->enum('status', ['pending', 'reviewed', 'resolved', 'archived'])->default('pending');
+            $table->softDeletes();
             $table->timestamps();
 
             // Indexes for better query performance
@@ -27,6 +28,7 @@ return new class extends Migration
             $table->index('feedback_type');
             $table->index('created_at');
             $table->index(['status', 'created_at']); // Composite index for filtered queries
+            $table->index('deleted_at');
         });
     }
 

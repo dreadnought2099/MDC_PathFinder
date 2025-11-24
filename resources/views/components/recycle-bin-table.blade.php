@@ -22,9 +22,14 @@
                     </thead>
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-600">
                         @foreach ($items as $item)
-                            {{-- Fallback for Staff Name --}}
+                            {{-- Fallback for different item types --}}
                             @php
-                                $displayName = $item->name ?? trim($item->first_name . ' ' . $item->last_name);
+                                if ($routePrefix === 'feedback') {
+                                    $displayName =
+                                        'Feedback #' . $item->id . ' (' . ucfirst($item->feedback_type) . ')';
+                                } else {
+                                    $displayName = $item->name ?? trim($item->first_name . ' ' . $item->last_name);
+                                }
                             @endphp
 
                             <tr class="hover:bg-gray-50 transition-colors duration-200 dark:hover:bg-gray-700">
@@ -51,7 +56,7 @@
                                                 Restore
                                             </button>
                                         @endif
-                                        
+
                                         @if (auth()->user()->hasRole('Admin') || ($routePrefix === 'staff' && auth()->user()->hasRole('Office Manager')))
                                             <!-- Permanently Delete Button -->
                                             <button type="button"
@@ -63,67 +68,70 @@
                                     </div>
 
                                     <!-- Restore Modal -->
-                                    <div id="restoreModal-{{ $routePrefix }}-{{ $item->id }}"
-                                        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden transition-all duration-300 opacity-0"
-                                        onclick="closeModal(event, this)">
-                                        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform transition-all duration-300 scale-95 dark:bg-gray-800 border border-primary"
-                                            onclick="event.stopPropagation()">
-                                            <!-- Modal Header -->
-                                            <div class="px-6 py-4 border-b border-primary dark-border-b-primary">
-                                                <div class="flex items-center justify-between">
-                                                    <h2 class="text-xl text-gray-900 dark:text-gray-300">Confirm <span
-                                                            class="text-primary">Restore</span></h2>
-                                                    <button
-                                                        onclick="hideModal('restoreModal-{{ $routePrefix }}-{{ $item->id }}')"
-                                                        class="text-gray-400 hover:text-red-600 transition-colors duration-200 cursor-pointer">
-                                                        <svg class="w-6 h-6" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                                        </svg>
-                                                    </button>
+                                    @if (auth()->user()->hasRole('Admin') || ($routePrefix === 'staff' && auth()->user()->hasRole('Office Manager')))
+                                        <div id="restoreModal-{{ $routePrefix }}-{{ $item->id }}"
+                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden transition-all duration-300 opacity-0"
+                                            onclick="closeModal(event, this)">
+                                            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 transform transition-all duration-300 scale-95 dark:bg-gray-800 border border-primary"
+                                                onclick="event.stopPropagation()">
+                                                <!-- Modal Header -->
+                                                <div class="px-6 py-4 border-b border-primary dark-border-b-primary">
+                                                    <div class="flex items-center justify-between">
+                                                        <h2 class="text-xl text-gray-900 dark:text-gray-300">Confirm
+                                                            <span class="text-primary">Restore</span></h2>
+                                                        <button
+                                                            onclick="hideModal('restoreModal-{{ $routePrefix }}-{{ $item->id }}')"
+                                                            class="text-gray-400 hover:text-red-600 transition-colors duration-200 cursor-pointer">
+                                                            <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                                                                viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                            </svg>
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <!-- Modal Body -->
-                                            <div class="px-6 py-6">
-                                                <div class="flex items-center space-x-4">
-                                                    <div class="flex-shrink-0">
-                                                        <div
-                                                            class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                                                            <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/restore.png"
-                                                                class="h-8 w-8" alt="Restore">
+                                                <!-- Modal Body -->
+                                                <div class="px-6 py-6">
+                                                    <div class="flex items-center space-x-4">
+                                                        <div class="flex-shrink-0">
+                                                            <div
+                                                                class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/icons/restore.png"
+                                                                    class="h-8 w-8" alt="Restore">
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+                                                                Are you sure you want to restore
+                                                                <span
+                                                                    class="font-medium text-blue-600">{{ $displayName }}</span>?
+                                                            </p>
                                                         </div>
                                                     </div>
-                                                    <div>
-                                                        <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
-                                                            Are you sure you want to restore
-                                                            <span
-                                                                class="font-medium text-blue-600">{{ $displayName }}</span>?
-                                                        </p>
-                                                    </div>
+                                                </div>
+                                                <!-- Modal Footer -->
+                                                <div class="px-6 py-4 bg-white rounded-b-2xl dark:bg-gray-800">
+                                                    <form action="{{ route("{$routePrefix}.restore", $item->id) }}"
+                                                        method="POST">
+                                                        @csrf
+                                                        <input type="hidden" name="tab"
+                                                            value="{{ $tab }}">
+                                                        <div class="flex justify-end space-x-3">
+                                                            <button type="button"
+                                                                onclick="hideModal('restoreModal-{{ $routePrefix }}-{{ $item->id }}')"
+                                                                class="px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover">
+                                                                Cancel
+                                                            </button>
+                                                            <button type="submit"
+                                                                class="bg-primary text-white text-sm font-medium px-4 py-2 bg-primary rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
+                                                                Restore
+                                                            </button>
+                                                        </div>
+                                                    </form>
                                                 </div>
                                             </div>
-                                            <!-- Modal Footer -->
-                                            <div class="px-6 py-4 bg-white rounded-b-2xl dark:bg-gray-800">
-                                                <form action="{{ route("{$routePrefix}.restore", $item->id) }}"
-                                                    method="POST">
-                                                    @csrf
-                                                    <input type="hidden" name="tab" value="{{ $tab }}">
-                                                    <div class="flex justify-end space-x-3">
-                                                        <button type="button"
-                                                            onclick="hideModal('restoreModal-{{ $routePrefix }}-{{ $item->id }}')"
-                                                            class="px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover">
-                                                            Cancel
-                                                        </button>
-                                                        <button type="submit"
-                                                            class="bg-primary text-white text-sm font-medium px-4 py-2 bg-primary rounded-md hover:text-primary border-2 border-primary hover:bg-white transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-primary-hover">
-                                                            Restore
-                                                        </button>
-                                                    </div>
-                                                </form>
-                                            </div>
                                         </div>
-                                    </div>
+                                    @endif
 
                                     <!-- Delete Modal -->
                                     @if (auth()->user()->hasRole('Admin') || ($routePrefix === 'staff' && auth()->user()->hasRole('Office Manager')))

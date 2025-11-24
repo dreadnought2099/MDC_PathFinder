@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Feedback extends Model
 {
+    use HasFactory, SoftDeletes;
+    
     protected $table = 'feedback';
 
     protected $fillable = [
@@ -21,6 +25,9 @@ class Feedback extends Model
     protected $casts = [
         'recaptcha_score' => 'float',
         'rating' => 'integer',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
     // Scope to get recent feedback

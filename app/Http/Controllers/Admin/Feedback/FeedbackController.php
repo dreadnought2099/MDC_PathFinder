@@ -18,7 +18,7 @@ class FeedbackController extends Controller
         $this->middleware('auth')->except(['create', 'store']);
     }
 
-  
+
     /**
      * Admin: View all feedback with filters and analytics
      */
@@ -210,6 +210,40 @@ class FeedbackController extends Controller
         return back()->with('success', 'Feedback deleted successfully.');
     }
 
+    /**
+     * Restore a soft-deleted feedback
+     */
+    public function restore($id)
+    {
+        $feedback = Feedback::onlyTrashed()->findOrFail($id);
+
+        $this->authorize('restore', Feedback::class);
+
+        $feedback->restore();
+
+        $tab = request()->input('tab', 'feedback');
+
+        return redirect()->route('recycle-bin', ['tab' => $tab])
+            ->with('success', 'Feedback restored successfully.');
+    }
+
+    /**
+     * Permanently delete a feedback
+     */
+    public function forceDelete($id)
+    {
+        $feedback = Feedback::onlyTrashed()->findOrFail($id);
+
+        $this->authorize('forceDelete', Feedback::class);
+
+        $feedback->forceDelete();
+
+        $tab = request()->input('tab', 'feedback');
+
+        return redirect()->route('recycle-bin', ['tab' => $tab])
+            ->with('success', 'Feedback permanently deleted.');
+    }
+    
     /**
      * Export feedback to CSV
      */

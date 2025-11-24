@@ -13,9 +13,9 @@
             // Dispatch custom event to notify navbar
             window.dispatchEvent(new CustomEvent('tab-changed', { detail: { tab: newTab } }));
         }
-        }" x-init="sessionStorage.setItem('activeTab', tab);
-        // Initial dispatch
-        window.dispatchEvent(new CustomEvent('tab-changed', { detail: { tab: tab } }));" class="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    }" x-init="sessionStorage.setItem('activeTab', tab);
+    // Initial dispatch
+    window.dispatchEvent(new CustomEvent('tab-changed', { detail: { tab: tab } }));" class="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
         <!-- Navigation -->
         <nav class="mb-6 flex justify-center space-x-6">
@@ -39,6 +39,12 @@
                     class="px-4 py-2 text-sm font-medium transition-all duration-300 ease-in-out hover-underline cursor-pointer transform hover:scale-105 active:scale-95">
                     Trashed Users
                 </button>
+
+                <button @click="setTab('feedback')"
+                    :class="{ 'text-primary border-b-2': tab === 'feedback', 'text-gray-600 dark:text-gray-100 hover:text-primary': tab !== 'feedback' }"
+                    class="px-4 py-2 text-sm font-medium transition-all duration-300 ease-in-out hover-underline cursor-pointer transform hover:scale-105 active:scale-95">
+                    Trashed Feedback
+                </button>
             @endif
         </nav>
 
@@ -58,11 +64,18 @@
                     empty-message="No trashed staff members found." tab="staff" />
             </div>
 
-            <!-- Users Tab -->
+
             @if (auth()->user()->hasRole('Admin'))
+                <!-- Users Tab -->
                 <div x-show="tab === 'users'" x-transition class="absolute w-full">
                     <x-recycle-bin-table :items="$users" route-prefix="room-user" title="Trashed Office Users"
                         empty-message="No trashed office users found." tab="users" />
+                </div>
+
+                <!-- Feedback Tab -->
+                <div x-show="tab === 'feedback'" x-transition class="absolute w-full">
+                    <x-recycle-bin-table :items="$feedback" route-prefix="feedback" title="Trashed Feedback"
+                        empty-message="No trashed feedback found." tab="feedback" />
                 </div>
             @endif
         </div>

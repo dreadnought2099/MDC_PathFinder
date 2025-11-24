@@ -173,5 +173,7 @@ Route::middleware(['auth', 'role:Admin|Office Manager', '2fa'])->prefix('admin')
         Route::post('/bulk-update-status', [FeedbackController::class, 'bulkUpdateStatus'])->name('bulkUpdateStatus');
         Route::delete('/bulk-delete', [FeedbackController::class, 'bulkDelete'])->name('bulkDelete');
         Route::delete('/{feedback}', [FeedbackController::class, 'destroy'])->name('destroy');
+        Route::post('/{id}/restore', [FeedbackController::class, 'restore'])->name('restore');
+        Route::delete('/{id}/force-delete', [FeedbackController::class, 'forceDelete'])->name('forceDelete');
     });
 });

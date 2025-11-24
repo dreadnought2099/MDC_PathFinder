@@ -43,7 +43,7 @@ class FeedbackPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Feedback $feedback): bool
+    public function restore(User $user): bool
     {
         return $user->hasRole('Admin');
     }
@@ -51,7 +51,7 @@ class FeedbackPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Feedback $feedback): bool
+    public function forceDelete(User $user): bool
     {
         return $user->hasRole('Admin');
     }
