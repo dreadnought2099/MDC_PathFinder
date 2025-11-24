@@ -75,7 +75,7 @@
                 <!-- Feedback Tab -->
                 <div x-show="tab === 'feedback'" x-transition class="absolute w-full">
                     <x-recycle-bin-table :items="$feedback" route-prefix="feedback" title="Trashed Feedback"
-                        empty-message="No trashed feedback found." tab="feedback" />
+                        empty-message="No trashed feedbacks found." tab="feedback" />
                 </div>
             @endif
         </div>
