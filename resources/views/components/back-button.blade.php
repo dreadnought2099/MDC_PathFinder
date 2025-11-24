@@ -65,6 +65,7 @@
             'rooms' => route('room.index'),
             'staff' => route('staff.index'),
             'users' => route('room-user.index'),
+            'feedback' =>route('feedback.index'),
         ];
 
         // Use the current tab or default to 'rooms'
@@ -93,7 +94,8 @@
             const tabUrls = {
                 'rooms': '{{ route('room.index') }}',
                 'staff': '{{ route('staff.index') }}',
-                'users': '{{ route('room-user.index') }}'
+                'users': '{{ route('room-user.index') }}',
+                'feedback': '{{ route('feedback.index') }}',
             };
             backUrl = tabUrls[currentTab] || tabUrls['rooms'];
         }
