@@ -213,7 +213,7 @@
                 @endif
 
                 <!-- Recycle Bin Card -->
-                @if (auth()->user()->hasRole('Admin'))
+                @if (auth()->user()->hasRole('Admin') || auth()->user()->hasRole('Office Manager'))
                     <a href="{{ route('recycle-bin') }}"
                         class="group card-shadow-hover shadow-primary-hover p-5 border-2 border-primary bg-white dark:bg-gray-800 rounded-lg transition-all duration-300">
                         <div class="flex flex-col items-center text-center space-y-3">

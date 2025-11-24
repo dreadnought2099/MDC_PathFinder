@@ -255,14 +255,38 @@ class StaffController extends Controller
     public function restore($id)
     {
         $staff = Staff::onlyTrashed()->findOrFail($id);
+
+        // Authorization: Admin can restore any, Office Manager only their office's staff
+        if (auth()->user()->hasRole('Office Manager')) {
+            if (!auth()->user()->room_id || auth()->user()->room_id !== $staff->room_id) {
+                abort(403, 'You can only restore staff from your office.');
+            }
+        }
+
+        // Add this authorization check
+        $this->authorize('restore', $staff);
+        
         $staff->restore();
-        return redirect()->route('recycle-bin')
+
+        // Get the tab parameter to maintain tab state
+        $tab = request()->input('tab', 'staff');
+
+        return redirect()->route('recycle-bin', ['tab' => $tab])
             ->with('success', "{$staff->full_name} restored successfully.");
     }
 
     public function forceDelete($id)
     {
         $staff = Staff::onlyTrashed()->findOrFail($id);
+
+
+        // Authorization: Admin can delete any, Office Manager only their office's staff
+        if (auth()->user()->hasRole('Office Manager')) {
+            if (!auth()->user()->room_id || auth()->user()->room_id !== $staff->room_id) {
+                abort(403, 'You can only permanently delete staff from your office.');
+            }
+        }
+
         $this->authorize('delete', $staff);
 
         if (Storage::disk('public')->exists('staffs/' . $staff->id)) {
@@ -271,7 +295,10 @@ class StaffController extends Controller
 
         $staff->forceDelete();
 
-        return redirect()->route('recycle-bin')
+        // Get the tab parameter to maintain tab state
+        $tab = request()->input('tab', 'staff');
+
+        return redirect()->route('recycle-bin', ['tab' => $tab])
             ->with('success', "{$staff->full_name} permanently deleted.");
     }
 

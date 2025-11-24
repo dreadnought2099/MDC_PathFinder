@@ -86,4 +86,27 @@ class StaffPolicy
 
         return Response::deny('You are not allowed to delete this staff member.');
     }
+
+    /**
+     * Determine if the user can restore a soft-deleted staff member.
+     */
+    public function restore(User $user, Staff $staff): Response
+    {
+        // Admin can restore any staff
+        if ($user->hasRole('Admin') && $user->hasPermissionTo('delete staff')) {
+            return Response::allow();
+        }
+
+        // Office Manager can only restore staff in their assigned office
+        if (
+            $user->hasRole('Office Manager') &&
+            $user->hasPermissionTo('delete staff') &&
+            $user->room_id &&
+            $user->room_id === $staff->room_id
+        ) {
+            return Response::allow();
+        }
+
+        return Response::deny('You are not allowed to restore this staff member.');
+    }
 }
