@@ -26,7 +26,7 @@
                             @php
                                 if ($routePrefix === 'feedback') {
                                     $displayName =
-                                        'Feedback #' . $item->id . ' (' . ucfirst($item->feedback_type) . ')';
+                                        'Feedback' . ' (' . ucfirst($item->feedback_type) . ')';
                                 } else {
                                     $displayName = $item->name ?? trim($item->first_name . ' ' . $item->last_name);
                                 }
