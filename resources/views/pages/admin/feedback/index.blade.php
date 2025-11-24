@@ -554,31 +554,80 @@
                 const status = document.getElementById('bulk-status').value;
                 form.action = '{{ route('feedback.bulkUpdateStatus') }}';
                 form.innerHTML = `
-                @csrf
-                ${checked.map(id => `<input type="hidden" name="feedback_ids[]" value="${id}">`).join('')}
-                <input type="hidden" name="status" value="${status}">
-            `;
+                    @csrf
+                    ${checked.map(id => `<input type="hidden" name="feedback_ids[]" value="${id}">`).join('')}
+                    <input type="hidden" name="status" value="${status}">
+                `;
                 form.submit();
             } else if (action === 'delete') {
-                if (confirm(`Are you sure you want to delete ${checked.length} item(s)?`)) {
-                    form.action = '{{ route('feedback.bulkDelete') }}';
-                    form.innerHTML = `
-                    @csrf
-                    @method('DELETE')
-                    ${checked.map(id => `<input type="hidden" name="feedback_ids[]" value="${id}">`).join('')}
-                `;
-                    form.submit();
-                }
+                // Use the modal instead of window.confirm
+                openBulkDeleteModal(checked);
             }
         }
 
+        function openBulkDeleteModal(feedbackIds) {
+            const modal = document.getElementById('feedbackDeleteModal');
+            const form = document.getElementById('feedbackDeleteForm');
+            const messageContainer = modal.querySelector('.text-gray-700');
+
+            // Update the entire message text for bulk delete
+            messageContainer.innerHTML =
+                `Are you sure you want to delete <span class="text-secondary font-semibold">${feedbackIds.length} feedback item(s)</span>? This action cannot be undone.`;
+
+            // Update form action and add hidden inputs for bulk delete
+            form.action = '{{ route('feedback.bulkDelete') }}';
+            form.innerHTML = `
+                @csrf
+                @method('DELETE')
+                ${feedbackIds.map(id => `<input type="hidden" name="feedback_ids[]" value="${id}">`).join('')}
+                <div class="flex flex-col sm:flex-row sm:justify-end gap-3">
+                    <button type="button" onclick="closeFeedbackModal()"
+                        class="w-full sm:w-auto px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-secondary rounded-md hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover">
+                        Delete
+                    </button>
+                </div>
+            `;
+
+            // Show modal with animation
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('.bg-white, .dark\\:bg-gray-800').classList.remove('scale-95');
+                modal.querySelector('.bg-white, .dark\\:bg-gray-800').classList.add('scale-100');
+            }, 10);
+
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Update the existing openFeedbackModal to restore original text
         function openFeedbackModal(id, feedbackType) {
             const modal = document.getElementById('feedbackDeleteModal');
-            const userSpan = document.getElementById('feedbackUser');
             const form = document.getElementById('feedbackDeleteForm');
+            const messageContainer = modal.querySelector('.text-gray-700');
 
-            userSpan.textContent = feedbackType || 'user';
+            // Restore original single-item delete message
+            messageContainer.innerHTML =
+                `Are you sure you want to delete this feedback from <span id="feedbackUser" class="text-secondary font-semibold">${feedbackType || 'user'}</span>? This action cannot be undone.`;
+
             form.action = `/admin/feedback/${id}`;
+            form.innerHTML = `
+                @csrf
+                @method('DELETE')
+                <div class="flex flex-col sm:flex-row sm:justify-end gap-3">
+                    <button type="button" onclick="closeFeedbackModal()"
+                        class="w-full sm:w-auto px-4 py-2 text-sm font-medium border-2 border-gray-400 text-white bg-gray-400 hover:text-gray-500 hover:bg-white rounded-md transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-300 shadow-cancel-hover">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-secondary border-2 border-secondary rounded-md hover:bg-white hover:text-secondary focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer dark:hover:bg-gray-800 shadow-secondary-hover">
+                        Delete
+                    </button>
+                </div>
+            `;
 
             modal.classList.remove('hidden');
             setTimeout(() => {
