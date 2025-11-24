@@ -148,27 +148,6 @@
                     </a>
                 @endif
 
-                {{-- Manage Office User Card --}}
-                @if (auth()->user()->hasRole('Admin') || auth()->user()->can('view room users'))
-                    <a href="{{ route('room-user.index') }}"
-                        class="group card-shadow-hover shadow-primary-hover p-5 border-2 border-primary bg-white dark:bg-gray-800 rounded-lg transition-all duration-300">
-                        <div class="flex flex-col items-center text-center space-y-3">
-                            <div class="bg-primary-10 hover:bg-primary-20 p-3 rounded-full transition-all duration-300">
-                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder@cac2411/public/icons/manage-user.png"
-                                    alt="Manage Staff"
-                                    class="h-10 w-10 object-contain group-hover:scale-120 transition-transform duration-300" />
-                            </div>
-                            <div>
-                                <h3
-                                    class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
-                                    Manage Office User
-                                </h3>
-                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Configure office users</p>
-                            </div>
-                        </div>
-                    </a>
-                @endif
-
                 <!-- Assign Staff Card -->
                 @if (auth()->user()->hasRole('Admin'))
                     <a href="{{ route('room.assign') }}"
@@ -190,6 +169,27 @@
                     </a>
                 @endif
 
+                {{-- Manage Office User Card --}}
+                @if (auth()->user()->hasRole('Admin') || auth()->user()->can('view room users'))
+                    <a href="{{ route('room-user.index') }}"
+                        class="group card-shadow-hover shadow-primary-hover p-5 border-2 border-primary bg-white dark:bg-gray-800 rounded-lg transition-all duration-300">
+                        <div class="flex flex-col items-center text-center space-y-3">
+                            <div class="bg-primary-10 hover:bg-primary-20 p-3 rounded-full transition-all duration-300">
+                                <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder@cac2411/public/icons/manage-user.png"
+                                    alt="Manage Staff"
+                                    class="h-10 w-10 object-contain group-hover:scale-120 transition-transform duration-300" />
+                            </div>
+                            <div>
+                                <h3
+                                    class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
+                                    Manage Office User
+                                </h3>
+                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Configure office users</p>
+                            </div>
+                        </div>
+                    </a>
+                @endif
+                
                 <!-- User Feedback Card -->
                 @if (auth()->user()->hasRole('Admin'))
                     <a href="{{ route('feedback.index') }}"
