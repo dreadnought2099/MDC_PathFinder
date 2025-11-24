@@ -12,6 +12,7 @@ class Staff extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'room_id',
         'first_name',
         'middle_name',
         'last_name',

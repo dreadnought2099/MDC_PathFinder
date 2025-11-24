@@ -84,6 +84,8 @@ class StaffController extends Controller
 
     public function create()
     {
+        $this->authorize('create', Staff::class);
+
         return view('pages.admin.staffs.create');
     }
 
@@ -101,6 +103,8 @@ class StaffController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Staff::class);
+
         $validated = $request->validate([
             'room_id' => 'nullable|exists:rooms,id',
             'first_name' => 'required|string|max:255',
@@ -113,10 +117,15 @@ class StaffController extends Controller
             'photo_path' => [
                 'nullable',
                 'image',
-                'max:5120', // 5MB in kilobytes
+                'max:5120',
                 'dimensions:max_width=4000,max_height=4000'
             ],
         ]);
+
+        // Auto-assign room_id for Office Managers
+        if (auth()->user()->hasRole('Office Manager') && auth()->user()->room_id) {
+            $validated['room_id'] = auth()->user()->room_id;
+        }
 
         $staff = Staff::create($validated);
 

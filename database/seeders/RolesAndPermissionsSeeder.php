@@ -42,7 +42,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $adminRole->syncPermissions(Permission::all());
 
         // Office Manager can only view + edit, no create
-        $managerRole->givePermissionTo(['view rooms', 'edit rooms', 'view staff', 'edit staff', 'view room users']);
+        $managerRole->givePermissionTo(['view rooms', 'edit rooms', 'view staff', 'create staff', 'edit staff', 'delete staff', 'view room users']);
 
         // Default Admin
         $admin = User::firstOrCreate(

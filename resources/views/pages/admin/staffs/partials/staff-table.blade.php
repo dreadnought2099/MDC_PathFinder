@@ -93,7 +93,7 @@
                                 @endif
 
                                 {{-- Delete --}}
-                                @if (auth()->user()->hasRole('Admin'))
+                                @if (auth()->user()->hasRole('Admin') || auth()->user()->can('delete staff'))
                                     <div class="relative inline-block group">
                                         <button type="button"
                                             onclick="openModal('{{ $staff->id }}', '{{ addslashes($staff->first_name . ' ' . $staff->last_name) }}')"
@@ -129,11 +129,9 @@
                                     <h3 class="text-base sm:text-lg font-medium dark:text-gray-300 text-gray-700 mb-2">
                                         No staff found
                                     </h3>
-                                    @if (auth()->user()->hasRole('Admin'))
-                                        <p class="text-gray-500 text-xs sm:text-sm dark:text-gray-400">
-                                            Get started by adding your first team member.
-                                        </p>
-                                    @endif
+                                    <p class="text-gray-500 text-xs sm:text-sm dark:text-gray-400">
+                                        Get started by adding your first team member.
+                                    </p>
                                 </div>
                             </div>
                         </td>

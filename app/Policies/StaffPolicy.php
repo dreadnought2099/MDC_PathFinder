@@ -13,10 +13,22 @@ class StaffPolicy
      */
     public function view(User $user, Staff $staff): Response
     {
-        return $user->hasPermissionTo('view staff') &&
-            ($user->hasRole('Admin') || $user->room_id === $staff->room_id)
-            ? Response::allow()
-            : Response::deny('You cannot view this staff member.');
+        // Admin can view any staff
+        if ($user->hasRole('Admin') && $user->hasPermissionTo('view staff')) {
+            return Response::allow();
+        }
+
+        // Office Manager can only view staff in their assigned office
+        if (
+            $user->hasRole('Office Manager') &&
+            $user->hasPermissionTo('view staff') &&
+            $user->room_id &&
+            $user->room_id === $staff->room_id
+        ) {
+            return Response::allow();
+        }
+
+        return Response::deny('You cannot view this staff member.');
     }
 
     /**
@@ -34,10 +46,22 @@ class StaffPolicy
      */
     public function update(User $user, Staff $staff): Response
     {
-        return $user->hasPermissionTo('edit staff') &&
-            ($user->hasRole('Admin') || $user->room_id === $staff->room_id)
-            ? Response::allow()
-            : Response::deny('You are not allowed to update this staff member.');
+        // Admin can update any staff
+        if ($user->hasRole('Admin') && $user->hasPermissionTo('edit staff')) {
+            return Response::allow();
+        }
+
+        // Office Manager can only update staff in their assigned office
+        if (
+            $user->hasRole('Office Manager') &&
+            $user->hasPermissionTo('edit staff') &&
+            $user->room_id &&
+            $user->room_id === $staff->room_id
+        ) {
+            return Response::allow();
+        }
+
+        return Response::deny('You are not allowed to update this staff member.');
     }
 
     /**
@@ -45,8 +69,21 @@ class StaffPolicy
      */
     public function delete(User $user, Staff $staff): Response
     {
-        return $user->hasPermissionTo('delete staff') && $user->hasRole('Admin')
-            ? Response::allow()
-            : Response::deny('Only an Admin can delete staff members.');
+        // Admin can delete any staff
+        if ($user->hasRole('Admin') && $user->hasPermissionTo('delete staff')) {
+            return Response::allow();
+        }
+
+        // Office Manager can only delete staff in their assigned office
+        if (
+            $user->hasRole('Office Manager') &&
+            $user->hasPermissionTo('delete staff') &&
+            $user->room_id &&
+            $user->room_id === $staff->room_id
+        ) {
+            return Response::allow();
+        }
+
+        return Response::deny('You are not allowed to delete this staff member.');
     }
 }
