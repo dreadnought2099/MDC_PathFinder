@@ -15,7 +15,7 @@
                     </img-reveal>
                     Dashboard
                 </h1>
-                <p class="text-base lg:text-lg text-gray-600 dark:text-gray-300">Manage your organization's staff and office
+                <p class="text-base lg:text-md text-gray-600 dark:text-gray-300">Manage your organization's staff and office
                     spaces</p>
             </div>
 
@@ -34,7 +34,7 @@
                             </span>
                             <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/three-minions.gif"
                                 alt="GIF" class="reveal-img">
-                            <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Total Staffs</div>
+                            <div class="text-xs lg:text-xs text-gray-600 dark:text-gray-300">Total Staffs</div>
                         </div>
                     </img-reveal>
 
@@ -48,7 +48,7 @@
                             </span>
                             <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/mr-incredible.gif"
                                 alt="GIF" class="reveal-img">
-                            <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Total Offices</div>
+                            <div class="text-xs lg:text-xs text-gray-600 dark:text-gray-300">Total Offices</div>
                         </div>
                     </img-reveal>
 
@@ -62,7 +62,7 @@
                             </span>
                             <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/pages.gif"
                                 alt="GIF" class="reveal-img">
-                            <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Assignments</div>
+                            <div class="text-xs lg:text-xs text-gray-600 dark:text-gray-300">Assignments</div>
                         </div>
                     </img-reveal>
 
@@ -77,7 +77,7 @@
                                 </span>
                                 <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/kermit-map.gif"
                                     alt="GIF" class="reveal-img">
-                                <div class="text-xs lg:text-sm text-gray-600 dark:text-gray-300">Paths</div>
+                                <div class="text-xs lg:text-xs text-gray-600 dark:text-gray-300">Paths</div>
                             </div>
                         </img-reveal>
                     @endif
