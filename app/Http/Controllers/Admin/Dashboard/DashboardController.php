@@ -19,7 +19,7 @@ class DashboardController extends Controller
 
             // Admin sees all rooms
             $totalPaths = Path::count();
-            $totalRooms = Room::count();
+            $totalRooms = Room::where('room_type', 'regular')->count();
             $totalStaffs = Staff::count();
             $totalAssignments = Staff::whereNotNull('room_id')->count();
         } else {
