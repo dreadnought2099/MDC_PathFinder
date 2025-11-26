@@ -154,110 +154,112 @@
     </div>
 </div>
 
-<script>
-    function feedbackForm() {
-        return {
-            message: '{{ old('message') }}',
-            rating: null,
-            hover: null,
-            canSubmit: false,
-            isSubmitting: false,
-            flashMessage: '',
-            flashClass: '',
-            lastSubmit: 0,
+@push('scripts')
+    <script>
+        function feedbackForm() {
+            return {
+                message: '{{ old('message') }}',
+                rating: null,
+                hover: null,
+                canSubmit: false,
+                isSubmitting: false,
+                flashMessage: '',
+                flashClass: '',
+                lastSubmit: 0,
 
-            async submit(event) {
-                const now = Date.now();
-                if (now - this.lastSubmit < 5000) {
-                    alert('Please wait a few seconds before submitting again.');
-                    return;
-                }
-                if (!this.canSubmit) {
-                    alert('Please enter at least 10 characters in your feedback.');
-                    return;
-                }
-
-                this.isSubmitting = true;
-                this.lastSubmit = now;
-
-                try {
-                    let token = '';
-                    if (typeof grecaptcha !== 'undefined') {
-                        token = await grecaptcha.execute('{{ config('services.recaptcha.site_key') }}', {
-                            action: 'feedback'
-                        });
-                        document.getElementById('g-recaptcha-response').value = token;
+                async submit(event) {
+                    const now = Date.now();
+                    if (now - this.lastSubmit < 5000) {
+                        alert('Please wait a few seconds before submitting again.');
+                        return;
+                    }
+                    if (!this.canSubmit) {
+                        alert('Please enter at least 10 characters in your feedback.');
+                        return;
                     }
 
-                    const formData = new FormData(event.target);
+                    this.isSubmitting = true;
+                    this.lastSubmit = now;
 
-                    const response = await fetch('{{ route('feedback.store') }}', {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json',
-                        },
-                    });
-
-                    const text = await response.text();
-
-                    let data;
                     try {
-                        data = JSON.parse(text);
-                    } catch (e) {
-                        console.error('Server returned non-JSON:', text);
+                        let token = '';
+                        if (typeof grecaptcha !== 'undefined') {
+                            token = await grecaptcha.execute('{{ config('services.recaptcha.site_key') }}', {
+                                action: 'feedback'
+                            });
+                            document.getElementById('g-recaptcha-response').value = token;
+                        }
+
+                        const formData = new FormData(event.target);
+
+                        const response = await fetch('{{ route('feedback.store') }}', {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json',
+                            },
+                        });
+
+                        const text = await response.text();
+
+                        let data;
+                        try {
+                            data = JSON.parse(text);
+                        } catch (e) {
+                            console.error('Server returned non-JSON:', text);
+                            this.flashClass = 'bg-red-100 text-red-700 border border-red-500';
+                            this.flashMessage = 'Unexpected server response. Please try again.';
+                            this.isSubmitting = false;
+                            return;
+                        }
+
+                        if (data.errors) {
+                            const firstError = Object.values(data.errors)[0][0];
+                            this.flashClass = 'bg-red-100 text-red-700 border border-red-500';
+                            this.flashMessage = firstError;
+                            this.isSubmitting = false;
+                            return;
+                        }
+
+                        if (data.success) {
+                            this.flashClass = 'bg-green-100 text-green-700 border border-green-500';
+                            this.message = '';
+                            this.rating = null;
+                            this.launchConfetti(); // Trigger confetti
+                        } else {
+                            this.flashClass = 'bg-red-100 text-red-700 border border-red-500';
+                        }
+
+                        this.flashMessage = data.message || 'An error occurred.';
+                        setTimeout(() => {
+                            this.flashMessage = ''
+                        }, 4000);
+
+                    } catch (err) {
+                        console.error(err);
                         this.flashClass = 'bg-red-100 text-red-700 border border-red-500';
-                        this.flashMessage = 'Unexpected server response. Please try again.';
+                        this.flashMessage = 'Submission failed. Please try again.';
+                        setTimeout(() => {
+                            this.flashMessage = ''
+                        }, 4000);
+                    } finally {
                         this.isSubmitting = false;
-                        return;
                     }
+                },
 
-                    if (data.errors) {
-                        const firstError = Object.values(data.errors)[0][0];
-                        this.flashClass = 'bg-red-100 text-red-700 border border-red-500';
-                        this.flashMessage = firstError;
-                        this.isSubmitting = false;
-                        return;
-                    }
-
-                    if (data.success) {
-                        this.flashClass = 'bg-green-100 text-green-700 border border-green-500';
-                        this.message = '';
-                        this.rating = null;
-                        this.launchConfetti(); // Trigger confetti
-                    } else {
-                        this.flashClass = 'bg-red-100 text-red-700 border border-red-500';
-                    }
-
-                    this.flashMessage = data.message || 'An error occurred.';
-                    setTimeout(() => {
-                        this.flashMessage = ''
-                    }, 4000);
-
-                } catch (err) {
-                    console.error(err);
-                    this.flashClass = 'bg-red-100 text-red-700 border border-red-500';
-                    this.flashMessage = 'Submission failed. Please try again.';
-                    setTimeout(() => {
-                        this.flashMessage = ''
-                    }, 4000);
-                } finally {
-                    this.isSubmitting = false;
+                launchConfetti() {
+                    confetti({
+                        particleCount: 50,
+                        spread: 70,
+                        origin: {
+                            y: 0.6
+                        },
+                        colors: ['#4ade80', '#22d3ee', '#facc15', '#f472b6'],
+                    });
                 }
-            },
-
-            launchConfetti() {
-                confetti({
-                    particleCount: 50,
-                    spread: 70,
-                    origin: {
-                        y: 0.6
-                    },
-                    colors: ['#4ade80', '#22d3ee', '#facc15', '#f472b6'],
-                });
             }
         }
-    }
-</script>
+    </script>
+@endpush
