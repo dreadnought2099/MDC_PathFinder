@@ -12,7 +12,7 @@
                 </img-reveal>
                 Management
             </h1>
-            <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300">
+            <p class="text-sm sm:text-base text-gray-700 dark:text-gray-300">
                 Manage offices and assign staff members
             </p>
 

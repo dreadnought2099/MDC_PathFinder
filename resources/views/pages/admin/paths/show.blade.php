@@ -9,7 +9,7 @@
             <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-1 dark:text-gray-100">
                 <span class="text-primary">Path</span> Details
             </h1>
-            <p class="text-sm sm:text-base lg:text-base text-gray-600 dark:text-gray-300 mt-1 sm:mt-2">
+            <p class="text-sm sm:text-base lg:text-base text-gray-700 dark:text-gray-300 mt-1 sm:mt-2">
                 Overview of the route from the starting office to the destination office.
             </p>
         </div>

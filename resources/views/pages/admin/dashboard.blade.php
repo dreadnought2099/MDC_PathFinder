@@ -15,7 +15,7 @@
                     </img-reveal>
                     Dashboard
                 </h1>
-                <p class="text-base lg:text-md text-gray-600 dark:text-gray-300">Manage your organization's staff and office
+                <p class="text-base lg:text-md text-gray-700 dark:text-gray-300">Manage your organization's staff and office
                     spaces</p>
             </div>
 
@@ -34,7 +34,7 @@
                             </span>
                             <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/three-minions.gif"
                                 alt="GIF" class="reveal-img">
-                            <div class="text-xs lg:text-xs text-gray-600 dark:text-gray-300">Total Staffs</div>
+                            <div class="text-xs lg:text-xs text-gray-700 dark:text-gray-300">Total Staffs</div>
                         </div>
                     </img-reveal>
 
@@ -48,7 +48,7 @@
                             </span>
                             <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/mr-incredible.gif"
                                 alt="GIF" class="reveal-img">
-                            <div class="text-xs lg:text-xs text-gray-600 dark:text-gray-300">Total Offices</div>
+                            <div class="text-xs lg:text-xs text-gray-700 dark:text-gray-300">Total Offices</div>
                         </div>
                     </img-reveal>
 
@@ -62,7 +62,7 @@
                             </span>
                             <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/pages.gif"
                                 alt="GIF" class="reveal-img">
-                            <div class="text-xs lg:text-xs text-gray-600 dark:text-gray-300">Assignments</div>
+                            <div class="text-xs lg:text-xs text-gray-700 dark:text-gray-300">Assignments</div>
                         </div>
                     </img-reveal>
 
@@ -77,7 +77,7 @@
                                 </span>
                                 <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/kermit-map.gif"
                                     alt="GIF" class="reveal-img">
-                                <div class="text-xs lg:text-xs text-gray-600 dark:text-gray-300">Paths</div>
+                                <div class="text-xs lg:text-xs text-gray-700 dark:text-gray-300">Paths</div>
                             </div>
                         </img-reveal>
                     @endif
@@ -100,7 +100,7 @@
                                     class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
                                     Path Navigation
                                 </h3>
-                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Manage office paths</p>
+                                <p class="text-xs text-gray-700 dark:text-gray-300 mt-1">Manage office paths</p>
                             </div>
                         </div>
                     </a>
@@ -121,7 +121,7 @@
                                     class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
                                     Manage Offices
                                 </h3>
-                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Configure office spaces</p>
+                                <p class="text-xs text-gray-700 dark:text-gray-300 mt-1">Configure office spaces</p>
                             </div>
                         </div>
                     </a>
@@ -142,7 +142,7 @@
                                     class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
                                     Manage Staff
                                 </h3>
-                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Organize staff members</p>
+                                <p class="text-xs text-gray-700 dark:text-gray-300 mt-1">Organize staff members</p>
                             </div>
                         </div>
                     </a>
@@ -163,7 +163,7 @@
                                     class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
                                     Assign Staff
                                 </h3>
-                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Assign staff to office</p>
+                                <p class="text-xs text-gray-700 dark:text-gray-300 mt-1">Assign staff to office</p>
                             </div>
                         </div>
                     </a>
@@ -184,7 +184,7 @@
                                     class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
                                     Manage Office User
                                 </h3>
-                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Configure office users</p>
+                                <p class="text-xs text-gray-700 dark:text-gray-300 mt-1">Configure office users</p>
                             </div>
                         </div>
                     </a>
@@ -205,7 +205,7 @@
                                     class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
                                     Manage Feedbacks
                                 </h3>
-                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Manage User Feedbacks
+                                <p class="text-xs text-gray-700 dark:text-gray-300 mt-1">Manage User Feedbacks
                                 </p>
                             </div>
                         </div>
@@ -227,7 +227,7 @@
                                     class="text-base font-medium text-gray-800 dark:text-white group-hover:text-primary transition-colors">
                                     Recycle Bin
                                 </h3>
-                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Restore or Permanently delete
+                                <p class="text-xs text-gray-700 dark:text-gray-300 mt-1">Restore or Permanently delete
                                 </p>
                             </div>
                         </div>

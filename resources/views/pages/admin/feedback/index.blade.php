@@ -9,7 +9,7 @@
                     <img src="https://cdn.jsdelivr.net/gh/dreadnought2099/MDC_PathFinder/public/gif/feedback.gif" alt="Feedback Gif" class="reveal-img">
                 </h1>
             </img-reveal>
-            <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300">
+            <p class="text-sm sm:text-base text-gray-700 dark:text-gray-300">
                 Monitor user feedback and suggestions.
             </p>
         </div>

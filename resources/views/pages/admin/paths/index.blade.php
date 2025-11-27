@@ -12,7 +12,7 @@
                 </img-reveal>
                 Management
             </h1>
-            <p class="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-300 mb-3">
+            <p class="text-sm sm:text-base md:text-md text-gray-700 dark:text-gray-300 mb-3">
                 Manage paths between offices
             </p>
 
