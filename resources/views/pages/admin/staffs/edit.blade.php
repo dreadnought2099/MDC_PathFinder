@@ -151,7 +151,3 @@
         </x-upload-progress-modal>
     </div>
 @endsection
-
-@push('scripts')
-    @vite('resources/js/staff-form.js')
-@endpush

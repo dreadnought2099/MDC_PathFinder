@@ -433,6 +433,4 @@
             window.existingOfficeHours = @json($officeHours);
         </script>
     @endif
-
-    @vite('resources/js/room-form.js')
 @endpush

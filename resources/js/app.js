@@ -2,8 +2,14 @@ import "./bootstrap";
 import gsap from "gsap";
 import { initLandingAnimations } from "./landing-animations";
 import { initializeFloatingLink, savePathSelection } from "./path-selection";
-import './room-form.js';
-import './staff-form.js';
+// Dynamic imports - only load when forms exist
+if (document.getElementById("room-form")) {
+    import("./room-form.js");
+}
+
+if (document.getElementById("staff-form")) {
+    import("./staff-form.js");
+}
 
 // Make GSAP available globally
 window.gsap = gsap;
