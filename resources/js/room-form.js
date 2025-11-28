@@ -8,7 +8,7 @@ import { initializeFormSubmission } from "./room-modules/form-submission";
 import { initializeConditionalFields } from "./room-modules/conditional-fields";
 import { initializeTextareaAutoResize } from "./room-modules/textarea-auto-resize";
 
-document.addEventListener("DOMContentLoaded", function () {
+function initRoomForm() {
     window.existingOfficeHours = window.existingOfficeHours || {};
     window.existingConsultationTimes = window.existingConsultationTimes || {};
     let isUploading = false;
@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     initializeConditionalFields();
     initializeTextareaAutoResize();
-});
+}
 
 // Make removeFile globally available for inline Blade onclick handlers
 window.removeFile = function (type) {
@@ -61,3 +61,11 @@ window.removeFile = function (type) {
         }
     }
 };
+
+// Run immediately if DOM is already loaded, otherwise wait
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initRoomForm);
+} else {
+    // DOM is already loaded (common with dynamic imports)
+    initRoomForm();
+}

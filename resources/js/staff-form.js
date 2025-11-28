@@ -4,7 +4,7 @@ import { setupAutoResize } from "./staff-modules/auto-resize.js";
 import { showTemporaryMessage, formatFileSize } from "./staff-modules/utils.js";
 import { initializeFormSubmission } from "./staff-modules/form-submission.js";
 
-document.addEventListener("DOMContentLoaded", () => {
+function initStaffForm() {
     const photoInput = document.getElementById("photo_path");
     const uploadBox = document.getElementById("staffUploadBox");
     const placeholder = document.getElementById("staffPlaceholder");
@@ -47,4 +47,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Initialize form submission
     initializeFormSubmission();
-});
+}
+
+// Run immediately if DOM is already loaded, otherwise wait
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initStaffForm);
+} else {
+    // DOM is already loaded (common with dynamic imports)
+    initStaffForm();
+}
